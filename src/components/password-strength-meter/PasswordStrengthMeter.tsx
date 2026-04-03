@@ -10,17 +10,27 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useState } from "react";
 
+export type PasswordStrengthMeterTranslation = {
+  label: string;
+};
+
 export type PasswordStrengthMeterProps = {
-  showPasswordVisibility?: boolean;
+  showPasswordAdornment?: boolean;
   inputSize: "small" | "medium";
+  translation: PasswordStrengthMeterTranslation;
 };
 
 export function PasswordStrengthMeter({
-  showPasswordVisibility = true,
+  showPasswordAdornment = true,
   inputSize = "medium",
+  translation = {
+    label: "Input Label",
+  },
 }: PasswordStrengthMeterProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
+
+  const { label } = translation;
 
   const handleClickShowPassword = () => {
     setShowPassword((show) => !show);
@@ -48,19 +58,22 @@ export function PasswordStrengthMeter({
     <Stack>
       <div className="password-input-wrapper">
         <FormControl variant="outlined" fullWidth>
-          <InputLabel htmlFor="outlined-adornment-password" size={inputSize}>
-            Password
+          <InputLabel
+            htmlFor="outlined-adornment-for-password"
+            size={inputSize}
+          >
+            {label}
           </InputLabel>
 
           <OutlinedInput
-            id="outlined-adornment-password"
+            id="outlined-adornment-for-password"
             type={showPassword ? "text" : "password"}
             fullWidth
             size={inputSize}
             value={password}
             onChange={handleOnChange}
             endAdornment={
-              showPasswordVisibility ? (
+              showPasswordAdornment ? (
                 <InputAdornment position="end">
                   <IconButton
                     aria-label={

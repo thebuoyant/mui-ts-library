@@ -13,8 +13,11 @@ type Story = StoryObj<typeof PasswordStrengthMeter>;
 
 export const Default: Story = {
   args: {
-    showPasswordVisibility: true,
+    showPasswordAdornment: true,
     inputSize: "small",
+    translation: {
+      label: "Passwort eingeben",
+    },
   },
   render: (args) => {
     return (
