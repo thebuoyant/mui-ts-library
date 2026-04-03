@@ -12,10 +12,12 @@ import { useState } from "react";
 
 export type PasswordStrengthMeterProps = {
   showPasswordVisibility?: boolean;
+  inputSize: "small" | "medium";
 };
 
 export function PasswordStrengthMeter({
   showPasswordVisibility = true,
+  inputSize = "medium",
 }: PasswordStrengthMeterProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
@@ -46,7 +48,7 @@ export function PasswordStrengthMeter({
     <Stack>
       <div className="password-input-wrapper">
         <FormControl variant="outlined" fullWidth>
-          <InputLabel htmlFor="outlined-adornment-password">
+          <InputLabel htmlFor="outlined-adornment-password" size={inputSize}>
             Password
           </InputLabel>
 
@@ -54,6 +56,7 @@ export function PasswordStrengthMeter({
             id="outlined-adornment-password"
             type={showPassword ? "text" : "password"}
             fullWidth
+            size={inputSize}
             value={password}
             onChange={handleOnChange}
             endAdornment={

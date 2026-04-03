@@ -14,6 +14,7 @@ type Story = StoryObj<typeof PasswordStrengthMeter>;
 export const Default: Story = {
   args: {
     showPasswordVisibility: true,
+    inputSize: "small",
   },
   render: (args) => {
     return (
