@@ -18,7 +18,8 @@ export const Default: Story = {
     showMeter: true,
     inputSize: "small",
     translation: {
-      label: "Passwort eingeben",
+      label: "Password",
+      summaryHeaderLabel: "Requirements for your password",
     },
     meterColors: {
       weak: "#cc0000",

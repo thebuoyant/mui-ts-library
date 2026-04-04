@@ -5,6 +5,7 @@ import {
   InputLabel,
   OutlinedInput,
   Stack,
+  Typography,
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -23,6 +24,7 @@ export type MeterColors = {
 
 export type PasswordStrengthMeterTranslation = {
   label: string;
+  summaryHeaderLabel: string;
 };
 
 export type PasswordStrengthMeterProps = {
@@ -39,7 +41,8 @@ export function PasswordStrengthMeter({
   showMeter = true,
   inputSize = "medium",
   translation = {
-    label: "Input Label",
+    label: "Password",
+    summaryHeaderLabel: "Requirements for your password",
   },
   meterColors = {
     weak: "#cc0000",
@@ -167,6 +170,20 @@ export function PasswordStrengthMeter({
           ></div>
         </div>
       )}
+      <div
+        className="summary-section"
+        style={{ marginTop: "4px", padding: "4px" }}
+      >
+        <div className="summary-header" style={{ marginBottom: "4px" }}>
+          <Typography
+            variant="caption"
+            gutterBottom
+            sx={{ display: "block", height: "200px" }}
+          >
+            {translation.summaryHeaderLabel}
+          </Typography>
+        </div>
+      </div>
     </Stack>
   );
 }
