@@ -9,6 +9,7 @@ import {
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useState } from "react";
+import { scorePassword } from "../../util/password-strength.util";
 
 export type MeterColors = {
   weak: string;
@@ -71,7 +72,10 @@ export function PasswordStrengthMeter({
   const handleOnChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    setPassword(event.target.value);
+    const readPassword = event.target.value;
+    console.log("Result: ", scorePassword(readPassword));
+
+    setPassword(readPassword);
   };
 
   return (
