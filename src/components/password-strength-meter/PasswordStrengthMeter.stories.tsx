@@ -18,6 +18,12 @@ export const Default: Story = {
     translation: {
       label: "Passwort eingeben",
     },
+    meterColors: {
+      weak: "#cc0000",
+      ok: "#fdc010",
+      good: "#8bc34a",
+      veryGood: "#43a047",
+    },
   },
   render: (args) => {
     return (
