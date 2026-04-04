@@ -13,6 +13,7 @@ type Story = StoryObj<typeof PasswordStrengthMeter>;
 
 export const Default: Story = {
   args: {
+    passwordMinLength: 8,
     showPasswordAdornment: true,
     showMeter: true,
     inputSize: "small",

@@ -14,7 +14,10 @@ export type StrengthResult = {
 const clampScore = (n: number): StrengthScore =>
   Math.max(0, Math.min(4, Math.round(n))) as StrengthScore;
 
-export function scorePassword(password: string): StrengthResult {
+export function scorePassword(
+  password: string,
+  passwordMinLength: number,
+): StrengthResult {
   const p = password ?? "";
   const hints: string[] = [];
 
@@ -31,10 +34,10 @@ export function scorePassword(password: string): StrengthResult {
   let points = 0;
 
   // Length scoring
-  if (length >= 8) points += 1;
+  if (length >= passwordMinLength) points += 1;
   else hints.push("Mindestens 8 Zeichen verwenden.");
 
-  if (length >= 12) points += 1;
+  if (length >= passwordMinLength + 4) points += 1;
   else hints.push("12+ Zeichen erhöhen die Sicherheit deutlich.");
 
   // Character class scoring

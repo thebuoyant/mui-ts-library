@@ -9,7 +9,10 @@ import {
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useState } from "react";
-import { scorePassword } from "../../util/password-strength.util";
+import {
+  scorePassword,
+  StrengthResult,
+} from "../../util/password-strength.util";
 
 export type MeterColors = {
   weak: string;
@@ -28,6 +31,7 @@ export type PasswordStrengthMeterProps = {
   inputSize?: "small" | "medium";
   translation?: PasswordStrengthMeterTranslation;
   meterColors?: MeterColors;
+  passwordMinLength?: number;
 };
 
 export function PasswordStrengthMeter({
@@ -43,15 +47,22 @@ export function PasswordStrengthMeter({
     good: "#8bc34a",
     veryGood: "#43a047",
   },
+  passwordMinLength = 8,
 }: PasswordStrengthMeterProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
-  const [meterStatus, setMeterStatus] = useState<
-    "empty" | "weak" | "ok" | "good" | "very good"
-  >("empty");
+  const [strengthResult, setStrengthResult] = useState<StrengthResult>({
+    score: 0,
+    percent: 0,
+    meterStatus: "weak",
+    length: 0,
+    hasLower: false,
+    hasUpper: false,
+    hasDigit: false,
+    hasSymbol: false,
+  });
 
   const { label } = translation;
-  const { weak } = meterColors;
 
   const handleClickShowPassword = () => {
     setShowPassword((show) => !show);
@@ -73,9 +84,26 @@ export function PasswordStrengthMeter({
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const readPassword = event.target.value;
-    console.log("Result: ", scorePassword(readPassword));
 
+    setStrengthResult(scorePassword(readPassword, passwordMinLength));
     setPassword(readPassword);
+  };
+
+  console.log("strengthResult:", strengthResult);
+
+  const calculateStrengthColor = (strengthResult: StrengthResult): string => {
+    switch (strengthResult.meterStatus) {
+      case "weak":
+        return meterColors.weak;
+      case "ok":
+        return meterColors.ok;
+      case "good":
+        return meterColors.good;
+      case "very good":
+        return meterColors.veryGood;
+      default:
+        return "transparent";
+    }
   };
 
   return (
@@ -129,22 +157,14 @@ export function PasswordStrengthMeter({
             display: "flex",
           }}
         >
-          {meterStatus === "empty" && (
-            <div
-              className="weak"
-              style={{
-                height: "100%",
-                width: "0",
-                backgroundColor: "transparent",
-              }}
-            ></div>
-          )}
-          {meterStatus === "weak" && (
-            <div
-              className="weak"
-              style={{ height: "100%", width: "25%", backgroundColor: weak }}
-            ></div>
-          )}
+          <div
+            className="meter-result"
+            style={{
+              height: "100%",
+              width: `${strengthResult.percent}%`,
+              backgroundColor: calculateStrengthColor(strengthResult),
+            }}
+          ></div>
         </div>
       )}
     </Stack>
