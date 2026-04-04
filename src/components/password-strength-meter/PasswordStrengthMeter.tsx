@@ -141,7 +141,7 @@ export function PasswordStrengthMeter({
                 </InputAdornment>
               ) : null
             }
-            label="Password"
+            label={label}
           />
         </FormControl>
       </div>
