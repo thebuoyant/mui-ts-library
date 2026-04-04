@@ -23,6 +23,7 @@ export type PasswordStrengthMeterTranslation = {
 
 export type PasswordStrengthMeterProps = {
   showPasswordAdornment?: boolean;
+  showMeter?: boolean;
   inputSize?: "small" | "medium";
   translation?: PasswordStrengthMeterTranslation;
   meterColors?: MeterColors;
@@ -30,6 +31,7 @@ export type PasswordStrengthMeterProps = {
 
 export function PasswordStrengthMeter({
   showPasswordAdornment = true,
+  showMeter = true,
   inputSize = "medium",
   translation = {
     label: "Input Label",
@@ -111,34 +113,36 @@ export function PasswordStrengthMeter({
           />
         </FormControl>
       </div>
-      <div
-        className="meter-wrapper"
-        style={{
-          width: "100%",
-          height: "8px",
-          border: "1px solid rgba(0, 0, 0, 0.23)",
-          borderRadius: "6px",
-          marginTop: "4px",
-          display: "flex",
-        }}
-      >
-        {meterStatus === "empty" && (
-          <div
-            className="weak"
-            style={{
-              height: "100%",
-              width: "0",
-              backgroundColor: "transparent",
-            }}
-          ></div>
-        )}
-        {meterStatus === "weak" && (
-          <div
-            className="weak"
-            style={{ height: "100%", width: "25%", backgroundColor: weak }}
-          ></div>
-        )}
-      </div>
+      {showMeter && (
+        <div
+          className="meter-wrapper"
+          style={{
+            width: "100%",
+            height: "8px",
+            border: "1px solid rgba(0, 0, 0, 0.23)",
+            borderRadius: "6px",
+            marginTop: "4px",
+            display: "flex",
+          }}
+        >
+          {meterStatus === "empty" && (
+            <div
+              className="weak"
+              style={{
+                height: "100%",
+                width: "0",
+                backgroundColor: "transparent",
+              }}
+            ></div>
+          )}
+          {meterStatus === "weak" && (
+            <div
+              className="weak"
+              style={{ height: "100%", width: "25%", backgroundColor: weak }}
+            ></div>
+          )}
+        </div>
+      )}
     </Stack>
   );
 }
