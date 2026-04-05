@@ -34,6 +34,8 @@ export type PasswordStrengthMeterTranslation = {
   summaryHeaderLabel: string;
   summaryMinCharsLeft: string;
   summaryMinCharsRight: string;
+  summaryCapitalLetter: string;
+  summaryLowerCaseLetter: string;
 };
 
 export type PasswordStrengthMeterProps = {
@@ -55,6 +57,8 @@ export function PasswordStrengthMeter({
     summaryHeaderLabel: "Requirements for your password",
     summaryMinCharsLeft: "At least ",
     summaryMinCharsRight: "characters",
+    summaryCapitalLetter: "At least 1 capital letter",
+    summaryLowerCaseLetter: "At least 1 lovercase letter",
   },
   meterColors = {
     weak: "#cc0000",
@@ -124,7 +128,7 @@ export function PasswordStrengthMeter({
         return "transparent";
     }
   };
-  console.log(translation);
+
   return (
     <Stack>
       <div className="password-input-wrapper">
@@ -198,13 +202,65 @@ export function PasswordStrengthMeter({
           >
             {translation.summaryHeaderLabel}
           </Typography>
-          <Stack direction="row" spacing={2}>
+          <Stack direction="row" spacing={4}>
             <Stack direction="column">
               <div className="summary-item" style={{ display: "flex" }}>
                 <Typography variant="caption" gutterBottom>
                   {`${translation.summaryMinCharsLeft} ${passwordMinLength} ${translation.summaryMinCharsRight}`}
                 </Typography>
                 {strengthResult.length >= passwordMinLength ? (
+                  <CheckCircleOutlineIcon
+                    style={{
+                      fontSize: 16,
+                      color: checkColors.success,
+                      position: "relative",
+                      top: 1,
+                      left: 3,
+                    }}
+                  />
+                ) : (
+                  <ErrorOutlineIcon
+                    style={{
+                      fontSize: 16,
+                      color: checkColors.failure,
+                      position: "relative",
+                      top: 1,
+                      left: 3,
+                    }}
+                  />
+                )}
+              </div>
+              <div className="summary-item" style={{ display: "flex" }}>
+                <Typography variant="caption" gutterBottom>
+                  {`${translation.summaryCapitalLetter}`}
+                </Typography>
+                {strengthResult.hasUpper ? (
+                  <CheckCircleOutlineIcon
+                    style={{
+                      fontSize: 16,
+                      color: checkColors.success,
+                      position: "relative",
+                      top: 1,
+                      left: 3,
+                    }}
+                  />
+                ) : (
+                  <ErrorOutlineIcon
+                    style={{
+                      fontSize: 16,
+                      color: checkColors.failure,
+                      position: "relative",
+                      top: 1,
+                      left: 3,
+                    }}
+                  />
+                )}
+              </div>
+              <div className="summary-item" style={{ display: "flex" }}>
+                <Typography variant="caption" gutterBottom>
+                  {`${translation.summaryLowerCaseLetter}`}
+                </Typography>
+                {strengthResult.hasLower ? (
                   <CheckCircleOutlineIcon
                     style={{
                       fontSize: 16,

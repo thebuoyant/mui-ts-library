@@ -22,6 +22,8 @@ export const Default: Story = {
       summaryHeaderLabel: "Requirements for your password",
       summaryMinCharsLeft: "At least ",
       summaryMinCharsRight: "characters",
+      summaryCapitalLetter: "At least 1 capital letter",
+      summaryLowerCaseLetter: "At least 1 lovercase letter",
     },
     meterColors: {
       weak: "#cc0000",
