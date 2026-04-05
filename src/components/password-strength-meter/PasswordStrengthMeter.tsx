@@ -37,6 +37,7 @@ export type PasswordStrengthMeterTranslation = {
   summaryCapitalLetter: string;
   summaryLowerCaseLetter: string;
   summaryNumber: string;
+  summarySpecialChar: string;
 };
 
 export type PasswordStrengthMeterProps = {
@@ -61,6 +62,7 @@ export function PasswordStrengthMeter({
     summaryCapitalLetter: "At least 1 capital letter",
     summaryLowerCaseLetter: "At least 1 lovercase letter",
     summaryNumber: "At least 1 number",
+    summarySpecialChar: "At least 1 special Character",
   },
   meterColors = {
     weak: "#cc0000",
@@ -204,7 +206,7 @@ export function PasswordStrengthMeter({
           >
             {translation.summaryHeaderLabel}
           </Typography>
-          <Stack direction="row" spacing={4}>
+          <Stack direction="row" spacing={6}>
             <Stack direction="column">
               <div className="summary-item" style={{ display: "flex" }}>
                 <Typography variant="caption" gutterBottom>
@@ -291,6 +293,32 @@ export function PasswordStrengthMeter({
                   {`${translation.summaryNumber}`}
                 </Typography>
                 {strengthResult.hasDigit ? (
+                  <CheckCircleOutlineIcon
+                    style={{
+                      fontSize: 16,
+                      color: checkColors.success,
+                      position: "relative",
+                      top: 1,
+                      left: 3,
+                    }}
+                  />
+                ) : (
+                  <ErrorOutlineIcon
+                    style={{
+                      fontSize: 16,
+                      color: checkColors.failure,
+                      position: "relative",
+                      top: 1,
+                      left: 3,
+                    }}
+                  />
+                )}
+              </div>
+              <div className="summary-item" style={{ display: "flex" }}>
+                <Typography variant="caption" gutterBottom>
+                  {`${translation.summarySpecialChar}`}
+                </Typography>
+                {strengthResult.hasSymbol ? (
                   <CheckCircleOutlineIcon
                     style={{
                       fontSize: 16,

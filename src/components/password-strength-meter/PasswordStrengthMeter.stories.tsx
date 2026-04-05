@@ -25,6 +25,7 @@ export const Default: Story = {
       summaryCapitalLetter: "At least 1 capital letter",
       summaryLowerCaseLetter: "At least 1 lovercase letter",
       summaryNumber: "At least 1 number",
+      summarySpecialChar: "At least 1 special Character",
     },
     meterColors: {
       weak: "#cc0000",
