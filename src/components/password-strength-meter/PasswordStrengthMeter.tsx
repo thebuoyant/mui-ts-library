@@ -36,6 +36,7 @@ export type PasswordStrengthMeterTranslation = {
   summaryMinCharsRight: string;
   summaryCapitalLetter: string;
   summaryLowerCaseLetter: string;
+  summaryNumber: string;
 };
 
 export type PasswordStrengthMeterProps = {
@@ -59,6 +60,7 @@ export function PasswordStrengthMeter({
     summaryMinCharsRight: "characters",
     summaryCapitalLetter: "At least 1 capital letter",
     summaryLowerCaseLetter: "At least 1 lovercase letter",
+    summaryNumber: "At least 1 number",
   },
   meterColors = {
     weak: "#cc0000",
@@ -283,7 +285,34 @@ export function PasswordStrengthMeter({
                 )}
               </div>
             </Stack>
-            <Stack direction="column">right</Stack>
+            <Stack direction="column">
+              <div className="summary-item" style={{ display: "flex" }}>
+                <Typography variant="caption" gutterBottom>
+                  {`${translation.summaryNumber}`}
+                </Typography>
+                {strengthResult.hasDigit ? (
+                  <CheckCircleOutlineIcon
+                    style={{
+                      fontSize: 16,
+                      color: checkColors.success,
+                      position: "relative",
+                      top: 1,
+                      left: 3,
+                    }}
+                  />
+                ) : (
+                  <ErrorOutlineIcon
+                    style={{
+                      fontSize: 16,
+                      color: checkColors.failure,
+                      position: "relative",
+                      top: 1,
+                      left: 3,
+                    }}
+                  />
+                )}
+              </div>
+            </Stack>
           </Stack>
         </div>
       </div>
