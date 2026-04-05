@@ -9,13 +9,13 @@ import {
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { useState } from "react";
 import {
   scorePassword,
-  StrengthResult,
+  type StrengthResult,
 } from "../../util/password-strength.util";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 
 export type CheckColors = {
   failure: string;
@@ -41,14 +41,67 @@ export type PasswordStrengthMeterTranslation = {
 };
 
 export type PasswordStrengthMeterProps = {
-  showPasswordAdornment: boolean;
-  showMeter: boolean;
-  inputSize: "small" | "medium";
-  translation: PasswordStrengthMeterTranslation;
-  meterColors: MeterColors;
-  passwordMinLength: number;
+  showPasswordAdornment?: boolean;
+  showMeter?: boolean;
+  inputSize?: "small" | "medium";
+  translation?: PasswordStrengthMeterTranslation;
+  meterColors?: MeterColors;
+  passwordMinLength?: number;
+  checkColors?: CheckColors;
+
+  /**
+   * Wird bei jeder Passwort-Änderung aufgerufen.
+   * So kann der Consumer das Passwort und das StrengthResult
+   * außerhalb der Komponente weiterverwenden.
+   */
+  onPasswordChange?: (password: string, strengthResult: StrengthResult) => void;
+};
+
+/**
+ * Kleine Hilfskomponente für die Anforderungsliste.
+ * So vermeiden wir doppelten Code und halten die Hauptkomponente lesbarer.
+ */
+type RequirementItemProps = {
+  label: string;
+  fulfilled: boolean;
   checkColors: CheckColors;
 };
+
+function RequirementItem({
+  label,
+  fulfilled,
+  checkColors,
+}: RequirementItemProps) {
+  return (
+    <div className="summary-item" style={{ display: "flex" }}>
+      <Typography variant="caption" gutterBottom>
+        {label}
+      </Typography>
+
+      {fulfilled ? (
+        <CheckCircleOutlineIcon
+          style={{
+            fontSize: 16,
+            color: checkColors.success,
+            position: "relative",
+            top: 1,
+            left: 3,
+          }}
+        />
+      ) : (
+        <ErrorOutlineIcon
+          style={{
+            fontSize: 16,
+            color: checkColors.failure,
+            position: "relative",
+            top: 1,
+            left: 3,
+          }}
+        />
+      )}
+    </div>
+  );
+}
 
 export function PasswordStrengthMeter({
   showPasswordAdornment = true,
@@ -57,12 +110,12 @@ export function PasswordStrengthMeter({
   translation = {
     label: "Password",
     summaryHeaderLabel: "Requirements for your password",
-    summaryMinCharsLeft: "At least ",
+    summaryMinCharsLeft: "At least",
     summaryMinCharsRight: "characters",
     summaryCapitalLetter: "At least 1 capital letter",
-    summaryLowerCaseLetter: "At least 1 lovercase letter",
+    summaryLowerCaseLetter: "At least 1 lowercase letter",
     summaryNumber: "At least 1 number",
-    summarySpecialChar: "At least 1 special Character",
+    summarySpecialChar: "At least 1 special character",
   },
   meterColors = {
     weak: "#cc0000",
@@ -75,6 +128,7 @@ export function PasswordStrengthMeter({
     failure: "#cc0000",
     success: "#43a047",
   },
+  onPasswordChange,
 }: PasswordStrengthMeterProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
@@ -112,14 +166,21 @@ export function PasswordStrengthMeter({
   ) => {
     const readPassword = event.target.value;
 
-    setStrengthResult(scorePassword(readPassword, passwordMinLength));
+    // StrengthResult genau einmal berechnen
+    const nextStrengthResult = scorePassword(readPassword, passwordMinLength);
+
+    // Lokalen State aktualisieren
     setPassword(readPassword);
+    setStrengthResult(nextStrengthResult);
+
+    // Optional den Consumer informieren
+    if (onPasswordChange) {
+      onPasswordChange(readPassword, nextStrengthResult);
+    }
   };
 
-  console.log("strengthResult:", strengthResult);
-
-  const calculateStrengthColor = (strengthResult: StrengthResult): string => {
-    switch (strengthResult.meterStatus) {
+  const calculateStrengthColor = (result: StrengthResult): string => {
+    switch (result.meterStatus) {
       case "weak":
         return meterColors.weak;
       case "ok":
@@ -172,6 +233,7 @@ export function PasswordStrengthMeter({
           />
         </FormControl>
       </div>
+
       {showMeter && (
         <div
           className="meter-wrapper"
@@ -190,10 +252,13 @@ export function PasswordStrengthMeter({
               height: "100%",
               width: `${strengthResult.percent}%`,
               backgroundColor: calculateStrengthColor(strengthResult),
+              borderRadius: "6px",
+              transition: "width 0.2s ease-in-out",
             }}
-          ></div>
+          />
         </div>
       )}
+
       <div
         className="summary-section"
         style={{ marginTop: "4px", padding: "4px" }}
@@ -206,140 +271,40 @@ export function PasswordStrengthMeter({
           >
             {translation.summaryHeaderLabel}
           </Typography>
+
           <Stack direction="row" spacing={6}>
             <Stack direction="column">
-              <div className="summary-item" style={{ display: "flex" }}>
-                <Typography variant="caption" gutterBottom>
-                  {`${translation.summaryMinCharsLeft} ${passwordMinLength} ${translation.summaryMinCharsRight}`}
-                </Typography>
-                {strengthResult.length >= passwordMinLength ? (
-                  <CheckCircleOutlineIcon
-                    style={{
-                      fontSize: 16,
-                      color: checkColors.success,
-                      position: "relative",
-                      top: 1,
-                      left: 3,
-                    }}
-                  />
-                ) : (
-                  <ErrorOutlineIcon
-                    style={{
-                      fontSize: 16,
-                      color: checkColors.failure,
-                      position: "relative",
-                      top: 1,
-                      left: 3,
-                    }}
-                  />
-                )}
-              </div>
-              <div className="summary-item" style={{ display: "flex" }}>
-                <Typography variant="caption" gutterBottom>
-                  {`${translation.summaryCapitalLetter}`}
-                </Typography>
-                {strengthResult.hasUpper ? (
-                  <CheckCircleOutlineIcon
-                    style={{
-                      fontSize: 16,
-                      color: checkColors.success,
-                      position: "relative",
-                      top: 1,
-                      left: 3,
-                    }}
-                  />
-                ) : (
-                  <ErrorOutlineIcon
-                    style={{
-                      fontSize: 16,
-                      color: checkColors.failure,
-                      position: "relative",
-                      top: 1,
-                      left: 3,
-                    }}
-                  />
-                )}
-              </div>
-              <div className="summary-item" style={{ display: "flex" }}>
-                <Typography variant="caption" gutterBottom>
-                  {`${translation.summaryLowerCaseLetter}`}
-                </Typography>
-                {strengthResult.hasLower ? (
-                  <CheckCircleOutlineIcon
-                    style={{
-                      fontSize: 16,
-                      color: checkColors.success,
-                      position: "relative",
-                      top: 1,
-                      left: 3,
-                    }}
-                  />
-                ) : (
-                  <ErrorOutlineIcon
-                    style={{
-                      fontSize: 16,
-                      color: checkColors.failure,
-                      position: "relative",
-                      top: 1,
-                      left: 3,
-                    }}
-                  />
-                )}
-              </div>
+              <RequirementItem
+                label={`${translation.summaryMinCharsLeft} ${passwordMinLength} ${translation.summaryMinCharsRight}`}
+                fulfilled={strengthResult.length >= passwordMinLength}
+                checkColors={checkColors}
+              />
+
+              <RequirementItem
+                label={translation.summaryCapitalLetter}
+                fulfilled={strengthResult.hasUpper}
+                checkColors={checkColors}
+              />
+
+              <RequirementItem
+                label={translation.summaryLowerCaseLetter}
+                fulfilled={strengthResult.hasLower}
+                checkColors={checkColors}
+              />
             </Stack>
+
             <Stack direction="column">
-              <div className="summary-item" style={{ display: "flex" }}>
-                <Typography variant="caption" gutterBottom>
-                  {`${translation.summaryNumber}`}
-                </Typography>
-                {strengthResult.hasDigit ? (
-                  <CheckCircleOutlineIcon
-                    style={{
-                      fontSize: 16,
-                      color: checkColors.success,
-                      position: "relative",
-                      top: 1,
-                      left: 3,
-                    }}
-                  />
-                ) : (
-                  <ErrorOutlineIcon
-                    style={{
-                      fontSize: 16,
-                      color: checkColors.failure,
-                      position: "relative",
-                      top: 1,
-                      left: 3,
-                    }}
-                  />
-                )}
-              </div>
-              <div className="summary-item" style={{ display: "flex" }}>
-                <Typography variant="caption" gutterBottom>
-                  {`${translation.summarySpecialChar}`}
-                </Typography>
-                {strengthResult.hasSymbol ? (
-                  <CheckCircleOutlineIcon
-                    style={{
-                      fontSize: 16,
-                      color: checkColors.success,
-                      position: "relative",
-                      top: 1,
-                      left: 3,
-                    }}
-                  />
-                ) : (
-                  <ErrorOutlineIcon
-                    style={{
-                      fontSize: 16,
-                      color: checkColors.failure,
-                      position: "relative",
-                      top: 1,
-                      left: 3,
-                    }}
-                  />
-                )}
-              </div>
+              <RequirementItem
+                label={translation.summaryNumber}
+                fulfilled={strengthResult.hasDigit}
+                checkColors={checkColors}
+              />
+
+              <RequirementItem
+                label={translation.summarySpecialChar}
+                fulfilled={strengthResult.hasSymbol}
+                checkColors={checkColors}
+              />
             </Stack>
           </Stack>
         </div>
