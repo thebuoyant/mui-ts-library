@@ -20,6 +20,8 @@ export const Default: Story = {
     translation: {
       label: "Password",
       summaryHeaderLabel: "Requirements for your password",
+      summaryMinCharsLeft: "At least ",
+      summaryMinCharsRight: "characters",
     },
     meterColors: {
       weak: "#cc0000",

@@ -14,6 +14,13 @@ import {
   scorePassword,
   StrengthResult,
 } from "../../util/password-strength.util";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+
+export type CheckColors = {
+  failure: string;
+  success: string;
+};
 
 export type MeterColors = {
   weak: string;
@@ -25,15 +32,18 @@ export type MeterColors = {
 export type PasswordStrengthMeterTranslation = {
   label: string;
   summaryHeaderLabel: string;
+  summaryMinCharsLeft: string;
+  summaryMinCharsRight: string;
 };
 
 export type PasswordStrengthMeterProps = {
-  showPasswordAdornment?: boolean;
-  showMeter?: boolean;
-  inputSize?: "small" | "medium";
-  translation?: PasswordStrengthMeterTranslation;
-  meterColors?: MeterColors;
-  passwordMinLength?: number;
+  showPasswordAdornment: boolean;
+  showMeter: boolean;
+  inputSize: "small" | "medium";
+  translation: PasswordStrengthMeterTranslation;
+  meterColors: MeterColors;
+  passwordMinLength: number;
+  checkColors: CheckColors;
 };
 
 export function PasswordStrengthMeter({
@@ -43,6 +53,8 @@ export function PasswordStrengthMeter({
   translation = {
     label: "Password",
     summaryHeaderLabel: "Requirements for your password",
+    summaryMinCharsLeft: "At least ",
+    summaryMinCharsRight: "characters",
   },
   meterColors = {
     weak: "#cc0000",
@@ -51,6 +63,10 @@ export function PasswordStrengthMeter({
     veryGood: "#43a047",
   },
   passwordMinLength = 8,
+  checkColors = {
+    failure: "#cc0000",
+    success: "#43a047",
+  },
 }: PasswordStrengthMeterProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
@@ -108,7 +124,7 @@ export function PasswordStrengthMeter({
         return "transparent";
     }
   };
-
+  console.log(translation);
   return (
     <Stack>
       <div className="password-input-wrapper">
@@ -174,14 +190,45 @@ export function PasswordStrengthMeter({
         className="summary-section"
         style={{ marginTop: "4px", padding: "4px" }}
       >
-        <div className="summary-header" style={{ marginBottom: "4px" }}>
+        <div className="summary" style={{ marginBottom: "4px" }}>
           <Typography
             variant="caption"
             gutterBottom
-            sx={{ display: "block", height: "200px" }}
+            sx={{ display: "block", fontSize: 14 }}
           >
             {translation.summaryHeaderLabel}
           </Typography>
+          <Stack direction="row" spacing={2}>
+            <Stack direction="column">
+              <div className="summary-item" style={{ display: "flex" }}>
+                <Typography variant="caption" gutterBottom>
+                  {`${translation.summaryMinCharsLeft} ${passwordMinLength} ${translation.summaryMinCharsRight}`}
+                </Typography>
+                {strengthResult.length >= passwordMinLength ? (
+                  <CheckCircleOutlineIcon
+                    style={{
+                      fontSize: 16,
+                      color: checkColors.success,
+                      position: "relative",
+                      top: 1,
+                      left: 3,
+                    }}
+                  />
+                ) : (
+                  <ErrorOutlineIcon
+                    style={{
+                      fontSize: 16,
+                      color: checkColors.failure,
+                      position: "relative",
+                      top: 1,
+                      left: 3,
+                    }}
+                  />
+                )}
+              </div>
+            </Stack>
+            <Stack direction="column">right</Stack>
+          </Stack>
         </div>
       </div>
     </Stack>
