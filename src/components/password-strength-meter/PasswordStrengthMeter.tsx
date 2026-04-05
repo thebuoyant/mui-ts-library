@@ -43,24 +43,15 @@ export type PasswordStrengthMeterTranslation = {
 export type PasswordStrengthMeterProps = {
   showPasswordAdornment?: boolean;
   showMeter?: boolean;
+  showSummary?: boolean;
   inputSize?: "small" | "medium";
   translation?: PasswordStrengthMeterTranslation;
   meterColors?: MeterColors;
   passwordMinLength?: number;
   checkColors?: CheckColors;
-
-  /**
-   * Wird bei jeder Passwort-Änderung aufgerufen.
-   * So kann der Consumer das Passwort und das StrengthResult
-   * außerhalb der Komponente weiterverwenden.
-   */
   onPasswordChange?: (password: string, strengthResult: StrengthResult) => void;
 };
 
-/**
- * Kleine Hilfskomponente für die Anforderungsliste.
- * So vermeiden wir doppelten Code und halten die Hauptkomponente lesbarer.
- */
 type RequirementItemProps = {
   label: string;
   fulfilled: boolean;
@@ -106,6 +97,7 @@ function RequirementItem({
 export function PasswordStrengthMeter({
   showPasswordAdornment = true,
   showMeter = true,
+  showSummary = true,
   inputSize = "medium",
   translation = {
     label: "Password",
@@ -258,57 +250,58 @@ export function PasswordStrengthMeter({
           />
         </div>
       )}
+      {showSummary && (
+        <div
+          className="summary-section"
+          style={{ marginTop: "4px", padding: "4px" }}
+        >
+          <div className="summary" style={{ marginBottom: "4px" }}>
+            <Typography
+              variant="caption"
+              gutterBottom
+              sx={{ display: "block", fontSize: 14 }}
+            >
+              {translation.summaryHeaderLabel}
+            </Typography>
 
-      <div
-        className="summary-section"
-        style={{ marginTop: "4px", padding: "4px" }}
-      >
-        <div className="summary" style={{ marginBottom: "4px" }}>
-          <Typography
-            variant="caption"
-            gutterBottom
-            sx={{ display: "block", fontSize: 14 }}
-          >
-            {translation.summaryHeaderLabel}
-          </Typography>
+            <Stack direction="row" spacing={6}>
+              <Stack direction="column">
+                <RequirementItem
+                  label={`${translation.summaryMinCharsLeft} ${passwordMinLength} ${translation.summaryMinCharsRight}`}
+                  fulfilled={strengthResult.length >= passwordMinLength}
+                  checkColors={checkColors}
+                />
 
-          <Stack direction="row" spacing={6}>
-            <Stack direction="column">
-              <RequirementItem
-                label={`${translation.summaryMinCharsLeft} ${passwordMinLength} ${translation.summaryMinCharsRight}`}
-                fulfilled={strengthResult.length >= passwordMinLength}
-                checkColors={checkColors}
-              />
+                <RequirementItem
+                  label={translation.summaryCapitalLetter}
+                  fulfilled={strengthResult.hasUpper}
+                  checkColors={checkColors}
+                />
 
-              <RequirementItem
-                label={translation.summaryCapitalLetter}
-                fulfilled={strengthResult.hasUpper}
-                checkColors={checkColors}
-              />
+                <RequirementItem
+                  label={translation.summaryLowerCaseLetter}
+                  fulfilled={strengthResult.hasLower}
+                  checkColors={checkColors}
+                />
+              </Stack>
 
-              <RequirementItem
-                label={translation.summaryLowerCaseLetter}
-                fulfilled={strengthResult.hasLower}
-                checkColors={checkColors}
-              />
+              <Stack direction="column">
+                <RequirementItem
+                  label={translation.summaryNumber}
+                  fulfilled={strengthResult.hasDigit}
+                  checkColors={checkColors}
+                />
+
+                <RequirementItem
+                  label={translation.summarySpecialChar}
+                  fulfilled={strengthResult.hasSymbol}
+                  checkColors={checkColors}
+                />
+              </Stack>
             </Stack>
-
-            <Stack direction="column">
-              <RequirementItem
-                label={translation.summaryNumber}
-                fulfilled={strengthResult.hasDigit}
-                checkColors={checkColors}
-              />
-
-              <RequirementItem
-                label={translation.summarySpecialChar}
-                fulfilled={strengthResult.hasSymbol}
-                checkColors={checkColors}
-              />
-            </Stack>
-          </Stack>
+          </div>
         </div>
-      </div>
+      )}
     </Stack>
   );
 }

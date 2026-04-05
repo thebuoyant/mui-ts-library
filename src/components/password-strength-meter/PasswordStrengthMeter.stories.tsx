@@ -16,6 +16,7 @@ export const Default: Story = {
     passwordMinLength: 8,
     showPasswordAdornment: true,
     showMeter: true,
+    showSummary: true,
     inputSize: "small",
     translation: {
       label: "Password",
@@ -32,6 +33,10 @@ export const Default: Story = {
       ok: "#fdc010",
       good: "#8bc34a",
       veryGood: "#43a047",
+    },
+    checkColors: {
+      failure: "#cc0000",
+      success: "#43a047",
     },
   },
   render: (args) => {
