@@ -1,9 +1,11 @@
 export type StrengthScore = 0 | 1 | 2 | 3 | 4;
 
+export type MeterStatus = "weak" | "ok" | "good" | "very good";
+
 export type StrengthResult = {
   score: StrengthScore;
   percent: number; // 0..100
-  meterStatus: string;
+  meterStatus: MeterStatus;
   length: number;
   hasLower: boolean;
   hasUpper: boolean;
@@ -11,55 +13,75 @@ export type StrengthResult = {
   hasSymbol: boolean;
 };
 
-const clampScore = (n: number): StrengthScore =>
-  Math.max(0, Math.min(4, Math.round(n))) as StrengthScore;
+const clampScore = (value: number): StrengthScore => {
+  return Math.max(0, Math.min(4, Math.round(value))) as StrengthScore;
+};
 
 export function scorePassword(
   password: string,
   passwordMinLength: number,
 ): StrengthResult {
-  const p = password ?? "";
-  const hints: string[] = [];
+  const normalizedPassword = password ?? "";
 
-  const length = p.length;
-  const hasLower = /[a-z]/.test(p);
-  const hasUpper = /[A-Z]/.test(p);
-  const hasDigit = /\d/.test(p);
-  const hasSymbol = /[^A-Za-z0-9]/.test(p);
+  const length = normalizedPassword.length;
+  const hasLower = /[a-z]/.test(normalizedPassword);
+  const hasUpper = /[A-Z]/.test(normalizedPassword);
+  const hasDigit = /\d/.test(normalizedPassword);
+  const hasSymbol = /[^A-Za-z0-9]/.test(normalizedPassword);
 
   const classes = [hasLower, hasUpper, hasDigit, hasSymbol].filter(
     Boolean,
   ).length;
 
-  let points = 0;
+  // Harte Mindestregel:
+  // Solange das Passwort kürzer als passwordMinLength ist,
+  // bleibt der Status immer "weak".
+  if (length < passwordMinLength) {
+    const score: StrengthScore = length === 0 ? 0 : 1;
 
-  // Length scoring
-  if (length >= passwordMinLength) points += 1;
-  else hints.push("Mindestens 8 Zeichen verwenden.");
-
-  if (length >= passwordMinLength + 4) points += 1;
-  else hints.push("12+ Zeichen erhöhen die Sicherheit deutlich.");
-
-  // Character class scoring
-  if (classes >= 2) points += 1;
-  else
-    hints.push("Groß-/Kleinbuchstaben, Zahlen oder Sonderzeichen kombinieren.");
-
-  if (classes >= 3) points += 1;
-
-  // Penalize common bad patterns
-  if (/^(.)\1+$/.test(p) && length > 0) {
-    points -= 2;
-    hints.push("Nicht nur ein Zeichen wiederholen.");
+    return {
+      score,
+      percent: score * 25,
+      meterStatus: "weak",
+      length,
+      hasLower,
+      hasUpper,
+      hasDigit,
+      hasSymbol,
+    };
   }
 
-  if (/1234|abcd|qwer|password|passwort|admin/i.test(p)) {
+  let points = 0;
+
+  // Mindestlänge erfüllt
+  points += 1;
+
+  // Bonus für deutlich längeres Passwort
+  if (length >= passwordMinLength + 4) {
+    points += 1;
+  }
+
+  // Bonus für Zeichenklassen
+  if (classes >= 2) {
+    points += 1;
+  }
+
+  if (classes >= 3) {
+    points += 1;
+  }
+
+  // Schlechte Muster bestrafen
+  if (/^(.)\1+$/.test(normalizedPassword)) {
     points -= 2;
-    hints.push("Keine häufigen Muster/Wörter verwenden.");
+  }
+
+  if (/1234|abcd|qwer|password|passwort|admin/i.test(normalizedPassword)) {
+    points -= 2;
   }
 
   const score = clampScore(points);
-  const meterStatus =
+
+  const meterStatus: MeterStatus =
     score <= 1
       ? "weak"
       : score === 2
@@ -67,16 +89,15 @@ export function scorePassword(
         : score === 3
           ? "good"
           : "very good";
-  const percent = score * 25;
 
   return {
     score,
-    percent,
-    meterStatus: meterStatus,
+    percent: score * 25,
+    meterStatus,
     length,
-    hasDigit,
     hasLower,
-    hasSymbol,
     hasUpper,
+    hasDigit,
+    hasSymbol,
   };
 }
