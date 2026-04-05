@@ -15,7 +15,7 @@ import { useState } from "react";
 import {
   scorePassword,
   type StrengthResult,
-} from "../../util/password-strength.util";
+} from "./util/password-strength.util";
 
 export type CheckColors = {
   failure: string;
