@@ -71,10 +71,6 @@ function TagSelectionInner({
   const selectTag = useTagSelectionStore((state) => state.selectTag);
   const deleteTag = useTagSelectionStore((state) => state.deleteTag);
 
-  /**
-   * Wenn Tags von außen neu reinkommen, synchronisieren wir sie in den Store.
-   * So bleibt die Komponente nah an deinem bisherigen Props-Ansatz.
-   */
   useEffect(() => {
     setTags(tags);
   }, [tags, setTags]);
@@ -104,6 +100,10 @@ function TagSelectionInner({
   };
 
   const handleTagSelect = (tag: TagSelectionItem) => {
+    if (tag.disabled || tag.selected) {
+      return;
+    }
+
     selectTag(tag.id);
 
     const nextTags = storeTags.map((currentTag) =>
@@ -189,6 +189,7 @@ function TagSelectionInner({
             expanded={detailsExpanded}
             onToggle={handleDetailsToggle}
             onTagDelete={handleTagDelete}
+            onTagSelect={handleTagSelect}
           />
         )}
       </Stack>
@@ -208,10 +209,6 @@ export function TagSelection({
   onSearchChange,
   onDetailsToggle,
 }: TagSelectionProps) {
-  /**
-   * Pro Komponenten-Instanz genau eine eigene Store-Instanz.
-   * useState mit Lazy Initializer ist hier ESLint-freundlich und gut lesbar.
-   */
   const [store] = useState(() => createTagSelectionStore(tags));
 
   return (

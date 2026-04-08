@@ -20,15 +20,17 @@ type TagSelectionDetailsProps = {
   expanded: boolean;
   onToggle: (expanded: boolean) => void;
   onTagDelete: (tag: TagSelectionItem) => void;
+  onTagSelect: (tag: TagSelectionItem) => void;
 };
 
 type TagGroupProps = {
   label: string;
   tags: TagSelectionItem[];
   onTagDelete?: (tag: TagSelectionItem) => void;
+  onTagSelect?: (tag: TagSelectionItem) => void;
 };
 
-function TagGroup({ label, tags, onTagDelete }: TagGroupProps) {
+function TagGroup({ label, tags, onTagDelete, onTagSelect }: TagGroupProps) {
   return (
     <div className="tag-selection-group">
       <Typography variant="subtitle2" gutterBottom>
@@ -46,6 +48,7 @@ function TagGroup({ label, tags, onTagDelete }: TagGroupProps) {
               key={tag.id}
               tag={tag}
               onDelete={tag.selected ? onTagDelete : undefined}
+              onClick={!tag.selected && !tag.disabled ? onTagSelect : undefined}
             />
           ))}
         </Stack>
@@ -62,6 +65,7 @@ export function TagSelectionDetails({
   expanded,
   onToggle,
   onTagDelete,
+  onTagSelect,
 }: TagSelectionDetailsProps) {
   return (
     <div className="tag-selection-section">
@@ -85,6 +89,7 @@ export function TagSelectionDetails({
           <TagGroup
             label={translation.availableGroupLabel}
             tags={availableTags}
+            onTagSelect={onTagSelect}
           />
 
           <TagGroup
