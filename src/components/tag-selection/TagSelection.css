@@ -1,0 +1,29 @@
+.tag-selection-root {
+  width: 100%;
+}
+
+.tag-selection-section {
+  margin-top: 8px;
+}
+
+.tag-selection-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag-selection-empty-text {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.tag-selection-details-content {
+  padding-top: 4px;
+}
+
+.tag-selection-group {
+  margin-top: 8px;
+}
+
+.tag-selection-group:first-child {
+  margin-top: 0;
+}
