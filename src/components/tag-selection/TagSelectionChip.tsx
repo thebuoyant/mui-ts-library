@@ -5,19 +5,27 @@ type TagSelectionChipProps = {
   tag: TagSelectionItem;
   onDelete?: (tag: TagSelectionItem) => void;
   onClick?: (tag: TagSelectionItem) => void;
+  showStartIcon?: boolean;
+  showDeleteIcon?: boolean;
 };
 
 export function TagSelectionChip({
   tag,
   onDelete,
   onClick,
+  showStartIcon = true,
+  showDeleteIcon = true,
 }: TagSelectionChipProps) {
+  const shouldShowStartIcon = showStartIcon && Boolean(tag.startIcon);
+  const shouldShowDeleteIcon =
+    showDeleteIcon && Boolean(onDelete) && Boolean(tag.deleteIcon);
+
   return (
     <Chip
       label={tag.label}
-      icon={tag.startIcon ?? undefined}
-      deleteIcon={tag.deleteIcon ?? undefined}
-      onDelete={onDelete ? () => onDelete(tag) : undefined}
+      icon={shouldShowStartIcon ? tag.startIcon : undefined}
+      deleteIcon={shouldShowDeleteIcon ? tag.deleteIcon : undefined}
+      onDelete={showDeleteIcon && onDelete ? () => onDelete(tag) : undefined}
       onClick={onClick ? () => onClick(tag) : undefined}
       clickable={Boolean(onClick) && !tag.disabled}
       disabled={tag.disabled}

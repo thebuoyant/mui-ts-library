@@ -112,6 +112,8 @@ export const Default: Story = {
     showSelectedTags: true,
     showAutoComplete: true,
     showDetails: true,
+    showStartIcon: true,
+    showDeleteIcon: true,
     translation: {
       selectedTagsLabel: "Selected tags",
       autoCompleteLabel: "Search and add tags",
@@ -144,20 +146,6 @@ export const Default: Story = {
           console.log("onDetailsToggle", expanded);
         }}
       />
-    </Box>
-  ),
-};
-
-export const OnlySelectedAndDetails: Story = {
-  args: {
-    tags: sampleTags,
-    showSelectedTags: true,
-    showAutoComplete: false,
-    showDetails: true,
-  },
-  render: (args) => (
-    <Box sx={{ maxWidth: 700 }}>
-      <TagSelection {...args} />
     </Box>
   ),
 };

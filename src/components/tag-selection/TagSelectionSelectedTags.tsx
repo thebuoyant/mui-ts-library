@@ -9,12 +9,16 @@ type TagSelectionSelectedTagsProps = {
   selectedTags: TagSelectionItem[];
   translation: TagSelectionTranslation;
   onTagDelete: (tag: TagSelectionItem) => void;
+  showStartIcon?: boolean;
+  showDeleteIcon?: boolean;
 };
 
 export function TagSelectionSelectedTags({
   selectedTags,
   translation,
   onTagDelete,
+  showStartIcon = true,
+  showDeleteIcon = true,
 }: TagSelectionSelectedTagsProps) {
   return (
     <div className="tag-selection-section">
@@ -29,7 +33,13 @@ export function TagSelectionSelectedTags({
       ) : (
         <Stack direction="row" className="tag-selection-chip-list">
           {selectedTags.map((tag) => (
-            <TagSelectionChip key={tag.id} tag={tag} onDelete={onTagDelete} />
+            <TagSelectionChip
+              key={tag.id}
+              tag={tag}
+              onDelete={onTagDelete}
+              showStartIcon={showStartIcon}
+              showDeleteIcon={showDeleteIcon}
+            />
           ))}
         </Stack>
       )}

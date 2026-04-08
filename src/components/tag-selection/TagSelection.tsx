@@ -50,6 +50,8 @@ function TagSelectionInner({
   showSelectedTags = true,
   showAutoComplete = true,
   showDetails = true,
+  showStartIcon = true,
+  showDeleteIcon = true,
   translation,
   onTagSelect,
   onTagDelete,
@@ -167,6 +169,8 @@ function TagSelectionInner({
             selectedTags={selectedTags}
             translation={translation}
             onTagDelete={handleTagDelete}
+            showStartIcon={showStartIcon}
+            showDeleteIcon={showDeleteIcon}
           />
         )}
 
@@ -177,6 +181,7 @@ function TagSelectionInner({
             translation={translation}
             onSearchChange={handleSearchChange}
             onTagSelect={handleTagSelect}
+            showStartIcon={showStartIcon}
           />
         )}
 
@@ -190,6 +195,8 @@ function TagSelectionInner({
             onToggle={handleDetailsToggle}
             onTagDelete={handleTagDelete}
             onTagSelect={handleTagSelect}
+            showStartIcon={showStartIcon}
+            showDeleteIcon={showDeleteIcon}
           />
         )}
       </Stack>
@@ -202,6 +209,8 @@ export function TagSelection({
   showSelectedTags = true,
   showAutoComplete = true,
   showDetails = true,
+  showStartIcon = true,
+  showDeleteIcon = true,
   translation = defaultTranslation,
   onTagSelect,
   onTagDelete,
@@ -218,6 +227,8 @@ export function TagSelection({
         showSelectedTags={showSelectedTags}
         showAutoComplete={showAutoComplete}
         showDetails={showDetails}
+        showStartIcon={showStartIcon}
+        showDeleteIcon={showDeleteIcon}
         translation={translation}
         onTagSelect={onTagSelect}
         onTagDelete={onTagDelete}

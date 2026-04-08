@@ -21,6 +21,8 @@ type TagSelectionDetailsProps = {
   onToggle: (expanded: boolean) => void;
   onTagDelete: (tag: TagSelectionItem) => void;
   onTagSelect: (tag: TagSelectionItem) => void;
+  showStartIcon?: boolean;
+  showDeleteIcon?: boolean;
 };
 
 type TagGroupProps = {
@@ -28,9 +30,18 @@ type TagGroupProps = {
   tags: TagSelectionItem[];
   onTagDelete?: (tag: TagSelectionItem) => void;
   onTagSelect?: (tag: TagSelectionItem) => void;
+  showStartIcon?: boolean;
+  showDeleteIcon?: boolean;
 };
 
-function TagGroup({ label, tags, onTagDelete, onTagSelect }: TagGroupProps) {
+function TagGroup({
+  label,
+  tags,
+  onTagDelete,
+  onTagSelect,
+  showStartIcon = true,
+  showDeleteIcon = true,
+}: TagGroupProps) {
   return (
     <div className="tag-selection-group">
       <Typography variant="subtitle2" gutterBottom>
@@ -49,6 +60,8 @@ function TagGroup({ label, tags, onTagDelete, onTagSelect }: TagGroupProps) {
               tag={tag}
               onDelete={tag.selected ? onTagDelete : undefined}
               onClick={!tag.selected && !tag.disabled ? onTagSelect : undefined}
+              showStartIcon={showStartIcon}
+              showDeleteIcon={showDeleteIcon}
             />
           ))}
         </Stack>
@@ -66,6 +79,8 @@ export function TagSelectionDetails({
   onToggle,
   onTagDelete,
   onTagSelect,
+  showStartIcon = true,
+  showDeleteIcon = true,
 }: TagSelectionDetailsProps) {
   return (
     <div className="tag-selection-section">
@@ -84,17 +99,23 @@ export function TagSelectionDetails({
             label={translation.selectedGroupLabel}
             tags={selectedTags}
             onTagDelete={onTagDelete}
+            showStartIcon={showStartIcon}
+            showDeleteIcon={showDeleteIcon}
           />
 
           <TagGroup
             label={translation.availableGroupLabel}
             tags={availableTags}
             onTagSelect={onTagSelect}
+            showStartIcon={showStartIcon}
+            showDeleteIcon={false}
           />
 
           <TagGroup
             label={translation.disabledGroupLabel}
             tags={disabledTags}
+            showStartIcon={showStartIcon}
+            showDeleteIcon={false}
           />
         </AccordionDetails>
       </Accordion>

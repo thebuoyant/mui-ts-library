@@ -11,6 +11,7 @@ type TagSelectionAutocompleteProps = {
   translation: TagSelectionTranslation;
   onSearchChange: (value: string) => void;
   onTagSelect: (tag: TagSelectionItem) => void;
+  showStartIcon?: boolean;
 };
 
 export function TagSelectionAutocomplete({
@@ -19,6 +20,7 @@ export function TagSelectionAutocomplete({
   translation,
   onSearchChange,
   onTagSelect,
+  showStartIcon = true,
 }: TagSelectionAutocompleteProps) {
   return (
     <div className="tag-selection-section">
@@ -45,7 +47,7 @@ export function TagSelectionAutocomplete({
           <li {...props} key={option.id}>
             <Chip
               label={option.label}
-              icon={option.startIcon ?? undefined}
+              icon={showStartIcon ? (option.startIcon ?? undefined) : undefined}
               sx={{
                 color: option.foregroundColor ?? "inherit",
                 backgroundColor: option.backgroundColor ?? "transparent",

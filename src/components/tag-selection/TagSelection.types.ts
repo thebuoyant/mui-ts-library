@@ -30,41 +30,36 @@ export type TagSelectionProps = {
   showAutoComplete?: boolean;
   showDetails?: boolean;
 
-  translation?: TagSelectionTranslation;
+  /**
+   * Steuert global, ob das optionale Start-Icon eines Tags angezeigt wird.
+   */
+  showStartIcon?: boolean;
 
   /**
-   * Wird aufgerufen, wenn ein Tag selektiert wurde.
+   * Steuert global, ob das optionale Delete-Icon angezeigt wird.
+   * Das Icon erscheint nur dort, wo ein onDelete vorhanden ist.
    */
+  showDeleteIcon?: boolean;
+
+  translation?: TagSelectionTranslation;
+
   onTagSelect?: (
     tag: TagSelectionItem,
     selectedTags: TagSelectionItem[],
     allTags: TagSelectionItem[],
   ) => void;
 
-  /**
-   * Wird aufgerufen, wenn ein selektiertes Tag per Delete/X wieder entfernt wurde.
-   */
   onTagDelete?: (
     tag: TagSelectionItem,
     selectedTags: TagSelectionItem[],
     allTags: TagSelectionItem[],
   ) => void;
 
-  /**
-   * Zentraler Callback für jede Änderung der Tag-Liste.
-   */
   onTagsChange?: (
     selectedTags: TagSelectionItem[],
     allTags: TagSelectionItem[],
   ) => void;
 
-  /**
-   * Optional: wenn sich der Autocomplete-Text ändert.
-   */
   onSearchChange?: (searchValue: string) => void;
-
-  /**
-   * Optional: wenn das Accordion geöffnet/geschlossen wird.
-   */
   onDetailsToggle?: (expanded: boolean) => void;
 };
