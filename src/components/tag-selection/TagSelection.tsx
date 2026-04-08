@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useRef } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { Box, Stack } from "@mui/material";
 import { useStore } from "zustand";
 import "./TagSelection.css";
@@ -72,8 +72,8 @@ function TagSelectionInner({
   const deleteTag = useTagSelectionStore((state) => state.deleteTag);
 
   /**
-   * Wenn die Tags von außen neu kommen, synchronisieren wir sie in den Store.
-   * So bleibt die Komponente nah an deinem bisherigen "props rein, UI raus"-Ansatz.
+   * Wenn Tags von außen neu reinkommen, synchronisieren wir sie in den Store.
+   * So bleibt die Komponente nah an deinem bisherigen Props-Ansatz.
    */
   useEffect(() => {
     setTags(tags);
@@ -209,17 +209,13 @@ export function TagSelection({
   onDetailsToggle,
 }: TagSelectionProps) {
   /**
-   * Pro Komponente eine eigene Store-Instanz.
-   * Dadurch teilen sich mehrere TagSelection-Komponenten nicht versehentlich denselben State.
+   * Pro Komponenten-Instanz genau eine eigene Store-Instanz.
+   * useState mit Lazy Initializer ist hier ESLint-freundlich und gut lesbar.
    */
-  const storeRef = useRef<TagSelectionStore | null>(null);
-
-  if (!storeRef.current) {
-    storeRef.current = createTagSelectionStore(tags);
-  }
+  const [store] = useState(() => createTagSelectionStore(tags));
 
   return (
-    <TagSelectionStoreContext.Provider value={storeRef.current}>
+    <TagSelectionStoreContext.Provider value={store}>
       <TagSelectionInner
         tags={tags}
         showSelectedTags={showSelectedTags}
