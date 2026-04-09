@@ -113,8 +113,9 @@ export const Default: Story = {
   args: {
     tags: sampleTags,
     inputSize: "small",
+    chipSize: "small",
     showSelectedTags: true,
-    showSelectedTagsLabel: false,
+    showSelectedTagsLabel: true,
     showAutoComplete: true,
     showStartIcon: true,
     showDeleteIcon: true,

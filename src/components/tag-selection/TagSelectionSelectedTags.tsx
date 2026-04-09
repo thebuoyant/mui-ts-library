@@ -12,6 +12,7 @@ type TagSelectionSelectedTagsProps = {
   showStartIcon?: boolean;
   showDeleteIcon?: boolean;
   showSelectedTagsLabel: boolean;
+  chipSize: "small" | "medium";
 };
 
 export function TagSelectionSelectedTags({
@@ -21,6 +22,7 @@ export function TagSelectionSelectedTags({
   showStartIcon = true,
   showDeleteIcon = true,
   showSelectedTagsLabel,
+  chipSize = "medium",
 }: TagSelectionSelectedTagsProps) {
   return (
     <div className="tag-selection-section">
@@ -42,6 +44,7 @@ export function TagSelectionSelectedTags({
               onDelete={onTagDelete}
               showStartIcon={showStartIcon}
               showDeleteIcon={showDeleteIcon}
+              chipSize={chipSize}
             />
           ))}
         </Stack>

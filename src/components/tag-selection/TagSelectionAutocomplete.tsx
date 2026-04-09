@@ -7,6 +7,7 @@ import type {
 
 type TagSelectionAutocompleteProps = {
   inputSize: "medium" | "small";
+  chipSize: "medium" | "small";
   availableTags: TagSelectionItem[];
   searchValue: string;
   translation: TagSelectionTranslation;
@@ -23,6 +24,7 @@ export function TagSelectionAutocomplete({
   onTagSelect,
   showStartIcon = true,
   inputSize = "medium",
+  chipSize = "medium",
 }: TagSelectionAutocompleteProps) {
   return (
     <div className="tag-selection-section">
@@ -67,6 +69,7 @@ export function TagSelectionAutocomplete({
             }}
           >
             <Chip
+              size={chipSize}
               label={option.label}
               icon={showStartIcon ? (option.startIcon ?? undefined) : undefined}
               sx={{

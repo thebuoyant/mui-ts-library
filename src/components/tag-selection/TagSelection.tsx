@@ -49,6 +49,7 @@ function TagSelectionInner({
   showStartIcon = true,
   showDeleteIcon = true,
   inputSize = "medium",
+  chipSize = "medium",
   translation,
   onTagSelect,
   onTagDelete,
@@ -148,6 +149,7 @@ function TagSelectionInner({
             showStartIcon={showStartIcon}
             showDeleteIcon={showDeleteIcon}
             showSelectedTagsLabel={showSelectedTagsLabel}
+            chipSize={chipSize}
           />
         )}
 
@@ -160,6 +162,7 @@ function TagSelectionInner({
             onTagSelect={handleTagSelect}
             showStartIcon={showStartIcon}
             inputSize={inputSize}
+            chipSize={chipSize}
           />
         )}
       </Stack>
@@ -176,6 +179,7 @@ export function TagSelection({
   showDeleteIcon = true,
   translation = defaultTranslation,
   inputSize = "medium",
+  chipSize = "medium",
   onTagSelect,
   onTagDelete,
   onTagsChange,
@@ -200,6 +204,7 @@ export function TagSelection({
         onSearchChange={onSearchChange}
         onDetailsToggle={onDetailsToggle}
         inputSize={inputSize}
+        chipSize={chipSize}
       />
     </TagSelectionStoreContext.Provider>
   );
