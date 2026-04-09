@@ -28,7 +28,6 @@ export type TagSelectionProps = {
   showSelectedTags?: boolean;
   showSelectedTagsLabel?: boolean;
   showAutoComplete?: boolean;
-  showDetails?: boolean;
   showStartIcon?: boolean;
   showDeleteIcon?: boolean;
   translation?: TagSelectionTranslation;

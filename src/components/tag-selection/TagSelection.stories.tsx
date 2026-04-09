@@ -115,7 +115,6 @@ export const Default: Story = {
     showSelectedTags: true,
     showSelectedTagsLabel: false,
     showAutoComplete: true,
-    showDetails: true,
     showStartIcon: true,
     showDeleteIcon: true,
     translation: {

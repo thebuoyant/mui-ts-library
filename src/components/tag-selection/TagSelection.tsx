@@ -173,7 +173,6 @@ export function TagSelection({
   showSelectedTags = true,
   showSelectedTagsLabel = true,
   showAutoComplete = true,
-  showDetails = true,
   showStartIcon = true,
   showDeleteIcon = true,
   translation = defaultTranslation,
@@ -192,7 +191,6 @@ export function TagSelection({
         showSelectedTags={showSelectedTags}
         showSelectedTagsLabel={showSelectedTagsLabel}
         showAutoComplete={showAutoComplete}
-        showDetails={showDetails}
         showStartIcon={showStartIcon}
         showDeleteIcon={showDeleteIcon}
         translation={translation}
