@@ -209,6 +209,7 @@ function TagSelectionInner({
 export function TagSelection({
   tags,
   showSelectedTags = true,
+  showSelectedTagsLabel = true,
   showAutoComplete = true,
   showDetails = true,
   showStartIcon = true,
@@ -227,6 +228,7 @@ export function TagSelection({
       <TagSelectionInner
         tags={tags}
         showSelectedTags={showSelectedTags}
+        showSelectedTagsLabel={showSelectedTagsLabel}
         showAutoComplete={showAutoComplete}
         showDetails={showDetails}
         showStartIcon={showStartIcon}
