@@ -129,7 +129,7 @@ export const Default: Story = {
     },
   },
   render: (args) => (
-    <Box sx={{ maxWidth: 700 }}>
+    <Box sx={{ maxWidth: 420 }}>
       <TagSelection
         {...args}
         onTagSelect={(tag, selectedTags, allTags) => {
