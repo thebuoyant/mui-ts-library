@@ -6,50 +6,53 @@ import CssIcon from "@mui/icons-material/Css";
 import HtmlIcon from "@mui/icons-material/Html";
 import DataObjectIcon from "@mui/icons-material/DataObject";
 import SmartToyIcon from "@mui/icons-material/SmartToy";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { TagSelection } from "./TagSelection";
 import type { TagSelectionItem } from "./TagSelection.types";
+import CloseIcon from "@mui/icons-material/Close";
+
+const START_ICON_COLOR = "#ffffff";
+const DELETE_ICON_COLOR = "#cccccc";
 
 const sampleTags: TagSelectionItem[] = [
   {
     id: "javascript",
     label: "JavaScript",
     selected: true,
-    startIcon: <JavascriptIcon />,
-    deleteIcon: <DeleteOutlineIcon />,
-    foregroundColor: "#0d47a1",
-    backgroundColor: "#e3f2fd",
+    startIcon: <JavascriptIcon style={{ color: START_ICON_COLOR }} />,
+    deleteIcon: <CloseIcon style={{ color: DELETE_ICON_COLOR }} />,
+    foregroundColor: "#ffffff",
+    backgroundColor: "	#660000",
   },
   {
     id: "typescript",
     label: "TypeScript",
     selected: true,
-    startIcon: <DataObjectIcon />,
-    deleteIcon: <DeleteOutlineIcon />,
-    foregroundColor: "#1565c0",
-    backgroundColor: "#e8f0fe",
+    startIcon: <DataObjectIcon style={{ color: START_ICON_COLOR }} />,
+    deleteIcon: <CloseIcon style={{ color: DELETE_ICON_COLOR }} />,
+    foregroundColor: "#ffffff",
+    backgroundColor: "#990000",
   },
   {
     id: "react",
     label: "React",
-    startIcon: <CodeIcon />,
-    deleteIcon: <DeleteOutlineIcon />,
-    foregroundColor: "#1565c0",
-    backgroundColor: "#e3f2fd",
+    startIcon: <CodeIcon style={{ color: START_ICON_COLOR }} />,
+    deleteIcon: <CloseIcon style={{ color: DELETE_ICON_COLOR }} />,
+    foregroundColor: "#ffffff",
+    backgroundColor: "#002241",
   },
   {
     id: "mui",
     label: "MUI",
-    startIcon: <SmartToyIcon />,
-    deleteIcon: <DeleteOutlineIcon />,
-    foregroundColor: "#6a1b9a",
-    backgroundColor: "#f3e5f5",
+    startIcon: <SmartToyIcon style={{ color: START_ICON_COLOR }} />,
+    deleteIcon: <CloseIcon style={{ color: DELETE_ICON_COLOR }} />,
+    foregroundColor: "#ffffff",
+    backgroundColor: "#7a5c8e",
   },
   {
     id: "css",
     label: "CSS",
     startIcon: <CssIcon />,
-    deleteIcon: <DeleteOutlineIcon />,
+    deleteIcon: <CloseIcon />,
     foregroundColor: "#1565c0",
     backgroundColor: "#e3f2fd",
   },
@@ -57,7 +60,7 @@ const sampleTags: TagSelectionItem[] = [
     id: "html",
     label: "HTML",
     startIcon: <HtmlIcon />,
-    deleteIcon: <DeleteOutlineIcon />,
+    deleteIcon: <CloseIcon />,
     foregroundColor: "#1565c0",
     backgroundColor: "#e3f2fd",
   },
@@ -65,7 +68,7 @@ const sampleTags: TagSelectionItem[] = [
     id: "python",
     label: "Python",
     startIcon: <CodeIcon />,
-    deleteIcon: <DeleteOutlineIcon />,
+    deleteIcon: <CloseIcon />,
     foregroundColor: "#ffffff",
     backgroundColor: "#1976d2",
   },
@@ -73,7 +76,7 @@ const sampleTags: TagSelectionItem[] = [
     id: "golang",
     label: "Golang",
     startIcon: <CodeIcon />,
-    deleteIcon: <DeleteOutlineIcon />,
+    deleteIcon: <CloseIcon />,
     foregroundColor: "#1565c0",
     backgroundColor: "#e3f2fd",
   },
@@ -82,7 +85,7 @@ const sampleTags: TagSelectionItem[] = [
     label: "jQuery",
     disabled: true,
     startIcon: <CodeIcon />,
-    deleteIcon: <DeleteOutlineIcon />,
+    deleteIcon: <CloseIcon />,
     foregroundColor: "#9e9e9e",
     backgroundColor: "#f5f5f5",
   },
@@ -91,7 +94,7 @@ const sampleTags: TagSelectionItem[] = [
     label: ".Net",
     disabled: true,
     startIcon: <CodeIcon />,
-    deleteIcon: <DeleteOutlineIcon />,
+    deleteIcon: <CloseIcon />,
     foregroundColor: "#9e9e9e",
     backgroundColor: "#f5f5f5",
   },
