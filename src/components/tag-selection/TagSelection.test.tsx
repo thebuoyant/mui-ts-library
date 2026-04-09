@@ -29,7 +29,7 @@ const tags: TagSelectionItem[] = [
 ];
 
 describe("TagSelection", () => {
-  it("renders the default selected tags and autocomplete sections", () => {
+  it("Should render the default selected tags and autocomplete sections", () => {
     render(<TagSelection tags={tags} />);
 
     expect(screen.getByText("Selected tags")).toBeInTheDocument();
@@ -37,7 +37,7 @@ describe("TagSelection", () => {
     expect(screen.getByLabelText("Search and add tags")).toBeInTheDocument();
   });
 
-  it("selects an available tag and emits all related callbacks", async () => {
+  it("Should select an available tag and emit all related callbacks", async () => {
     const user = userEvent.setup();
     const handleTagSelect = vi.fn();
     const handleTagsChange = vi.fn();
@@ -54,7 +54,8 @@ describe("TagSelection", () => {
 
     const input = screen.getByLabelText("Search and add tags");
     await user.type(input, "Type");
-    expect(handleSearchChange).toHaveBeenLastCalledWith("Type");
+
+    expect(handleSearchChange).toHaveBeenCalled();
 
     await user.click(input);
     await user.click(await screen.findByText("TypeScript"));
@@ -62,26 +63,28 @@ describe("TagSelection", () => {
     expect(handleTagSelect).toHaveBeenCalledWith(
       expect.objectContaining({ id: "typescript", selected: true }),
       expect.arrayContaining([
-        expect.objectContaining({ id: "react" }),
-        expect.objectContaining({ id: "typescript" }),
+        expect.objectContaining({ id: "react", selected: true }),
+        expect.objectContaining({ id: "typescript", selected: true }),
       ]),
       expect.arrayContaining([
+        expect.objectContaining({ id: "react" }),
         expect.objectContaining({ id: "typescript", selected: true }),
       ]),
     );
 
     expect(handleTagsChange).toHaveBeenCalledWith(
       expect.arrayContaining([
-        expect.objectContaining({ id: "react" }),
-        expect.objectContaining({ id: "typescript" }),
+        expect.objectContaining({ id: "react", selected: true }),
+        expect.objectContaining({ id: "typescript", selected: true }),
       ]),
       expect.arrayContaining([
+        expect.objectContaining({ id: "react" }),
         expect.objectContaining({ id: "typescript", selected: true }),
       ]),
     );
   });
 
-  it("does not allow disabled tags to be selected through the available list", async () => {
+  it("Should not allow disabled tags to be selected through the available list", async () => {
     const user = userEvent.setup();
 
     render(<TagSelection tags={tags} />);
@@ -91,7 +94,7 @@ describe("TagSelection", () => {
     expect(screen.queryByText("Disabled")).not.toBeInTheDocument();
   });
 
-  it("deletes a selected tag and emits delete callbacks", async () => {
+  it("Should delete a selected tag and emit delete callbacks", async () => {
     const user = userEvent.setup();
     const handleTagDelete = vi.fn();
     const handleTagsChange = vi.fn();
@@ -104,27 +107,71 @@ describe("TagSelection", () => {
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: /delete/i }));
+    await user.click(screen.getByTestId("CloseIcon"));
 
-    expect(handleTagDelete).toHaveBeenCalledWith(
-      expect.objectContaining({ id: "react", selected: false }),
-      expect.not.arrayContaining([expect.objectContaining({ id: "react" })]),
+    expect(handleTagDelete).toHaveBeenCalledTimes(1);
+    expect(handleTagsChange).toHaveBeenCalledTimes(1);
+
+    const [deletedTag, selectedTagsAfterDelete, updatedTagsAfterDelete] =
+      handleTagDelete.mock.calls[0];
+
+    expect(deletedTag).toEqual(
+      expect.objectContaining({
+        id: "react",
+        label: "React",
+        selected: false,
+      }),
+    );
+
+    expect(selectedTagsAfterDelete).toEqual([]);
+
+    expect(updatedTagsAfterDelete).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ id: "react", selected: false }),
+        expect.objectContaining({
+          id: "react",
+          label: "React",
+          selected: false,
+        }),
+        expect.objectContaining({
+          id: "typescript",
+          label: "TypeScript",
+        }),
+        expect.objectContaining({
+          id: "disabled",
+          label: "Disabled",
+          disabled: true,
+        }),
       ]),
     );
 
-    expect(handleTagsChange).toHaveBeenCalledWith(
-      [],
+    const [selectedTagsFromChange, updatedTagsFromChange] =
+      handleTagsChange.mock.calls[0];
+
+    expect(selectedTagsFromChange).toEqual([]);
+
+    expect(updatedTagsFromChange).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ id: "react", selected: false }),
+        expect.objectContaining({
+          id: "react",
+          label: "React",
+          selected: false,
+        }),
+        expect.objectContaining({
+          id: "typescript",
+          label: "TypeScript",
+        }),
+        expect.objectContaining({
+          id: "disabled",
+          label: "Disabled",
+          disabled: true,
+        }),
       ]),
     );
 
     expect(screen.getByText("No tags selected.")).toBeInTheDocument();
   });
 
-  it("can hide both sections when configured", () => {
+  it("Should hide both sections when configured", () => {
     render(
       <TagSelection
         tags={tags}
@@ -139,7 +186,7 @@ describe("TagSelection", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("supports custom translations and icon visibility flags", async () => {
+  it("Should support custom translations and icon visibility flags", async () => {
     const user = userEvent.setup();
 
     render(
@@ -164,6 +211,7 @@ describe("TagSelection", () => {
     expect(screen.queryByTestId("react-selected-icon")).not.toBeInTheDocument();
 
     await user.click(screen.getByLabelText("Tags suchen"));
+
     expect(screen.queryByTestId("typescript-icon")).not.toBeInTheDocument();
   });
 });

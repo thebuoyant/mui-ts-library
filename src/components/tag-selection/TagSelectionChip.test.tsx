@@ -16,7 +16,7 @@ const baseTag = {
 };
 
 describe("TagSelectionChip", () => {
-  it("renders a filled chip for selected tags and uses custom colors", () => {
+  it("Should render a filled chip for selected tags and use custom colors", () => {
     render(<TagSelectionChip tag={baseTag} chipSize="small" />);
 
     const chip = screen.getByText("React").closest(".MuiChip-root");
@@ -30,7 +30,7 @@ describe("TagSelectionChip", () => {
     expect(screen.getByTestId("start-icon")).toBeInTheDocument();
   });
 
-  it("calls onClick and onDelete with the current tag", async () => {
+  it("Should call onClick and onDelete with the current tag", async () => {
     const user = userEvent.setup();
     const handleClick = vi.fn();
     const handleDelete = vi.fn();
@@ -44,8 +44,8 @@ describe("TagSelectionChip", () => {
       />,
     );
 
-    await user.click(screen.getByText("React"));
-    await user.click(screen.getByRole("button", { name: /delete/i }));
+    await user.click(screen.getByRole("button", { name: "React" }));
+    await user.click(screen.getByTestId("delete-icon"));
 
     expect(handleClick).toHaveBeenCalledWith(
       expect.objectContaining({ id: "react" }),
@@ -55,7 +55,7 @@ describe("TagSelectionChip", () => {
     );
   });
 
-  it("hides optional icons when they are disabled via props", () => {
+  it("Should hide optional icons when they are disabled via props", () => {
     render(
       <TagSelectionChip
         tag={baseTag}
@@ -70,7 +70,7 @@ describe("TagSelectionChip", () => {
     expect(screen.queryByTestId("delete-icon")).not.toBeInTheDocument();
   });
 
-  it("renders disabled chips as not clickable", () => {
+  it("Should render disabled chips as not clickable", () => {
     render(
       <TagSelectionChip
         tag={{ ...baseTag, disabled: true, selected: false }}

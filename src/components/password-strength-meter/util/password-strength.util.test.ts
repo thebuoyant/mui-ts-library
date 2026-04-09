@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { scorePassword } from "./password-strength.util";
 
 describe("scorePassword", () => {
-  it("returns a weak empty result for an empty password", () => {
+  it("Should return a weak empty result for an empty password", () => {
     expect(scorePassword("", 8)).toEqual({
       score: 0,
       percent: 0,
@@ -15,10 +15,10 @@ describe("scorePassword", () => {
     });
   });
 
-  it("keeps short passwords weak even when several character classes exist", () => {
+  it("Should keep short passwords weak even when several character classes exist", () => {
     const result = scorePassword("Aa1!", 8);
 
-    expect(result).toMatchObject({
+    expect(result).toEqual({
       score: 1,
       percent: 25,
       meterStatus: "weak",
@@ -30,32 +30,40 @@ describe("scorePassword", () => {
     });
   });
 
-  it("returns ok for a password that meets the minimum length with two classes", () => {
-    const result = scorePassword("abcdefgh", 8);
+  it("Should return ok for a password that meets the minimum length with two character classes", () => {
+    const result = scorePassword("Abefghij", 8);
 
     expect(result.score).toBe(2);
     expect(result.percent).toBe(50);
     expect(result.meterStatus).toBe("ok");
+    expect(result.length).toBe(8);
     expect(result.hasLower).toBe(true);
+    expect(result.hasUpper).toBe(true);
+    expect(result.hasDigit).toBe(false);
+    expect(result.hasSymbol).toBe(false);
   });
 
-  it("returns good for a password with at least three character classes", () => {
-    const result = scorePassword("Abcdefg1", 8);
+  it("Should return good for a password with at least three character classes and without banned patterns", () => {
+    const result = scorePassword("Qw7!mnOp", 8);
 
     expect(result.score).toBe(3);
     expect(result.percent).toBe(75);
     expect(result.meterStatus).toBe("good");
+    expect(result.hasLower).toBe(true);
+    expect(result.hasUpper).toBe(true);
+    expect(result.hasDigit).toBe(true);
+    expect(result.hasSymbol).toBe(true);
   });
 
-  it("returns very good for a longer password with multiple character classes", () => {
-    const result = scorePassword("Abcdefg1!XYZ", 8);
+  it("Should return very good for a longer password with multiple character classes", () => {
+    const result = scorePassword("Qw7!mnOpXy12", 8);
 
     expect(result.score).toBe(4);
     expect(result.percent).toBe(100);
     expect(result.meterStatus).toBe("very good");
   });
 
-  it("penalizes repeated characters heavily", () => {
+  it("Should penalize repeated characters heavily", () => {
     const result = scorePassword("AAAAAAAAAAAA", 8);
 
     expect(result.score).toBe(0);
@@ -63,27 +71,28 @@ describe("scorePassword", () => {
     expect(result.meterStatus).toBe("weak");
   });
 
-  it("penalizes common patterns like 1234", () => {
-    const result = scorePassword("Abcd1234!", 8);
+  it("Should penalize common patterns like 1234", () => {
+    const result = scorePassword("Qw!9Lm1234Xy", 8);
 
     expect(result.score).toBe(2);
     expect(result.percent).toBe(50);
     expect(result.meterStatus).toBe("ok");
   });
 
-  it("penalizes common german patterns like passwort", () => {
+  it("Should penalize common german patterns like passwort", () => {
     const result = scorePassword("MeinPasswort123!", 8);
 
     expect(result.score).toBe(2);
+    expect(result.percent).toBe(50);
     expect(result.meterStatus).toBe("ok");
   });
 
-  it("clamps the score to the allowed range", () => {
+  it("Should clamp the score to the allowed range", () => {
     expect(scorePassword("A".repeat(30), 8).score).toBe(0);
-    expect(scorePassword("VeryStrongPassword123!@#", 8).score).toBe(4);
+    expect(scorePassword("Qw7!mnOpXy12", 8).score).toBe(4);
   });
 
-  it("treats nullish input safely as an empty password", () => {
+  it("Should treat nullish input safely as an empty password", () => {
     const result = scorePassword(undefined as never, 8);
 
     expect(result).toMatchObject({

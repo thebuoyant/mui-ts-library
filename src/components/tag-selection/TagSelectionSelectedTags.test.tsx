@@ -16,7 +16,7 @@ const translation: TagSelectionTranslation = {
 };
 
 describe("TagSelectionSelectedTags", () => {
-  it("renders the empty state when no tags are selected", () => {
+  it("Should render the empty state when no tags are selected", () => {
     render(
       <TagSelectionSelectedTags
         selectedTags={[]}
@@ -31,7 +31,7 @@ describe("TagSelectionSelectedTags", () => {
     expect(screen.getByText("No tags selected.")).toBeInTheDocument();
   });
 
-  it("renders selected tags and forwards delete events", async () => {
+  it("Should render selected tags and forward delete events", async () => {
     const user = userEvent.setup();
     const handleDelete = vi.fn();
 
@@ -57,7 +57,7 @@ describe("TagSelectionSelectedTags", () => {
     expect(screen.getByText("React")).toBeInTheDocument();
     expect(screen.getByTestId("selected-start-icon")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: /delete/i }));
+    await user.click(screen.getByTestId("CloseIcon"));
 
     expect(handleDelete).toHaveBeenCalledWith(
       expect.objectContaining({ id: "react" }),

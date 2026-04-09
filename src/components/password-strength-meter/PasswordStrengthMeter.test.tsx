@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { PasswordStrengthMeter } from "./PasswordStrengthMeter";
 
 describe("PasswordStrengthMeter", () => {
-  it("renders with its default label and hidden password input", () => {
+  it("Should render with its default label and hidden password input", () => {
     render(<PasswordStrengthMeter />);
 
     const input = screen.getByLabelText("Password") as HTMLInputElement;
@@ -16,49 +16,48 @@ describe("PasswordStrengthMeter", () => {
     ).toBeInTheDocument();
   });
 
-  it("toggles the password visibility when the adornment button is clicked", async () => {
+  it("Should toggle the password visibility when the adornment button is clicked", async () => {
     const user = userEvent.setup();
 
     render(<PasswordStrengthMeter />);
 
     const input = screen.getByLabelText("Password") as HTMLInputElement;
-    const toggleButton = screen.getByRole("button", { name: "Show password" });
+    const showButton = screen.getByRole("button", { name: "Show password" });
 
-    await user.click(toggleButton);
+    await user.click(showButton);
     expect(input.type).toBe("text");
-    expect(
-      screen.getByRole("button", { name: "Hide password" }),
-    ).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Hide password" }));
+    const hideButton = screen.getByRole("button", { name: "Hide password" });
+    await user.click(hideButton);
     expect(input.type).toBe("password");
   });
 
-  it("calls onPasswordChange with the typed password and calculated result", async () => {
+  it("Should call onPasswordChange with the typed password and calculated result", async () => {
     const user = userEvent.setup();
     const handlePasswordChange = vi.fn();
 
     render(<PasswordStrengthMeter onPasswordChange={handlePasswordChange} />);
 
     const input = screen.getByLabelText("Password");
-    await user.type(input, "Abcd1234!");
+    await user.type(input, "Qw7!mnOp");
 
     expect(handlePasswordChange).toHaveBeenCalled();
     expect(handlePasswordChange).toHaveBeenLastCalledWith(
-      "Abcd1234!",
+      "Qw7!mnOp",
       expect.objectContaining({
-        meterStatus: "ok",
-        score: 2,
-        percent: 50,
-        hasUpper: true,
+        score: 3,
+        percent: 75,
+        meterStatus: "good",
+        length: 8,
         hasLower: true,
+        hasUpper: true,
         hasDigit: true,
         hasSymbol: true,
       }),
     );
   });
 
-  it("updates the strength meter width and color based on the current password", async () => {
+  it("Should update the strength meter width and color based on the current password", async () => {
     const user = userEvent.setup();
 
     render(
@@ -75,7 +74,7 @@ describe("PasswordStrengthMeter", () => {
     const input = screen.getByLabelText("Password");
     const meter = document.querySelector(".meter-result") as HTMLDivElement;
 
-    await user.type(input, "Abcdefg1");
+    await user.type(input, "Qw7!mnOp");
 
     expect(meter).toHaveStyle({
       width: "75%",
@@ -83,7 +82,7 @@ describe("PasswordStrengthMeter", () => {
     });
   });
 
-  it("renders translated texts and custom minimum length in the summary", () => {
+  it("Should render translated texts and custom minimum length in the summary", () => {
     render(
       <PasswordStrengthMeter
         passwordMinLength={12}
@@ -106,12 +105,12 @@ describe("PasswordStrengthMeter", () => {
     expect(screen.getByText("Großbuchstabe")).toBeInTheDocument();
   });
 
-  it("shows success icons for fulfilled rules and failure icons for open rules", async () => {
+  it("Should show success icons for fulfilled rules and failure icons for open rules", async () => {
     const user = userEvent.setup();
 
     render(<PasswordStrengthMeter />);
 
-    await user.type(screen.getByLabelText("Password"), "Abcd1234!");
+    await user.type(screen.getByLabelText("Password"), "Qw7!mnOp");
 
     const successIcons = document.querySelectorAll(
       '[data-testid="CheckCircleOutlineIcon"]',
@@ -124,7 +123,7 @@ describe("PasswordStrengthMeter", () => {
     expect(failureIcons.length).toBe(0);
   });
 
-  it("can hide the adornment, meter and summary blocks", () => {
+  it("Should hide the adornment, meter and summary blocks when configured", () => {
     render(
       <PasswordStrengthMeter
         showPasswordAdornment={false}

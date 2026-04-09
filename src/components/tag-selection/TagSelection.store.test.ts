@@ -9,7 +9,7 @@ const initialTags: TagSelectionItem[] = [
 ];
 
 describe("createTagSelectionStore", () => {
-  it("creates the initial state", () => {
+  it("Should create the initial state", () => {
     const store = createTagSelectionStore(initialTags);
 
     expect(store.getState()).toMatchObject({
@@ -19,7 +19,7 @@ describe("createTagSelectionStore", () => {
     });
   });
 
-  it("updates tags, search value and details state", () => {
+  it("Should update tags, search value and details state", () => {
     const store = createTagSelectionStore(initialTags);
 
     store.getState().setTags([{ id: "9", label: "Vitest" }]);
@@ -31,7 +31,7 @@ describe("createTagSelectionStore", () => {
     expect(store.getState().detailsExpanded).toBe(true);
   });
 
-  it("selects a non-disabled tag and clears the current search", () => {
+  it("Should select a non-disabled tag and clear the current search", () => {
     const store = createTagSelectionStore(initialTags);
 
     store.getState().setSearchValue("rea");
@@ -43,7 +43,7 @@ describe("createTagSelectionStore", () => {
     expect(store.getState().searchValue).toBe("");
   });
 
-  it("does not select a disabled tag", () => {
+  it("Should not select a disabled tag", () => {
     const store = createTagSelectionStore(initialTags);
 
     store.getState().selectTag("2");
@@ -53,7 +53,7 @@ describe("createTagSelectionStore", () => {
     ).not.toBe(true);
   });
 
-  it("deletes a selected tag by resetting its selected flag", () => {
+  it("Should delete a selected tag by resetting its selected flag", () => {
     const store = createTagSelectionStore(initialTags);
 
     store.getState().deleteTag("3");

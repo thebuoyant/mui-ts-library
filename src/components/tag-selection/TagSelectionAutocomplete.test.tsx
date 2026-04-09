@@ -1,9 +1,13 @@
 import LabelIcon from "@mui/icons-material/Label";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { TagSelectionAutocomplete } from "./TagSelectionAutocomplete";
-import type { TagSelectionTranslation } from "./TagSelection.types";
+import type {
+  TagSelectionItem,
+  TagSelectionTranslation,
+} from "./TagSelection.types";
 
 const translation: TagSelectionTranslation = {
   selectedTagsLabel: "Selected tags",
@@ -14,7 +18,7 @@ const translation: TagSelectionTranslation = {
   placeholder: "Type to search...",
 };
 
-const availableTags = [
+const availableTags: TagSelectionItem[] = [
   {
     id: "react",
     label: "React",
@@ -23,20 +27,47 @@ const availableTags = [
   { id: "vitest", label: "Vitest" },
 ];
 
+type TestWrapperProps = {
+  onSearchChange?: (value: string) => void;
+  onTagSelect?: (tag: TagSelectionItem) => void;
+  showStartIcon?: boolean;
+  availableTags?: TagSelectionItem[];
+};
+
+function TestWrapper({
+  onSearchChange = vi.fn(),
+  onTagSelect = vi.fn(),
+  showStartIcon = true,
+  availableTags = [],
+}: TestWrapperProps) {
+  const [searchValue, setSearchValue] = useState("");
+
+  return (
+    <TagSelectionAutocomplete
+      availableTags={availableTags}
+      searchValue={searchValue}
+      translation={translation}
+      onSearchChange={(value) => {
+        setSearchValue(value);
+        onSearchChange(value);
+      }}
+      onTagSelect={onTagSelect}
+      showStartIcon={showStartIcon}
+      inputSize="medium"
+      chipSize="medium"
+    />
+  );
+}
+
 describe("TagSelectionAutocomplete", () => {
-  it("renders the input and notifies about search changes", async () => {
+  it("Should render the input and notify about search changes", async () => {
     const user = userEvent.setup();
     const handleSearchChange = vi.fn();
 
     render(
-      <TagSelectionAutocomplete
+      <TestWrapper
         availableTags={availableTags}
-        searchValue=""
-        translation={translation}
         onSearchChange={handleSearchChange}
-        onTagSelect={vi.fn()}
-        inputSize="small"
-        chipSize="medium"
       />,
     );
 
@@ -44,24 +75,20 @@ describe("TagSelectionAutocomplete", () => {
     await user.type(input, "rea");
 
     expect(handleSearchChange).toHaveBeenLastCalledWith("rea");
+    expect(input).toHaveValue("rea");
     expect(
       screen.getByPlaceholderText("Type to search..."),
     ).toBeInTheDocument();
   });
 
-  it("renders the available tags as chips and selects one option", async () => {
+  it("Should render the available tags as chips and select one option", async () => {
     const user = userEvent.setup();
     const handleTagSelect = vi.fn();
 
     render(
-      <TagSelectionAutocomplete
+      <TestWrapper
         availableTags={availableTags}
-        searchValue=""
-        translation={translation}
-        onSearchChange={vi.fn()}
         onTagSelect={handleTagSelect}
-        inputSize="medium"
-        chipSize="small"
       />,
     );
 
@@ -79,21 +106,10 @@ describe("TagSelectionAutocomplete", () => {
     );
   });
 
-  it("shows the no-options text and can hide the start icon", async () => {
+  it("Should show the no-options text and hide the start icon when configured", async () => {
     const user = userEvent.setup();
 
-    render(
-      <TagSelectionAutocomplete
-        availableTags={[]}
-        searchValue=""
-        translation={translation}
-        onSearchChange={vi.fn()}
-        onTagSelect={vi.fn()}
-        showStartIcon={false}
-        inputSize="medium"
-        chipSize="medium"
-      />,
-    );
+    render(<TestWrapper availableTags={[]} showStartIcon={false} />);
 
     await user.click(screen.getByLabelText("Search and add tags"));
 
