@@ -7,7 +7,6 @@ import {
   type TagSelectionStore,
 } from "./TagSelection.store";
 import { TagSelectionAutocomplete } from "./TagSelectionAutocomplete";
-import { TagSelectionDetails } from "./TagSelectionDetails";
 import { TagSelectionSelectedTags } from "./TagSelectionSelectedTags";
 import type {
   TagSelectionItem,
@@ -50,7 +49,6 @@ function TagSelectionInner({
   showSelectedTags = true,
   showSelectedTagsLabel = true,
   showAutoComplete = true,
-  showDetails = true,
   showStartIcon = true,
   showDeleteIcon = true,
   translation,
@@ -58,19 +56,11 @@ function TagSelectionInner({
   onTagDelete,
   onTagsChange,
   onSearchChange,
-  onDetailsToggle,
 }: TagSelectionInnerProps) {
   const storeTags = useTagSelectionStore((state) => state.tags);
   const searchValue = useTagSelectionStore((state) => state.searchValue);
-  const detailsExpanded = useTagSelectionStore(
-    (state) => state.detailsExpanded,
-  );
-
   const setTags = useTagSelectionStore((state) => state.setTags);
   const setSearchValue = useTagSelectionStore((state) => state.setSearchValue);
-  const setDetailsExpanded = useTagSelectionStore(
-    (state) => state.setDetailsExpanded,
-  );
   const selectTag = useTagSelectionStore((state) => state.selectTag);
   const deleteTag = useTagSelectionStore((state) => state.deleteTag);
 
@@ -80,11 +70,6 @@ function TagSelectionInner({
 
   const selectedTags = useMemo(
     () => storeTags.filter((tag) => tag.selected),
-    [storeTags],
-  );
-
-  const disabledTags = useMemo(
-    () => storeTags.filter((tag) => tag.disabled),
     [storeTags],
   );
 
@@ -154,14 +139,6 @@ function TagSelectionInner({
     }
   };
 
-  const handleDetailsToggle = (expanded: boolean) => {
-    setDetailsExpanded(expanded);
-
-    if (onDetailsToggle) {
-      onDetailsToggle(expanded);
-    }
-  };
-
   return (
     <Box className="tag-selection-root">
       <Stack>
@@ -184,21 +161,6 @@ function TagSelectionInner({
             onSearchChange={handleSearchChange}
             onTagSelect={handleTagSelect}
             showStartIcon={showStartIcon}
-          />
-        )}
-
-        {showDetails && (
-          <TagSelectionDetails
-            selectedTags={selectedTags}
-            availableTags={availableTags}
-            disabledTags={disabledTags}
-            translation={translation}
-            expanded={detailsExpanded}
-            onToggle={handleDetailsToggle}
-            onTagDelete={handleTagDelete}
-            onTagSelect={handleTagSelect}
-            showStartIcon={showStartIcon}
-            showDeleteIcon={showDeleteIcon}
           />
         )}
       </Stack>
