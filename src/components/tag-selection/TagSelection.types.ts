@@ -15,9 +15,6 @@ export type TagSelectionTranslation = {
   selectedTagsLabel: string;
   autoCompleteLabel: string;
   detailsLabel: string;
-  selectedGroupLabel: string;
-  availableGroupLabel: string;
-  disabledGroupLabel: string;
   noSelectedTagsText: string;
   noAvailableTagsText: string;
   placeholder: string;
