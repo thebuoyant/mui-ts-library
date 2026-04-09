@@ -36,6 +36,16 @@ export function TagSelectionAutocomplete({
             onTagSelect(value);
           }
         }}
+        slotProps={{
+          listbox: {
+            sx: {
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 1,
+              padding: 1,
+            },
+          },
+        }}
         renderInput={(params) => (
           <TextField
             {...params}
@@ -44,7 +54,15 @@ export function TagSelectionAutocomplete({
           />
         )}
         renderOption={(props, option) => (
-          <li {...props} key={option.id}>
+          <li
+            {...props}
+            key={option.id}
+            style={{
+              width: "auto",
+              padding: 0,
+              margin: 0,
+            }}
+          >
             <Chip
               label={option.label}
               icon={showStartIcon ? (option.startIcon ?? undefined) : undefined}
