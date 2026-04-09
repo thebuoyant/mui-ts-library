@@ -48,6 +48,7 @@ type TagSelectionInnerProps = Omit<TagSelectionProps, "translation"> & {
 function TagSelectionInner({
   tags,
   showSelectedTags = true,
+  showSelectedTagsLabel = true,
   showAutoComplete = true,
   showDetails = true,
   showStartIcon = true,
@@ -171,6 +172,7 @@ function TagSelectionInner({
             onTagDelete={handleTagDelete}
             showStartIcon={showStartIcon}
             showDeleteIcon={showDeleteIcon}
+            showSelectedTagsLabel={showSelectedTagsLabel}
           />
         )}
 

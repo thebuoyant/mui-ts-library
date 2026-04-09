@@ -110,6 +110,7 @@ export const Default: Story = {
   args: {
     tags: sampleTags,
     showSelectedTags: true,
+    showSelectedTagsLabel: false,
     showAutoComplete: true,
     showDetails: true,
     showStartIcon: true,

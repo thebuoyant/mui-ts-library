@@ -11,6 +11,7 @@ type TagSelectionSelectedTagsProps = {
   onTagDelete: (tag: TagSelectionItem) => void;
   showStartIcon?: boolean;
   showDeleteIcon?: boolean;
+  showSelectedTagsLabel: boolean;
 };
 
 export function TagSelectionSelectedTags({
@@ -19,13 +20,15 @@ export function TagSelectionSelectedTags({
   onTagDelete,
   showStartIcon = true,
   showDeleteIcon = true,
+  showSelectedTagsLabel,
 }: TagSelectionSelectedTagsProps) {
   return (
     <div className="tag-selection-section">
-      <Typography variant="subtitle2" gutterBottom>
-        {translation.selectedTagsLabel}
-      </Typography>
-
+      {showSelectedTagsLabel && (
+        <Typography variant="subtitle2" gutterBottom>
+          {translation.selectedTagsLabel}
+        </Typography>
+      )}
       {selectedTags.length === 0 ? (
         <Typography variant="body2" className="tag-selection-empty-text">
           {translation.noSelectedTagsText}
