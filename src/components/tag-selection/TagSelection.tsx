@@ -48,6 +48,7 @@ function TagSelectionInner({
   showAutoComplete = true,
   showStartIcon = true,
   showDeleteIcon = true,
+  inputSize = "medium",
   translation,
   onTagSelect,
   onTagDelete,
@@ -158,6 +159,7 @@ function TagSelectionInner({
             onSearchChange={handleSearchChange}
             onTagSelect={handleTagSelect}
             showStartIcon={showStartIcon}
+            inputSize={inputSize}
           />
         )}
       </Stack>
@@ -173,6 +175,7 @@ export function TagSelection({
   showStartIcon = true,
   showDeleteIcon = true,
   translation = defaultTranslation,
+  inputSize = "medium",
   onTagSelect,
   onTagDelete,
   onTagsChange,
@@ -196,6 +199,7 @@ export function TagSelection({
         onTagsChange={onTagsChange}
         onSearchChange={onSearchChange}
         onDetailsToggle={onDetailsToggle}
+        inputSize={inputSize}
       />
     </TagSelectionStoreContext.Provider>
   );

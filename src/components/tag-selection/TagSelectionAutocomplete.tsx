@@ -6,6 +6,7 @@ import type {
 } from "./TagSelection.types";
 
 type TagSelectionAutocompleteProps = {
+  inputSize: "medium" | "small";
   availableTags: TagSelectionItem[];
   searchValue: string;
   translation: TagSelectionTranslation;
@@ -21,11 +22,13 @@ export function TagSelectionAutocomplete({
   onSearchChange,
   onTagSelect,
   showStartIcon = true,
+  inputSize = "medium",
 }: TagSelectionAutocompleteProps) {
   return (
     <div className="tag-selection-section">
       <Autocomplete<TagSelectionItem, false, false, false>
         options={availableTags}
+        size={inputSize}
         getOptionLabel={(option) => option.label}
         inputValue={searchValue}
         onInputChange={(_, newInputValue) => {

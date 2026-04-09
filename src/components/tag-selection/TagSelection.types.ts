@@ -28,6 +28,7 @@ export type TagSelectionProps = {
   showStartIcon?: boolean;
   showDeleteIcon?: boolean;
   translation?: TagSelectionTranslation;
+  inputSize?: "small" | "medium";
   onTagSelect?: (
     tag: TagSelectionItem,
     selectedTags: TagSelectionItem[],

@@ -112,6 +112,7 @@ type Story = StoryObj<typeof TagSelection>;
 export const Default: Story = {
   args: {
     tags: sampleTags,
+    inputSize: "small",
     showSelectedTags: true,
     showSelectedTagsLabel: false,
     showAutoComplete: true,
