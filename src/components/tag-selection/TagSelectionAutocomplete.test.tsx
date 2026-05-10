@@ -51,7 +51,11 @@ function TestWrapper({
         setSearchValue(value);
         onSearchChange(value);
       }}
-      onTagSelect={onTagSelect}
+      onTagSelect={(tag) => {
+        // Simulate the store clearing searchValue after selection.
+        setSearchValue("");
+        onTagSelect(tag);
+      }}
       showStartIcon={showStartIcon}
       inputSize="medium"
       chipSize="medium"
@@ -104,6 +108,21 @@ describe("TagSelectionAutocomplete", () => {
     expect(handleTagSelect).toHaveBeenCalledWith(
       expect.objectContaining({ id: "react" }),
     );
+  });
+
+  it("Should clear the input after a tag is selected", async () => {
+    const user = userEvent.setup();
+
+    render(<TestWrapper availableTags={availableTags} />);
+
+    const input = screen.getByLabelText("Search and add tags");
+    await user.type(input, "Rea");
+
+    expect(input).toHaveValue("Rea");
+
+    await user.click(await screen.findByText("React"));
+
+    expect(input).toHaveValue("");
   });
 
   it("Should show the no-options text and hide the start icon when configured", async () => {

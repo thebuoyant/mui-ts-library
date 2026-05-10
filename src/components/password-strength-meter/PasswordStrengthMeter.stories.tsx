@@ -24,7 +24,7 @@ export const Default: Story = {
       summaryMinCharsLeft: "At least ",
       summaryMinCharsRight: "characters",
       summaryCapitalLetter: "At least 1 capital letter",
-      summaryLowerCaseLetter: "At least 1 lovercase letter",
+      summaryLowerCaseLetter: "At least 1 lowercase letter",
       summaryNumber: "At least 1 number",
       summarySpecialChar: "At least 1 special Character",
     },

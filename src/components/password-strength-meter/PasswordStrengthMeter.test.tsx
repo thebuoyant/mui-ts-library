@@ -82,6 +82,54 @@ describe("PasswordStrengthMeter", () => {
     });
   });
 
+  it("Should reach 'very good' strength for a long, varied password", async () => {
+    const user = userEvent.setup();
+    const handlePasswordChange = vi.fn();
+
+    render(<PasswordStrengthMeter onPasswordChange={handlePasswordChange} />);
+
+    await user.type(screen.getByLabelText("Password"), "Qw7!mnOpXy12");
+
+    expect(handlePasswordChange).toHaveBeenLastCalledWith(
+      "Qw7!mnOpXy12",
+      expect.objectContaining({
+        score: 4,
+        percent: 100,
+        meterStatus: "very good",
+      }),
+    );
+  });
+
+  it("Should keep 'weak' strength for a short password regardless of character classes", async () => {
+    const user = userEvent.setup();
+    const handlePasswordChange = vi.fn();
+
+    render(<PasswordStrengthMeter onPasswordChange={handlePasswordChange} />);
+
+    await user.type(screen.getByLabelText("Password"), "Aa1!");
+
+    expect(handlePasswordChange).toHaveBeenLastCalledWith(
+      "Aa1!",
+      expect.objectContaining({ meterStatus: "weak", score: 1 }),
+    );
+  });
+
+  it("Should expose the meter bar with correct ARIA progressbar attributes", async () => {
+    const user = userEvent.setup();
+
+    render(<PasswordStrengthMeter />);
+
+    const meter = screen.getByRole("progressbar", { name: "Password strength" });
+
+    expect(meter).toHaveAttribute("aria-valuenow", "0");
+    expect(meter).toHaveAttribute("aria-valuemin", "0");
+    expect(meter).toHaveAttribute("aria-valuemax", "100");
+
+    await user.type(screen.getByLabelText("Password"), "Qw7!mnOp");
+
+    expect(meter).toHaveAttribute("aria-valuenow", "75");
+  });
+
   it("Should render translated texts and custom minimum length in the summary", () => {
     render(
       <PasswordStrengthMeter
@@ -105,7 +153,7 @@ describe("PasswordStrengthMeter", () => {
     expect(screen.getByText("Großbuchstabe")).toBeInTheDocument();
   });
 
-  it("Should show success icons for fulfilled rules and failure icons for open rules", async () => {
+  it("Should show success icons for all fulfilled rules after a strong password is entered", async () => {
     const user = userEvent.setup();
 
     render(<PasswordStrengthMeter />);
@@ -135,7 +183,9 @@ describe("PasswordStrengthMeter", () => {
     expect(
       screen.queryByRole("button", { name: /password/i }),
     ).not.toBeInTheDocument();
-    expect(document.querySelector(".meter-wrapper")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("progressbar"),
+    ).not.toBeInTheDocument();
     expect(
       screen.queryByText("Requirements for your password"),
     ).not.toBeInTheDocument();

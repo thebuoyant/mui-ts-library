@@ -16,7 +16,7 @@ const baseTag = {
 };
 
 describe("TagSelectionChip", () => {
-  it("Should render a filled chip for selected tags and use custom colors", () => {
+  it("Should render a filled chip for selected tags and apply custom colors", () => {
     render(<TagSelectionChip tag={baseTag} chipSize="small" />);
 
     const chip = screen.getByText("React").closest(".MuiChip-root");
@@ -28,6 +28,19 @@ describe("TagSelectionChip", () => {
       borderColor: "rgb(200, 210, 220)",
     });
     expect(screen.getByTestId("start-icon")).toBeInTheDocument();
+  });
+
+  it("Should render an outlined chip for non-selected tags", () => {
+    render(
+      <TagSelectionChip
+        tag={{ ...baseTag, selected: false }}
+        chipSize="medium"
+      />,
+    );
+
+    const chip = screen.getByText("React").closest(".MuiChip-root");
+
+    expect(chip).toHaveClass("MuiChip-outlined");
   });
 
   it("Should call onClick and onDelete with the current tag", async () => {
@@ -52,6 +65,27 @@ describe("TagSelectionChip", () => {
     );
     expect(handleDelete).toHaveBeenCalledWith(
       expect.objectContaining({ id: "react" }),
+    );
+  });
+
+  it("Should show the MUI default delete icon when onDelete is set but no custom deleteIcon exists", async () => {
+    const user = userEvent.setup();
+    const handleDelete = vi.fn();
+
+    render(
+      <TagSelectionChip
+        tag={{ id: "vue", label: "Vue", selected: true }}
+        chipSize="medium"
+        onDelete={handleDelete}
+      />,
+    );
+
+    // MUI rendert sein Standard-Lösch-Icon (CancelIcon) wenn onDelete gesetzt ist.
+    const deleteButton = screen.getByTestId("CancelIcon");
+    await user.click(deleteButton);
+
+    expect(handleDelete).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "vue" }),
     );
   });
 

@@ -4,7 +4,7 @@ export type MeterStatus = "weak" | "ok" | "good" | "very good";
 
 export type StrengthResult = {
   score: StrengthScore;
-  percent: number; // 0..100
+  percent: number; // 0..100, immer score * 25
   meterStatus: MeterStatus;
   length: number;
   hasLower: boolean;
@@ -21,6 +21,7 @@ export function scorePassword(
   password: string,
   passwordMinLength: number,
 ): StrengthResult {
+  // Nullish-Fallback schützt gegen fehlerhafte Aufrufe mit undefined/null.
   const normalizedPassword = password ?? "";
 
   const length = normalizedPassword.length;
@@ -33,9 +34,8 @@ export function scorePassword(
     Boolean,
   ).length;
 
-  // Harte Mindestregel:
-  // Solange das Passwort kürzer als passwordMinLength ist,
-  // bleibt der Status immer "weak".
+  // Harte Mindestregel: Passwörter unter der Mindestlänge bleiben immer "weak",
+  // unabhängig davon, wie viele Zeichenklassen sie verwenden.
   if (length < passwordMinLength) {
     const score: StrengthScore = length === 0 ? 0 : 1;
 
@@ -53,15 +53,12 @@ export function scorePassword(
 
   let points = 0;
 
-  // Mindestlänge erfüllt
-  points += 1;
+  points += 1; // Mindestlänge erfüllt
 
-  // Bonus für deutlich längeres Passwort
   if (length >= passwordMinLength + 4) {
-    points += 1;
+    points += 1; // Bonus für deutlich längere Passwörter
   }
 
-  // Bonus für Zeichenklassen
   if (classes >= 2) {
     points += 1;
   }
@@ -70,11 +67,12 @@ export function scorePassword(
     points += 1;
   }
 
-  // Schlechte Muster bestrafen
+  // Strafe für komplett wiederholte Zeichen (z. B. "AAAAAAA").
   if (/^(.)\1+$/.test(normalizedPassword)) {
     points -= 2;
   }
 
+  // Strafe für bekannte, unsichere Muster.
   if (/1234|abcd|qwer|password|passwort|admin/i.test(normalizedPassword)) {
     points -= 2;
   }

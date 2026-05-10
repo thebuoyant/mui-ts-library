@@ -32,7 +32,7 @@ export function TagSelectionSelectedTags({
         </Typography>
       )}
       {selectedTags.length === 0 ? (
-        <Typography variant="body2" className="tag-selection-empty-text">
+        <Typography variant="body2" color="text.secondary">
           {translation.noSelectedTagsText}
         </Typography>
       ) : (

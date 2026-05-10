@@ -21,7 +21,7 @@ const sampleTags: TagSelectionItem[] = [
     startIcon: <JavascriptIcon style={{ color: START_ICON_COLOR }} />,
     deleteIcon: <CloseIcon style={{ color: DELETE_ICON_COLOR }} />,
     foregroundColor: "#ffffff",
-    backgroundColor: "	#660000",
+    backgroundColor: "#660000",
   },
   {
     id: "typescript",
@@ -96,7 +96,7 @@ const sampleTags: TagSelectionItem[] = [
     startIcon: <CodeIcon style={{ color: START_ICON_COLOR }} />,
     deleteIcon: <CloseIcon style={{ color: DELETE_ICON_COLOR }} />,
     foregroundColor: "#ffffff",
-    backgroundColor: "	#939598",
+    backgroundColor: "#939598",
   },
 ];
 

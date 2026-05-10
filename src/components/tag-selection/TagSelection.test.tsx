@@ -37,6 +37,13 @@ describe("TagSelection", () => {
     expect(screen.getByLabelText("Search and add tags")).toBeInTheDocument();
   });
 
+  it("Should hide the selected-tags label when showSelectedTagsLabel is false", () => {
+    render(<TagSelection tags={tags} showSelectedTagsLabel={false} />);
+
+    expect(screen.queryByText("Selected tags")).not.toBeInTheDocument();
+    expect(screen.getByText("React")).toBeInTheDocument();
+  });
+
   it("Should select an available tag and emit all related callbacks", async () => {
     const user = userEvent.setup();
     const handleTagSelect = vi.fn();
@@ -84,6 +91,21 @@ describe("TagSelection", () => {
     );
   });
 
+  it("Should clear the search input after a tag is selected", async () => {
+    const user = userEvent.setup();
+
+    render(<TagSelection tags={tags} />);
+
+    const input = screen.getByLabelText("Search and add tags");
+    await user.type(input, "Type");
+
+    expect(input).toHaveValue("Type");
+
+    await user.click(await screen.findByText("TypeScript"));
+
+    expect(input).toHaveValue("");
+  });
+
   it("Should not allow disabled tags to be selected through the available list", async () => {
     const user = userEvent.setup();
 
@@ -127,20 +149,9 @@ describe("TagSelection", () => {
 
     expect(updatedTagsAfterDelete).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({
-          id: "react",
-          label: "React",
-          selected: false,
-        }),
-        expect.objectContaining({
-          id: "typescript",
-          label: "TypeScript",
-        }),
-        expect.objectContaining({
-          id: "disabled",
-          label: "Disabled",
-          disabled: true,
-        }),
+        expect.objectContaining({ id: "react", selected: false }),
+        expect.objectContaining({ id: "typescript" }),
+        expect.objectContaining({ id: "disabled", disabled: true }),
       ]),
     );
 
@@ -148,27 +159,33 @@ describe("TagSelection", () => {
       handleTagsChange.mock.calls[0];
 
     expect(selectedTagsFromChange).toEqual([]);
-
     expect(updatedTagsFromChange).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({
-          id: "react",
-          label: "React",
-          selected: false,
-        }),
-        expect.objectContaining({
-          id: "typescript",
-          label: "TypeScript",
-        }),
-        expect.objectContaining({
-          id: "disabled",
-          label: "Disabled",
-          disabled: true,
-        }),
+        expect.objectContaining({ id: "react", selected: false }),
+        expect.objectContaining({ id: "typescript" }),
+        expect.objectContaining({ id: "disabled", disabled: true }),
       ]),
     );
 
     expect(screen.getByText("No tags selected.")).toBeInTheDocument();
+  });
+
+  it("Should reflect an external tags update in the rendered output", async () => {
+    const user = userEvent.setup();
+    const initialTags: TagSelectionItem[] = [
+      { id: "vue", label: "Vue", selected: true, deleteIcon: <CloseIcon /> },
+    ];
+    const updatedTags: TagSelectionItem[] = [
+      ...initialTags,
+      { id: "svelte", label: "Svelte", selected: true, deleteIcon: <CloseIcon /> },
+    ];
+
+    const { rerender } = render(<TagSelection tags={initialTags} />);
+    expect(screen.getByText("Vue")).toBeInTheDocument();
+    expect(screen.queryByText("Svelte")).not.toBeInTheDocument();
+
+    rerender(<TagSelection tags={updatedTags} />);
+    expect(screen.getByText("Svelte")).toBeInTheDocument();
   });
 
   it("Should hide both sections when configured", () => {

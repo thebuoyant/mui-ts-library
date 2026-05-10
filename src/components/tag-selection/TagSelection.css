@@ -12,10 +12,6 @@
   gap: 8px;
 }
 
-.tag-selection-empty-text {
-  color: rgba(0, 0, 0, 0.6);
-}
-
 .tag-selection-details-content {
   padding-top: 4px;
 }

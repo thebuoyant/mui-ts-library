@@ -4,6 +4,7 @@ import type { TagSelectionItem } from "./TagSelection.types";
 export type TagSelectionStoreState = {
   tags: TagSelectionItem[];
   searchValue: string;
+  // Für zukünftiges "Alle Tags"-Panel – noch nicht über die UI zugänglich.
   detailsExpanded: boolean;
 
   setTags: (tags: TagSelectionItem[]) => void;
@@ -38,6 +39,7 @@ export function createTagSelectionStore(initialTags: TagSelectionItem[]) {
         tags: state.tags.map((tag) =>
           tag.id === tagId && !tag.disabled ? { ...tag, selected: true } : tag,
         ),
+        // Suchfeld nach Auswahl leeren, damit der Nutzer direkt weitersuchen kann.
         searchValue: "",
       }));
     },

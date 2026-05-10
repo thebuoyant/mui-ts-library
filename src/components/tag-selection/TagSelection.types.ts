@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 
 export type TagSelectionItem = {
+  // Wird intern als React-Key und für Store-Operationen (select/delete) verwendet.
   id: string;
   label: string;
   selected?: boolean;
@@ -14,6 +15,7 @@ export type TagSelectionItem = {
 export type TagSelectionTranslation = {
   selectedTagsLabel: string;
   autoCompleteLabel: string;
+  // detailsLabel: reserviert für das noch nicht implementierte "Alle Tags"-Panel.
   detailsLabel: string;
   noSelectedTagsText: string;
   noAvailableTagsText: string;
@@ -45,5 +47,6 @@ export type TagSelectionProps = {
     allTags: TagSelectionItem[],
   ) => void;
   onSearchChange?: (searchValue: string) => void;
+  // Reserviert für das noch nicht implementierte "Alle Tags"-Panel.
   onDetailsToggle?: (expanded: boolean) => void;
 };

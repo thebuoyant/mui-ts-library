@@ -30,6 +30,10 @@ export function TagSelectionAutocomplete({
     <div className="tag-selection-section">
       <Autocomplete<TagSelectionItem, false, false, false>
         options={availableTags}
+        // value=null hält die Auswahl immer leer: nach einem Klick auf eine Option
+        // soll kein "ausgewählter Wert" im Feld stehen, sondern das Feld über
+        // searchValue="" (aus dem Store) automatisch geleert werden.
+        value={null}
         size={inputSize}
         getOptionLabel={(option) => option.label}
         inputValue={searchValue}

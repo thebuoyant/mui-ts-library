@@ -37,7 +37,12 @@ function useTagSelectionStore<T>(
   return useStore(store, selector);
 }
 
-type TagSelectionInnerProps = Omit<TagSelectionProps, "translation"> & {
+// onDetailsToggle wird erst in einer zukünftigen Version implementiert.
+// translation ist hier nicht optional, da der äußere Wrapper den Default bereits auflöst.
+type TagSelectionInnerProps = Omit<
+  TagSelectionProps,
+  "translation" | "onDetailsToggle"
+> & {
   translation: TagSelectionTranslation;
 };
 
@@ -93,6 +98,8 @@ function TagSelectionInner({
 
     selectTag(tag.id);
 
+    // Den nächsten Zustand manuell berechnen: selectTag aktualisiert den Store
+    // asynchron, aber die Callbacks müssen sofort mit korrekten Werten aufgerufen werden.
     const nextTags = storeTags.map((currentTag) =>
       currentTag.id === tag.id ? { ...currentTag, selected: true } : currentTag,
     );
@@ -112,6 +119,7 @@ function TagSelectionInner({
   const handleTagDelete = (tag: TagSelectionItem) => {
     deleteTag(tag.id);
 
+    // Gleiche Strategie wie handleTagSelect: asynchronen Store-Update vorausberechnen.
     const nextTags = storeTags.map((currentTag) =>
       currentTag.id === tag.id
         ? { ...currentTag, selected: false }
@@ -202,7 +210,6 @@ export function TagSelection({
         onTagDelete={onTagDelete}
         onTagsChange={onTagsChange}
         onSearchChange={onSearchChange}
-        onDetailsToggle={onDetailsToggle}
         inputSize={inputSize}
         chipSize={chipSize}
       />

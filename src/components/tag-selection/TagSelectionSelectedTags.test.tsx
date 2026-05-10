@@ -63,4 +63,40 @@ describe("TagSelectionSelectedTags", () => {
       expect.objectContaining({ id: "react" }),
     );
   });
+
+  it("Should render multiple selected tags", () => {
+    render(
+      <TagSelectionSelectedTags
+        selectedTags={[
+          { id: "react", label: "React", selected: true },
+          { id: "vue", label: "Vue", selected: true },
+          { id: "svelte", label: "Svelte", selected: true },
+        ]}
+        translation={translation}
+        onTagDelete={vi.fn()}
+        showSelectedTagsLabel
+        chipSize="medium"
+      />,
+    );
+
+    expect(screen.getByText("React")).toBeInTheDocument();
+    expect(screen.getByText("Vue")).toBeInTheDocument();
+    expect(screen.getByText("Svelte")).toBeInTheDocument();
+    expect(screen.queryByText("No tags selected.")).not.toBeInTheDocument();
+  });
+
+  it("Should not render the label when showSelectedTagsLabel is false", () => {
+    render(
+      <TagSelectionSelectedTags
+        selectedTags={[]}
+        translation={translation}
+        onTagDelete={vi.fn()}
+        showSelectedTagsLabel={false}
+        chipSize="medium"
+      />,
+    );
+
+    expect(screen.queryByText("Selected tags")).not.toBeInTheDocument();
+    expect(screen.getByText("No tags selected.")).toBeInTheDocument();
+  });
 });

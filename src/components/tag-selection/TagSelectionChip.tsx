@@ -19,7 +19,11 @@ export function TagSelectionChip({
   chipSize = "medium",
 }: TagSelectionChipProps) {
   const shouldShowStartIcon = showStartIcon && Boolean(tag.startIcon);
-  const shouldShowDeleteIcon =
+
+  // Nur das custom deleteIcon ersetzen – MUI zeigt sein Standard-Icon,
+  // solange onDelete übergeben wird. shouldShowCustomDeleteIcon steuert
+  // lediglich ob tag.deleteIcon das Standard-Icon überschreibt.
+  const shouldShowCustomDeleteIcon =
     showDeleteIcon && Boolean(onDelete) && Boolean(tag.deleteIcon);
 
   return (
@@ -27,7 +31,7 @@ export function TagSelectionChip({
       size={chipSize}
       label={tag.label}
       icon={shouldShowStartIcon ? tag.startIcon : undefined}
-      deleteIcon={shouldShowDeleteIcon ? tag.deleteIcon : undefined}
+      deleteIcon={shouldShowCustomDeleteIcon ? tag.deleteIcon : undefined}
       onDelete={showDeleteIcon && onDelete ? () => onDelete(tag) : undefined}
       onClick={onClick ? () => onClick(tag) : undefined}
       clickable={Boolean(onClick) && !tag.disabled}
@@ -36,7 +40,8 @@ export function TagSelectionChip({
       sx={{
         color: tag.foregroundColor ?? "inherit",
         backgroundColor: tag.backgroundColor ?? "transparent",
-        borderColor: tag.backgroundColor ?? "rgba(0, 0, 0, 0.23)",
+        // backgroundColor auch als Rahmenfarbe nutzen – ohne Angabe übernimmt MUI den Theme-Wert.
+        borderColor: tag.backgroundColor ?? undefined,
         cursor: onClick && !tag.disabled ? "pointer" : "default",
       }}
     />

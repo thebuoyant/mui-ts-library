@@ -1,4 +1,5 @@
 import {
+  Box,
   FormControl,
   IconButton,
   InputAdornment,
@@ -16,40 +17,29 @@ import {
   scorePassword,
   type StrengthResult,
 } from "./util/password-strength.util";
+import type {
+  CheckColors,
+  MeterColors,
+  PasswordStrengthMeterProps,
+  PasswordStrengthMeterTranslation,
+} from "./PasswordStrengthMeter.types";
 
-export type CheckColors = {
-  failure: string;
-  success: string;
+export type {
+  CheckColors,
+  MeterColors,
+  PasswordStrengthMeterTranslation,
+  PasswordStrengthMeterProps,
 };
 
-export type MeterColors = {
-  weak: string;
-  ok: string;
-  good: string;
-  veryGood: string;
-};
-
-export type PasswordStrengthMeterTranslation = {
-  label: string;
-  summaryHeaderLabel: string;
-  summaryMinCharsLeft: string;
-  summaryMinCharsRight: string;
-  summaryCapitalLetter: string;
-  summaryLowerCaseLetter: string;
-  summaryNumber: string;
-  summarySpecialChar: string;
-};
-
-export type PasswordStrengthMeterProps = {
-  showPasswordAdornment?: boolean;
-  showMeter?: boolean;
-  showSummary?: boolean;
-  inputSize?: "small" | "medium";
-  translation?: PasswordStrengthMeterTranslation;
-  meterColors?: MeterColors;
-  passwordMinLength?: number;
-  checkColors?: CheckColors;
-  onPasswordChange?: (password: string, strengthResult: StrengthResult) => void;
+const INITIAL_STRENGTH_RESULT: StrengthResult = {
+  score: 0,
+  percent: 0,
+  meterStatus: "weak",
+  length: 0,
+  hasLower: false,
+  hasUpper: false,
+  hasDigit: false,
+  hasSymbol: false,
 };
 
 type RequirementItemProps = {
@@ -64,33 +54,18 @@ function RequirementItem({
   checkColors,
 }: RequirementItemProps) {
   return (
-    <div className="summary-item" style={{ display: "flex" }}>
-      <Typography variant="caption" gutterBottom>
-        {label}
-      </Typography>
-
+    <Stack direction="row" alignItems="center" spacing={0.5} mb={0.25}>
+      <Typography variant="caption">{label}</Typography>
       {fulfilled ? (
         <CheckCircleOutlineIcon
-          style={{
-            fontSize: 16,
-            color: checkColors.success,
-            position: "relative",
-            top: 1,
-            left: 3,
-          }}
+          style={{ fontSize: 16, color: checkColors.success }}
         />
       ) : (
         <ErrorOutlineIcon
-          style={{
-            fontSize: 16,
-            color: checkColors.failure,
-            position: "relative",
-            top: 1,
-            left: 3,
-          }}
+          style={{ fontSize: 16, color: checkColors.failure }}
         />
       )}
-    </div>
+    </Stack>
   );
 }
 
@@ -124,16 +99,9 @@ export function PasswordStrengthMeter({
 }: PasswordStrengthMeterProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
-  const [strengthResult, setStrengthResult] = useState<StrengthResult>({
-    score: 0,
-    percent: 0,
-    meterStatus: "weak",
-    length: 0,
-    hasLower: false,
-    hasUpper: false,
-    hasDigit: false,
-    hasSymbol: false,
-  });
+  const [strengthResult, setStrengthResult] = useState<StrengthResult>(
+    INITIAL_STRENGTH_RESULT,
+  );
 
   const { label } = translation;
 
@@ -141,6 +109,8 @@ export function PasswordStrengthMeter({
     setShowPassword((show) => !show);
   };
 
+  // preventDefault verhindert, dass das Textfeld den Fokus verliert,
+  // wenn der Nutzer auf den Sichtbarkeits-Button klickt (mousedown/up-Verhalten des Browsers).
   const handleMouseDownPassword = (
     event: React.MouseEvent<HTMLButtonElement>,
   ) => {
@@ -157,15 +127,11 @@ export function PasswordStrengthMeter({
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const readPassword = event.target.value;
-
-    // StrengthResult genau einmal berechnen
     const nextStrengthResult = scorePassword(readPassword, passwordMinLength);
 
-    // Lokalen State aktualisieren
     setPassword(readPassword);
     setStrengthResult(nextStrengthResult);
 
-    // Optional den Consumer informieren
     if (onPasswordChange) {
       onPasswordChange(readPassword, nextStrengthResult);
     }
@@ -188,59 +154,59 @@ export function PasswordStrengthMeter({
 
   return (
     <Stack>
-      <div className="password-input-wrapper">
-        <FormControl variant="outlined" fullWidth>
-          <InputLabel
-            htmlFor="outlined-adornment-for-password"
-            size={inputSize}
-          >
-            {label}
-          </InputLabel>
+      <FormControl variant="outlined" fullWidth>
+        <InputLabel htmlFor="password-strength-input" size={inputSize}>
+          {label}
+        </InputLabel>
 
-          <OutlinedInput
-            id="outlined-adornment-for-password"
-            type={showPassword ? "text" : "password"}
-            fullWidth
-            size={inputSize}
-            value={password}
-            onChange={handleOnChange}
-            endAdornment={
-              showPasswordAdornment ? (
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label={
-                      showPassword ? "Hide password" : "Show password"
-                    }
-                    onClick={handleClickShowPassword}
-                    onMouseDown={handleMouseDownPassword}
-                    onMouseUp={handleMouseUpPassword}
-                    edge="end"
-                  >
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              ) : null
-            }
-            label={label}
-          />
-        </FormControl>
-      </div>
+        <OutlinedInput
+          id="password-strength-input"
+          type={showPassword ? "text" : "password"}
+          fullWidth
+          size={inputSize}
+          value={password}
+          onChange={handleOnChange}
+          endAdornment={
+            showPasswordAdornment ? (
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  onClick={handleClickShowPassword}
+                  onMouseDown={handleMouseDownPassword}
+                  onMouseUp={handleMouseUpPassword}
+                  edge="end"
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ) : null
+          }
+          label={label}
+        />
+      </FormControl>
 
       {showMeter && (
-        <div
-          className="meter-wrapper"
-          style={{
+        // role="progressbar" macht den Balken für Screenreader verständlich –
+        // ohne diese Attribute ist er für assistive Technologien unsichtbar.
+        <Box
+          role="progressbar"
+          aria-label="Password strength"
+          aria-valuenow={strengthResult.percent}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          sx={{
             width: "100%",
             height: "8px",
-            border: "1px solid rgba(0, 0, 0, 0.23)",
+            border: "1px solid",
+            borderColor: "divider",
             borderRadius: "6px",
-            marginTop: "4px",
+            mt: 0.5,
             display: "flex",
           }}
         >
-          <div
+          <Box
             className="meter-result"
-            style={{
+            sx={{
               height: "100%",
               width: `${strengthResult.percent}%`,
               backgroundColor: calculateStrengthColor(strengthResult),
@@ -248,59 +214,52 @@ export function PasswordStrengthMeter({
               transition: "width 0.2s ease-in-out",
             }}
           />
-        </div>
+        </Box>
       )}
+
       {showSummary && (
-        <div
-          className="summary-section"
-          style={{ marginTop: "4px", padding: "4px" }}
-        >
-          <div className="summary" style={{ marginBottom: "4px" }}>
-            <Typography
-              variant="caption"
-              gutterBottom
-              sx={{ display: "block", fontSize: 14 }}
-            >
-              {translation.summaryHeaderLabel}
-            </Typography>
+        <Box sx={{ mt: 0.5, p: 0.5 }}>
+          <Typography
+            variant="caption"
+            gutterBottom
+            sx={{ display: "block", fontSize: 14 }}
+          >
+            {translation.summaryHeaderLabel}
+          </Typography>
 
-            <Stack direction="row" spacing={6}>
-              <Stack direction="column">
-                <RequirementItem
-                  label={`${translation.summaryMinCharsLeft} ${passwordMinLength} ${translation.summaryMinCharsRight}`}
-                  fulfilled={strengthResult.length >= passwordMinLength}
-                  checkColors={checkColors}
-                />
-
-                <RequirementItem
-                  label={translation.summaryCapitalLetter}
-                  fulfilled={strengthResult.hasUpper}
-                  checkColors={checkColors}
-                />
-
-                <RequirementItem
-                  label={translation.summaryLowerCaseLetter}
-                  fulfilled={strengthResult.hasLower}
-                  checkColors={checkColors}
-                />
-              </Stack>
-
-              <Stack direction="column">
-                <RequirementItem
-                  label={translation.summaryNumber}
-                  fulfilled={strengthResult.hasDigit}
-                  checkColors={checkColors}
-                />
-
-                <RequirementItem
-                  label={translation.summarySpecialChar}
-                  fulfilled={strengthResult.hasSymbol}
-                  checkColors={checkColors}
-                />
-              </Stack>
+          <Stack direction="row" spacing={6}>
+            <Stack direction="column">
+              <RequirementItem
+                label={`${translation.summaryMinCharsLeft} ${passwordMinLength} ${translation.summaryMinCharsRight}`}
+                fulfilled={strengthResult.length >= passwordMinLength}
+                checkColors={checkColors}
+              />
+              <RequirementItem
+                label={translation.summaryCapitalLetter}
+                fulfilled={strengthResult.hasUpper}
+                checkColors={checkColors}
+              />
+              <RequirementItem
+                label={translation.summaryLowerCaseLetter}
+                fulfilled={strengthResult.hasLower}
+                checkColors={checkColors}
+              />
             </Stack>
-          </div>
-        </div>
+
+            <Stack direction="column">
+              <RequirementItem
+                label={translation.summaryNumber}
+                fulfilled={strengthResult.hasDigit}
+                checkColors={checkColors}
+              />
+              <RequirementItem
+                label={translation.summarySpecialChar}
+                fulfilled={strengthResult.hasSymbol}
+                checkColors={checkColors}
+              />
+            </Stack>
+          </Stack>
+        </Box>
       )}
     </Stack>
   );
