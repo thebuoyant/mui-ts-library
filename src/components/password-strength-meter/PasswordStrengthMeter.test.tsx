@@ -130,6 +130,44 @@ describe("PasswordStrengthMeter", () => {
     expect(meter).toHaveAttribute("aria-valuenow", "75");
   });
 
+  it("Should render in controlled mode and reflect an external value", () => {
+    render(<PasswordStrengthMeter value="Qw7!mnOp" />);
+
+    const input = screen.getByLabelText("Password") as HTMLInputElement;
+    const meter = document.querySelector(".meter-result") as HTMLDivElement;
+
+    expect(input.value).toBe("Qw7!mnOp");
+    expect(meter).toHaveStyle({ width: "75%" });
+  });
+
+  it("Should update the meter when the controlled value changes externally", () => {
+    const { rerender } = render(<PasswordStrengthMeter value="" />);
+
+    expect(
+      screen.getByRole("progressbar", { name: "Password strength" }),
+    ).toHaveAttribute("aria-valuenow", "0");
+
+    rerender(<PasswordStrengthMeter value="Qw7!mnOpXy12" />);
+
+    expect(
+      screen.getByRole("progressbar", { name: "Password strength" }),
+    ).toHaveAttribute("aria-valuenow", "100");
+  });
+
+  it("Should generate unique IDs so two instances do not conflict", () => {
+    render(
+      <>
+        <PasswordStrengthMeter />
+        <PasswordStrengthMeter />
+      </>,
+    );
+
+    const inputs = screen.getAllByLabelText("Password");
+
+    expect(inputs).toHaveLength(2);
+    expect(inputs[0].id).not.toBe(inputs[1].id);
+  });
+
   it("Should render translated texts and custom minimum length in the summary", () => {
     render(
       <PasswordStrengthMeter
@@ -183,9 +221,7 @@ describe("PasswordStrengthMeter", () => {
     expect(
       screen.queryByRole("button", { name: /password/i }),
     ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole("progressbar"),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
     expect(
       screen.queryByText("Requirements for your password"),
     ).not.toBeInTheDocument();

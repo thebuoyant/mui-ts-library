@@ -6,97 +6,84 @@ import CssIcon from "@mui/icons-material/Css";
 import HtmlIcon from "@mui/icons-material/Html";
 import DataObjectIcon from "@mui/icons-material/DataObject";
 import SmartToyIcon from "@mui/icons-material/SmartToy";
+import CloseIcon from "@mui/icons-material/Close";
 import { TagSelection } from "./TagSelection";
 import type { TagSelectionItem } from "./TagSelection.types";
-import CloseIcon from "@mui/icons-material/Close";
-
-const START_ICON_COLOR = "#ffffff";
-const DELETE_ICON_COLOR = "#cccccc";
 
 const sampleTags: TagSelectionItem[] = [
   {
     id: "javascript",
     label: "JavaScript",
     selected: true,
-    startIcon: <JavascriptIcon style={{ color: START_ICON_COLOR }} />,
-    deleteIcon: <CloseIcon style={{ color: DELETE_ICON_COLOR }} />,
-    foregroundColor: "#ffffff",
-    backgroundColor: "#660000",
+    color: "warning",
+    startIcon: <JavascriptIcon />,
+    deleteIcon: <CloseIcon />,
   },
   {
     id: "typescript",
     label: "TypeScript",
     selected: true,
-    startIcon: <DataObjectIcon style={{ color: START_ICON_COLOR }} />,
-    deleteIcon: <CloseIcon style={{ color: DELETE_ICON_COLOR }} />,
-    foregroundColor: "#ffffff",
-    backgroundColor: "#990000",
+    color: "info",
+    startIcon: <DataObjectIcon />,
+    deleteIcon: <CloseIcon />,
   },
   {
     id: "react",
     label: "React",
-    startIcon: <CodeIcon style={{ color: START_ICON_COLOR }} />,
-    deleteIcon: <CloseIcon style={{ color: DELETE_ICON_COLOR }} />,
-    foregroundColor: "#ffffff",
-    backgroundColor: "#002241",
+    color: "primary",
+    startIcon: <CodeIcon />,
+    deleteIcon: <CloseIcon />,
   },
   {
     id: "mui",
     label: "MUI",
-    startIcon: <SmartToyIcon style={{ color: START_ICON_COLOR }} />,
-    deleteIcon: <CloseIcon style={{ color: DELETE_ICON_COLOR }} />,
-    foregroundColor: "#ffffff",
-    backgroundColor: "#7a5c8e",
+    color: "secondary",
+    startIcon: <SmartToyIcon />,
+    deleteIcon: <CloseIcon />,
   },
   {
     id: "css",
     label: "CSS",
-    startIcon: <CssIcon style={{ color: START_ICON_COLOR }} />,
-    deleteIcon: <CloseIcon style={{ color: DELETE_ICON_COLOR }} />,
-    foregroundColor: "#ffffff",
-    backgroundColor: "#4c2e73",
+    color: "info",
+    startIcon: <CssIcon />,
+    deleteIcon: <CloseIcon />,
   },
   {
     id: "html",
     label: "HTML",
-    startIcon: <HtmlIcon style={{ color: START_ICON_COLOR }} />,
-    deleteIcon: <CloseIcon style={{ color: DELETE_ICON_COLOR }} />,
-    foregroundColor: "#ffffff",
-    backgroundColor: "#3e5b3c",
+    color: "error",
+    startIcon: <HtmlIcon />,
+    deleteIcon: <CloseIcon />,
   },
   {
     id: "python",
     label: "Python",
-    startIcon: <CodeIcon style={{ color: START_ICON_COLOR }} />,
-    deleteIcon: <CloseIcon style={{ color: DELETE_ICON_COLOR }} />,
-    foregroundColor: "#ffffff",
-    backgroundColor: "#7b4a5a",
+    color: "success",
+    startIcon: <CodeIcon />,
+    deleteIcon: <CloseIcon />,
   },
   {
     id: "golang",
     label: "Golang",
-    startIcon: <CodeIcon style={{ color: START_ICON_COLOR }} />,
-    deleteIcon: <CloseIcon style={{ color: DELETE_ICON_COLOR }} />,
-    foregroundColor: "#ffffff",
-    backgroundColor: "#b35900",
+    color: "primary",
+    startIcon: <CodeIcon />,
+    deleteIcon: <CloseIcon />,
   },
   {
     id: "jquery",
     label: "jQuery",
     disabled: true,
-    startIcon: <CodeIcon style={{ color: START_ICON_COLOR }} />,
-    deleteIcon: <CloseIcon style={{ color: DELETE_ICON_COLOR }} />,
-    foregroundColor: "#ffffff",
-    backgroundColor: "#00819a",
+    color: "default",
+    startIcon: <CodeIcon />,
+    deleteIcon: <CloseIcon />,
   },
   {
     id: "dotnet",
     label: ".Net",
     disabled: true,
-    startIcon: <CodeIcon style={{ color: START_ICON_COLOR }} />,
-    deleteIcon: <CloseIcon style={{ color: DELETE_ICON_COLOR }} />,
-    foregroundColor: "#ffffff",
-    backgroundColor: "#939598",
+    color: "default",
+    startIcon: <CodeIcon />,
+    deleteIcon: <CloseIcon />,
   },
 ];
 
@@ -143,9 +130,6 @@ export const Default: Story = {
         }}
         onSearchChange={(searchValue) => {
           console.log("onSearchChange", searchValue);
-        }}
-        onDetailsToggle={(expanded) => {
-          console.log("onDetailsToggle", expanded);
         }}
       />
     </Box>

@@ -43,6 +43,40 @@ describe("TagSelectionChip", () => {
     expect(chip).toHaveClass("MuiChip-outlined");
   });
 
+  it("Should apply a MUI semantic color when color prop is set and no custom colors exist", () => {
+    render(
+      <TagSelectionChip
+        tag={{ id: "ts", label: "TypeScript", selected: true, color: "primary" }}
+        chipSize="medium"
+      />,
+    );
+
+    const chip = screen.getByText("TypeScript").closest(".MuiChip-root");
+
+    expect(chip).toHaveClass("MuiChip-colorPrimary");
+  });
+
+  it("Should prefer custom colors over the semantic color prop", () => {
+    render(
+      <TagSelectionChip
+        tag={{
+          id: "ts",
+          label: "TypeScript",
+          selected: true,
+          color: "primary",
+          backgroundColor: "rgb(200, 210, 220)",
+        }}
+        chipSize="medium"
+      />,
+    );
+
+    const chip = screen.getByText("TypeScript").closest(".MuiChip-root");
+
+    // Wenn custom backgroundColor gesetzt ist, darf kein colorPrimary verwendet werden.
+    expect(chip).not.toHaveClass("MuiChip-colorPrimary");
+    expect(chip).toHaveStyle({ backgroundColor: "rgb(200, 210, 220)" });
+  });
+
   it("Should call onClick and onDelete with the current tag", async () => {
     const user = userEvent.setup();
     const handleClick = vi.fn();
@@ -80,7 +114,6 @@ describe("TagSelectionChip", () => {
       />,
     );
 
-    // MUI rendert sein Standard-Lösch-Icon (CancelIcon) wenn onDelete gesetzt ist.
     const deleteButton = screen.getByTestId("CancelIcon");
     await user.click(deleteButton);
 

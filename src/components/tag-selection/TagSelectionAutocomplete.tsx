@@ -62,27 +62,36 @@ export function TagSelectionAutocomplete({
             placeholder={translation.placeholder}
           />
         )}
-        renderOption={(props, option) => (
-          <li
-            {...props}
-            key={option.id}
-            style={{
-              width: "auto",
-              padding: 0,
-              margin: 0,
-            }}
-          >
-            <Chip
-              size={chipSize}
-              label={option.label}
-              icon={showStartIcon ? (option.startIcon ?? undefined) : undefined}
-              sx={{
-                color: option.foregroundColor ?? "inherit",
-                backgroundColor: option.backgroundColor ?? "transparent",
-              }}
-            />
-          </li>
-        )}
+        renderOption={(props, option) => {
+          const hasCustomColors = Boolean(
+            option.foregroundColor || option.backgroundColor,
+          );
+
+          return (
+            <li
+              {...props}
+              key={option.id}
+              style={{ width: "auto", padding: 0, margin: 0 }}
+            >
+              <Chip
+                size={chipSize}
+                label={option.label}
+                icon={
+                  showStartIcon ? (option.startIcon ?? undefined) : undefined
+                }
+                color={!hasCustomColors ? (option.color ?? "default") : undefined}
+                sx={
+                  hasCustomColors
+                    ? {
+                        color: option.foregroundColor ?? "inherit",
+                        backgroundColor: option.backgroundColor ?? "transparent",
+                      }
+                    : undefined
+                }
+              />
+            </li>
+          );
+        }}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         noOptionsText={translation.noAvailableTagsText}
       />

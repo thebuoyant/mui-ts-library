@@ -26,6 +26,10 @@ export function TagSelectionChip({
   const shouldShowCustomDeleteIcon =
     showDeleteIcon && Boolean(onDelete) && Boolean(tag.deleteIcon);
 
+  // foregroundColor/backgroundColor haben Vorrang vor color, da sie explizite
+  // Branding-Farben darstellen. color nutzt das MUI-Theme und ist der Standardweg.
+  const hasCustomColors = Boolean(tag.foregroundColor || tag.backgroundColor);
+
   return (
     <Chip
       size={chipSize}
@@ -37,11 +41,14 @@ export function TagSelectionChip({
       clickable={Boolean(onClick) && !tag.disabled}
       disabled={tag.disabled}
       variant={tag.selected ? "filled" : "outlined"}
+      color={!hasCustomColors ? (tag.color ?? "default") : undefined}
       sx={{
-        color: tag.foregroundColor ?? "inherit",
-        backgroundColor: tag.backgroundColor ?? "transparent",
-        // backgroundColor auch als Rahmenfarbe nutzen – ohne Angabe übernimmt MUI den Theme-Wert.
-        borderColor: tag.backgroundColor ?? undefined,
+        ...(hasCustomColors && {
+          color: tag.foregroundColor ?? "inherit",
+          backgroundColor: tag.backgroundColor ?? "transparent",
+          // backgroundColor auch als Rahmenfarbe nutzen – ohne Angabe übernimmt MUI den Theme-Wert.
+          borderColor: tag.backgroundColor ?? undefined,
+        }),
         cursor: onClick && !tag.disabled ? "pointer" : "default",
       }}
     />

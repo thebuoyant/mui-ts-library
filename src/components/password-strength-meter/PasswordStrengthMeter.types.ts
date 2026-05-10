@@ -26,6 +26,9 @@ export type PasswordStrengthMeterTranslation = {
 };
 
 export type PasswordStrengthMeterProps = {
+  // Wenn gesetzt, wird die Komponente kontrolliert: das Passwort kommt von außen,
+  // Änderungen werden über onPasswordChange nach oben gegeben.
+  value?: string;
   showPasswordAdornment?: boolean;
   showMeter?: boolean;
   showSummary?: boolean;

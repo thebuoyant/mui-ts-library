@@ -12,7 +12,7 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import { useState } from "react";
+import { useId, useMemo, useState } from "react";
 import {
   scorePassword,
   type StrengthResult,
@@ -29,17 +29,6 @@ export type {
   MeterColors,
   PasswordStrengthMeterTranslation,
   PasswordStrengthMeterProps,
-};
-
-const INITIAL_STRENGTH_RESULT: StrengthResult = {
-  score: 0,
-  percent: 0,
-  meterStatus: "weak",
-  length: 0,
-  hasLower: false,
-  hasUpper: false,
-  hasDigit: false,
-  hasSymbol: false,
 };
 
 type RequirementItemProps = {
@@ -70,6 +59,7 @@ function RequirementItem({
 }
 
 export function PasswordStrengthMeter({
+  value,
   showPasswordAdornment = true,
   showMeter = true,
   showSummary = true,
@@ -97,10 +87,21 @@ export function PasswordStrengthMeter({
   },
   onPasswordChange,
 }: PasswordStrengthMeterProps) {
+  // useId() erzeugt eine pro-Instanz eindeutige ID – verhindert Konflikte
+  // wenn mehrere PasswordStrengthMeter auf der gleichen Seite gerendert werden.
+  const uniqueId = useId();
+  const inputId = `${uniqueId}-password`;
+
   const [showPassword, setShowPassword] = useState(false);
-  const [password, setPassword] = useState("");
-  const [strengthResult, setStrengthResult] = useState<StrengthResult>(
-    INITIAL_STRENGTH_RESULT,
+  const [internalPassword, setInternalPassword] = useState("");
+
+  // Im kontrollierten Modus kommt der Wert von außen (value-Prop),
+  // im unkontrollierten Modus wird der interne State genutzt.
+  const password = value !== undefined ? value : internalPassword;
+
+  const strengthResult = useMemo(
+    () => scorePassword(password, passwordMinLength),
+    [password, passwordMinLength],
   );
 
   const { label } = translation;
@@ -127,13 +128,13 @@ export function PasswordStrengthMeter({
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const readPassword = event.target.value;
-    const nextStrengthResult = scorePassword(readPassword, passwordMinLength);
 
-    setPassword(readPassword);
-    setStrengthResult(nextStrengthResult);
+    if (value === undefined) {
+      setInternalPassword(readPassword);
+    }
 
     if (onPasswordChange) {
-      onPasswordChange(readPassword, nextStrengthResult);
+      onPasswordChange(readPassword, scorePassword(readPassword, passwordMinLength));
     }
   };
 
@@ -155,12 +156,12 @@ export function PasswordStrengthMeter({
   return (
     <Stack>
       <FormControl variant="outlined" fullWidth>
-        <InputLabel htmlFor="password-strength-input" size={inputSize}>
+        <InputLabel htmlFor={inputId} size={inputSize}>
           {label}
         </InputLabel>
 
         <OutlinedInput
-          id="password-strength-input"
+          id={inputId}
           type={showPassword ? "text" : "password"}
           fullWidth
           size={inputSize}

@@ -1,12 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Box } from "@mui/material";
+import { Box, TextField } from "@mui/material";
+import { useState } from "react";
 import { PasswordStrengthMeter } from "./PasswordStrengthMeter";
 
 const meta: Meta<typeof PasswordStrengthMeter> = {
   title: "Components/PasswordStrengthMeter",
   component: PasswordStrengthMeter,
-  argTypes: {},
 };
+
 export default meta;
 
 type Story = StoryObj<typeof PasswordStrengthMeter>;
@@ -21,12 +22,12 @@ export const Default: Story = {
     translation: {
       label: "Password",
       summaryHeaderLabel: "Requirements for your password",
-      summaryMinCharsLeft: "At least ",
+      summaryMinCharsLeft: "At least",
       summaryMinCharsRight: "characters",
       summaryCapitalLetter: "At least 1 capital letter",
       summaryLowerCaseLetter: "At least 1 lowercase letter",
       summaryNumber: "At least 1 number",
-      summarySpecialChar: "At least 1 special Character",
+      summarySpecialChar: "At least 1 special character",
     },
     meterColors: {
       weak: "#cc0000",
@@ -39,10 +40,36 @@ export const Default: Story = {
       success: "#43a047",
     },
   },
-  render: (args) => {
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <PasswordStrengthMeter {...args} />
+    </Box>
+  ),
+};
+
+// Zeigt den kontrollierten Modus: Das Passwort wird von außen verwaltet,
+// z. B. wenn die Komponente in ein bestehendes Formular eingebettet wird.
+export const Controlled: Story = {
+  render: () => {
+    const [password, setPassword] = useState("");
+
     return (
-      <Box sx={{ maxWidth: 420 }}>
-        <PasswordStrengthMeter {...args} />
+      <Box sx={{ maxWidth: 420, display: "flex", flexDirection: "column", gap: 2 }}>
+        <TextField
+          label="External password field"
+          size="small"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          helperText="Dieses Feld steuert den PasswordStrengthMeter von außen."
+        />
+        <PasswordStrengthMeter
+          value={password}
+          showPasswordAdornment={false}
+          inputSize="small"
+          onPasswordChange={(_, result) => {
+            console.log("Strength:", result.meterStatus);
+          }}
+        />
       </Box>
     );
   },
