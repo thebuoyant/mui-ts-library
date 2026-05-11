@@ -155,7 +155,7 @@ export const Default: Story = {
     timeScale: "months",
   },
   render: (args) => (
-    <Box sx={{ width: "100%", maxWidth: 800 }}>
+    <Box sx={{ width: "100%", maxWidth: 900, height: 500 }}>
       <GanttChart
         {...args}
         onTaskClick={(task) => console.log("onTaskClick", task)}
@@ -174,7 +174,19 @@ export const WeeksScale: Story = {
     timeScale: "weeks",
   },
   render: (args) => (
-    <Box sx={{ width: "100%", maxWidth: 800 }}>
+    <Box sx={{ width: "100%", maxWidth: 900, height: 500 }}>
+      <GanttChart {...args} onTaskClick={(task) => console.log("onTaskClick", task)} />
+    </Box>
+  ),
+};
+
+export const QuartersScale: Story = {
+  args: {
+    tasks: sampleTasks,
+    timeScale: "quarters",
+  },
+  render: (args) => (
+    <Box sx={{ width: "100%", maxWidth: 900, height: 500 }}>
       <GanttChart {...args} onTaskClick={(task) => console.log("onTaskClick", task)} />
     </Box>
   ),
@@ -186,7 +198,7 @@ export const MinimalFlat: Story = {
     timeScale: "months",
   },
   render: (args) => (
-    <Box sx={{ width: "100%", maxWidth: 600 }}>
+    <Box sx={{ width: "100%", maxWidth: 700, height: 300 }}>
       <GanttChart {...args} />
     </Box>
   ),

@@ -158,3 +158,44 @@ export function getMonthsInRange(range: TimelineRange): Date[] {
 
   return months;
 }
+
+// ---------------------------------------------------------------------------
+// Quartals-Hilfsfunktionen
+// ---------------------------------------------------------------------------
+
+export type QuarterLabel = {
+  key: string;   // z. B. "2025-Q2"
+  label: string; // z. B. "Q2 2025"
+  start: Date;
+};
+
+export function startOfQuarter(date: Date): Date {
+  const quarterStartMonth = Math.floor(date.getMonth() / 3) * 3;
+  return new Date(date.getFullYear(), quarterStartMonth, 1, 0, 0, 0, 0);
+}
+
+export function endOfQuarter(date: Date): Date {
+  const quarterEndMonth = Math.floor(date.getMonth() / 3) * 3 + 2;
+  return endOfMonth(new Date(date.getFullYear(), quarterEndMonth, 1));
+}
+
+/**
+ * Gibt alle Quartalsstarts zwischen start und end zurück.
+ * Beginnt immer am Quartalsbeginn, der start enthält.
+ */
+export function getQuartersInRange(range: TimelineRange): QuarterLabel[] {
+  const result: QuarterLabel[] = [];
+  let current = startOfQuarter(range.start);
+
+  while (current <= range.end) {
+    const q = (Math.floor(current.getMonth() / 3) + 1) as 1 | 2 | 3 | 4;
+    result.push({
+      key: `${current.getFullYear()}-Q${q}`,
+      label: `Q${q} ${current.getFullYear()}`,
+      start: new Date(current),
+    });
+    current = new Date(current.getFullYear(), current.getMonth() + 3, 1);
+  }
+
+  return result;
+}

@@ -1,6 +1,6 @@
 export type GanttTaskStatus = "planned" | "in-progress" | "done" | "blocked";
 
-export type GanttTimeScale = "days" | "weeks" | "months";
+export type GanttTimeScale = "days" | "weeks" | "months" | "quarters";
 
 export type GanttTask = {
   // Eindeutige Kennung — wird als React-Key und für Abhängigkeiten verwendet.
@@ -27,6 +27,7 @@ export type GanttTaskNode = GanttTask & {
 export type GanttChartProps = {
   tasks: GanttTask[];
   timeScale?: GanttTimeScale;
+  height?: number | string;
   onTaskClick?: (task: GanttTask) => void;
   onMilestoneClick?: (task: GanttTask) => void;
   onAddTask?: (parentTask?: GanttTask) => void;

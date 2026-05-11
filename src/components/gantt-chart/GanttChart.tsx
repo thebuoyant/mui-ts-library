@@ -1,12 +1,13 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { useStore } from "zustand";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import {
   createGanttChartStore,
   type GanttChartStore,
 } from "./GanttChart.store";
 import type { GanttChartProps } from "./GanttChart.types";
-import { getVisibleTasks } from "./util/gantt-chart.util";
+import { GanttTaskPanel } from "./GanttTaskPanel";
+import { GanttTimeline } from "./GanttTimeline";
 
 const GanttChartStoreContext = createContext<GanttChartStore | null>(null);
 
@@ -24,28 +25,45 @@ export function useGanttChartStore<T>(
 
 type GanttChartInnerProps = GanttChartProps;
 
-// Platzhalter — wird in Phase 2 durch das echte Split-Layout ersetzt.
 function GanttChartInner({
   tasks,
   onTaskClick,
-  onAddTask,
-  onDeleteTask,
-  onStatusChange,
+  onMilestoneClick,
+  height = 400,
 }: GanttChartInnerProps) {
   const setTasks = useGanttChartStore((s) => s.setTasks);
-  const taskTree = useGanttChartStore((s) => s.taskTree);
-  const expandedIds = useGanttChartStore((s) => s.expandedIds);
-  const toggleExpand = useGanttChartStore((s) => s.toggleExpand);
-  // Selector würde bei jedem Aufruf eine neue Array-Referenz erzeugen → Endlosschleife.
-  const visibleTasks = useMemo(() => getVisibleTasks(taskTree, expandedIds), [taskTree, expandedIds]);
+  const leftRef = useRef<HTMLDivElement>(null);
+  const rightRef = useRef<HTMLDivElement>(null);
+  // Verhindert gegenseitiges Auslösen der Scroll-Handler (Feedback-Loop).
+  const isSyncing = useRef(false);
 
   useEffect(() => {
     setTasks(tasks);
   }, [tasks, setTasks]);
 
+  const handleLeftScroll = () => {
+    if (isSyncing.current) return;
+    isSyncing.current = true;
+    if (rightRef.current && leftRef.current) {
+      rightRef.current.scrollTop = leftRef.current.scrollTop;
+    }
+    isSyncing.current = false;
+  };
+
+  const handleRightScroll = () => {
+    if (isSyncing.current) return;
+    isSyncing.current = true;
+    if (leftRef.current && rightRef.current) {
+      leftRef.current.scrollTop = rightRef.current.scrollTop;
+    }
+    isSyncing.current = false;
+  };
+
   return (
     <Box
       sx={{
+        display: "flex",
+        height,
         border: "1px solid",
         borderColor: "divider",
         borderRadius: 1,
@@ -53,44 +71,17 @@ function GanttChartInner({
         width: "100%",
       }}
     >
-      {visibleTasks.map((task) => (
-        <Box
-          key={task.id}
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
-            px: 2,
-            py: 0.75,
-            pl: 2 + task.depth * 3,
-            borderBottom: "1px solid",
-            borderColor: "divider",
-            cursor: onTaskClick ? "pointer" : "default",
-            "&:hover": onTaskClick ? { bgcolor: "action.hover" } : undefined,
-          }}
-          onClick={() => onTaskClick?.(task)}
-        >
-          {/* Expand/Collapse-Button für Tasks mit Kindern */}
-          {task.children.length > 0 && (
-            <Box
-              component="span"
-              sx={{ fontSize: 10, userSelect: "none", minWidth: 12 }}
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleExpand(task.id);
-              }}
-            >
-              {expandedIds.has(task.id) ? "▼" : "▶"}
-            </Box>
-          )}
-          <Typography variant="body2" noWrap>
-            {task.name}
-          </Typography>
-          <Typography variant="caption" color="text.secondary" sx={{ ml: "auto" }}>
-            {task.status}
-          </Typography>
-        </Box>
-      ))}
+      <GanttTaskPanel
+        scrollRef={leftRef}
+        onScroll={handleLeftScroll}
+        onTaskClick={onTaskClick}
+      />
+      <GanttTimeline
+        scrollRef={rightRef}
+        onScroll={handleRightScroll}
+        onTaskClick={onTaskClick}
+        onMilestoneClick={onMilestoneClick}
+      />
     </Box>
   );
 }
@@ -103,6 +94,7 @@ export function GanttChart({
   onAddTask,
   onDeleteTask,
   onStatusChange,
+  height,
 }: GanttChartProps) {
   const [store] = useState(() => createGanttChartStore(tasks, timeScale));
 
@@ -116,6 +108,7 @@ export function GanttChart({
         onAddTask={onAddTask}
         onDeleteTask={onDeleteTask}
         onStatusChange={onStatusChange}
+        height={height}
       />
     </GanttChartStoreContext.Provider>
   );

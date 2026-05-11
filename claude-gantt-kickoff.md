@@ -8,23 +8,17 @@ Wir arbeiten an **`mui-ts-library`** — einer eigenen React-Komponentenbiblioth
 /Users/thomasschlender/Development-React-Components/mui-ts-library
 ```
 
-### Bereits implementierte Komponenten
-
-1. **`TagSelection`** — Multi-Tag-Picker mit Autocomplete, Chip-Anzeige, Zustand-Store und vollständiger Callback-API
-2. **`PasswordStrengthMeter`** — Passwort-Eingabe mit Live-Stärkeberechnung, animiertem Meter-Balken und Anforderungsliste
-3. **`GanttChart`** — Phase 1 abgeschlossen (siehe unten)
-
 ### Etablierte Patterns — diese müssen beim Gantt exakt eingehalten werden
 
 | Pattern | Detail |
 |---|---|
-| **Sprache** | Code/Variablen/Methoden auf Englisch. Kommentare auf Deutsch, aber NUR wenn das WHY nicht-offensichtlich ist. Keine offensichtlichen Beschreibungen. |
+| **Sprache** | Code/Variablen/Methoden auf Englisch. Kommentare auf Deutsch, aber NUR wenn das WHY nicht-offensichtlich ist. |
 | **State** | Zustand v5 Vanilla-Store via `createStore` aus `zustand/vanilla`, in React-Context verpackt |
-| **Styling** | MUI `sx`-Prop, MUI-Theme-Farben (kein hardcodiertes Hex außer als expliziter Escape-Hatch) |
+| **Styling** | MUI `sx`-Prop, MUI-Theme-Farben (kein hardcodiertes Hex) |
 | **Typen** | Alle öffentlichen Typen in einer eigenen `*.types.ts`-Datei |
-| **Tests** | Vitest + @testing-library/react — Tests beschreiben Verhalten, nicht Implementierung |
+| **Tests** | Vitest + @testing-library/react — Tests beschreiben Verhalten |
 | **Stories** | Storybook mit `@storybook/react-vite`, MUI ThemeProvider global in `.storybook/preview.tsx` |
-| **Exports** | Alles aus `src/index.ts` re-exportieren, inkl. separater `*.types.ts` |
+| **Exports** | Alles aus `src/index.ts` re-exportieren |
 
 ### Tech-Stack
 
@@ -34,272 +28,187 @@ React 19, TypeScript 5.9, MUI v7, Zustand v5, Vite 8, Vitest 4, Storybook 10
 
 ---
 
-## Ziel-Screenshot (microtool.de Referenz)
+## Aktueller Stand: Phase 1 + 2 abgeschlossen ✅ (96 Tests grün)
 
-Das Gantt soll so aussehen:
+### Alle vorhandenen Dateien
 
+| Datei | Inhalt |
+|---|---|
+| `GanttChart.types.ts` | `GanttTaskStatus`, `GanttTimeScale`, `GanttTask`, `GanttTaskNode`, `GanttChartProps` |
+| `GanttChart.store.ts` | Zustand-Store mit `tasks`, `taskTree`, `expandedIds`, `timeScale`, `timelineRange` |
+| `GanttChart.store.test.ts` | 11 Store-Tests |
+| `util/gantt-chart.util.ts` | Alle Datum- und Baum-Hilfsfunktionen |
+| `util/gantt-chart.util.test.ts` | 23 Util-Tests |
+| `GanttChart.constants.ts` | `ROW_HEIGHT=40`, `HEADER_HEIGHT=40`, `LEFT_PANEL_WIDTH=280`, `COLUMN_WIDTH_MONTH=120`, `COLUMN_WIDTH_QUARTER=360`, `BAR_HEIGHT=16` |
+| `GanttChart.tsx` | Haupt-Komponente: Store-Kontext, Scroll-Sync, Split-Layout |
+| `GanttChart.test.tsx` | 9 Komponenten-Tests |
+| `GanttTaskPanel.tsx` | Linkes Panel: sticky Header, Task-Zeilen mit Expand/Collapse + Status-Dot |
+| `GanttTimelineHeader.tsx` | Spalten-Header (generisch: `columns: HeaderColumn[]`) |
+| `GanttTimeline.tsx` | Rechtes Panel: Balken, Meilensteine, Gitterlinien, `displayRange`-Logik |
+| `GanttChart.stories.tsx` | 4 Stories: Default, WeeksScale, QuartersScale, MinimalFlat |
+
+### GanttTimeScale
+
+```ts
+export type GanttTimeScale = "days" | "weeks" | "months" | "quarters";
 ```
-┌──────────────────────────┬──────────────────────────────────────────────────────┐
-│  Name          Zustand   │  Nov          Dez          Jan          Feb           │
-│                          │  3  10  17  24  1   8  15  22  29   5  12  19  26    │
-├──────────────────────────┼──────────────────────────────────────────────────────┤
-│▼ 🔵 Hybrid agiles Projekt│  [══════════════════════════════════════════════════] │
-│  ○  Ziele festlegen  ✓   │  [═══]                                               │
-│  ○  Requirements Eng 🔵  │      [══════════════════════════════════════════════] │
-│▼ ○  Release 1 entw.  🔵  │           [══════════════◆]                          │
-│  ▼ 🔵 Team Genf Spr  🔵  │           [══════════════]                           │
-│      Sprint 1.1      🔵  │           [═══]                                      │
-│      Sprint 1.2      🔴  │               [═══]                                  │
-│  ▷ 🔴 Team Berlin    🔴  │               [═══════]                              │
-│  ◆  Release 1 Ende   🔴  │                         ◆  ← Meilenstein             │
-│▷ ○  Release 2 entw.  🔴  │                         [══════════════════]         │
-│  ◆  Release 2 Ende   🔴  │                                              ◆       │
-└──────────────────────────┴──────────────────────────────────────────────────────┘
-         (fest, kein H-Scroll)               (scrollt horizontal)
-         vertikaler Scroll synchronisiert beide Seiten
-```
 
-**Nummerierte Pfeile im Screenshot** = SVG-Abhängigkeitspfeile (Phase 5).
-**Rauten** = Meilensteine (`isMilestone: true` auf einem `GanttTask`).
+Implementiert: `months` + `quarters`. `days` und `weeks` sind im Store vorhanden aber der Header-Renderer fällt noch auf `months` zurück (Phase 3+).
 
 ---
 
-## Was bisher implementiert ist (Phase 1 — FERTIG ✅)
+## Wie der Storybook-Screenshot aussieht (Referenz)
 
-### Dateien
+Die aktuelle Storybook-Ansicht zeigt:
+- Linkes Panel: "Name"-Header, Task-Zeilen mit ▶/▼, farbigem Status-Dot, Task-Name
+- Rechtes Panel: Monats-/Quartals-Header, Balken nach Status-Farbe, Meilenstein-Raute
+- Farben: `done` = grün (success), `in-progress` = blau (info), `planned` = orange (warning), `blocked` = rot (error)
+- Milestone = Raute ◆ in `warning.main`
 
-| Datei | Status |
-|---|---|
-| `src/components/gantt-chart/GanttChart.types.ts` | ✅ fertig |
-| `src/components/gantt-chart/util/gantt-chart.util.ts` | ✅ fertig |
-| `src/components/gantt-chart/util/gantt-chart.util.test.ts` | ✅ 17 Tests grün |
-| `src/components/gantt-chart/GanttChart.store.ts` | ✅ fertig |
-| `src/components/gantt-chart/GanttChart.store.test.ts` | ✅ 11 Tests grün |
-| `src/components/gantt-chart/GanttChart.tsx` | ✅ Platzhalter (einfache Task-Liste) |
-| `src/components/gantt-chart/GanttChart.stories.tsx` | ✅ 3 Stories mit Mock-Daten |
-| `src/index.ts` | ✅ Gantt-Exports hinzugefügt |
+---
 
-**Gesamt: 81 Tests, alle grün.**
+## Kritisches Wissen für alle Sessions
 
-### Wichtiger bekannter Bug — bereits gefixt
-
-`getVisibleTasks()` darf NICHT als Zustand-Selector verwendet werden:
+### 1. useMemo-Pflicht für `getVisibleTasks`
 
 ```tsx
-// FALSCH — erzeugt bei jedem Render eine neue Array-Referenz → Endlosschleife
+// FALSCH — neue Array-Referenz → Endlosschleife
 const visibleTasks = useGanttChartStore((s) => s.getVisibleTasks());
 
-// RICHTIG — stabile Referenzen aus dem Store, Ableitung via useMemo
+// RICHTIG
 const taskTree = useGanttChartStore((s) => s.taskTree);
 const expandedIds = useGanttChartStore((s) => s.expandedIds);
 const visibleTasks = useMemo(() => getVisibleTasks(taskTree, expandedIds), [taskTree, expandedIds]);
 ```
 
-**Grund:** Zustand vergleicht Selector-Rückgabewerte via `Object.is`. Jedes `getVisibleTasks()`-Call gibt ein neues Array zurück → immer "geändert" → Endlosschleife.
+### 2. displayRange für Quarters
 
-### Store-API (GanttChart.store.ts)
-
-```ts
-type GanttChartStoreState = {
-  tasks: GanttTask[];
-  taskTree: GanttTaskNode[];       // buildTaskTree(tasks), bei setTasks neu berechnet
-  expandedIds: Set<string>;        // Root-Tasks standardmäßig aufgeklappt
-  timeScale: GanttTimeScale;
-  timelineRange: TimelineRange;    // { start: Date, end: Date }
-
-  setTasks(tasks: GanttTask[]): void;
-  toggleExpand(taskId: string): void;
-  expandAll(): void;
-  collapseAll(): void;
-  setTimeScale(scale: GanttTimeScale): void;
-  getVisibleTasks(): GanttTaskNode[];  // NUR für store-interne Nutzung, nicht als Selector!
-};
-```
-
-### Util-Funktionen (gantt-chart.util.ts)
+`calculateTaskPosition` arbeitet mit `timelineRange`. Bei Quartals-Ansicht muss die Range auf Quartalsgrenzen ausgeweitet werden, damit Balken-Prozente und Spalten-Anfänge übereinstimmen. `GanttTimeline.tsx` berechnet dafür `displayRange` lokal:
 
 ```ts
-getTimelineRange(tasks): TimelineRange       // frühester Start bis spätestes Ende, startOfMonth padding
-calculateTaskPosition(task, range): { left: number, width: number }  // Prozent-Werte 0–100
-buildTaskTree(tasks): GanttTaskNode[]        // Flat-Liste → verschachtelter Baum mit depth-Property
-getVisibleTasks(nodes, expandedIds): GanttTaskNode[]  // Flachliste der sichtbaren Knoten
-startOfMonth(date): Date
-endOfMonth(date): Date
-addMonths(date, months): Date
-getMonthsInRange(range): Date[]              // Für Timeline-Header
+if (timeScale === "quarters") {
+  displayRange = { start: startOfQuarter(timelineRange.start), end: endOfQuarter(timelineRange.end) };
+}
 ```
 
-### Mock-Daten (GanttChart.stories.tsx)
+### 3. GanttTimelineHeader ist generisch
 
-Software-Projekt "E-Commerce Platform v2.0", März–Juni 2025:
-- Projekt-Root → Release 1 (Backend API, März–April) + Release 2 (Frontend, Mai–Juni)
-- Je 2 Teams (Alpha/Beta) mit je 2 Sprints
-- Meilenstein "Go-Live" am 30.06.2025
-- Statuse: done / in-progress / planned gemischt
+`GanttTimelineHeader` nimmt `columns: HeaderColumn[]` (key, label, width). `GanttTimeline` baut das Array je nach `timeScale`.
+
+### 4. Circular Import (bewusst so)
+
+`GanttTaskPanel` und `GanttTimeline` importieren `useGanttChartStore` aus `./GanttChart`. Das ist derselbe Pattern wie in `TagSelection`. Vite/TypeScript handeln das korrekt.
 
 ---
 
-## Nächste Schritte: Phase 2 — Split-Panel-Layout
+## Props-API
 
-### Ziel
-
-Den Platzhalter in `GanttChart.tsx` durch das echte Split-Layout ersetzen:
-- Links: fixe Breite (~280px), keine horizontale Scroll, vertikaler Scroll per Ref gesteuert
-- Rechts: horizontaler Scroll (Timeline), vertikaler Scroll synchronisiert mit links
-
-### Konkrete Implementierung
-
-**Outer Container:**
 ```tsx
-<Box sx={{ display: "flex", overflow: "hidden", height: "100%", border: "1px solid", borderColor: "divider", borderRadius: 1 }}>
-  <GanttTaskPanel />   {/* links, fix */}
-  <GanttTimeline />    {/* rechts, scrollt */}
-</Box>
-```
-
-**Scroll-Synchronisation:**
-```tsx
-// Beide Panels bekommen ein Ref auf ihren scroll-container
-const leftRef = useRef<HTMLDivElement>(null);
-const rightRef = useRef<HTMLDivElement>(null);
-
-// Right → Left sync (nur vertikaler Scroll)
-const handleRightScroll = () => {
-  if (leftRef.current && rightRef.current) {
-    leftRef.current.scrollTop = rightRef.current.scrollTop;
-  }
-};
-// Left → Right sync (nur vertikaler Scroll)
-const handleLeftScroll = () => {
-  if (leftRef.current && rightRef.current) {
-    rightRef.current.scrollTop = leftRef.current.scrollTop;
-  }
-};
-```
-
-> **Wichtig:** Kein Feedback-Loop möglich, da Browser `scrollTop`-Zuweisung ohne `onScroll` feuern.
-
-**Timeline-Header (GanttTimelineHeader):**
-```tsx
-// Monate aus getMonthsInRange(timelineRange) — bereits in util
-// Jeder Monat bekommt columnWidth px Breite
-// Sub-Header: Wochen (getWeeksInRange) oder Tage je nach timeScale
-```
-
-**Zeilenbreite:**
-- Jede Zeile in der Timeline muss dieselbe Höhe haben wie links (z. B. `ROW_HEIGHT = 40`)
-- `ROW_HEIGHT` als Konstante in `GanttChart.constants.ts` oder direkt in der Komponente
-
-### Neue Dateien für Phase 2
-
-```
-src/components/gantt-chart/
-  GanttChart.tsx              ← Haupt-Komponente, ersetzt Platzhalter
-  GanttTaskPanel.tsx          ← linke Spalte (Name + Status)
-  GanttTimeline.tsx           ← rechte Seite (Header + Balken-Zeilen)
-  GanttTimelineHeader.tsx     ← Monats-/Wochen-Header
-  GanttChart.constants.ts     ← ROW_HEIGHT, LEFT_PANEL_WIDTH, COLUMN_WIDTH_MONTH, etc.
-```
-
-### Timeline-Breite berechnen
-
-```ts
-// Anzahl Monate × Pixel pro Monat
-const months = getMonthsInRange(timelineRange); // bereits implementiert
-const totalWidth = months.length * COLUMN_WIDTH_MONTH;
+<GanttChart
+  tasks={tasks}                   // GanttTask[]
+  timeScale="months"              // "days" | "weeks" | "months" | "quarters"
+  height={500}                    // number | string, Default: 400
+  onTaskClick={(task) => ...}
+  onMilestoneClick={(task) => ...}
+  onAddTask={(parentTask?) => ...}
+  onDeleteTask={(task) => ...}
+  onStatusChange={(task, status) => ...}
+/>
 ```
 
 ---
 
-## Phase 3 — Task-Panel (linke Spalte)
+## Nächste Phase: Phase 3 — Wochen-Skala + Verfeinerungen
 
-Komponente `GanttTaskPanel.tsx`:
+### 3a — Wochen-Header implementieren
 
-```tsx
-// Jede Zeile:
-<Box sx={{ display: "flex", alignItems: "center", height: ROW_HEIGHT, pl: 1 + depth * 2 }}>
-  {/* Expand/Collapse-Button wenn children.length > 0 */}
-  <StatusDot status={task.status} />
-  <Typography noWrap>{task.name}</Typography>
-  {/* Optional: + Button für onAddTask, Löschen-Icon für onDeleteTask */}
-</Box>
+`GanttTimeScale = "weeks"` fällt aktuell auf months zurück. Zu implementieren:
+
+```ts
+// In gantt-chart.util.ts
+export function startOfWeek(date: Date): Date { /* Montag der Woche */ }
+export function getWeeksInRange(range: TimelineRange): Date[]
 ```
 
-**StatusDot-Farben (MUI semantic colors):**
 ```ts
-const STATUS_COLORS: Record<GanttTaskStatus, string> = {
-  "planned":     "warning.main",
-  "in-progress": "info.main",
-  "done":        "success.main",
-  "blocked":     "error.main",
+// In GanttTimeline.tsx
+if (timeScale === "weeks") {
+  return getWeeksInRange(displayRange).map((w) => ({
+    key: w.toISOString(),
+    label: `KW ${getWeekNumber(w)}`,  // oder kurzes Datum "03.03."
+    width: COLUMN_WIDTH_WEEK,          // = 30px
+  }));
+}
+```
+
+`COLUMN_WIDTH_WEEK = 30` zu `GanttChart.constants.ts` hinzufügen.
+
+### 3b — Status-Chip / Status-Spalte im linken Panel (optional)
+
+Im Referenz-Screenshot gibt es neben dem Namen noch eine "Zustand"-Spalte mit Chip. Kann als zweite Spalte rechts im `GanttTaskPanel` ergänzt werden:
+
+```tsx
+<Chip
+  label={task.status}
+  size="small"
+  color={STATUS_COLORS[task.status]}  // semantic MUI color
+  sx={{ ml: "auto", mr: 1 }}
+/>
+```
+
+### 3c — Zwei-Ebenen-Header für Monate (Quartals-Oberzeile + Monats-Unterzeile)
+
+Im Referenz-Screenshot: Quartal als Oberkopf, Monate darunter. `GanttTimelineHeader` müsste eine optionale Sub-Header-Zeile bekommen:
+
+```tsx
+type HeaderColumn = {
+  key: string;
+  label: string;
+  width: number;
+  subColumns?: HeaderColumn[];  // z. B. Monate innerhalb eines Quartals
 };
 ```
 
 ---
 
-## Phase 4 — Balken-Rows (rechte Seite)
-
-Komponente `GanttTimelineRow.tsx` (eine Zeile pro sichtbarem Task):
-
-```tsx
-// Balken-Position via calculateTaskPosition (bereits implementiert)
-const { left, width } = calculateTaskPosition(task, timelineRange);
-
-// Normaler Balken:
-<Box sx={{
-  position: "absolute",
-  left: `${left}%`,
-  width: `${width}%`,
-  height: BAR_HEIGHT,           // z. B. 16px
-  top: (ROW_HEIGHT - BAR_HEIGHT) / 2,
-  bgcolor: STATUS_BGCOLOR[task.status],  // MUI theme colors
-  borderRadius: 1,
-}} />
-
-// Meilenstein statt Balken:
-<Box sx={{
-  position: "absolute",
-  left: `${left}%`,
-  width: 12, height: 12,
-  top: (ROW_HEIGHT - 12) / 2,
-  bgcolor: "warning.main",
-  transform: "rotate(45deg)",  // Raute
-}} />
-```
-
----
-
-## Phase 5 — SVG-Abhängigkeitspfeile
+## Phase 4 (nächste Prio) — SVG-Abhängigkeitspfeile
 
 SVG-Layer absolut über der Timeline (`pointer-events: none`):
 
 ```tsx
-// Für jede dependency-Beziehung:
-// - Quell-Task (predecessor) → Ziel-Task (successor)
-// - Y-Position: Zeilen-Index × ROW_HEIGHT + ROW_HEIGHT/2
-// - X-Position der Quell-Linie: calculateTaskPosition(predecessor).left + width
-// - X-Position der Ziel-Linie: calculateTaskPosition(successor).left
-// Pfeilspitze via SVG <marker>
+// In GanttTimeline.tsx, nach den Bar-Rows:
+<svg
+  style={{ position: "absolute", top: HEADER_HEIGHT, left: 0, width: "100%", height: "100%", pointerEvents: "none" }}
+>
+  <defs>
+    <marker id="arrowhead" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto">
+      <polygon points="0 0, 6 2, 0 4" fill="currentColor" />
+    </marker>
+  </defs>
+  {dependencyLines.map(...)}
+</svg>
 ```
 
----
-
-## Phase 6 — Callback-API verdrahten
-
-Alle Props optional:
-- `onTaskClick` — Klick auf Task-Zeile oder Balken
-- `onMilestoneClick` — Klick auf Meilenstein-Raute
-- `onAddTask(parentTask?)` — "+" Button in der Zeile
-- `onDeleteTask(task)` — Löschen-Icon
-- `onStatusChange(task, status)` — Klick auf Status-Dot → MUI Menu mit Status-Optionen
+Für jede `task.dependencies[]`-Beziehung:
+- `startX = calculateTaskPosition(predecessor, displayRange).left + width` (rechter Rand des Vorgängers) * totalWidth / 100
+- `startY = visibleTasks.indexOf(predecessor) * ROW_HEIGHT + ROW_HEIGHT / 2 + HEADER_HEIGHT`
+- Linie: L-förmig (erst nach rechts, dann nach unten/oben, dann nach rechts zur Ziel-Spalte)
+- Nur zeichnen wenn beide Tasks sichtbar sind (in `visibleTasks`)
 
 ---
 
-## Phase 7 — Tests + Stories abrunden
+## Phase 5 — Callback-API vollständig verdrahten
 
-- Story `FullProject` mit komplettem Mock-Datensatz und allen Callbacks als `console.log`
-- Tests für Balken-Rendering, Meilenstein-Rendering, Callback-Aufrufe
-- Tests für Scroll-Sync brauchen jsdom — ggf. überspringen und nur Store/Util testen
+- `onAddTask` → "+" Icon in jeder Task-Zeile im linken Panel (sichtbar bei Hover)
+- `onDeleteTask` → Löschen-Icon im Hover-Zustand
+- `onStatusChange` → Klick auf Status-Dot → MUI `Menu` mit Status-Optionen
+
+---
+
+## Phase 6 — Tests + Stories abrunden
+
+- Story `FullyExpanded` mit `expandAll()` im Store nach mount
+- Tests für Wochen-Header, SVG-Pfeile (ob DOM-Element vorhanden), Callback-Aufrufe
 
 ---
 
@@ -307,18 +216,7 @@ Alle Props optional:
 
 ```
 Bitte lies zuerst die claude-gantt-kickoff.md im Root des Projekts.
-Dann starte Phase 2: Split-Panel-Layout mit Scroll-Synchronisation und Timeline-Header.
-GanttChart.tsx (Platzhalter) soll durch das echte Layout ersetzt werden.
-Halte dich genau an die etablierten Patterns und die Implementierungsdetails in der Kickoff-Datei.
+Dann implementiere Phase 3a: Wochen-Skala (getWeeksInRange, COLUMN_WIDTH_WEEK, Integration in GanttTimeline).
+Danach optional Phase 3b: Status-Chip im linken Panel.
+96 Tests müssen nach den Änderungen grün bleiben.
 ```
-
----
-
-## Wichtige Hinweise für jede Session
-
-1. **useMemo für abgeleitete Listen** — niemals `getVisibleTasks()` direkt als Zustand-Selector (neue Array-Referenz → Endlosschleife)
-2. **Immer Tests mitschreiben** — kein Feature ohne Test
-3. **Kommentare nur auf Deutsch und nur für nicht-offensichtliche WHYs**
-4. **Farben immer via MUI `color`-Prop oder Theme** — kein hardcodiertes Hex
-5. **SVG-Schicht ist Phase 5** — erst Layout und Balken stabilisieren, dann Pfeile
-6. **81 Tests müssen nach jeder Phase weiter grün bleiben**

@@ -4,9 +4,11 @@ import {
   buildTaskTree,
   calculateTaskPosition,
   getMonthsInRange,
+  getQuartersInRange,
   getTimelineRange,
   getVisibleTasks,
   startOfMonth,
+  startOfQuarter,
   endOfMonth,
   addMonths,
 } from "./gantt-chart.util";
@@ -68,6 +70,67 @@ describe("getMonthsInRange", () => {
     expect(months).toHaveLength(3);
     expect(months[0].getMonth()).toBe(0); // Januar
     expect(months[2].getMonth()).toBe(2); // März
+  });
+});
+
+describe("startOfQuarter", () => {
+  it("Should return the first day of Q1 for a January date", () => {
+    const result = startOfQuarter(new Date("2025-02-15"));
+
+    expect(result.getMonth()).toBe(0); // Januar = Q1-Start
+    expect(result.getDate()).toBe(1);
+  });
+
+  it("Should return the first day of Q3 for an August date", () => {
+    const result = startOfQuarter(new Date("2025-08-20"));
+
+    expect(result.getMonth()).toBe(6); // Juli = Q3-Start
+    expect(result.getDate()).toBe(1);
+  });
+});
+
+describe("getQuartersInRange", () => {
+  it("Should return one entry per quarter within the range", () => {
+    const quarters = getQuartersInRange({
+      start: new Date("2025-01-01"),
+      end: new Date("2025-09-30"),
+    });
+
+    expect(quarters).toHaveLength(3);
+    expect(quarters[0].key).toBe("2025-Q1");
+    expect(quarters[1].key).toBe("2025-Q2");
+    expect(quarters[2].key).toBe("2025-Q3");
+  });
+
+  it("Should include a quarter when the range starts mid-quarter", () => {
+    const quarters = getQuartersInRange({
+      start: new Date("2025-02-15"), // mitten in Q1
+      end: new Date("2025-04-01"),   // Anfang Q2
+    });
+
+    // startOfQuarter rundet auf Q1-Beginn zurück → Q1 und Q2 werden zurückgegeben.
+    expect(quarters[0].key).toBe("2025-Q1");
+    expect(quarters).toHaveLength(2);
+  });
+
+  it("Should generate correct labels", () => {
+    const quarters = getQuartersInRange({
+      start: new Date("2025-10-01"),
+      end: new Date("2025-12-31"),
+    });
+
+    expect(quarters[0].label).toBe("Q4 2025");
+  });
+
+  it("Should span year boundaries correctly", () => {
+    const quarters = getQuartersInRange({
+      start: new Date("2025-10-01"),
+      end: new Date("2026-03-31"),
+    });
+
+    expect(quarters).toHaveLength(2);
+    expect(quarters[0].key).toBe("2025-Q4");
+    expect(quarters[1].key).toBe("2026-Q1");
   });
 });
 
