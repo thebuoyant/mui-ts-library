@@ -29,6 +29,9 @@ function GanttChartInner({
   tasks,
   onTaskClick,
   onMilestoneClick,
+  onAddTask,
+  onDeleteTask,
+  onStatusChange,
   height = 400,
 }: GanttChartInnerProps) {
   const setTasks = useGanttChartStore((s) => s.setTasks);
@@ -75,6 +78,9 @@ function GanttChartInner({
         scrollRef={leftRef}
         onScroll={handleLeftScroll}
         onTaskClick={onTaskClick}
+        onAddTask={onAddTask}
+        onDeleteTask={onDeleteTask}
+        onStatusChange={onStatusChange}
       />
       <GanttTimeline
         scrollRef={rightRef}

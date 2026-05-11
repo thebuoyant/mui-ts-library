@@ -78,6 +78,7 @@ const sampleTasks: GanttTask[] = [
     status: "planned",
     startDate: new Date("2025-05-01"),
     endDate: new Date("2025-06-30"),
+    dependencies: ["release-1"],
   },
   {
     id: "r2-team-alpha",
@@ -137,6 +138,7 @@ const sampleTasks: GanttTask[] = [
     startDate: new Date("2025-06-30"),
     endDate: new Date("2025-06-30"),
     isMilestone: true,
+    dependencies: ["release-2"],
   },
 ];
 

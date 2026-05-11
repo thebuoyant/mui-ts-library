@@ -1,15 +1,19 @@
-import { useMemo } from "react";
+import { useId, useMemo } from "react";
 import { type RefObject, type UIEventHandler } from "react";
 import { Box } from "@mui/material";
 import { useGanttChartStore } from "./GanttChart";
 import type { GanttTask } from "./GanttChart.types";
+import type { GanttTaskNode } from "./GanttChart.types";
 import {
   calculateTaskPosition,
   endOfQuarter,
+  getISOWeekNumber,
   getMonthsInRange,
   getQuartersInRange,
   getVisibleTasks,
+  getWeeksInRange,
   startOfQuarter,
+  startOfWeek,
 } from "./util/gantt-chart.util";
 import type { TimelineRange } from "./util/gantt-chart.util";
 import { GanttTimelineHeader } from "./GanttTimelineHeader";
@@ -18,6 +22,8 @@ import {
   BAR_HEIGHT,
   COLUMN_WIDTH_MONTH,
   COLUMN_WIDTH_QUARTER,
+  COLUMN_WIDTH_WEEK,
+  HEADER_HEIGHT,
   ROW_HEIGHT,
 } from "./GanttChart.constants";
 
@@ -27,6 +33,81 @@ const BAR_COLOR: Record<string, string> = {
   done: "success.main",
   blocked: "error.main",
 };
+
+// ---------------------------------------------------------------------------
+// SVG-Abhängigkeitspfeile
+// ---------------------------------------------------------------------------
+
+type DependencyLine = {
+  key: string;
+  d: string;
+};
+
+/**
+ * Berechnet Z-förmige Pfadkoordinaten für alle sichtbaren Finish-to-Start-Abhängigkeiten.
+ * Nicht sichtbare Vorgänger (z. B. eingeklappt) werden übersprungen.
+ *
+ * Drei Routing-Fälle damit das Z immer sichtbar ist:
+ *   1. Viel Platz (x2 >> x1)     → Mittelpunkt-Z, ausgewogen
+ *   2. Wenig Platz, rechts Platz  → Z mit festem Austrittsversatz nach rechts
+ *   3. Am rechten Timeline-Rand   → Umgekehrtes Z: erst nach links, dann runter, dann rechts
+ */
+function computeDependencyLines(
+  visibleTasks: GanttTaskNode[],
+  displayRange: TimelineRange,
+  totalWidth: number,
+): DependencyLine[] {
+  if (totalWidth === 0) return [];
+
+  const SEGMENT = 24; // Mindestlänge eines horizontalen Z-Schenkels in Pixeln
+  const MARGIN = 8;   // Sicherheitsabstand vom rechten Rand
+
+  const lines: DependencyLine[] = [];
+  // Map statt findIndex damit die Berechnung O(n) statt O(n²) bleibt.
+  const visibleIndexMap = new Map(visibleTasks.map((t, i) => [t.id, i]));
+
+  for (const successor of visibleTasks) {
+    if (!successor.dependencies?.length) continue;
+
+    const succIdx = visibleIndexMap.get(successor.id)!;
+    const succPos = calculateTaskPosition(successor, displayRange);
+    const x2 = (succPos.left / 100) * totalWidth;
+    const y2 = succIdx * ROW_HEIGHT + ROW_HEIGHT / 2;
+
+    for (const predId of successor.dependencies) {
+      const predIdx = visibleIndexMap.get(predId);
+      if (predIdx === undefined) continue; // Vorgänger nicht sichtbar → kein Pfeil
+
+      const predecessor = visibleTasks[predIdx];
+      const predPos = calculateTaskPosition(predecessor, displayRange);
+      const x1 = ((predPos.left + predPos.width) / 100) * totalWidth;
+      const y1 = predIdx * ROW_HEIGHT + ROW_HEIGHT / 2;
+
+      let xBend: number;
+      if (x2 >= x1 + 2 * SEGMENT) {
+        // Fall 1: Genug Platz — Mittelpunkt ergibt ein ausgewogenes Z
+        xBend = (x1 + x2) / 2;
+      } else if (x1 + SEGMENT <= totalWidth - MARGIN) {
+        // Fall 2: Wenig Platz, aber rechts noch Luft — fixer Austrittsversatz
+        xBend = x1 + SEGMENT;
+      } else {
+        // Fall 3: Am rechten Rand — nach links umleiten damit der Pfad sichtbar bleibt
+        xBend = Math.max(x2 - SEGMENT, MARGIN);
+      }
+
+      lines.push({
+        key: `${predId}-${successor.id}`,
+        d: `M ${x1} ${y1} H ${xBend} V ${y2} H ${x2}`,
+      });
+    }
+  }
+
+  return lines;
+}
+
+// ---------------------------------------------------------------------------
+// Komponente
+// ---------------------------------------------------------------------------
 
 type GanttTimelineProps = {
   scrollRef: RefObject<HTMLDivElement>;
@@ -46,15 +127,22 @@ export function GanttTimeline({
   const timelineRange = useGanttChartStore((s) => s.timelineRange);
   const timeScale = useGanttChartStore((s) => s.timeScale);
 
+  // Jede Instanz braucht eine eigene Marker-ID damit mehrere GanttCharts auf einer Seite
+  // nicht dieselbe SVG-defs-Referenz teilen.
+  const instanceId = useId().replace(/:/g, "");
+  const arrowMarkerId = `gantt-arrow-${instanceId}`;
+
   // Selector würde bei jedem Aufruf eine neue Array-Referenz liefern → Endlosschleife.
   const visibleTasks = useMemo(
     () => getVisibleTasks(taskTree, expandedIds),
     [taskTree, expandedIds],
   );
 
-  // Für Quartale muss der Anzeigebereich auf Quartalsgrenzen ausgeweitet werden,
-  // damit die Balken-Prozentwerte mit den Spalten-Anfängen übereinstimmen.
+  // Anzeigebereich auf Spalten-Grenzen ausweiten damit Balken-Prozente korrekt ausgerichtet sind.
   const displayRange = useMemo((): TimelineRange => {
+    if (timeScale === "weeks") {
+      return { start: startOfWeek(timelineRange.start), end: timelineRange.end };
+    }
     if (timeScale === "quarters") {
       return {
         start: startOfQuarter(timelineRange.start),
@@ -65,6 +153,13 @@ export function GanttTimeline({
   }, [timeScale, timelineRange]);
 
   const columns = useMemo((): HeaderColumn[] => {
+    if (timeScale === "weeks") {
+      return getWeeksInRange(displayRange).map((w) => ({
+        key: w.toISOString(),
+        label: `KW${getISOWeekNumber(w)}`,
+        width: COLUMN_WIDTH_WEEK,
+      }));
+    }
     if (timeScale === "quarters") {
       return getQuartersInRange(displayRange).map((q) => ({
         key: q.key,
@@ -84,13 +179,22 @@ export function GanttTimeline({
     [columns],
   );
 
-  // Breite der engsten Spalte — bestimmt den Abstand der Gitterlinien.
-  const gridColumnWidth = timeScale === "quarters" ? COLUMN_WIDTH_QUARTER : COLUMN_WIDTH_MONTH;
+  const dependencyLines = useMemo(
+    () => computeDependencyLines(visibleTasks, displayRange, totalWidth),
+    [visibleTasks, displayRange, totalWidth],
+  );
+
+  const gridColumnWidth =
+    timeScale === "weeks"
+      ? COLUMN_WIDTH_WEEK
+      : timeScale === "quarters"
+        ? COLUMN_WIDTH_QUARTER
+        : COLUMN_WIDTH_MONTH;
 
   return (
     <Box ref={scrollRef} onScroll={onScroll} sx={{ flex: 1, overflow: "auto" }}>
-      {/* Innerer Container fixiert die Mindestbreite — verhindert Stauchung bei schmalem Viewport. */}
-      <Box sx={{ minWidth: totalWidth }}>
+      {/* position: relative ist Pflicht damit der SVG-Layer korrekt absolut positioniert wird. */}
+      <Box sx={{ minWidth: totalWidth, position: "relative" }}>
         <GanttTimelineHeader columns={columns} />
 
         {visibleTasks.map((task) => {
@@ -105,7 +209,6 @@ export function GanttTimeline({
                 position: "relative",
                 borderBottom: "1px solid",
                 borderColor: "divider",
-                // Vertikale Gitter-Linien via Hintergrundmuster — eine Linie pro Spalte.
                 backgroundImage: (theme) =>
                   `linear-gradient(to right, transparent calc(${gridColumnWidth}px - 1px), ${theme.palette.divider} calc(${gridColumnWidth}px - 1px), ${theme.palette.divider} ${gridColumnWidth}px)`,
                 backgroundSize: `${gridColumnWidth}px 100%`,
@@ -134,7 +237,6 @@ export function GanttTimeline({
                   sx={{
                     position: "absolute",
                     left: `${left}%`,
-                    // Mindestbreite 0.5% damit Balken nie vollständig unsichtbar werden.
                     width: `${Math.max(width, 0.5)}%`,
                     height: BAR_HEIGHT,
                     top: "50%",
@@ -150,6 +252,47 @@ export function GanttTimeline({
             </Box>
           );
         })}
+
+        {/* SVG-Layer über allen Balken — pointer-events: none damit Klicks durchgehen. */}
+        {dependencyLines.length > 0 && (
+          <svg
+            data-testid="gantt-dependency-arrows"
+            style={{
+              position: "absolute",
+              top: HEADER_HEIGHT,
+              left: 0,
+              width: totalWidth,
+              height: visibleTasks.length * ROW_HEIGHT,
+              pointerEvents: "none",
+              overflow: "visible",
+            }}
+          >
+            <defs>
+              <marker
+                id={arrowMarkerId}
+                markerWidth="6"
+                markerHeight="4"
+                refX="5"
+                refY="2"
+                orient="auto"
+              >
+                <polygon points="0 0, 6 2, 0 4" fill="currentColor" />
+              </marker>
+            </defs>
+            {dependencyLines.map((line) => (
+              <path
+                key={line.key}
+                data-testid={`gantt-dep-${line.key}`}
+                d={line.d}
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.5}
+                strokeOpacity={0.4}
+                markerEnd={`url(#${arrowMarkerId})`}
+              />
+            ))}
+          </svg>
+        )}
       </Box>
     </Box>
   );

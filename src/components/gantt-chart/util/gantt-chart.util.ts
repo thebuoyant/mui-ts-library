@@ -160,6 +160,47 @@ export function getMonthsInRange(range: TimelineRange): Date[] {
 }
 
 // ---------------------------------------------------------------------------
+// Wochen-Hilfsfunktionen
+// ---------------------------------------------------------------------------
+
+/** Gibt den Montag der Woche zurück, die das gegebene Datum enthält (ISO 8601). */
+export function startOfWeek(date: Date): Date {
+  const d = new Date(date);
+  const day = d.getDay(); // 0=So, 1=Mo, ..., 6=Sa
+  // Sonntag (0) liegt 6 Tage nach Montag, alle anderen Tage liegen (day-1) Tage nach Montag.
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+/**
+ * Berechnet die ISO-8601-Kalenderwoche.
+ * Woche 1 = die Woche mit dem ersten Donnerstag des Jahres.
+ */
+export function getISOWeekNumber(date: Date): number {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayOfWeek = d.getUTCDay() || 7; // 1=Mo ... 7=So
+  d.setUTCDate(d.getUTCDate() + 4 - dayOfWeek); // Donnerstag dieser Woche
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+}
+
+/** Gibt alle Wochenanfänge (Montage) zwischen start und end zurück. */
+export function getWeeksInRange(range: TimelineRange): Date[] {
+  const weeks: Date[] = [];
+  let current = startOfWeek(range.start);
+
+  while (current <= range.end) {
+    weeks.push(new Date(current));
+    // +7 Tage — Date-Konstruktor normalisiert Monats-/Jahresübergänge automatisch.
+    current = new Date(current.getFullYear(), current.getMonth(), current.getDate() + 7);
+  }
+
+  return weeks;
+}
+
+// ---------------------------------------------------------------------------
 // Quartals-Hilfsfunktionen
 // ---------------------------------------------------------------------------
 

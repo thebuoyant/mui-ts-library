@@ -103,4 +103,153 @@ describe("GanttChart", () => {
     expect(screen.queryByTestId("gantt-bar-child")).not.toBeInTheDocument();
     expect(screen.queryByTestId("gantt-milestone-milestone")).not.toBeInTheDocument();
   });
+
+  it("renders a status chip for each visible task row", () => {
+    render(<GanttChart tasks={tasks} />);
+
+    // "In Progress" für root (status = "in-progress"), "Planned" für child und milestone
+    expect(screen.getByText("In Progress")).toBeInTheDocument();
+    expect(screen.getAllByText("Planned")).toHaveLength(2);
+  });
+
+  it("renders the weeks scale header with KW labels", () => {
+    render(<GanttChart tasks={tasks} timeScale="weeks" />);
+
+    const kwLabels = screen.getAllByText(/^KW\d+$/);
+    expect(kwLabels.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Phase 5 — Callback-API
+// ---------------------------------------------------------------------------
+
+describe("GanttChart — onAddTask / onDeleteTask", () => {
+  it("calls onAddTask with the task when the add icon is clicked", () => {
+    const onAddTask = vi.fn();
+    render(<GanttChart tasks={tasks} onAddTask={onAddTask} />);
+
+    fireEvent.click(screen.getByTestId("gantt-add-task-root"));
+
+    expect(onAddTask).toHaveBeenCalledOnce();
+    expect(onAddTask).toHaveBeenCalledWith(expect.objectContaining({ id: "root" }));
+  });
+
+  it("calls onDeleteTask with the task when the delete icon is clicked", () => {
+    const onDeleteTask = vi.fn();
+    render(<GanttChart tasks={tasks} onDeleteTask={onDeleteTask} />);
+
+    fireEvent.click(screen.getByTestId("gantt-delete-task-child"));
+
+    expect(onDeleteTask).toHaveBeenCalledOnce();
+    expect(onDeleteTask).toHaveBeenCalledWith(expect.objectContaining({ id: "child" }));
+  });
+
+  it("does not call onTaskClick when the add icon is clicked", () => {
+    const onTaskClick = vi.fn();
+    const onAddTask = vi.fn();
+    render(<GanttChart tasks={tasks} onTaskClick={onTaskClick} onAddTask={onAddTask} />);
+
+    fireEvent.click(screen.getByTestId("gantt-add-task-root"));
+
+    expect(onTaskClick).not.toHaveBeenCalled();
+  });
+});
+
+describe("GanttChart — onStatusChange", () => {
+  it("calls onStatusChange when a status menu item is clicked", () => {
+    const onStatusChange = vi.fn();
+    render(<GanttChart tasks={tasks} onStatusChange={onStatusChange} />);
+
+    fireEvent.click(screen.getByTestId("gantt-task-row-child").querySelector(".MuiChip-root")!);
+    fireEvent.click(screen.getByText("Done"));
+
+    expect(onStatusChange).toHaveBeenCalledOnce();
+    expect(onStatusChange).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "child" }),
+      "done",
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// SVG-Abhängigkeitspfeile
+// ---------------------------------------------------------------------------
+
+const tasksWithDeps: GanttTask[] = [
+  {
+    id: "pred",
+    name: "Predecessor",
+    status: "done",
+    startDate: new Date("2025-01-01"),
+    endDate: new Date("2025-01-31"),
+  },
+  {
+    id: "succ",
+    name: "Successor",
+    status: "planned",
+    startDate: new Date("2025-02-01"),
+    endDate: new Date("2025-02-28"),
+    dependencies: ["pred"],
+  },
+];
+
+describe("GanttChart — dependency arrows", () => {
+  it("renders an SVG arrow between two visible tasks", () => {
+    render(<GanttChart tasks={tasksWithDeps} />);
+
+    expect(screen.getByTestId("gantt-dep-pred-succ")).toBeInTheDocument();
+  });
+
+  it("does not render an SVG arrow when the predecessor ID does not exist in the task list", () => {
+    const tasksMissingDep: GanttTask[] = [
+      {
+        id: "only",
+        name: "Only Task",
+        status: "planned",
+        startDate: new Date("2025-01-01"),
+        endDate: new Date("2025-01-31"),
+        dependencies: ["nonexistent"],
+      },
+    ];
+    render(<GanttChart tasks={tasksMissingDep} />);
+
+    expect(screen.queryByTestId(/^gantt-dep-/)).not.toBeInTheDocument();
+  });
+
+  it("hides the arrow when the predecessor becomes invisible after collapsing its parent", () => {
+    const tasksHiddenDep: GanttTask[] = [
+      {
+        id: "parent",
+        name: "Parent",
+        status: "done",
+        startDate: new Date("2025-01-01"),
+        endDate: new Date("2025-03-31"),
+      },
+      {
+        id: "hidden-pred",
+        parentId: "parent",
+        name: "Hidden Pred",
+        status: "done",
+        startDate: new Date("2025-01-01"),
+        endDate: new Date("2025-01-31"),
+      },
+      {
+        id: "successor",
+        name: "Successor",
+        status: "planned",
+        startDate: new Date("2025-02-01"),
+        endDate: new Date("2025-03-31"),
+        dependencies: ["hidden-pred"],
+      },
+    ];
+    render(<GanttChart tasks={tasksHiddenDep} />);
+
+    // parent ist aufgeklappt → hidden-pred sichtbar → Pfeil vorhanden
+    expect(screen.getByTestId("gantt-dep-hidden-pred-successor")).toBeInTheDocument();
+
+    // parent einklappen → hidden-pred verschwindet → Pfeil ebenfalls weg
+    fireEvent.click(screen.getByText("▼"));
+    expect(screen.queryByTestId("gantt-dep-hidden-pred-successor")).not.toBeInTheDocument();
+  });
 });

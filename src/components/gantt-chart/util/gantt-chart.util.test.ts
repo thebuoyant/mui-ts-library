@@ -3,12 +3,15 @@ import type { GanttTask } from "../GanttChart.types";
 import {
   buildTaskTree,
   calculateTaskPosition,
+  getISOWeekNumber,
   getMonthsInRange,
   getQuartersInRange,
   getTimelineRange,
   getVisibleTasks,
+  getWeeksInRange,
   startOfMonth,
   startOfQuarter,
+  startOfWeek,
   endOfMonth,
   addMonths,
 } from "./gantt-chart.util";
@@ -70,6 +73,82 @@ describe("getMonthsInRange", () => {
     expect(months).toHaveLength(3);
     expect(months[0].getMonth()).toBe(0); // Januar
     expect(months[2].getMonth()).toBe(2); // März
+  });
+});
+
+describe("startOfWeek", () => {
+  it("Should return the Monday for a Wednesday date", () => {
+    // 15.01.2025 ist ein Mittwoch
+    const result = startOfWeek(new Date("2025-01-15"));
+
+    expect(result.getDay()).toBe(1); // Montag
+    expect(result.getDate()).toBe(13); // 13.01.2025 ist der Montag dieser Woche
+  });
+
+  it("Should return the same Monday when given a Monday", () => {
+    const result = startOfWeek(new Date("2025-01-13")); // bereits Montag
+
+    expect(result.getDate()).toBe(13);
+  });
+
+  it("Should return the previous Monday when given a Sunday", () => {
+    // 19.01.2025 ist ein Sonntag
+    const result = startOfWeek(new Date("2025-01-19"));
+
+    expect(result.getDate()).toBe(13); // Montag 13.01.
+  });
+});
+
+describe("getISOWeekNumber", () => {
+  it("Should return week 1 for the first week of 2025", () => {
+    // 01.01.2025 ist ein Mittwoch → gehört zu KW 1
+    expect(getISOWeekNumber(new Date("2025-01-01"))).toBe(1);
+  });
+
+  it("Should return week 1 of the next year for Dec 31 when it belongs there", () => {
+    // 31.12.2024 ist ein Dienstag → gehört zu KW 1/2025 per ISO 8601
+    expect(getISOWeekNumber(new Date("2024-12-31"))).toBe(1);
+  });
+
+  it("Should return week 10 for the 10th week of 2025", () => {
+    // 03.03.2025 (Montag) = Beginn KW 10
+    expect(getISOWeekNumber(new Date("2025-03-03"))).toBe(10);
+  });
+});
+
+describe("getWeeksInRange", () => {
+  it("Should return Mondays only", () => {
+    const weeks = getWeeksInRange({
+      start: new Date("2025-03-01"),
+      end: new Date("2025-03-31"),
+    });
+
+    for (const week of weeks) {
+      expect(week.getDay()).toBe(1); // jeder Eintrag muss ein Montag sein
+    }
+  });
+
+  it("Should cover the full range including a week that starts before range.start", () => {
+    // 01.03.2025 ist Samstag; startOfWeek → Montag 24.02.2025
+    const weeks = getWeeksInRange({
+      start: new Date("2025-03-01"),
+      end: new Date("2025-03-31"),
+    });
+
+    expect(weeks[0].getDate()).toBe(24); // Montag 24.02.
+    expect(weeks[0].getMonth()).toBe(1); // Februar
+  });
+
+  it("Should produce 7-day intervals between entries", () => {
+    const weeks = getWeeksInRange({
+      start: new Date("2025-01-06"),
+      end: new Date("2025-01-27"),
+    });
+
+    for (let i = 1; i < weeks.length; i++) {
+      const diff = (weeks[i].getTime() - weeks[i - 1].getTime()) / 86400000;
+      expect(diff).toBe(7);
+    }
   });
 });
 
