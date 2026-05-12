@@ -1,7 +1,25 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Box } from "@mui/material";
 import { GanttChart } from "./GanttChart";
-import type { GanttTask } from "./GanttChart.types";
+import type { GanttTask, GanttTranslations } from "./GanttChart.types";
+
+const EN_TRANSLATIONS: GanttTranslations = {
+  scaleDays: "Days",
+  scaleWeeks: "Weeks",
+  scaleMonths: "Months",
+  scaleQuarters: "Quarters",
+  rangeFrom: "From",
+  rangeTo: "To",
+  rangeResetTooltip: "Reset range",
+  columnName: "Name",
+  columnStatus: "Status",
+  statusPlanned: "Planned",
+  statusInProgress: "In Progress",
+  statusDone: "Done",
+  statusBlocked: "Blocked",
+  weekColumnPrefix: "W",
+  dateLocale: "en-US",
+};
 
 const sampleTasks: GanttTask[] = [
   {
@@ -292,6 +310,56 @@ export const WithDependencies: Story = {
   },
   render: (args) => (
     <Box sx={{ width: "100%", maxWidth: 900, height: 400 }}>
+      <GanttChart {...args} onTaskClick={(task) => console.log("onTaskClick", task)} />
+    </Box>
+  ),
+};
+
+export const CustomDateRange: Story = {
+  args: {
+    tasks: sampleTasks,
+    timeScale: "months",
+    // Zeigt das gesamte Jahr 2025, obwohl die Tasks nur März–Juni abdecken.
+    defaultRangeStart: new Date("2025-01-01"),
+    defaultRangeEnd: new Date("2025-12-31"),
+  },
+  render: (args) => (
+    <Box sx={{ width: "100%", maxWidth: 900, height: 500 }}>
+      <GanttChart
+        {...args}
+        onTaskClick={(task) => console.log("onTaskClick", task)}
+      />
+    </Box>
+  ),
+};
+
+export const EnglishTranslations: Story = {
+  args: {
+    tasks: sampleTasks,
+    timeScale: "months",
+    translations: EN_TRANSLATIONS,
+  },
+  render: (args) => (
+    <Box sx={{ width: "100%", maxWidth: 900, height: 500 }}>
+      <GanttChart
+        {...args}
+        onTaskClick={(task) => console.log("onTaskClick", task)}
+        onAddTask={(task) => console.log("onAddTask", task)}
+        onDeleteTask={(task) => console.log("onDeleteTask", task)}
+        onStatusChange={(task, status) => console.log("onStatusChange", task, status)}
+      />
+    </Box>
+  ),
+};
+
+export const NoToolbar: Story = {
+  args: {
+    tasks: sampleTasks,
+    timeScale: "months",
+    showToolbar: false,
+  },
+  render: (args) => (
+    <Box sx={{ width: "100%", maxWidth: 900, height: 500 }}>
       <GanttChart {...args} onTaskClick={(task) => console.log("onTaskClick", task)} />
     </Box>
   ),

@@ -130,4 +130,39 @@ describe("createGanttChartStore", () => {
 
     expect(visible.map((t) => t.id)).toEqual(["project", "release-1", "sprint-1"]);
   });
+
+  it("Should set a custom timeline range and mark it as customized", () => {
+    const store = createGanttChartStore(tasks);
+    const customRange = { start: new Date("2024-01-01"), end: new Date("2026-12-31") };
+
+    store.getState().setTimelineRange(customRange);
+
+    expect(store.getState().timelineRange.start.getFullYear()).toBe(2024);
+    expect(store.getState().timelineRange.end.getFullYear()).toBe(2026);
+    expect(store.getState().isRangeCustomized).toBe(true);
+  });
+
+  it("Should reset to the auto-calculated range after resetTimelineRange", () => {
+    const store = createGanttChartStore(tasks);
+    store.getState().setTimelineRange({ start: new Date("2024-01-01"), end: new Date("2026-12-31") });
+
+    store.getState().resetTimelineRange();
+
+    // Auto-Range von tasks: frühester Start = 2025-01-01, spätestes Ende = 2025-04-30
+    expect(store.getState().timelineRange.start.getFullYear()).toBe(2025);
+    expect(store.getState().isRangeCustomized).toBe(false);
+  });
+
+  it("Should not overwrite a custom range when setTasks is called", () => {
+    const store = createGanttChartStore(tasks);
+    const customRange = { start: new Date("2024-01-01"), end: new Date("2026-12-31") };
+    store.getState().setTimelineRange(customRange);
+
+    const newTasks = tasks.map((t) => ({ ...t, startDate: new Date("2023-01-01") }));
+    store.getState().setTasks(newTasks);
+
+    // Manuell gesetzter Bereich bleibt erhalten.
+    expect(store.getState().timelineRange.start.getFullYear()).toBe(2024);
+    expect(store.getState().isRangeCustomized).toBe(true);
+  });
 });

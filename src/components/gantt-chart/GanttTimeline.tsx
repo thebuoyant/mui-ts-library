@@ -1,7 +1,7 @@
 import { useId, useMemo } from "react";
 import { type RefObject, type UIEventHandler } from "react";
 import { Box } from "@mui/material";
-import { useGanttChartStore } from "./GanttChart";
+import { useGanttChartStore, useGanttTranslations } from "./GanttChart";
 import type { GanttTask } from "./GanttChart.types";
 import type { GanttTaskNode } from "./GanttChart.types";
 import {
@@ -128,6 +128,7 @@ export function GanttTimeline({
   const expandedIds = useGanttChartStore((s) => s.expandedIds);
   const timelineRange = useGanttChartStore((s) => s.timelineRange);
   const timeScale = useGanttChartStore((s) => s.timeScale);
+  const t = useGanttTranslations();
 
   // Jede Instanz braucht eine eigene Marker-ID damit mehrere GanttCharts auf einer Seite
   // nicht dieselbe SVG-defs-Referenz teilen.
@@ -165,7 +166,7 @@ export function GanttTimeline({
     if (timeScale === "weeks") {
       return getWeeksInRange(displayRange).map((w) => ({
         key: w.toISOString(),
-        label: `KW${getISOWeekNumber(w)}`,
+        label: `${t.weekColumnPrefix}${getISOWeekNumber(w)}`,
         width: COLUMN_WIDTH_WEEK,
       }));
     }
@@ -178,10 +179,10 @@ export function GanttTimeline({
     }
     return getMonthsInRange(displayRange).map((m) => ({
       key: m.toISOString(),
-      label: m.toLocaleString("de-DE", { month: "short", year: "2-digit" }),
+      label: m.toLocaleString(t.dateLocale, { month: "short", year: "2-digit" }),
       width: COLUMN_WIDTH_MONTH,
     }));
-  }, [timeScale, displayRange]);
+  }, [timeScale, displayRange, t.weekColumnPrefix, t.dateLocale]);
 
   const totalWidth = useMemo(
     () => columns.reduce((sum, col) => sum + col.width, 0),
@@ -197,14 +198,14 @@ export function GanttTimeline({
       const key = `${d.getFullYear()}-${d.getMonth()}`;
       if (!monthMap.has(key)) {
         monthMap.set(key, {
-          label: d.toLocaleString("de-DE", { month: "short", year: "2-digit" }),
+          label: d.toLocaleString(t.dateLocale, { month: "short", year: "2-digit" }),
           width: 0,
         });
       }
       monthMap.get(key)!.width += COLUMN_WIDTH_DAY;
     }
     return Array.from(monthMap.entries()).map(([key, val]) => ({ key, ...val }));
-  }, [timeScale, columns]);
+  }, [timeScale, columns, t.dateLocale]);
 
   const dependencyLines = useMemo(
     () => computeDependencyLines(visibleTasks, displayRange, totalWidth),

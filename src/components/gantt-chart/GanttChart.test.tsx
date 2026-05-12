@@ -166,6 +166,81 @@ describe("GanttChart", () => {
 });
 
 // ---------------------------------------------------------------------------
+// Phase 8 — Toolbar
+// ---------------------------------------------------------------------------
+
+describe("GanttChart — toolbar", () => {
+  it("renders the toolbar by default", () => {
+    render(<GanttChart tasks={tasks} />);
+
+    expect(screen.getByTestId("gantt-toolbar")).toBeInTheDocument();
+  });
+
+  it("does not render the toolbar when showToolbar is false", () => {
+    render(<GanttChart tasks={tasks} showToolbar={false} />);
+
+    expect(screen.queryByTestId("gantt-toolbar")).not.toBeInTheDocument();
+  });
+
+  it("changes the time scale when a scale button is clicked", () => {
+    render(<GanttChart tasks={tasks} />);
+
+    fireEvent.click(screen.getByTestId("gantt-scale-weeks"));
+
+    // Nach dem Wechsel auf Wochen erscheinen KW-Labels im Header.
+    expect(screen.getAllByText(/^KW\d+$/).length).toBeGreaterThan(0);
+  });
+
+  it("initialises the visible date range from defaultRangeStart and defaultRangeEnd", () => {
+    render(
+      <GanttChart
+        tasks={tasks}
+        defaultRangeStart={new Date("2024-01-01")}
+        defaultRangeEnd={new Date("2026-12-31")}
+      />,
+    );
+
+    // Der reset-Button muss direkt sichtbar sein, weil ein initialer Bereich gesetzt ist.
+    expect(screen.getByTestId("gantt-range-reset")).toBeInTheDocument();
+  });
+
+  it("renders translated labels when translations prop is provided", () => {
+    render(
+      <GanttChart
+        tasks={tasks}
+        translations={{ rangeFrom: "From", rangeTo: "To", scaleDays: "Days" }}
+      />,
+    );
+
+    // TextField rendert Label-Text zweimal (label-Element + sichtbare span)
+    expect(screen.getAllByText("From").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("To").length).toBeGreaterThan(0);
+    expect(screen.getByText("Days")).toBeInTheDocument();
+  });
+
+  it("shows a reset button only after the date range has been customized", () => {
+    render(<GanttChart tasks={tasks} />);
+
+    expect(screen.queryByTestId("gantt-range-reset")).not.toBeInTheDocument();
+
+    const startInput = screen.getByTestId("gantt-range-start");
+    fireEvent.change(startInput, { target: { value: "2024-01-01" } });
+
+    expect(screen.getByTestId("gantt-range-reset")).toBeInTheDocument();
+  });
+
+  it("hides the reset button and restores the auto range after clicking reset", () => {
+    render(<GanttChart tasks={tasks} />);
+
+    fireEvent.change(screen.getByTestId("gantt-range-start"), { target: { value: "2024-01-01" } });
+    expect(screen.getByTestId("gantt-range-reset")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId("gantt-range-reset"));
+    expect(screen.queryByTestId("gantt-range-reset")).not.toBeInTheDocument();
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Phase 5 — Callback-API
 // ---------------------------------------------------------------------------
 

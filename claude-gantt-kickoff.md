@@ -28,7 +28,7 @@ React 19, TypeScript 5.9, MUI v7, Zustand v5, Vite 8, Vitest 4, Storybook 10
 
 ---
 
-## Aktueller Stand: Phasen 1–7 abgeschlossen ✅ (120 Tests grün)
+## Aktueller Stand: Phasen 1–8+i18n abgeschlossen ✅ (130 Tests grün)
 
 ### Alle vorhandenen Dateien
 
@@ -46,7 +46,8 @@ React 19, TypeScript 5.9, MUI v7, Zustand v5, Vite 8, Vitest 4, Storybook 10
 | `GanttTimelineHeader.tsx` | Generischer Spalten-Header: `columns: HeaderColumn[]` |
 | `GanttTimeline.tsx` | Rechtes Panel: Balken, Meilensteine, Gitterlinien, SVG-Pfeile |
 | `GanttTaskPanel.tsx` | Linkes Panel inkl. `GanttTaskRow` Sub-Komponente mit Hover-Icons + Status-Menü |
-| `GanttChart.stories.tsx` | 4 Stories (Default hat `dependencies` auf release-2 und milestone-go-live) |
+| `GanttToolbar.tsx` | Toolbar: `ToggleButtonGroup` Skala-Switcher + `TextField type="date"` Von/Bis-Range |
+| `GanttChart.stories.tsx` | 7 Stories inkl. FullyExpanded, WithDependencies, DaysScale |
 
 ### GanttTimeScale — implementierter Stand
 
@@ -121,7 +122,9 @@ Implementiert in `GanttTimeline.tsx`:
 <GanttChart
   tasks={tasks}                   // GanttTask[]
   timeScale="months"              // "days" | "weeks" | "months" | "quarters"
-  height={500}                    // number | string, Default: 400
+  height={500}                    // number | string, Default: 400 (inkl. Toolbar)
+  initialExpandAll={false}        // alle Knoten aufgeklappt statt nur Root
+  showToolbar={true}              // Toolbar ein-/ausblenden (Standard: true)
   onTaskClick={(task) => ...}
   onMilestoneClick={(task) => ...}
   onAddTask={(parentTask?) => ...}
@@ -131,6 +134,12 @@ Implementiert in `GanttTimeline.tsx`:
 ```
 
 `GanttTask.dependencies?: string[]` — IDs der Vorgänger-Tasks (Finish-to-Start).
+
+**Store-Aktionen (via `useGanttChartStore`):**
+- `setTimelineRange(range)` — manuellen Datumsbereich setzen, setzt `isRangeCustomized = true`
+- `resetTimelineRange()` — auf auto-berechneten Bereich aus Tasks zurücksetzen
+- `setTimeScale(scale)` — Skala wechseln
+- `setTasks(tasks)` — Tasks ersetzen (überschreibt Range nicht wenn `isRangeCustomized`)
 
 ---
 
@@ -174,7 +183,119 @@ Tests: `initialExpandAll` zeigt Grandchild-Tasks die ohne das Flag eingeklappt w
 
 ---
 
+---
+
+## Phase 8 — Toolbar: Scale-Switcher + Date-Range-Controls ✅
+
+Neue Datei `GanttToolbar.tsx` (importiert `useGanttChartStore` aus `./GanttChart` — circular OK):
+- `ToggleButtonGroup` (size="small") mit 4 Skalen-Buttons: Tage / Wochen / Monate / Quartale
+- `data-testid="gantt-scale-{scale}"` für Tests
+- Zwei `TextField type="date"` (Von/Bis) mit timezone-sicherer Formatierung via `toDateInputValue` (lokales Datum, nicht UTC)
+- Reset-Button (`RestoreIcon`) erscheint nur wenn `isRangeCustomized === true`
+- `data-testid="gantt-range-start"`, `"gantt-range-end"`, `"gantt-range-reset"` für Tests
+
+Store-Erweiterungen:
+- `isRangeCustomized: boolean` — verhindert Auto-Überschreiben durch `setTasks`
+- `setTimelineRange(range)` — setzt Range + `isRangeCustomized = true`
+- `resetTimelineRange()` — recalculates from tasks, `isRangeCustomized = false`
+- `setTasks` respektiert `isRangeCustomized` via Spread-Pattern: `...(state.isRangeCustomized ? {} : { timelineRange: getTimelineRange(tasks) })`
+
+`GanttChart.tsx` Layout-Änderung: äußerer Container ist jetzt `flexDirection: "column"`, Split-Panel bekommt `flex: 1`. Toolbar ist oben im gleichen Border-Box-Bereich.
+
+Kritisch: `parseDateInput("2025-03-01")` → `new Date(2025, 2, 1, 0, 0, 0, 0)` (lokale Mitternacht) — NICHT `new Date("2025-03-01")` (UTC, erzeugt Timezone-Offset-Bug).
+
+---
+
+## Phase 9 — CRUD Dialoge (nächste Session)
+
+### Ziel
+Built-in MUI Dialoge für Add/Edit/Delete wenn `enableBuiltinDialogs?: boolean` gesetzt.
+
+### Neue Dateien
+- `GanttTaskDialog.tsx` — MUI Dialog mit Formularfeldern für Add + Edit
+- `GanttDeleteDialog.tsx` — Bestätigungs-Dialog mit Aufgabenname
+
+### Formularfelder (GanttTaskDialog)
+```
+Name (TextField, required)
+Startdatum (TextField type="date", required)
+Enddatum (TextField type="date", required)
+Status (Select: planned / in-progress / done / blocked)
+Ist Meilenstein (Checkbox — setzt startDate = endDate automatisch)
+Übergeordnete Aufgabe (Select der vorhandenen Tasks, optional)
+```
+
+### Props-Erweiterungen
+```tsx
+enableBuiltinDialogs?: boolean   // default: false
+onTaskCreated?: (task: Omit<GanttTask, "id">) => void
+onTaskUpdated?: (task: GanttTask) => void
+onTaskDeleted?: (taskId: string) => void
+```
+
+### Verhalten
+- `enableBuiltinDialogs=false` (default): Hover-Icons rufen `onAddTask` / `onDeleteTask` direkt auf (bisheriges Verhalten)
+- `enableBuiltinDialogs=true`: Add-Icon öffnet `GanttTaskDialog` im "Neu"-Modus; Edit-Icon (neues drittes Icon auf hover) öffnet im "Bearbeiten"-Modus; Delete-Icon öffnet `GanttDeleteDialog`
+- `GanttTaskPanel` bekommt neues `enableBuiltinDialogs` Prop; Dialog-State (`open`, `editTask`) lebt in `GanttTaskRow`
+
+### Doppelter Hover-Icon-Satz wenn enableBuiltinDialogs
+```tsx
+// Hover-Icons wenn enableBuiltinDialogs:
+<EditIcon />  → öffnet Edit-Dialog
+<AddIcon />   → öffnet Add-Dialog (parentTask = current task)
+<DeleteIcon /> → öffnet Delete-Dialog
+```
+
+### ID-Generierung
+Da die Library keine IDs kennt, erzeugt sie temporäre IDs via `crypto.randomUUID()` oder ruft `onTaskCreated` mit `Omit<GanttTask, "id">` auf — der Caller vergibt die echte ID und gibt `tasks` neu zurück.
+
+---
+
+## Phase 10 — Progress-Balken + Today-Linie (nach Phase 9)
+
+### Progress-Balken
+```ts
+// GanttTask Erweiterung:
+progress?: number; // 0–100
+```
+In `GanttTimeline.tsx`: inneres `<Box>` mit `width: ${progress}%`, `bgcolor: "currentColor"`, `opacity: 0.4` über dem Haupt-Balken.
+
+### Today-Linie
+In `GanttTimeline.tsx` SVG-Layer: berechnete X-Position von `new Date()` relativ zu `displayRange`, dann `<line x1={x} y1={0} x2={x} y2={totalHeight} stroke="error.main" strokeWidth={1.5} strokeDasharray="4 2" />`.
+
+---
+
+---
+
+## Phase 8b — defaultRangeStart/End + i18n/Translations ✅
+
+**Neue Props:**
+- `defaultRangeStart?: Date` und `defaultRangeEnd?: Date` — initialer Sichtbereich, setzt `isRangeCustomized = true` im Store sodass `setTasks` ihn nicht überschreibt
+- `translations?: Partial<GanttTranslations>` — nur abweichende Keys angeben, Rest kommt aus `DEFAULT_GANTT_TRANSLATIONS`
+
+**`GanttTranslations` Typ (in `GanttChart.types.ts`):**
+| Key | Default | Zweck |
+|---|---|---|
+| `scaleDays/Weeks/Months/Quarters` | Tage/Wochen/Monate/Quartale | Toolbar Skalen-Buttons |
+| `rangeFrom` / `rangeTo` | Von / Bis | Toolbar Datums-Inputs |
+| `rangeResetTooltip` | Bereich zurücksetzen | Reset-Button Tooltip |
+| `columnName` / `columnStatus` | Name / Status | Panel-Header |
+| `statusPlanned/InProgress/Done/Blocked` | Planned/In Progress/Done/Blocked | Status Chip + Menü |
+| `weekColumnPrefix` | KW | Vor der Wochennummer (→ "W1" für Englisch) |
+| `dateLocale` | de-DE | `toLocaleString()` in Timeline-Header |
+
+**Translations-Kontext:** `GanttTranslationsContext` in `GanttChart.tsx`, zugänglich via `useGanttTranslations()` (exportiert). Alle Komponenten (Toolbar, Panel, Timeline) rufen diesen Hook auf.
+
+**Kritisch:** `useMemo` für `mergedTranslations` in `GanttChart` verhindert unnötige Context-Updates. Columns-Memos haben `t.weekColumnPrefix` und `t.dateLocale` in den deps.
+
+---
+
 ## So starten wir die nächste Session
 
-Phasen 1–7 sind vollständig abgeschlossen. Das Gantt ist feature-complete.
-Nächste mögliche Schritte: Drag-and-Drop (Balken verschieben), `today`-Markierung als vertikale Linie, oder Export als PNG/SVG.
+```
+Bitte lies zuerst die claude-gantt-kickoff.md im Root des Projekts.
+Dann implementiere Phase 9: CRUD Dialoge.
+enableBuiltinDialogs?: boolean Prop.
+GanttTaskDialog.tsx für Add/Edit, GanttDeleteDialog.tsx für Delete-Bestätigung.
+130 Tests müssen nach den Änderungen grün bleiben.
+```

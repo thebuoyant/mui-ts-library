@@ -3,8 +3,8 @@ import { type RefObject, type UIEventHandler } from "react";
 import { Box, Chip, IconButton, Menu, MenuItem, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useGanttChartStore } from "./GanttChart";
-import type { GanttTask, GanttTaskNode, GanttTaskStatus } from "./GanttChart.types";
+import { useGanttChartStore, useGanttTranslations } from "./GanttChart";
+import type { GanttTask, GanttTaskNode, GanttTaskStatus, GanttTranslations } from "./GanttChart.types";
 import { getVisibleTasks } from "./util/gantt-chart.util";
 import { ROW_HEIGHT, HEADER_HEIGHT, LEFT_PANEL_WIDTH } from "./GanttChart.constants";
 
@@ -25,8 +25,14 @@ const STATUS_CHIP_COLOR: Record<
   blocked: "error",
 };
 
-function formatStatus(status: GanttTaskStatus): string {
-  return status.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+function getStatusLabel(status: GanttTaskStatus, t: GanttTranslations): string {
+  const map: Record<GanttTaskStatus, string> = {
+    planned: t.statusPlanned,
+    "in-progress": t.statusInProgress,
+    done: t.statusDone,
+    blocked: t.statusBlocked,
+  };
+  return map[status];
 }
 
 // ---------------------------------------------------------------------------
@@ -53,6 +59,7 @@ function GanttTaskRow({
   onStatusChange,
 }: GanttTaskRowProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const t = useGanttTranslations();
 
   return (
     <Box
@@ -144,7 +151,7 @@ function GanttTaskRow({
       )}
 
       <Chip
-        label={formatStatus(task.status)}
+        label={getStatusLabel(task.status, t)}
         size="small"
         variant="outlined"
         color={STATUS_CHIP_COLOR[task.status] ?? "default"}
@@ -179,7 +186,7 @@ function GanttTaskRow({
                 setAnchorEl(null);
               }}
             >
-              {formatStatus(s)}
+              {getStatusLabel(s, t)}
             </MenuItem>
           ))}
         </Menu>
@@ -209,6 +216,7 @@ export function GanttTaskPanel({
   onDeleteTask,
   onStatusChange,
 }: GanttTaskPanelProps) {
+  const t = useGanttTranslations();
   const taskTree = useGanttChartStore((s) => s.taskTree);
   const expandedIds = useGanttChartStore((s) => s.expandedIds);
   const toggleExpand = useGanttChartStore((s) => s.toggleExpand);
@@ -247,10 +255,10 @@ export function GanttTaskPanel({
         }}
       >
         <Typography variant="caption" color="text.secondary" sx={{ flex: 1 }}>
-          Name
+          {t.columnName}
         </Typography>
         <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
-          Status
+          {t.columnStatus}
         </Typography>
       </Box>
 

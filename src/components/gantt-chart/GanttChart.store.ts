@@ -11,12 +11,16 @@ export type GanttChartStoreState = {
   expandedIds: Set<string>;
   timeScale: GanttTimeScale;
   timelineRange: TimelineRange;
+  // true sobald der Nutzer den Bereich manuell gesetzt hat — verhindert Auto-Reset durch setTasks.
+  isRangeCustomized: boolean;
 
   setTasks: (tasks: GanttTask[]) => void;
   toggleExpand: (taskId: string) => void;
   expandAll: () => void;
   collapseAll: () => void;
   setTimeScale: (scale: GanttTimeScale) => void;
+  setTimelineRange: (range: TimelineRange) => void;
+  resetTimelineRange: () => void;
 
   // Gibt die aktuell sichtbare, geordnete Flachliste zurück.
   getVisibleTasks: () => GanttTaskNode[];
@@ -28,7 +32,10 @@ export function createGanttChartStore(
   initialTasks: GanttTask[],
   initialTimeScale: GanttTimeScale = "months",
   initialExpandAll = false,
+  initialRange?: TimelineRange,
 ) {
+  const autoRange = getTimelineRange(initialTasks);
+
   return createStore<GanttChartStoreState>((set, get) => ({
     tasks: initialTasks,
     taskTree: buildTaskTree(initialTasks),
@@ -37,14 +44,17 @@ export function createGanttChartStore(
       ? new Set(initialTasks.map((t) => t.id))
       : new Set(initialTasks.filter((t) => !t.parentId).map((t) => t.id)),
     timeScale: initialTimeScale,
-    timelineRange: getTimelineRange(initialTasks),
+    timelineRange: initialRange ?? autoRange,
+    // Manuell übergebener Bereich wird als customized markiert → setTasks überschreibt ihn nicht.
+    isRangeCustomized: initialRange !== undefined,
 
     setTasks: (tasks) => {
-      set({
+      set((state) => ({
         tasks,
         taskTree: buildTaskTree(tasks),
-        timelineRange: getTimelineRange(tasks),
-      });
+        // Manuell gesetzten Bereich nicht überschreiben wenn der Nutzer ihn angepasst hat.
+        ...(state.isRangeCustomized ? {} : { timelineRange: getTimelineRange(tasks) }),
+      }));
     },
 
     toggleExpand: (taskId) => {
@@ -71,6 +81,17 @@ export function createGanttChartStore(
 
     setTimeScale: (timeScale) => {
       set({ timeScale });
+    },
+
+    setTimelineRange: (range) => {
+      set({ timelineRange: range, isRangeCustomized: true });
+    },
+
+    resetTimelineRange: () => {
+      set((state) => ({
+        timelineRange: getTimelineRange(state.tasks),
+        isRangeCustomized: false,
+      }));
     },
 
     getVisibleTasks: () => {

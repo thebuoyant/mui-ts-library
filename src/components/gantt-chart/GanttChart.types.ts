@@ -24,12 +24,63 @@ export type GanttTaskNode = GanttTask & {
   depth: number;
 };
 
+// Alle Texte die der GanttChart rendert — für einfache Lokalisierung überschreibbar.
+export type GanttTranslations = {
+  // Toolbar — Skalen-Buttons
+  scaleDays: string;
+  scaleWeeks: string;
+  scaleMonths: string;
+  scaleQuarters: string;
+  // Toolbar — Datumsbereich
+  rangeFrom: string;
+  rangeTo: string;
+  rangeResetTooltip: string;
+  // Task-Panel — Spalten-Header
+  columnName: string;
+  columnStatus: string;
+  // Status-Labels (Chip + Kontextmenü)
+  statusPlanned: string;
+  statusInProgress: string;
+  statusDone: string;
+  statusBlocked: string;
+  // Timeline — Wochen-Prefix (z. B. "KW" → "W" für Englisch)
+  weekColumnPrefix: string;
+  // Locale für die Datums-Formatierung im Timeline-Header
+  dateLocale: string;
+};
+
+// Standardwerte entsprechen dem aktuell gerenderten Verhalten (DE Toolbar, EN Status).
+export const DEFAULT_GANTT_TRANSLATIONS: GanttTranslations = {
+  scaleDays: "Tage",
+  scaleWeeks: "Wochen",
+  scaleMonths: "Monate",
+  scaleQuarters: "Quartale",
+  rangeFrom: "Von",
+  rangeTo: "Bis",
+  rangeResetTooltip: "Bereich zurücksetzen",
+  columnName: "Name",
+  columnStatus: "Status",
+  statusPlanned: "Planned",
+  statusInProgress: "In Progress",
+  statusDone: "Done",
+  statusBlocked: "Blocked",
+  weekColumnPrefix: "KW",
+  dateLocale: "de-DE",
+};
+
 export type GanttChartProps = {
   tasks: GanttTask[];
   timeScale?: GanttTimeScale;
   height?: number | string;
   // Wenn true, startet der Chart mit allen Knoten aufgeklappt statt nur den Root-Tasks.
   initialExpandAll?: boolean;
+  // Toolbar mit Skalen-Switcher und Datumsbereich ein-/ausblenden (Standard: true).
+  showToolbar?: boolean;
+  // Optionaler initialer Sichtbereich — überschreibt die automatische Berechnung aus den Tasks.
+  defaultRangeStart?: Date;
+  defaultRangeEnd?: Date;
+  // Texte überschreiben für einfache Lokalisierung — nur abweichende Keys angeben.
+  translations?: Partial<GanttTranslations>;
   onTaskClick?: (task: GanttTask) => void;
   onMilestoneClick?: (task: GanttTask) => void;
   onAddTask?: (parentTask?: GanttTask) => void;
