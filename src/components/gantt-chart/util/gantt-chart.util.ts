@@ -201,6 +201,39 @@ export function getWeeksInRange(range: TimelineRange): Date[] {
 }
 
 // ---------------------------------------------------------------------------
+// Tages-Hilfsfunktionen
+// ---------------------------------------------------------------------------
+
+/** Gibt alle Tage (Mitternacht) zwischen start und end zurück (inklusive). */
+export function getDaysInRange(range: TimelineRange): Date[] {
+  const days: Date[] = [];
+  let current = new Date(
+    range.start.getFullYear(),
+    range.start.getMonth(),
+    range.start.getDate(),
+    0, 0, 0, 0,
+  );
+  const endMidnight = new Date(
+    range.end.getFullYear(),
+    range.end.getMonth(),
+    range.end.getDate(),
+    0, 0, 0, 0,
+  ).getTime();
+
+  while (current.getTime() <= endMidnight) {
+    days.push(new Date(current));
+    current = new Date(
+      current.getFullYear(),
+      current.getMonth(),
+      current.getDate() + 1,
+      0, 0, 0, 0,
+    );
+  }
+
+  return days;
+}
+
+// ---------------------------------------------------------------------------
 // Quartals-Hilfsfunktionen
 // ---------------------------------------------------------------------------
 

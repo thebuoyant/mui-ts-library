@@ -7,28 +7,27 @@ export type HeaderColumn = {
   width: number;
 };
 
-type GanttTimelineHeaderProps = {
-  columns: HeaderColumn[];
+// Obere Gruppenzeile für den Zwei-Ebenen-Header (z. B. Monate über Tages-Spalten).
+export type HeaderGroup = {
+  key: string;
+  label: string;
+  width: number;
 };
 
-export function GanttTimelineHeader({ columns }: GanttTimelineHeaderProps) {
+type GanttTimelineHeaderProps = {
+  columns: HeaderColumn[];
+  // Wenn gesetzt, wird eine zweite (obere) Zeile mit Gruppenüberschriften gerendert.
+  groups?: HeaderGroup[];
+};
+
+function HeaderRow({ items }: { items: Array<{ key: string; label: string; width: number }> }) {
   return (
-    <Box
-      sx={{
-        display: "flex",
-        position: "sticky",
-        top: 0,
-        bgcolor: "background.paper",
-        zIndex: 1,
-        borderBottom: "1px solid",
-        borderColor: "divider",
-      }}
-    >
-      {columns.map((col) => (
+    <Box sx={{ display: "flex" }}>
+      {items.map((item) => (
         <Box
-          key={col.key}
+          key={item.key}
           sx={{
-            width: col.width,
+            width: item.width,
             flexShrink: 0,
             height: HEADER_HEIGHT,
             display: "flex",
@@ -39,10 +38,28 @@ export function GanttTimelineHeader({ columns }: GanttTimelineHeaderProps) {
           }}
         >
           <Typography variant="caption" color="text.secondary">
-            {col.label}
+            {item.label}
           </Typography>
         </Box>
       ))}
+    </Box>
+  );
+}
+
+export function GanttTimelineHeader({ columns, groups }: GanttTimelineHeaderProps) {
+  return (
+    <Box
+      sx={{
+        position: "sticky",
+        top: 0,
+        bgcolor: "background.paper",
+        zIndex: 1,
+        borderBottom: "1px solid",
+        borderColor: "divider",
+      }}
+    >
+      {groups && <HeaderRow items={groups} />}
+      <HeaderRow items={columns} />
     </Box>
   );
 }

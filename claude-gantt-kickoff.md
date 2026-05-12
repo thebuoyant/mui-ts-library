@@ -28,7 +28,7 @@ React 19, TypeScript 5.9, MUI v7, Zustand v5, Vite 8, Vitest 4, Storybook 10
 
 ---
 
-## Aktueller Stand: Phasen 1–5 abgeschlossen ✅ (114 Tests grün)
+## Aktueller Stand: Phasen 1–7 abgeschlossen ✅ (120 Tests grün)
 
 ### Alle vorhandenen Dateien
 
@@ -55,7 +55,7 @@ React 19, TypeScript 5.9, MUI v7, Zustand v5, Vite 8, Vitest 4, Storybook 10
 | `months` | ✅ | `COLUMN_WIDTH_MONTH = 120px` |
 | `quarters` | ✅ | `COLUMN_WIDTH_QUARTER = 360px` |
 | `weeks` | ✅ | `COLUMN_WIDTH_WEEK = 40px` |
-| `days` | ❌ noch nicht | fällt auf months zurück |
+| `days` | ✅ | `COLUMN_WIDTH_DAY = 20px` |
 
 ### Konstanten (GanttChart.constants.ts)
 
@@ -63,6 +63,7 @@ React 19, TypeScript 5.9, MUI v7, Zustand v5, Vite 8, Vitest 4, Storybook 10
 ROW_HEIGHT = 40
 HEADER_HEIGHT = 40
 LEFT_PANEL_WIDTH = 280
+COLUMN_WIDTH_DAY = 20
 COLUMN_WIDTH_WEEK = 40
 COLUMN_WIDTH_MONTH = 120
 COLUMN_WIDTH_QUARTER = 360
@@ -145,28 +146,35 @@ Implementiert in `GanttTaskPanel.tsx`:
 
 ---
 
-## Phase 6 — `days`-Skala + Zwei-Ebenen-Header
+## Phase 6 — `days`-Skala + Zwei-Ebenen-Header ✅
 
-Niedrige Prio — `days` fällt aktuell auf `months` zurück, alles andere funktioniert.
-
-`COLUMN_WIDTH_DAY = 20` + `getDaysInRange` in util.
+Implementiert in `GanttTimeline.tsx` + `GanttTimelineHeader.tsx`:
+- `getDaysInRange` in `util/gantt-chart.util.ts` — liefert alle Tage (Mitternacht) zwischen Start und Ende
+- `COLUMN_WIDTH_DAY = 20px` in `GanttChart.constants.ts`
+- `GanttTimelineHeader` unterstützt optional `groups?: HeaderGroup[]` — wenn gesetzt, wird eine zweite Zeile oben gerendert (Monatsüberschriften über Tages-Spalten)
+- `GanttTimeline` berechnet `groups` für `days`-Skala via Gruppierung nach Monat
+- `headerTotalHeight = groups ? HEADER_HEIGHT * 2 : HEADER_HEIGHT` — SVG-Layer (`top`) passt sich korrekt an
+- Story `DaysScale` hinzugefügt
+- Pre-existing TS-Fehler behoben: `RefObject<HTMLDivElement | null>` in Panel + Timeline Props
+- Kritisches Wissen: `displayRange` für `days` braucht keine Anpassung — `timelineRange.start` ist bereits `startOfMonth` (= Tag 1 Mitternacht)
 
 ---
 
-## Phase 7 — Stories + Tests abrunden
+## Phase 7 — Stories + Tests abrunden ✅
 
-- Story `FullyExpanded`: `useEffect(() => store.getState().expandAll(), [])` nach mount
-- Story `WithDependencies`: Tasks mit komplexen Abhängigkeiten zum Testen der Pfeile
-- Tests für Phase 5: Callback-Aufrufe für Add/Delete/StatusChange
+Neues Prop `initialExpandAll?: boolean` in `GanttChartProps`:
+- `createGanttChartStore` akzeptiert `initialExpandAll` als 3. Parameter — initialisiert `expandedIds` mit allen Task-IDs statt nur Root-IDs
+- `GanttChart` leitet `initialExpandAll` an den Store-Konstruktor weiter (kein `useEffect` nötig)
+
+Stories:
+- `FullyExpanded`: `initialExpandAll={true}`, `height: 700`, zeigt alle 4 Hierarchie-Ebenen
+- `WithDependencies`: 7 flache Tasks mit Fan-in, Fan-out und Ketten-Abhängigkeiten (design, research → dev+docs → testing → release → go-live milestone)
+
+Tests: `initialExpandAll` zeigt Grandchild-Tasks die ohne das Flag eingeklappt wären
 
 ---
 
 ## So starten wir die nächste Session
 
-```
-Bitte lies zuerst die claude-gantt-kickoff.md im Root des Projekts.
-Dann implementiere Phase 6: days-Skala + Zwei-Ebenen-Header.
-COLUMN_WIDTH_DAY = 20, getDaysInRange in util hinzufügen.
-Header-Zwei-Ebenen: obere Zeile zeigt Monat, untere zeigt Tag-Nummer.
-114 Tests müssen nach den Änderungen grün bleiben.
-```
+Phasen 1–7 sind vollständig abgeschlossen. Das Gantt ist feature-complete.
+Nächste mögliche Schritte: Drag-and-Drop (Balken verschieben), `today`-Markierung als vertikale Linie, oder Export als PNG/SVG.

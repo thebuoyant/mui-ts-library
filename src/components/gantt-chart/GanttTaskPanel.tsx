@@ -193,7 +193,7 @@ function GanttTaskRow({
 // ---------------------------------------------------------------------------
 
 type GanttTaskPanelProps = {
-  scrollRef: RefObject<HTMLDivElement>;
+  scrollRef: RefObject<HTMLDivElement | null>;
   onScroll: UIEventHandler<HTMLDivElement>;
   onTaskClick?: (task: GanttTask) => void;
   onAddTask?: (task: GanttTask) => void;

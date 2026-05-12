@@ -28,6 +28,8 @@ export type GanttChartProps = {
   tasks: GanttTask[];
   timeScale?: GanttTimeScale;
   height?: number | string;
+  // Wenn true, startet der Chart mit allen Knoten aufgeklappt statt nur den Root-Tasks.
+  initialExpandAll?: boolean;
   onTaskClick?: (task: GanttTask) => void;
   onMilestoneClick?: (task: GanttTask) => void;
   onAddTask?: (parentTask?: GanttTask) => void;

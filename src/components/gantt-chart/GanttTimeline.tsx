@@ -7,6 +7,7 @@ import type { GanttTaskNode } from "./GanttChart.types";
 import {
   calculateTaskPosition,
   endOfQuarter,
+  getDaysInRange,
   getISOWeekNumber,
   getMonthsInRange,
   getQuartersInRange,
@@ -17,9 +18,10 @@ import {
 } from "./util/gantt-chart.util";
 import type { TimelineRange } from "./util/gantt-chart.util";
 import { GanttTimelineHeader } from "./GanttTimelineHeader";
-import type { HeaderColumn } from "./GanttTimelineHeader";
+import type { HeaderColumn, HeaderGroup } from "./GanttTimelineHeader";
 import {
   BAR_HEIGHT,
+  COLUMN_WIDTH_DAY,
   COLUMN_WIDTH_MONTH,
   COLUMN_WIDTH_QUARTER,
   COLUMN_WIDTH_WEEK,
@@ -110,7 +112,7 @@ function computeDependencyLines(
 // ---------------------------------------------------------------------------
 
 type GanttTimelineProps = {
-  scrollRef: RefObject<HTMLDivElement>;
+  scrollRef: RefObject<HTMLDivElement | null>;
   onScroll: UIEventHandler<HTMLDivElement>;
   onTaskClick?: (task: GanttTask) => void;
   onMilestoneClick?: (task: GanttTask) => void;
@@ -153,6 +155,13 @@ export function GanttTimeline({
   }, [timeScale, timelineRange]);
 
   const columns = useMemo((): HeaderColumn[] => {
+    if (timeScale === "days") {
+      return getDaysInRange(displayRange).map((d) => ({
+        key: d.toISOString(),
+        label: String(d.getDate()),
+        width: COLUMN_WIDTH_DAY,
+      }));
+    }
     if (timeScale === "weeks") {
       return getWeeksInRange(displayRange).map((w) => ({
         key: w.toISOString(),
@@ -179,23 +188,46 @@ export function GanttTimeline({
     [columns],
   );
 
+  // Obere Monatsgruppen für den Zwei-Ebenen-Header der Tages-Skala.
+  const groups = useMemo((): HeaderGroup[] | undefined => {
+    if (timeScale !== "days") return undefined;
+    const monthMap = new Map<string, { label: string; width: number }>();
+    for (const col of columns) {
+      const d = new Date(col.key);
+      const key = `${d.getFullYear()}-${d.getMonth()}`;
+      if (!monthMap.has(key)) {
+        monthMap.set(key, {
+          label: d.toLocaleString("de-DE", { month: "short", year: "2-digit" }),
+          width: 0,
+        });
+      }
+      monthMap.get(key)!.width += COLUMN_WIDTH_DAY;
+    }
+    return Array.from(monthMap.entries()).map(([key, val]) => ({ key, ...val }));
+  }, [timeScale, columns]);
+
   const dependencyLines = useMemo(
     () => computeDependencyLines(visibleTasks, displayRange, totalWidth),
     [visibleTasks, displayRange, totalWidth],
   );
 
   const gridColumnWidth =
-    timeScale === "weeks"
-      ? COLUMN_WIDTH_WEEK
-      : timeScale === "quarters"
-        ? COLUMN_WIDTH_QUARTER
-        : COLUMN_WIDTH_MONTH;
+    timeScale === "days"
+      ? COLUMN_WIDTH_DAY
+      : timeScale === "weeks"
+        ? COLUMN_WIDTH_WEEK
+        : timeScale === "quarters"
+          ? COLUMN_WIDTH_QUARTER
+          : COLUMN_WIDTH_MONTH;
+
+  // Zwei-Ebenen-Header (Tages-Skala) ist doppelt so hoch → SVG-Offset anpassen.
+  const headerTotalHeight = groups ? HEADER_HEIGHT * 2 : HEADER_HEIGHT;
 
   return (
     <Box ref={scrollRef} onScroll={onScroll} sx={{ flex: 1, overflow: "auto" }}>
       {/* position: relative ist Pflicht damit der SVG-Layer korrekt absolut positioniert wird. */}
       <Box sx={{ minWidth: totalWidth, position: "relative" }}>
-        <GanttTimelineHeader columns={columns} />
+        <GanttTimelineHeader columns={columns} groups={groups} />
 
         {visibleTasks.map((task) => {
           const { left, width } = calculateTaskPosition(task, displayRange);
@@ -259,7 +291,7 @@ export function GanttTimeline({
             data-testid="gantt-dependency-arrows"
             style={{
               position: "absolute",
-              top: HEADER_HEIGHT,
+              top: headerTotalHeight,
               left: 0,
               width: totalWidth,
               height: visibleTasks.length * ROW_HEIGHT,

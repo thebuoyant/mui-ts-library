@@ -95,6 +95,7 @@ function GanttChartInner({
 export function GanttChart({
   tasks,
   timeScale = "months",
+  initialExpandAll = false,
   onTaskClick,
   onMilestoneClick,
   onAddTask,
@@ -102,7 +103,7 @@ export function GanttChart({
   onStatusChange,
   height,
 }: GanttChartProps) {
-  const [store] = useState(() => createGanttChartStore(tasks, timeScale));
+  const [store] = useState(() => createGanttChartStore(tasks, timeScale, initialExpandAll));
 
   return (
     <GanttChartStoreContext.Provider value={store}>

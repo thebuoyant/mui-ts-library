@@ -27,12 +27,15 @@ export type GanttChartStore = ReturnType<typeof createGanttChartStore>;
 export function createGanttChartStore(
   initialTasks: GanttTask[],
   initialTimeScale: GanttTimeScale = "months",
+  initialExpandAll = false,
 ) {
   return createStore<GanttChartStoreState>((set, get) => ({
     tasks: initialTasks,
     taskTree: buildTaskTree(initialTasks),
-    // Standardmäßig alle Root-Tasks aufgeklappt, damit der Nutzer direkt die erste Ebene sieht.
-    expandedIds: new Set(initialTasks.filter((t) => !t.parentId).map((t) => t.id)),
+    // initialExpandAll: alle Knoten aufgeklappt — sonst nur Root-Tasks.
+    expandedIds: initialExpandAll
+      ? new Set(initialTasks.map((t) => t.id))
+      : new Set(initialTasks.filter((t) => !t.parentId).map((t) => t.id)),
     timeScale: initialTimeScale,
     timelineRange: getTimelineRange(initialTasks),
 

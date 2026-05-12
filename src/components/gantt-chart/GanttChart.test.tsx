@@ -118,6 +118,51 @@ describe("GanttChart", () => {
     const kwLabels = screen.getAllByText(/^KW\d+$/);
     expect(kwLabels.length).toBeGreaterThan(0);
   });
+
+  it("renders the days scale header with day number labels and a two-row header", () => {
+    render(<GanttChart tasks={tasks} timeScale="days" />);
+
+    // Tages-Spalten zeigen Zahlen 1–31 — "15" muss für jeden Monat im Range vorhanden sein
+    const fifteenLabels = screen.getAllByText("15");
+    expect(fifteenLabels.length).toBeGreaterThan(0);
+
+    // Monatsgruppen der oberen Zeile sind sichtbar (Jan–Mär 2025 aus den Test-Tasks)
+    const monthLabels = screen.getAllByText(/^(Jan|Feb|März|Apr|Mai|Jun|Jul|Aug|Sep|Okt|Nov|Dez)/);
+    expect(monthLabels.length).toBeGreaterThan(0);
+  });
+
+  it("shows all tasks at all depths when initialExpandAll is true", () => {
+    const deepTasks: GanttTask[] = [
+      {
+        id: "root",
+        name: "Root",
+        status: "planned",
+        startDate: new Date("2025-01-01"),
+        endDate: new Date("2025-03-31"),
+      },
+      {
+        id: "child",
+        parentId: "root",
+        name: "Child",
+        status: "planned",
+        startDate: new Date("2025-01-01"),
+        endDate: new Date("2025-02-28"),
+      },
+      {
+        id: "grandchild",
+        parentId: "child",
+        name: "Grandchild",
+        status: "planned",
+        startDate: new Date("2025-01-01"),
+        endDate: new Date("2025-01-31"),
+      },
+    ];
+
+    render(<GanttChart tasks={deepTasks} initialExpandAll />);
+
+    // Ohne initialExpandAll wäre Grandchild nicht sichtbar, da child standardmäßig eingeklappt ist.
+    expect(screen.getByText("Grandchild")).toBeInTheDocument();
+  });
 });
 
 // ---------------------------------------------------------------------------

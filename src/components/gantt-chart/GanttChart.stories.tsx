@@ -194,6 +194,109 @@ export const QuartersScale: Story = {
   ),
 };
 
+export const DaysScale: Story = {
+  args: {
+    tasks: sampleTasks,
+    timeScale: "days",
+  },
+  render: (args) => (
+    <Box sx={{ width: "100%", maxWidth: 900, height: 500 }}>
+      <GanttChart {...args} onTaskClick={(task) => console.log("onTaskClick", task)} />
+    </Box>
+  ),
+};
+
+export const FullyExpanded: Story = {
+  args: {
+    tasks: sampleTasks,
+    timeScale: "months",
+    initialExpandAll: true,
+  },
+  render: (args) => (
+    <Box sx={{ width: "100%", maxWidth: 900, height: 700 }}>
+      <GanttChart
+        {...args}
+        onTaskClick={(task) => console.log("onTaskClick", task)}
+        onAddTask={(task) => console.log("onAddTask", task)}
+        onDeleteTask={(task) => console.log("onDeleteTask", task)}
+        onStatusChange={(task, status) => console.log("onStatusChange", task, status)}
+      />
+    </Box>
+  ),
+};
+
+const dependencyTasks: GanttTask[] = [
+  {
+    id: "design",
+    name: "Design",
+    status: "done",
+    startDate: new Date("2025-01-01"),
+    endDate: new Date("2025-01-31"),
+  },
+  {
+    id: "research",
+    name: "Research",
+    status: "done",
+    startDate: new Date("2025-01-01"),
+    endDate: new Date("2025-02-15"),
+  },
+  {
+    id: "dev",
+    name: "Development",
+    status: "in-progress",
+    startDate: new Date("2025-02-01"),
+    endDate: new Date("2025-03-31"),
+    dependencies: ["design"],
+  },
+  {
+    id: "docs",
+    name: "Documentation",
+    status: "planned",
+    startDate: new Date("2025-02-15"),
+    endDate: new Date("2025-03-15"),
+    dependencies: ["design"],
+  },
+  {
+    id: "testing",
+    name: "Testing",
+    status: "planned",
+    startDate: new Date("2025-04-01"),
+    endDate: new Date("2025-04-30"),
+    // Fan-in: hängt von dev UND research ab (unterschiedliche Y-Positionen)
+    dependencies: ["dev", "research"],
+  },
+  {
+    id: "release",
+    name: "Release",
+    status: "planned",
+    startDate: new Date("2025-05-01"),
+    endDate: new Date("2025-05-15"),
+    // Fan-in aus zwei parallelen Pfaden
+    dependencies: ["testing", "docs"],
+  },
+  {
+    id: "go-live",
+    name: "Go-Live",
+    status: "planned",
+    startDate: new Date("2025-05-15"),
+    endDate: new Date("2025-05-15"),
+    isMilestone: true,
+    dependencies: ["release"],
+  },
+];
+
+export const WithDependencies: Story = {
+  args: {
+    tasks: dependencyTasks,
+    timeScale: "months",
+  },
+  render: (args) => (
+    <Box sx={{ width: "100%", maxWidth: 900, height: 400 }}>
+      <GanttChart {...args} onTaskClick={(task) => console.log("onTaskClick", task)} />
+    </Box>
+  ),
+};
+
 export const MinimalFlat: Story = {
   args: {
     tasks: sampleTasks.filter((t) => !t.parentId || t.parentId === "project"),

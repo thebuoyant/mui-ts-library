@@ -3,6 +3,7 @@ import type { GanttTask } from "../GanttChart.types";
 import {
   buildTaskTree,
   calculateTaskPosition,
+  getDaysInRange,
   getISOWeekNumber,
   getMonthsInRange,
   getQuartersInRange,
@@ -149,6 +150,51 @@ describe("getWeeksInRange", () => {
       const diff = (weeks[i].getTime() - weeks[i - 1].getTime()) / 86400000;
       expect(diff).toBe(7);
     }
+  });
+});
+
+describe("getDaysInRange", () => {
+  it("Should return one entry per day in January", () => {
+    const days = getDaysInRange({
+      start: new Date("2025-01-01"),
+      end: new Date("2025-01-31"),
+    });
+
+    expect(days).toHaveLength(31);
+  });
+
+  it("Should include both the start day and the end day", () => {
+    const days = getDaysInRange({
+      start: new Date("2025-03-01"),
+      end: new Date("2025-03-05"),
+    });
+
+    expect(days[0].getDate()).toBe(1);
+    expect(days[days.length - 1].getDate()).toBe(5);
+  });
+
+  it("Should produce 1-day intervals between entries", () => {
+    const days = getDaysInRange({
+      start: new Date("2025-01-06"),
+      end: new Date("2025-01-13"),
+    });
+
+    for (let i = 1; i < days.length; i++) {
+      const diff = (days[i].getTime() - days[i - 1].getTime()) / 86400000;
+      expect(diff).toBe(1);
+    }
+  });
+
+  it("Should span month boundaries correctly", () => {
+    const days = getDaysInRange({
+      start: new Date("2025-01-30"),
+      end: new Date("2025-02-02"),
+    });
+
+    expect(days).toHaveLength(4);
+    expect(days[1].getDate()).toBe(31);
+    expect(days[2].getDate()).toBe(1);
+    expect(days[2].getMonth()).toBe(1); // Februar
   });
 });
 
