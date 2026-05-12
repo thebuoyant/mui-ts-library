@@ -153,7 +153,11 @@ Der `borderRight` (vertikaler Separator zwischen Panel und Timeline) liegt auf d
 
 ### 9. Circular Import (bewusst)
 
-`GanttTaskPanel`, `GanttTimeline`, `GanttToolbar` importieren `useGanttChartStore`/`useGanttTranslations` aus `./GanttChart`. Identisch mit TagSelection-Pattern.
+`GanttTaskPanel`, `GanttTimeline`, `GanttToolbar`, `GanttTaskDialog`, `GanttDeleteDialog` importieren `useGanttChartStore`/`useGanttTranslations` aus `./GanttChart`. Identisch mit TagSelection-Pattern.
+
+### 10. Action-Icons — immer sichtbar (kein Hover-Opacity-Pattern)
+
+Icons (Add/Edit/Delete) haben **keine** `opacity: 0` / `:hover`-Logik mehr. Sie sind immer sichtbar wenn die entsprechende Callback-Prop oder `enableBuiltinDialogs=true` gesetzt ist.
 
 ---
 
@@ -231,6 +235,7 @@ Render-Funktionen nutzen `args.height` (kein hardcodierter Wert im Box-Wrapper).
 - Dialoge werden nur gerendert wenn `enableBuiltinDialogs=true` (kein unnötiger DOM-Overhead)
 - ID-Generierung für neue Tasks via `crypto.randomUUID()`
 - Kaskadierendes Löschen: `deleteTask(id)` entfernt Task + alle Nachkommen rekursiv
+- Icons sind **immer sichtbar** (kein Hover-Opacity-Pattern mehr)
 
 ### Formularfelder (GanttTaskDialog)
 
