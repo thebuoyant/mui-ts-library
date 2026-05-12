@@ -8,6 +8,7 @@ import type { GanttTask, GanttTaskNode, GanttTaskStatus, GanttTranslations } fro
 import { getVisibleTasks } from "./util/gantt-chart.util";
 import { ROW_HEIGHT, HEADER_HEIGHT, LEFT_PANEL_WIDTH } from "./GanttChart.constants";
 
+
 const STATUS_DOT_COLOR: Record<string, string> = {
   planned: "warning.main",
   "in-progress": "info.main",
@@ -73,6 +74,7 @@ function GanttTaskRow({
         pr: 1,
         gap: 0.75,
         borderBottom: "1px solid",
+        borderRight: "1px solid",
         borderColor: "divider",
         cursor: onTaskClick ? "pointer" : "default",
         "&:hover": onTaskClick ? { bgcolor: "action.hover" } : undefined,
@@ -220,11 +222,15 @@ export function GanttTaskPanel({
   const taskTree = useGanttChartStore((s) => s.taskTree);
   const expandedIds = useGanttChartStore((s) => s.expandedIds);
   const toggleExpand = useGanttChartStore((s) => s.toggleExpand);
+  const timeScale = useGanttChartStore((s) => s.timeScale);
   // Selector würde bei jedem Aufruf eine neue Array-Referenz liefern → Endlosschleife.
   const visibleTasks = useMemo(
     () => getVisibleTasks(taskTree, expandedIds),
     [taskTree, expandedIds],
   );
+
+  // Tages-Skala hat einen zweizeiligen Header (Monat + Tag) → Panel-Header muss gleich hoch sein.
+  const headerHeight = timeScale === "days" ? HEADER_HEIGHT * 2 : HEADER_HEIGHT;
 
   return (
     <Box
@@ -235,31 +241,43 @@ export function GanttTaskPanel({
         flexShrink: 0,
         overflowY: "auto",
         overflowX: "hidden",
-        borderRight: "1px solid",
-        borderColor: "divider",
       }}
     >
       <Box
         sx={{
-          height: HEADER_HEIGHT,
+          height: headerHeight,
           position: "sticky",
           top: 0,
           bgcolor: "background.paper",
           zIndex: 1,
           borderBottom: "1px solid",
+          borderRight: "1px solid",
           borderColor: "divider",
           display: "flex",
-          alignItems: "center",
-          px: 2,
-          gap: 1,
+          flexDirection: "column",
         }}
       >
-        <Typography variant="caption" color="text.secondary" sx={{ flex: 1 }}>
-          {t.columnName}
-        </Typography>
-        <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
-          {t.columnStatus}
-        </Typography>
+        {/* Erste Zeile: Spalten-Labels — bei Tages-Skala mit Trenn-Border unten */}
+        <Box
+          sx={{
+            height: HEADER_HEIGHT,
+            display: "flex",
+            alignItems: "center",
+            px: 2,
+            gap: 1,
+            borderBottom: timeScale === "days" ? "1px solid" : undefined,
+            borderColor: timeScale === "days" ? "divider" : undefined,
+          }}
+        >
+          <Typography variant="caption" color="text.secondary" sx={{ flex: 1 }}>
+            {t.columnName}
+          </Typography>
+          <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
+            {t.columnStatus}
+          </Typography>
+        </Box>
+        {/* Zweite Zeile nur bei Tages-Skala — leer, richtet sich an den Tag-Nummern aus */}
+        {timeScale === "days" && <Box sx={{ flex: 1 }} />}
       </Box>
 
       {visibleTasks.map((task) => (

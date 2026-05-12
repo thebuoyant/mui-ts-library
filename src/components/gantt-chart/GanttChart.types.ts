@@ -71,7 +71,10 @@ export const DEFAULT_GANTT_TRANSLATIONS: GanttTranslations = {
 export type GanttChartProps = {
   tasks: GanttTask[];
   timeScale?: GanttTimeScale;
+  /** Höhe des Charts. "auto" = 100 % des Eltern-Containers. Standard: 400. */
   height?: number | string;
+  /** Breite des Charts. "auto" = 100 % des Eltern-Containers. Standard: "100%". */
+  width?: number | string;
   // Wenn true, startet der Chart mit allen Knoten aufgeklappt statt nur den Root-Tasks.
   initialExpandAll?: boolean;
   // Toolbar mit Skalen-Switcher und Datumsbereich ein-/ausblenden (Standard: true).

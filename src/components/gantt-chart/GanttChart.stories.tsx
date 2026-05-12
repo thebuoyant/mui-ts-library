@@ -163,6 +163,28 @@ const sampleTasks: GanttTask[] = [
 const meta: Meta<typeof GanttChart> = {
   title: "Components/GanttChart",
   component: GanttChart,
+  args: {
+    height: 500,
+    width: "auto",
+    initialExpandAll: false,
+    showToolbar: true,
+  },
+  argTypes: {
+    timeScale: { control: "radio", options: ["days", "weeks", "months", "quarters"] },
+    height: { control: "text" },
+    width: { control: "text" },
+    initialExpandAll: { control: "boolean" },
+    showToolbar: { control: "boolean" },
+    // Date objects aren't directly controllable — use the CustomDateRange story instead.
+    defaultRangeStart: { control: false },
+    defaultRangeEnd: { control: false },
+    translations: { control: false },
+    onTaskClick: { control: false },
+    onMilestoneClick: { control: false },
+    onAddTask: { control: false },
+    onDeleteTask: { control: false },
+    onStatusChange: { control: false },
+  },
 };
 
 export default meta;
@@ -175,7 +197,7 @@ export const Default: Story = {
     timeScale: "months",
   },
   render: (args) => (
-    <Box sx={{ width: "100%", maxWidth: 900, height: 500 }}>
+    <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
       <GanttChart
         {...args}
         onTaskClick={(task) => console.log("onTaskClick", task)}
@@ -194,7 +216,7 @@ export const WeeksScale: Story = {
     timeScale: "weeks",
   },
   render: (args) => (
-    <Box sx={{ width: "100%", maxWidth: 900, height: 500 }}>
+    <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
       <GanttChart {...args} onTaskClick={(task) => console.log("onTaskClick", task)} />
     </Box>
   ),
@@ -206,7 +228,7 @@ export const QuartersScale: Story = {
     timeScale: "quarters",
   },
   render: (args) => (
-    <Box sx={{ width: "100%", maxWidth: 900, height: 500 }}>
+    <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
       <GanttChart {...args} onTaskClick={(task) => console.log("onTaskClick", task)} />
     </Box>
   ),
@@ -218,7 +240,7 @@ export const DaysScale: Story = {
     timeScale: "days",
   },
   render: (args) => (
-    <Box sx={{ width: "100%", maxWidth: 900, height: 500 }}>
+    <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
       <GanttChart {...args} onTaskClick={(task) => console.log("onTaskClick", task)} />
     </Box>
   ),
@@ -229,9 +251,10 @@ export const FullyExpanded: Story = {
     tasks: sampleTasks,
     timeScale: "months",
     initialExpandAll: true,
+    height: 700,
   },
   render: (args) => (
-    <Box sx={{ width: "100%", maxWidth: 900, height: 700 }}>
+    <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
       <GanttChart
         {...args}
         onTaskClick={(task) => console.log("onTaskClick", task)}
@@ -280,7 +303,6 @@ const dependencyTasks: GanttTask[] = [
     status: "planned",
     startDate: new Date("2025-04-01"),
     endDate: new Date("2025-04-30"),
-    // Fan-in: hängt von dev UND research ab (unterschiedliche Y-Positionen)
     dependencies: ["dev", "research"],
   },
   {
@@ -289,7 +311,6 @@ const dependencyTasks: GanttTask[] = [
     status: "planned",
     startDate: new Date("2025-05-01"),
     endDate: new Date("2025-05-15"),
-    // Fan-in aus zwei parallelen Pfaden
     dependencies: ["testing", "docs"],
   },
   {
@@ -307,9 +328,10 @@ export const WithDependencies: Story = {
   args: {
     tasks: dependencyTasks,
     timeScale: "months",
+    height: 400,
   },
   render: (args) => (
-    <Box sx={{ width: "100%", maxWidth: 900, height: 400 }}>
+    <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
       <GanttChart {...args} onTaskClick={(task) => console.log("onTaskClick", task)} />
     </Box>
   ),
@@ -319,12 +341,11 @@ export const CustomDateRange: Story = {
   args: {
     tasks: sampleTasks,
     timeScale: "months",
-    // Zeigt das gesamte Jahr 2025, obwohl die Tasks nur März–Juni abdecken.
     defaultRangeStart: new Date("2025-01-01"),
     defaultRangeEnd: new Date("2025-12-31"),
   },
   render: (args) => (
-    <Box sx={{ width: "100%", maxWidth: 900, height: 500 }}>
+    <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
       <GanttChart
         {...args}
         onTaskClick={(task) => console.log("onTaskClick", task)}
@@ -340,7 +361,7 @@ export const EnglishTranslations: Story = {
     translations: EN_TRANSLATIONS,
   },
   render: (args) => (
-    <Box sx={{ width: "100%", maxWidth: 900, height: 500 }}>
+    <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
       <GanttChart
         {...args}
         onTaskClick={(task) => console.log("onTaskClick", task)}
@@ -359,7 +380,7 @@ export const NoToolbar: Story = {
     showToolbar: false,
   },
   render: (args) => (
-    <Box sx={{ width: "100%", maxWidth: 900, height: 500 }}>
+    <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
       <GanttChart {...args} onTaskClick={(task) => console.log("onTaskClick", task)} />
     </Box>
   ),
@@ -369,9 +390,10 @@ export const MinimalFlat: Story = {
   args: {
     tasks: sampleTasks.filter((t) => !t.parentId || t.parentId === "project"),
     timeScale: "months",
+    height: 300,
   },
   render: (args) => (
-    <Box sx={{ width: "100%", maxWidth: 700, height: 300 }}>
+    <Box sx={{ width: "100%", maxWidth: 700, height: args.height }}>
       <GanttChart {...args} />
     </Box>
   ),

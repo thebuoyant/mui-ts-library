@@ -148,8 +148,8 @@ describe("createGanttChartStore", () => {
 
     store.getState().resetTimelineRange();
 
-    // Auto-Range von tasks: frühester Start = 2025-01-01, spätestes Ende = 2025-04-30
-    expect(store.getState().timelineRange.start.getFullYear()).toBe(2025);
+    // Auto-Range inkl. 1-Monat-Puffer: frühester Start = 2025-01-01 → Puffer = Dez 2024
+    expect(store.getState().timelineRange.start.getFullYear()).toBe(2024);
     expect(store.getState().isRangeCustomized).toBe(false);
   });
 

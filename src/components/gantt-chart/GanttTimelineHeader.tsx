@@ -47,6 +47,10 @@ function HeaderRow({ items }: { items: Array<{ key: string; label: string; width
 }
 
 export function GanttTimelineHeader({ columns, groups }: GanttTimelineHeaderProps) {
+  // Explizite Höhe mit border-box sorgt dafür, dass Task-Panel- und Timeline-Header
+  // exakt gleich hoch sind (beide: border-box = HEADER_HEIGHT, content = HEADER_HEIGHT - 1px).
+  const totalHeight = groups ? HEADER_HEIGHT * 2 : HEADER_HEIGHT;
+
   return (
     <Box
       sx={{
@@ -56,9 +60,15 @@ export function GanttTimelineHeader({ columns, groups }: GanttTimelineHeaderProp
         zIndex: 1,
         borderBottom: "1px solid",
         borderColor: "divider",
+        height: totalHeight,
+        overflow: "visible",
       }}
     >
-      {groups && <HeaderRow items={groups} />}
+      {groups && (
+        <Box sx={{ height: HEADER_HEIGHT, borderBottom: "1px solid", borderColor: "divider", overflow: "visible" }}>
+          <HeaderRow items={groups} />
+        </Box>
+      )}
       <HeaderRow items={columns} />
     </Box>
   );

@@ -24,8 +24,8 @@ export function getTimelineRange(tasks: GanttTask[]): TimelineRange {
   const ends = tasks.map((t) => t.endDate.getTime());
 
   return {
-    start: startOfMonth(new Date(Math.min(...starts))),
-    end: endOfMonth(new Date(Math.max(...ends))),
+    start: startOfMonth(addMonths(new Date(Math.min(...starts)), -1)),
+    end: endOfMonth(addMonths(new Date(Math.max(...ends)), 1)),
   };
 }
 

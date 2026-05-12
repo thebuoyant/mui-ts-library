@@ -44,6 +44,15 @@ export function useGanttTranslations(): GanttTranslations {
 // Inner component (hat Zugriff auf beide Kontexte)
 // ---------------------------------------------------------------------------
 
+// "auto" → "100%" (füllt den Eltern-Container aus).
+// Reine Zahl-Strings ("500") → Zahl, damit MUI sie korrekt als px ausgibt.
+function resolveSize(value: number | string | undefined, fallback: number | string): number | string {
+  if (value === undefined) return fallback;
+  if (value === "auto") return "100%";
+  if (typeof value === "string" && /^\d+$/.test(value)) return Number(value);
+  return value;
+}
+
 type GanttChartInnerProps = GanttChartProps;
 
 function GanttChartInner({
@@ -54,8 +63,11 @@ function GanttChartInner({
   onDeleteTask,
   onStatusChange,
   showToolbar = true,
-  height = 400,
+  height,
+  width,
 }: GanttChartInnerProps) {
+  const resolvedHeight = resolveSize(height, 400);
+  const resolvedWidth = resolveSize(width, "100%");
   const setTasks = useGanttChartStore((s) => s.setTasks);
   const leftRef = useRef<HTMLDivElement>(null);
   const rightRef = useRef<HTMLDivElement>(null);
@@ -89,12 +101,12 @@ function GanttChartInner({
       sx={{
         display: "flex",
         flexDirection: "column",
-        height,
+        height: resolvedHeight,
+        width: resolvedWidth,
         border: "1px solid",
         borderColor: "divider",
         borderRadius: 1,
         overflow: "hidden",
-        width: "100%",
       }}
     >
       {showToolbar && <GanttToolbar />}
@@ -137,6 +149,7 @@ export function GanttChart({
   onDeleteTask,
   onStatusChange,
   height,
+  width,
 }: GanttChartProps) {
   const mergedTranslations = useMemo(
     () => ({ ...DEFAULT_GANTT_TRANSLATIONS, ...translations }),
@@ -168,6 +181,7 @@ export function GanttChart({
           onStatusChange={onStatusChange}
           showToolbar={showToolbar}
           height={height}
+          width={width}
         />
       </GanttChartStoreContext.Provider>
     </GanttTranslationsContext.Provider>
