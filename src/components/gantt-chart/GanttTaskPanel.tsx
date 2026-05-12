@@ -3,10 +3,13 @@ import { type RefObject, type UIEventHandler } from "react";
 import { Box, Chip, IconButton, Menu, MenuItem, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import { useGanttChartStore, useGanttTranslations } from "./GanttChart";
 import type { GanttTask, GanttTaskNode, GanttTaskStatus, GanttTranslations } from "./GanttChart.types";
 import { getVisibleTasks } from "./util/gantt-chart.util";
 import { ROW_HEIGHT, HEADER_HEIGHT, LEFT_PANEL_WIDTH } from "./GanttChart.constants";
+import { GanttTaskDialog } from "./GanttTaskDialog";
+import { GanttDeleteDialog } from "./GanttDeleteDialog";
 
 
 const STATUS_DOT_COLOR: Record<string, string> = {
@@ -46,6 +49,7 @@ type GanttTaskRowProps = {
   toggleExpand: (id: string) => void;
   onTaskClick?: (task: GanttTask) => void;
   onAddTask?: (task: GanttTask) => void;
+  onEditTask?: (task: GanttTask) => void;
   onDeleteTask?: (task: GanttTask) => void;
   onStatusChange?: (task: GanttTask, status: GanttTaskStatus) => void;
 };
@@ -56,6 +60,7 @@ function GanttTaskRow({
   toggleExpand,
   onTaskClick,
   onAddTask,
+  onEditTask,
   onDeleteTask,
   onStatusChange,
 }: GanttTaskRowProps) {
@@ -114,7 +119,7 @@ function GanttTaskRow({
       </Typography>
 
       {/* Hover-Icons — opacity 0 im Ruhezustand, 1 bei hover auf die Zeile */}
-      {(onAddTask || onDeleteTask) && (
+      {(onAddTask || onDeleteTask || onEditTask) && (
         <Box
           className="gantt-row-actions"
           sx={{
@@ -125,6 +130,18 @@ function GanttTaskRow({
             flexShrink: 0,
           }}
         >
+          {onEditTask && (
+            <IconButton
+              size="small"
+              data-testid={`gantt-edit-task-${task.id}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                onEditTask(task);
+              }}
+            >
+              <EditIcon fontSize="inherit" />
+            </IconButton>
+          )}
           {onAddTask && (
             <IconButton
               size="small"
@@ -208,6 +225,10 @@ type GanttTaskPanelProps = {
   onAddTask?: (task: GanttTask) => void;
   onDeleteTask?: (task: GanttTask) => void;
   onStatusChange?: (task: GanttTask, status: GanttTaskStatus) => void;
+  enableBuiltinDialogs?: boolean;
+  onTaskCreated?: (task: GanttTask) => void;
+  onTaskUpdated?: (task: GanttTask) => void;
+  onTaskDeleted?: (taskId: string) => void;
 };
 
 export function GanttTaskPanel({
@@ -217,17 +238,67 @@ export function GanttTaskPanel({
   onAddTask,
   onDeleteTask,
   onStatusChange,
+  enableBuiltinDialogs,
+  onTaskCreated,
+  onTaskUpdated,
+  onTaskDeleted,
 }: GanttTaskPanelProps) {
   const t = useGanttTranslations();
   const taskTree = useGanttChartStore((s) => s.taskTree);
   const expandedIds = useGanttChartStore((s) => s.expandedIds);
   const toggleExpand = useGanttChartStore((s) => s.toggleExpand);
   const timeScale = useGanttChartStore((s) => s.timeScale);
+  const storeAddTask = useGanttChartStore((s) => s.addTask);
+  const storeUpdateTask = useGanttChartStore((s) => s.updateTask);
+  const storeDeleteTask = useGanttChartStore((s) => s.deleteTask);
+
   // Selector würde bei jedem Aufruf eine neue Array-Referenz liefern → Endlosschleife.
   const visibleTasks = useMemo(
     () => getVisibleTasks(taskTree, expandedIds),
     [taskTree, expandedIds],
   );
+
+  // Dialog-State
+  const [addOpen, setAddOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [activeTask, setActiveTask] = useState<GanttTask | null>(null);
+
+  // Dialog-Save-Handler
+  const handleAddSave = (data: Omit<GanttTask, "id">) => {
+    const newTask: GanttTask = { ...data, id: crypto.randomUUID() };
+    storeAddTask(newTask);
+    onTaskCreated?.(newTask);
+    setAddOpen(false);
+  };
+
+  const handleEditSave = (data: Omit<GanttTask, "id">) => {
+    if (!activeTask) return;
+    const updatedTask: GanttTask = { ...data, id: activeTask.id };
+    storeUpdateTask(updatedTask);
+    onTaskUpdated?.(updatedTask);
+    setEditOpen(false);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (!activeTask) return;
+    storeDeleteTask(activeTask.id);
+    onTaskDeleted?.(activeTask.id);
+    setDeleteOpen(false);
+  };
+
+  // Row-Action-Handler: bei enableBuiltinDialogs Dialoge öffnen, sonst Props direkt durchreichen.
+  const rowOnAdd = enableBuiltinDialogs
+    ? (task: GanttTask) => { setActiveTask(task); setAddOpen(true); }
+    : onAddTask;
+
+  const rowOnEdit = enableBuiltinDialogs
+    ? (task: GanttTask) => { setActiveTask(task); setEditOpen(true); }
+    : undefined;
+
+  const rowOnDelete = enableBuiltinDialogs
+    ? (task: GanttTask) => { setActiveTask(task); setDeleteOpen(true); }
+    : onDeleteTask;
 
   // Tages-Skala hat einen zweizeiligen Header (Monat + Tag) → Panel-Header muss gleich hoch sein.
   const headerHeight = timeScale === "days" ? HEADER_HEIGHT * 2 : HEADER_HEIGHT;
@@ -287,11 +358,37 @@ export function GanttTaskPanel({
           expandedIds={expandedIds}
           toggleExpand={toggleExpand}
           onTaskClick={onTaskClick}
-          onAddTask={onAddTask}
-          onDeleteTask={onDeleteTask}
+          onAddTask={rowOnAdd}
+          onEditTask={rowOnEdit}
+          onDeleteTask={rowOnDelete}
           onStatusChange={onStatusChange}
         />
       ))}
+
+      {enableBuiltinDialogs && (
+        <>
+          <GanttTaskDialog
+            open={addOpen}
+            mode="add"
+            defaultParentId={activeTask?.id}
+            onSave={handleAddSave}
+            onClose={() => setAddOpen(false)}
+          />
+          <GanttTaskDialog
+            open={editOpen}
+            mode="edit"
+            initialTask={activeTask ?? undefined}
+            onSave={handleEditSave}
+            onClose={() => setEditOpen(false)}
+          />
+          <GanttDeleteDialog
+            open={deleteOpen}
+            task={activeTask}
+            onConfirm={handleDeleteConfirm}
+            onClose={() => setDeleteOpen(false)}
+          />
+        </>
+      )}
     </Box>
   );
 }

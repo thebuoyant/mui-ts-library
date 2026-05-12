@@ -19,6 +19,20 @@ const EN_TRANSLATIONS: GanttTranslations = {
   statusBlocked: "Blocked",
   weekColumnPrefix: "W",
   dateLocale: "en-US",
+  dialogAddTitle: "Add Task",
+  dialogEditTitle: "Edit Task",
+  dialogDeleteTitle: "Delete Task",
+  dialogSave: "Save",
+  dialogCancel: "Cancel",
+  dialogDelete: "Delete",
+  dialogFieldName: "Name",
+  dialogFieldStartDate: "Start Date",
+  dialogFieldEndDate: "End Date",
+  dialogFieldStatus: "Status",
+  dialogFieldMilestone: "Is Milestone",
+  dialogFieldParent: "Parent Task",
+  dialogFieldParentNone: "— None —",
+  dialogDeleteConfirm: "Delete task \"{name}\"?",
 };
 
 const sampleTasks: GanttTask[] = [
@@ -175,6 +189,7 @@ const meta: Meta<typeof GanttChart> = {
     width: { control: "text" },
     initialExpandAll: { control: "boolean" },
     showToolbar: { control: "boolean" },
+    enableBuiltinDialogs: { control: "boolean" },
     // Date objects aren't directly controllable — use the CustomDateRange story instead.
     defaultRangeStart: { control: false },
     defaultRangeEnd: { control: false },
@@ -184,6 +199,9 @@ const meta: Meta<typeof GanttChart> = {
     onAddTask: { control: false },
     onDeleteTask: { control: false },
     onStatusChange: { control: false },
+    onTaskCreated: { control: false },
+    onTaskUpdated: { control: false },
+    onTaskDeleted: { control: false },
   },
 };
 
@@ -395,6 +413,25 @@ export const MinimalFlat: Story = {
   render: (args) => (
     <Box sx={{ width: "100%", maxWidth: 700, height: args.height }}>
       <GanttChart {...args} />
+    </Box>
+  ),
+};
+
+export const WithBuiltinDialogs: Story = {
+  args: {
+    tasks: sampleTasks,
+    timeScale: "months",
+    enableBuiltinDialogs: true,
+  },
+  render: (args) => (
+    <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
+      <GanttChart
+        {...args}
+        onTaskCreated={(task) => console.log("onTaskCreated", task)}
+        onTaskUpdated={(task) => console.log("onTaskUpdated", task)}
+        onTaskDeleted={(id) => console.log("onTaskDeleted", id)}
+        onStatusChange={(task, status) => console.log("onStatusChange", task, status)}
+      />
     </Box>
   ),
 };

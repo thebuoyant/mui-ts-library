@@ -153,6 +153,48 @@ describe("createGanttChartStore", () => {
     expect(store.getState().isRangeCustomized).toBe(false);
   });
 
+  it("Should add a task and rebuild the tree", () => {
+    const store = createGanttChartStore(tasks);
+    const newTask: GanttTask = {
+      id: "new-task",
+      parentId: "project",
+      name: "New Task",
+      status: "planned",
+      startDate: new Date("2025-02-01"),
+      endDate: new Date("2025-02-28"),
+    };
+
+    store.getState().addTask(newTask);
+
+    expect(store.getState().tasks).toHaveLength(4);
+    expect(store.getState().tasks.find((t) => t.id === "new-task")).toBeDefined();
+    // Baum muss neu aufgebaut worden sein: project hat jetzt 2 direkte Kinder.
+    expect(store.getState().taskTree[0].children).toHaveLength(2);
+  });
+
+  it("Should update a task and rebuild the tree", () => {
+    const store = createGanttChartStore(tasks);
+    const updated: GanttTask = { ...tasks[0], name: "Updated Project" };
+
+    store.getState().updateTask(updated);
+
+    expect(store.getState().tasks[0].name).toBe("Updated Project");
+    expect(store.getState().taskTree[0].name).toBe("Updated Project");
+  });
+
+  it("Should delete a task and cascade to all descendants", () => {
+    const store = createGanttChartStore(tasks);
+
+    // release-1 löschen → sprint-1 (Kind von release-1) muss auch entfernt werden.
+    store.getState().deleteTask("release-1");
+
+    const ids = store.getState().tasks.map((t) => t.id);
+    expect(ids).toContain("project");
+    expect(ids).not.toContain("release-1");
+    expect(ids).not.toContain("sprint-1");
+    expect(store.getState().taskTree[0].children).toHaveLength(0);
+  });
+
   it("Should not overwrite a custom range when setTasks is called", () => {
     const store = createGanttChartStore(tasks);
     const customRange = { start: new Date("2024-01-01"), end: new Date("2026-12-31") };

@@ -47,6 +47,23 @@ export type GanttTranslations = {
   weekColumnPrefix: string;
   // Locale für die Datums-Formatierung im Timeline-Header
   dateLocale: string;
+  // Dialoge — Titel und Buttons
+  dialogAddTitle: string;
+  dialogEditTitle: string;
+  dialogDeleteTitle: string;
+  dialogSave: string;
+  dialogCancel: string;
+  dialogDelete: string;
+  // Dialoge — Formularfelder
+  dialogFieldName: string;
+  dialogFieldStartDate: string;
+  dialogFieldEndDate: string;
+  dialogFieldStatus: string;
+  dialogFieldMilestone: string;
+  dialogFieldParent: string;
+  dialogFieldParentNone: string;
+  // Dialoge — Bestätigungstext ({name} wird durch den Task-Namen ersetzt)
+  dialogDeleteConfirm: string;
 };
 
 // Standardwerte entsprechen dem aktuell gerenderten Verhalten (DE Toolbar, EN Status).
@@ -66,6 +83,20 @@ export const DEFAULT_GANTT_TRANSLATIONS: GanttTranslations = {
   statusBlocked: "Blocked",
   weekColumnPrefix: "KW",
   dateLocale: "de-DE",
+  dialogAddTitle: "Aufgabe hinzufügen",
+  dialogEditTitle: "Aufgabe bearbeiten",
+  dialogDeleteTitle: "Aufgabe löschen",
+  dialogSave: "Speichern",
+  dialogCancel: "Abbrechen",
+  dialogDelete: "Löschen",
+  dialogFieldName: "Name",
+  dialogFieldStartDate: "Startdatum",
+  dialogFieldEndDate: "Enddatum",
+  dialogFieldStatus: "Status",
+  dialogFieldMilestone: "Ist Meilenstein",
+  dialogFieldParent: "Übergeordnete Aufgabe",
+  dialogFieldParentNone: "— Keine —",
+  dialogDeleteConfirm: "Soll die Aufgabe \"{name}\" wirklich gelöscht werden?",
 };
 
 export type GanttChartProps = {
@@ -84,9 +115,15 @@ export type GanttChartProps = {
   defaultRangeEnd?: Date;
   // Texte überschreiben für einfache Lokalisierung — nur abweichende Keys angeben.
   translations?: Partial<GanttTranslations>;
+  // Wenn true, öffnen Add/Edit/Delete-Icons MUI-Dialoge statt direkt Callbacks aufzurufen.
+  enableBuiltinDialogs?: boolean;
   onTaskClick?: (task: GanttTask) => void;
   onMilestoneClick?: (task: GanttTask) => void;
   onAddTask?: (parentTask?: GanttTask) => void;
   onDeleteTask?: (task: GanttTask) => void;
   onStatusChange?: (task: GanttTask, status: GanttTaskStatus) => void;
+  // Dialog-Callbacks — werden nur ausgelöst wenn enableBuiltinDialogs=true
+  onTaskCreated?: (task: GanttTask) => void;
+  onTaskUpdated?: (task: GanttTask) => void;
+  onTaskDeleted?: (taskId: string) => void;
 };

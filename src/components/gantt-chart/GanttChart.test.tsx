@@ -293,6 +293,139 @@ describe("GanttChart — onStatusChange", () => {
 });
 
 // ---------------------------------------------------------------------------
+// Phase 9 — Built-in CRUD Dialoge
+// ---------------------------------------------------------------------------
+
+describe("GanttChart — enableBuiltinDialogs", () => {
+  it("does not show the edit icon when enableBuiltinDialogs is not set", () => {
+    render(<GanttChart tasks={tasks} />);
+
+    expect(screen.queryByTestId("gantt-edit-task-root")).not.toBeInTheDocument();
+  });
+
+  it("shows the edit icon on each row when enableBuiltinDialogs is true", () => {
+    render(<GanttChart tasks={tasks} enableBuiltinDialogs />);
+
+    expect(screen.getByTestId("gantt-edit-task-root")).toBeInTheDocument();
+  });
+
+  it("opens the add dialog when the add icon is clicked", () => {
+    render(<GanttChart tasks={tasks} enableBuiltinDialogs />);
+
+    fireEvent.click(screen.getByTestId("gantt-add-task-root"));
+
+    expect(screen.getByTestId("gantt-task-dialog")).toBeInTheDocument();
+    expect(screen.getByText("Aufgabe hinzufügen")).toBeInTheDocument();
+  });
+
+  it("opens the edit dialog when the edit icon is clicked", () => {
+    render(<GanttChart tasks={tasks} enableBuiltinDialogs />);
+
+    fireEvent.click(screen.getByTestId("gantt-edit-task-root"));
+
+    expect(screen.getByTestId("gantt-task-dialog")).toBeInTheDocument();
+    expect(screen.getByText("Aufgabe bearbeiten")).toBeInTheDocument();
+  });
+
+  it("opens the delete dialog when the delete icon is clicked", () => {
+    render(<GanttChart tasks={tasks} enableBuiltinDialogs />);
+
+    fireEvent.click(screen.getByTestId("gantt-delete-task-child"));
+
+    expect(screen.getByTestId("gantt-delete-dialog")).toBeInTheDocument();
+  });
+
+  it("calls onTaskCreated with correct data after submitting the add dialog", () => {
+    const onTaskCreated = vi.fn();
+    render(<GanttChart tasks={tasks} enableBuiltinDialogs onTaskCreated={onTaskCreated} />);
+
+    fireEvent.click(screen.getByTestId("gantt-add-task-root"));
+    fireEvent.change(screen.getByTestId("gantt-dialog-field-name"), { target: { value: "New Task" } });
+    fireEvent.click(screen.getByTestId("gantt-dialog-save"));
+
+    expect(onTaskCreated).toHaveBeenCalledOnce();
+    expect(onTaskCreated).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "New Task", parentId: "root" }),
+    );
+  });
+
+  it("calls onTaskUpdated with the updated task after submitting the edit dialog", () => {
+    const onTaskUpdated = vi.fn();
+    render(<GanttChart tasks={tasks} enableBuiltinDialogs onTaskUpdated={onTaskUpdated} />);
+
+    fireEvent.click(screen.getByTestId("gantt-edit-task-root"));
+    fireEvent.change(screen.getByTestId("gantt-dialog-field-name"), { target: { value: "Updated Root" } });
+    fireEvent.click(screen.getByTestId("gantt-dialog-save"));
+
+    expect(onTaskUpdated).toHaveBeenCalledOnce();
+    expect(onTaskUpdated).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "root", name: "Updated Root" }),
+    );
+  });
+
+  it("calls onTaskDeleted with the task id after confirming the delete dialog", () => {
+    const onTaskDeleted = vi.fn();
+    render(<GanttChart tasks={tasks} enableBuiltinDialogs onTaskDeleted={onTaskDeleted} />);
+
+    fireEvent.click(screen.getByTestId("gantt-delete-task-child"));
+    fireEvent.click(screen.getByTestId("gantt-dialog-delete-confirm"));
+
+    expect(onTaskDeleted).toHaveBeenCalledOnce();
+    expect(onTaskDeleted).toHaveBeenCalledWith("child");
+  });
+
+  it("does not call onTaskDeleted when the delete dialog is cancelled", () => {
+    const onTaskDeleted = vi.fn();
+    render(<GanttChart tasks={tasks} enableBuiltinDialogs onTaskDeleted={onTaskDeleted} />);
+
+    fireEvent.click(screen.getByTestId("gantt-delete-task-child"));
+    fireEvent.click(screen.getByText("Abbrechen"));
+
+    expect(onTaskDeleted).not.toHaveBeenCalled();
+  });
+
+  it("pre-fills the edit dialog with the task's current name", () => {
+    render(<GanttChart tasks={tasks} enableBuiltinDialogs />);
+
+    fireEvent.click(screen.getByTestId("gantt-edit-task-root"));
+
+    const nameInput = screen.getByTestId("gantt-dialog-field-name") as HTMLInputElement;
+    expect(nameInput.value).toBe("Root Task");
+  });
+
+  it("reflects the added task in the panel immediately after confirming the add dialog", () => {
+    render(<GanttChart tasks={tasks} enableBuiltinDialogs />);
+
+    fireEvent.click(screen.getByTestId("gantt-add-task-root"));
+    fireEvent.change(screen.getByTestId("gantt-dialog-field-name"), { target: { value: "Brand New Task" } });
+    fireEvent.click(screen.getByTestId("gantt-dialog-save"));
+
+    expect(screen.getByText("Brand New Task")).toBeInTheDocument();
+  });
+
+  it("removes the task from the panel immediately after confirming the delete dialog", () => {
+    render(<GanttChart tasks={tasks} enableBuiltinDialogs />);
+
+    expect(screen.getByText("Child Task")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId("gantt-delete-task-child"));
+    fireEvent.click(screen.getByTestId("gantt-dialog-delete-confirm"));
+
+    expect(screen.queryByText("Child Task")).not.toBeInTheDocument();
+  });
+
+  it("disables the end date field when the milestone checkbox is checked", () => {
+    render(<GanttChart tasks={tasks} enableBuiltinDialogs />);
+
+    fireEvent.click(screen.getByTestId("gantt-add-task-root"));
+    fireEvent.click(screen.getByTestId("gantt-dialog-field-milestone"));
+
+    const endDateInput = screen.getByTestId("gantt-dialog-field-end") as HTMLInputElement;
+    expect(endDateInput).toBeDisabled();
+  });
+});
+
+// ---------------------------------------------------------------------------
 // SVG-Abhängigkeitspfeile
 // ---------------------------------------------------------------------------
 

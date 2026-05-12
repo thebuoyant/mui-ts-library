@@ -62,6 +62,10 @@ function GanttChartInner({
   onAddTask,
   onDeleteTask,
   onStatusChange,
+  enableBuiltinDialogs,
+  onTaskCreated,
+  onTaskUpdated,
+  onTaskDeleted,
   showToolbar = true,
   height,
   width,
@@ -119,6 +123,10 @@ function GanttChartInner({
           onAddTask={onAddTask}
           onDeleteTask={onDeleteTask}
           onStatusChange={onStatusChange}
+          enableBuiltinDialogs={enableBuiltinDialogs}
+          onTaskCreated={onTaskCreated}
+          onTaskUpdated={onTaskUpdated}
+          onTaskDeleted={onTaskDeleted}
         />
         <GanttTimeline
           scrollRef={rightRef}
@@ -143,11 +151,15 @@ export function GanttChart({
   defaultRangeStart,
   defaultRangeEnd,
   translations,
+  enableBuiltinDialogs,
   onTaskClick,
   onMilestoneClick,
   onAddTask,
   onDeleteTask,
   onStatusChange,
+  onTaskCreated,
+  onTaskUpdated,
+  onTaskDeleted,
   height,
   width,
 }: GanttChartProps) {
@@ -174,11 +186,15 @@ export function GanttChart({
         <GanttChartInner
           tasks={tasks}
           timeScale={timeScale}
+          enableBuiltinDialogs={enableBuiltinDialogs}
           onTaskClick={onTaskClick}
           onMilestoneClick={onMilestoneClick}
           onAddTask={onAddTask}
           onDeleteTask={onDeleteTask}
           onStatusChange={onStatusChange}
+          onTaskCreated={onTaskCreated}
+          onTaskUpdated={onTaskUpdated}
+          onTaskDeleted={onTaskDeleted}
           showToolbar={showToolbar}
           height={height}
           width={width}

@@ -28,25 +28,27 @@ React 19, TypeScript 5.9, MUI v7, Zustand v5, Vite 8, Vitest 4, Storybook 10
 
 ---
 
-## Aktueller Stand: Phasen 1–8+i18n+Layout-Fixes abgeschlossen ✅ (130 Tests grün)
+## Aktueller Stand: Phasen 1–9+i18n+Layout-Fixes abgeschlossen ✅ (146 Tests grün)
 
 ### Alle vorhandenen Dateien
 
 | Datei                           | Inhalt                                                                               |
 | ------------------------------- | ------------------------------------------------------------------------------------ |
 | `GanttChart.types.ts`           | `GanttTaskStatus`, `GanttTimeScale`, `GanttTask`, `GanttTaskNode`, `GanttTranslations`, `GanttChartProps` |
-| `GanttChart.store.ts`           | Zustand-Store: `tasks`, `taskTree`, `expandedIds`, `timeScale`, `timelineRange`, `isRangeCustomized` |
-| `GanttChart.store.test.ts`      | 11 Store-Tests                                                                       |
+| `GanttChart.store.ts`           | Zustand-Store: `tasks`, `taskTree`, `expandedIds`, `timeScale`, `timelineRange`, `isRangeCustomized` + `addTask`, `updateTask`, `deleteTask` |
+| `GanttChart.store.test.ts`      | 14 Store-Tests                                                                       |
 | `GanttChart.constants.ts`       | alle Layout-Konstanten                                                               |
 | `util/gantt-chart.util.ts`      | Datum- und Baum-Hilfsfunktionen                                                      |
 | `util/gantt-chart.util.test.ts` | 34 Util-Tests                                                                        |
 | `GanttChart.tsx`                | Haupt-Komponente: Store-Kontext, Translations-Kontext, `resolveSize`, Scroll-Sync    |
-| `GanttChart.test.tsx`           | 85 Komponenten-Tests                                                                 |
-| `GanttTaskPanel.tsx`            | Linkes Panel: `GanttTaskRow` Sub-Komponente mit Hover-Icons + Status-Menü            |
+| `GanttChart.test.tsx`           | 98 Komponenten-Tests                                                                 |
+| `GanttTaskPanel.tsx`            | Linkes Panel: `GanttTaskRow` mit Hover-Icons (Add/Edit/Delete) + Dialog-State        |
+| `GanttTaskDialog.tsx`           | MUI Dialog für Add + Edit (Formularfelder inkl. Meilenstein-Checkbox + Elterntask)   |
+| `GanttDeleteDialog.tsx`         | MUI Bestätigungs-Dialog für Löschen                                                  |
 | `GanttTimelineHeader.tsx`       | Header mit optionalem zwei-Ebenen-Modus (`groups`) für Tages-Skala                  |
 | `GanttTimeline.tsx`             | Rechtes Panel: Balken, Meilensteine, Gitterlinien, SVG-Pfeile                        |
 | `GanttToolbar.tsx`              | Toolbar: Skala-Switcher + Von/Bis-Date-Inputs + Reset-Button                        |
-| `GanttChart.stories.tsx`        | 10 Stories mit argTypes und meta args                                                |
+| `GanttChart.stories.tsx`        | 11 Stories mit argTypes und meta args                                                |
 
 ### GanttTimeScale — implementierter Stand
 
@@ -168,11 +170,15 @@ Der `borderRight` (vertikaler Separator zwischen Panel und Timeline) liegt auf d
   defaultRangeStart={new Date(...)}      // optionaler initialer Von-Wert (setzt isRangeCustomized)
   defaultRangeEnd={new Date(...)}        // optionaler initialer Bis-Wert
   translations={{ scaleDays: "Days" }}   // Partial<GanttTranslations> — nur abweichende Keys
+  enableBuiltinDialogs={true}            // default: false — öffnet Dialoge statt direkter Callbacks
   onTaskClick={(task) => ...}
   onMilestoneClick={(task) => ...}
-  onAddTask={(parentTask?) => ...}
-  onDeleteTask={(task) => ...}
+  onAddTask={(parentTask?) => ...}       // nur wenn enableBuiltinDialogs=false
+  onDeleteTask={(task) => ...}           // nur wenn enableBuiltinDialogs=false
   onStatusChange={(task, status) => ...}
+  onTaskCreated={(task) => ...}          // enthält generierte UUID (enableBuiltinDialogs=true)
+  onTaskUpdated={(task) => ...}          // (enableBuiltinDialogs=true)
+  onTaskDeleted={(taskId) => ...}        // (enableBuiltinDialogs=true)
 />
 ```
 
@@ -184,10 +190,13 @@ Der `borderRight` (vertikaler Separator zwischen Panel und Timeline) liegt auf d
 - `resetTimelineRange()` — auf auto-berechneten Bereich (mit 1-Monat-Puffer) zurücksetzen
 - `setTimeScale(scale)` — Skala wechseln
 - `setTasks(tasks)` — Tasks ersetzen (überschreibt Range nicht wenn `isRangeCustomized`)
+- `addTask(task)` — Task hinzufügen und Baum neu aufbauen
+- `updateTask(task)` — Task aktualisieren und Baum neu aufbauen
+- `deleteTask(taskId)` — Task + alle Nachkommen kaskadierend löschen
 
 ---
 
-## Storybook — 10 Stories
+## Storybook — 11 Stories
 
 | Story               | Besonderheit                                            |
 | ------------------- | ------------------------------------------------------- |
@@ -201,23 +210,27 @@ Der `borderRight` (vertikaler Separator zwischen Panel und Timeline) liegt auf d
 | EnglishTranslations | `translations: EN_TRANSLATIONS`, W-prefix statt KW     |
 | NoToolbar           | `showToolbar: false`                                    |
 | MinimalFlat         | Nur Root-Tasks gefiltert, maxWidth: 700, height: 300    |
+| WithBuiltinDialogs  | `enableBuiltinDialogs: true`, onTaskCreated/Updated/Deleted verdrahtet |
 
 Meta `args`: `height: 500, width: "auto", initialExpandAll: false, showToolbar: true`
-Meta `argTypes`: `timeScale` (radio), `height`/`width` (text), `initialExpandAll`/`showToolbar` (boolean)
+Meta `argTypes`: `timeScale` (radio), `height`/`width` (text), `initialExpandAll`/`showToolbar`/`enableBuiltinDialogs` (boolean)
 Render-Funktionen nutzen `args.height` (kein hardcodierter Wert im Box-Wrapper).
 
 ---
 
-## Phase 9 — CRUD Dialoge (nächste Session)
+## Phase 9 — CRUD Dialoge ✅ abgeschlossen
 
-### Ziel
+### Implementiertes Verhalten
 
-Built-in MUI Dialoge für Add/Edit/Delete wenn `enableBuiltinDialogs?: boolean` gesetzt.
+- `enableBuiltinDialogs=false` (default): Hover-Icons rufen `onAddTask` / `onDeleteTask` direkt auf (bisheriges Verhalten, kein Edit-Icon)
+- `enableBuiltinDialogs=true`: Edit/Add/Delete-Icons öffnen je einen MUI Dialog; Store wird sofort aktualisiert; danach werden `onTaskCreated` / `onTaskUpdated` / `onTaskDeleted` gefeuert
 
-### Neue Dateien
+### Dialog-State-Architektur
 
-- `GanttTaskDialog.tsx` — MUI Dialog mit Formularfeldern für Add + Edit
-- `GanttDeleteDialog.tsx` — Bestätigungs-Dialog mit Aufgabenname
+- Dialog-State (`addOpen`, `editOpen`, `deleteOpen`, `activeTask`) lebt in `GanttTaskPanel`
+- Dialoge werden nur gerendert wenn `enableBuiltinDialogs=true` (kein unnötiger DOM-Overhead)
+- ID-Generierung für neue Tasks via `crypto.randomUUID()`
+- Kaskadierendes Löschen: `deleteTask(id)` entfernt Task + alle Nachkommen rekursiv
 
 ### Formularfelder (GanttTaskDialog)
 
@@ -275,9 +288,6 @@ In `GanttTimeline.tsx` SVG-Layer: berechnete X-Position von `new Date()` relativ
 
 ```
 Bitte lies zuerst die claude-gantt-kickoff.md im Root des Projekts.
-Dann implementiere Phase 9: CRUD Dialoge.
-enableBuiltinDialogs?: boolean Prop.
-GanttTaskDialog.tsx für Add/Edit, GanttDeleteDialog.tsx für Delete-Bestätigung.
-130 Tests müssen nach den Änderungen grün bleiben.
-Für jede CRUD-Operation sollen die aktualisierten GanttTasks als kompletter Tree zurückgegeben werden.
+Dann implementiere Phase 10: Progress-Balken + Today-Linie.
+146 Tests müssen nach den Änderungen grün bleiben.
 ```

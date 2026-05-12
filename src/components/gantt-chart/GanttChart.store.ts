@@ -15,6 +15,10 @@ export type GanttChartStoreState = {
   isRangeCustomized: boolean;
 
   setTasks: (tasks: GanttTask[]) => void;
+  addTask: (task: GanttTask) => void;
+  updateTask: (task: GanttTask) => void;
+  // Löscht den Task und alle Nachkommen kaskadierend.
+  deleteTask: (taskId: string) => void;
   toggleExpand: (taskId: string) => void;
   expandAll: () => void;
   collapseAll: () => void;
@@ -55,6 +59,33 @@ export function createGanttChartStore(
         // Manuell gesetzten Bereich nicht überschreiben wenn der Nutzer ihn angepasst hat.
         ...(state.isRangeCustomized ? {} : { timelineRange: getTimelineRange(tasks) }),
       }));
+    },
+
+    addTask: (task) => {
+      set((state) => {
+        const tasks = [...state.tasks, task];
+        return { tasks, taskTree: buildTaskTree(tasks) };
+      });
+    },
+
+    updateTask: (task) => {
+      set((state) => {
+        const tasks = state.tasks.map((t) => (t.id === task.id ? task : t));
+        return { tasks, taskTree: buildTaskTree(tasks) };
+      });
+    },
+
+    deleteTask: (taskId) => {
+      set((state) => {
+        const idsToRemove = new Set<string>();
+        const collect = (id: string) => {
+          idsToRemove.add(id);
+          state.tasks.filter((t) => t.parentId === id).forEach((t) => collect(t.id));
+        };
+        collect(taskId);
+        const tasks = state.tasks.filter((t) => !idsToRemove.has(t.id));
+        return { tasks, taskTree: buildTaskTree(tasks) };
+      });
     },
 
     toggleExpand: (taskId) => {
