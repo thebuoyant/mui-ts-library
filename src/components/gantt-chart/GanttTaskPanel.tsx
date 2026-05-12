@@ -118,15 +118,12 @@ function GanttTaskRow({
         {task.name}
       </Typography>
 
-      {/* Hover-Icons — opacity 0 im Ruhezustand, 1 bei hover auf die Zeile */}
       {(onAddTask || onDeleteTask || onEditTask) && (
         <Box
           className="gantt-row-actions"
           sx={{
             display: "flex",
             gap: 0.25,
-            opacity: 0,
-            ".gantt-task-row:hover &": { opacity: 1 },
             flexShrink: 0,
           }}
         >
