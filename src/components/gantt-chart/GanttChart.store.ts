@@ -1,6 +1,6 @@
 import { createStore } from "zustand/vanilla";
 import type { GanttTask, GanttTaskNode, GanttTimeScale } from "./GanttChart.types";
-import { buildTaskTree, getTimelineRange, getVisibleTasks } from "./util/gantt-chart.util";
+import { addMonths, buildTaskTree, endOfMonth, getTimelineRange, getVisibleTasks, startOfMonth } from "./util/gantt-chart.util";
 import type { TimelineRange } from "./util/gantt-chart.util";
 
 export type GanttChartStoreState = {
@@ -31,6 +31,21 @@ export type GanttChartStoreState = {
 };
 
 export type GanttChartStore = ReturnType<typeof createGanttChartStore>;
+
+// Expandiert den Bereich auf Task-Grenzen (mit ±1-Monat-Puffer, auf Monatsgrenzen gerundet).
+// Verkleinert den Bereich nie — nur Erweiterungen sind möglich.
+function expandRangeForTask(range: TimelineRange, task: GanttTask): TimelineRange {
+  const newStart =
+    task.startDate < range.start
+      ? startOfMonth(addMonths(task.startDate, -1))
+      : range.start;
+  const newEnd =
+    task.endDate > range.end
+      ? endOfMonth(addMonths(task.endDate, 1))
+      : range.end;
+  if (newStart === range.start && newEnd === range.end) return range;
+  return { start: newStart, end: newEnd };
+}
 
 export function createGanttChartStore(
   initialTasks: GanttTask[],
@@ -64,14 +79,22 @@ export function createGanttChartStore(
     addTask: (task) => {
       set((state) => {
         const tasks = [...state.tasks, task];
-        return { tasks, taskTree: buildTaskTree(tasks) };
+        return {
+          tasks,
+          taskTree: buildTaskTree(tasks),
+          timelineRange: expandRangeForTask(state.timelineRange, task),
+        };
       });
     },
 
     updateTask: (task) => {
       set((state) => {
         const tasks = state.tasks.map((t) => (t.id === task.id ? task : t));
-        return { tasks, taskTree: buildTaskTree(tasks) };
+        return {
+          tasks,
+          taskTree: buildTaskTree(tasks),
+          timelineRange: expandRangeForTask(state.timelineRange, task),
+        };
       });
     },
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type InputHTMLAttributes } from "react";
+import { useEffect, useMemo, useRef, useState, type InputHTMLAttributes } from "react";
 import {
   Box,
   Button,
@@ -13,6 +13,7 @@ import {
   MenuItem,
   Select,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { useGanttChartStore, useGanttTranslations } from "./GanttChart";
@@ -40,6 +41,28 @@ function clampDate(date: Date, start: Date, end: Date): Date {
 // DFS-Traversal des Task-Baums — liefert Tasks in Anzeigereihenfolge mit depth-Info.
 function flattenTree(nodes: GanttTaskNode[]): GanttTaskNode[] {
   return nodes.flatMap((n) => [n, ...flattenTree(n.children)]);
+}
+
+// Tooltip nur wenn der Text tatsächlich abgeschnitten ist (scrollWidth > clientWidth).
+function OverflowTooltip({ label }: { label: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [overflow, setOverflow] = useState(false);
+  return (
+    <Tooltip title={label} disableHoverListener={!overflow}>
+      <Typography
+        ref={ref}
+        component="span"
+        variant="body2"
+        noWrap
+        sx={{ display: "block", overflow: "hidden", textOverflow: "ellipsis", minWidth: 0 }}
+        onMouseEnter={() => {
+          if (ref.current) setOverflow(ref.current.scrollWidth > ref.current.clientWidth);
+        }}
+      >
+        {label}
+      </Typography>
+    </Tooltip>
+  );
 }
 
 type GanttTaskDialogProps = {
@@ -244,17 +267,20 @@ export function GanttTaskDialog({
             label={t.dialogFieldParent}
             onChange={(e) => setForm((prev) => ({ ...prev, parentId: e.target.value }))}
             inputProps={{ "data-testid": "gantt-dialog-field-parent" }}
+            MenuProps={{ PaperProps: { sx: { maxHeight: 280 } } }}
           >
             <MenuItem value="">{t.dialogFieldParentNone}</MenuItem>
             {parentOptions.map((task) => (
-              <MenuItem key={task.id} value={task.id}>
+              <MenuItem key={task.id} value={task.id} sx={{ minWidth: 0 }}>
                 <Box
                   sx={{
                     display: "flex",
                     alignItems: "center",
                     pl: task.depth * 2,
                     gap: 0.75,
+                    minWidth: 0,
                     width: "100%",
+                    overflow: "hidden",
                   }}
                 >
                   {task.depth > 0 && (
@@ -266,9 +292,7 @@ export function GanttTaskDialog({
                       {"└"}
                     </Typography>
                   )}
-                  <Typography variant="body2" noWrap>
-                    {task.name}
-                  </Typography>
+                  <OverflowTooltip label={task.name} />
                 </Box>
               </MenuItem>
             ))}

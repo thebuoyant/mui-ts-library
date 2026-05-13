@@ -1,4 +1,4 @@
-import { useId, useMemo } from "react";
+import { useEffect, useId, useMemo } from "react";
 import { type RefObject, type UIEventHandler } from "react";
 import { Box, useTheme } from "@mui/material";
 import { useGanttChartStore, useGanttTranslations } from "./GanttChart";
@@ -222,6 +222,13 @@ export function GanttTimeline({
     return ((now - start) / (end - start)) * totalWidth;
   }, [displayRange, totalWidth]);
 
+  // Beim ersten Rendern den heutigen Tag horizontal in die Mitte scrollen.
+  useEffect(() => {
+    if (todayX === null || !scrollRef.current) return;
+    const viewportWidth = scrollRef.current.clientWidth;
+    scrollRef.current.scrollLeft = Math.max(0, todayX - viewportWidth / 2);
+  }, []);  // eslint-disable-line react-hooks/exhaustive-deps
+
   const gridColumnWidth =
     timeScale === "days"
       ? COLUMN_WIDTH_DAY
@@ -370,7 +377,7 @@ export function GanttTimeline({
                 y1={0}
                 x2={todayX}
                 y2={visibleTasks.length * ROW_HEIGHT}
-                stroke={theme.palette.error.main}
+                stroke={theme.palette.primary.main}
                 strokeWidth={1.5}
                 strokeDasharray="4 2"
               />

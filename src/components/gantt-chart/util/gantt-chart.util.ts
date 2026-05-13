@@ -10,22 +10,26 @@ export type TimelineRange = {
 };
 
 /**
- * Berechnet den frühesten Start und das späteste Ende aller Tasks.
- * Liefert einen Puffer von einem Monat auf jeder Seite, damit Balken
- * nie bündig am Rand der Timeline kleben.
+ * Standardbereich = aktuelles Quartal. Hat der Task-Set Daten außerhalb dieses Quartals,
+ * wird der Bereich auf beiden Seiten mit einem Monat Puffer erweitert — er wird nie verkleinert.
  */
 export function getTimelineRange(tasks: GanttTask[]): TimelineRange {
+  const now = new Date();
+  const quarterStart = startOfQuarter(now);
+  const quarterEnd = endOfQuarter(now);
+
   if (tasks.length === 0) {
-    const now = new Date();
-    return { start: startOfMonth(now), end: addMonths(now, 3) };
+    return { start: quarterStart, end: quarterEnd };
   }
 
   const starts = tasks.map((t) => t.startDate.getTime());
   const ends = tasks.map((t) => t.endDate.getTime());
+  const taskStart = startOfMonth(addMonths(new Date(Math.min(...starts)), -1));
+  const taskEnd = endOfMonth(addMonths(new Date(Math.max(...ends)), 1));
 
   return {
-    start: startOfMonth(addMonths(new Date(Math.min(...starts)), -1)),
-    end: endOfMonth(addMonths(new Date(Math.max(...ends)), 1)),
+    start: taskStart < quarterStart ? taskStart : quarterStart,
+    end: taskEnd > quarterEnd ? taskEnd : quarterEnd,
   };
 }
 

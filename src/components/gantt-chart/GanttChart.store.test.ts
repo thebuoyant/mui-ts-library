@@ -195,6 +195,41 @@ describe("createGanttChartStore", () => {
     expect(store.getState().taskTree[0].children).toHaveLength(0);
   });
 
+  it("Should expand the timeline range when a task is added outside the current range", () => {
+    const store = createGanttChartStore(tasks);
+    // Aktueller Bereich: ca. Dez 2024 – Mai 2025 (auto-berechnet aus tasks)
+    const rangeBefore = store.getState().timelineRange;
+
+    const futureTask: GanttTask = {
+      id: "future",
+      name: "Future Task",
+      status: "planned",
+      startDate: new Date("2027-03-01"),
+      endDate: new Date("2027-05-31"),
+    };
+    store.getState().addTask(futureTask);
+
+    const rangeAfter = store.getState().timelineRange;
+    expect(rangeAfter.end > rangeBefore.end).toBe(true);
+    expect(rangeAfter.end.getFullYear()).toBe(2027);
+  });
+
+  it("Should expand the timeline range when a task is updated to dates outside the current range", () => {
+    const store = createGanttChartStore(tasks);
+    const rangeBefore = store.getState().timelineRange;
+
+    const updatedTask: GanttTask = {
+      ...tasks[0],
+      startDate: new Date("2023-06-01"),
+      endDate: new Date("2023-12-31"),
+    };
+    store.getState().updateTask(updatedTask);
+
+    const rangeAfter = store.getState().timelineRange;
+    expect(rangeAfter.start < rangeBefore.start).toBe(true);
+    expect(rangeAfter.start.getFullYear()).toBe(2023);
+  });
+
   it("Should not overwrite a custom range when setTasks is called", () => {
     const store = createGanttChartStore(tasks);
     const customRange = { start: new Date("2024-01-01"), end: new Date("2026-12-31") };

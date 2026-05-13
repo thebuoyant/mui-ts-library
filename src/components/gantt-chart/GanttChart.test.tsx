@@ -524,7 +524,14 @@ describe("GanttChart — today line", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2030-06-01"));
 
-    render(<GanttChart tasks={tasks} />);
+    // Expliziten Bereich setzen damit getTimelineRange das heutige Quartal nicht einschließt.
+    render(
+      <GanttChart
+        tasks={tasks}
+        defaultRangeStart={new Date("2025-01-01")}
+        defaultRangeEnd={new Date("2025-06-30")}
+      />,
+    );
 
     expect(screen.queryByTestId("gantt-today-line")).not.toBeInTheDocument();
 
