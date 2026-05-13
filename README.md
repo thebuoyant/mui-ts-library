@@ -1,6 +1,6 @@
 # mui-ts-library
 
-A type-safe React component library built with **TypeScript** and **MUI (Material UI)**. Components are designed as standalone additions to MUI — they follow MUI's design language, support theming out of the box, and ship with full TypeScript types, Storybook stories, and unit tests.
+A type-safe React component library built with **TypeScript** and **MUI (Material UI v7)**. Components are designed as standalone additions to MUI — they follow MUI's design language, support theming out of the box, and ship with full TypeScript types, Storybook stories, and unit tests.
 
 ---
 
@@ -10,9 +10,13 @@ A type-safe React component library built with **TypeScript** and **MUI (Materia
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Usage](#usage)
+  - [GanttChart](#gantchart)
   - [TagSelection](#tagselection)
   - [PasswordStrengthMeter](#passwordstrengthmeter)
 - [Props Reference](#props-reference)
+  - [GanttChart Props](#ganttchart-props)
+  - [GanttTask](#gantttask)
+  - [GanttTranslations](#gannttranslations)
   - [TagSelection Props](#tagselection-props)
   - [TagSelectionItem](#tagselectionitem)
   - [PasswordStrengthMeter Props](#passwordstrengthmeter-props)
@@ -20,17 +24,7 @@ A type-safe React component library built with **TypeScript** and **MUI (Materia
   - [Translations](#translations)
   - [Colors & Theming](#colors--theming)
 - [Development](#development)
-  - [Local Setup](#local-setup)
-  - [Storybook](#storybook)
-  - [Tests](#tests)
-  - [Coverage](#coverage)
 - [Publishing to npm](#publishing-to-npm)
-  - [1. Prepare package.json](#1-prepare-packagejson)
-  - [2. Versioning (SemVer)](#2-versioning-semver)
-  - [3. Build](#3-build)
-  - [4. Dry Run](#4-dry-run)
-  - [5. Publish](#5-publish)
-  - [6. Automate with GitHub Actions](#6-automate-with-github-actions)
 - [License](#license)
 
 ---
@@ -39,8 +33,9 @@ A type-safe React component library built with **TypeScript** and **MUI (Materia
 
 | Component | Description |
 |---|---|
+| `GanttChart` | Interactive project timeline with hierarchical tasks, milestones, dependencies, drag-to-scroll, built-in CRUD dialogs, and live today-line |
 | `TagSelection` | Multi-tag picker with search autocomplete, chip display, and full callback API |
-| `PasswordStrengthMeter` | Password input with live strength scoring, animated meter, and requirements summary |
+| `PasswordStrengthMeter` | Password input with live strength scoring, animated meter, and requirements checklist |
 
 ---
 
@@ -55,6 +50,7 @@ react-dom >= 19
 @emotion/react >= 11
 @emotion/styled >= 11
 @mui/icons-material >= 7
+zustand >= 5
 ```
 
 ---
@@ -80,6 +76,119 @@ pnpm add mui-ts-library
 
 Wrap your app in MUI's `ThemeProvider` as usual. No additional provider is needed for this library.
 
+---
+
+### GanttChart
+
+A full-featured project timeline component with hierarchical tasks, milestones, dependency arrows, progress tracking, and built-in CRUD dialogs.
+
+```tsx
+import { GanttChart } from 'mui-ts-library';
+import type { GanttTask } from 'mui-ts-library';
+
+const tasks: GanttTask[] = [
+  {
+    id: 'project',
+    name: 'My Project',
+    status: 'in-progress',
+    startDate: new Date('2026-03-01'),
+    endDate: new Date('2026-06-30'),
+  },
+  {
+    id: 'phase-1',
+    parentId: 'project',
+    name: 'Phase 1 — Backend',
+    status: 'done',
+    startDate: new Date('2026-03-01'),
+    endDate: new Date('2026-04-30'),
+    progress: 100,
+  },
+  {
+    id: 'phase-2',
+    parentId: 'project',
+    name: 'Phase 2 — Frontend',
+    status: 'in-progress',
+    startDate: new Date('2026-05-01'),
+    endDate: new Date('2026-06-30'),
+    progress: 40,
+    dependencies: ['phase-1'],
+  },
+  {
+    id: 'go-live',
+    parentId: 'project',
+    name: 'Go-Live',
+    status: 'planned',
+    startDate: new Date('2026-06-30'),
+    endDate: new Date('2026-06-30'),
+    isMilestone: true,
+    dependencies: ['phase-2'],
+  },
+];
+
+function App() {
+  return (
+    <GanttChart
+      tasks={tasks}
+      timeScale="months"
+      height={500}
+      onTaskCreated={(task) => console.log('Created:', task)}
+      onTaskUpdated={(task) => console.log('Updated:', task)}
+      onTaskDeleted={(id) => console.log('Deleted:', id)}
+      onTasksChange={(all) => console.log('All tasks:', all)}
+    />
+  );
+}
+```
+
+**With external CRUD control (`enableBuiltinDialogs={false}`):**
+
+```tsx
+<GanttChart
+  tasks={tasks}
+  enableBuiltinDialogs={false}
+  onAddTask={(parentTask) => openMyDialog({ parentId: parentTask?.id })}
+  onEditTask={(task) => openMyDialog(task)}
+  onDeleteTask={(task) => confirmAndDelete(task.id)}
+  onTaskClick={(task) => console.log('Clicked:', task.name)}
+  onMilestoneClick={(task) => console.log('Milestone:', task.name)}
+/>
+```
+
+**With custom date range and English translations:**
+
+```tsx
+import type { GanttTranslations } from 'mui-ts-library';
+
+const EN: Partial<GanttTranslations> = {
+  scaleDays: 'Days',
+  scaleWeeks: 'Weeks',
+  scaleMonths: 'Months',
+  scaleQuarters: 'Quarters',
+  rangeFrom: 'From',
+  rangeTo: 'To',
+  weekColumnPrefix: 'W',
+  dateLocale: 'en-US',
+  dialogAddTitle: 'Add Task',
+  dialogEditTitle: 'Edit Task',
+  statusPlanned: 'Planned',
+  statusInProgress: 'In Progress',
+  statusDone: 'Done',
+  statusBlocked: 'Blocked',
+};
+
+<GanttChart
+  tasks={tasks}
+  timeScale="quarters"
+  defaultRangeStart={new Date('2026-01-01')}
+  defaultRangeEnd={new Date('2026-12-31')}
+  translations={EN}
+  height="auto"
+  width="auto"
+/>
+```
+
+---
+
 ### TagSelection
 
 ```tsx
@@ -96,15 +205,9 @@ function App() {
   return (
     <TagSelection
       tags={tags}
-      onTagSelect={(tag, selectedTags, allTags) => {
-        console.log('Selected:', tag.label);
-      }}
-      onTagDelete={(tag, selectedTags, allTags) => {
-        console.log('Removed:', tag.label);
-      }}
-      onTagsChange={(selectedTags, allTags) => {
-        console.log('Current selection:', selectedTags.map(t => t.label));
-      }}
+      onTagSelect={(tag, selectedTags) => console.log('Selected:', tag.label)}
+      onTagDelete={(tag, selectedTags) => console.log('Removed:', tag.label)}
+      onTagsChange={(selectedTags) => console.log('Selection:', selectedTags)}
     />
   );
 }
@@ -138,14 +241,12 @@ import { PasswordStrengthMeter } from 'mui-ts-library';
 import type { StrengthResult } from 'mui-ts-library';
 
 function App() {
-  const handlePasswordChange = (password: string, result: StrengthResult) => {
-    console.log(`Score: ${result.score}/4 — ${result.meterStatus}`);
-  };
-
   return (
     <PasswordStrengthMeter
       passwordMinLength={10}
-      onPasswordChange={handlePasswordChange}
+      onPasswordChange={(password, result: StrengthResult) => {
+        console.log(`Score: ${result.score}/4 — ${result.meterStatus}`);
+      }}
     />
   );
 }
@@ -164,6 +265,97 @@ function App() {
 
 ## Props Reference
 
+### GanttChart Props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `tasks` | `GanttTask[]` | — | **Required.** Full flat list of tasks (hierarchy is derived via `parentId`). |
+| `timeScale` | `"days" \| "weeks" \| "months" \| "quarters"` | `"months"` | Initial time scale of the timeline. |
+| `height` | `number \| string \| "auto"` | `400` | Chart height. `"auto"` fills the parent container. |
+| `width` | `number \| string \| "auto"` | `"100%"` | Chart width. `"auto"` fills the parent container. |
+| `initialExpandAll` | `boolean` | `false` | Expand all nodes on mount instead of only root tasks. |
+| `showToolbar` | `boolean` | `true` | Show/hide the scale switcher and date-range toolbar. |
+| `defaultRangeStart` | `Date` | current quarter | Overrides the auto-computed start of the visible range. |
+| `defaultRangeEnd` | `Date` | current quarter | Overrides the auto-computed end of the visible range. |
+| `translations` | `Partial<GanttTranslations>` | German defaults | Override individual display strings for i18n (see [Translations](#translations)). |
+| `minPanelWidth` | `number` | `200` | Minimum width of the left task panel in pixels. |
+| `maxPanelWidth` | `number` | `600` | Maximum width of the left task panel in pixels. |
+| `enableBuiltinDialogs` | `boolean` | `true` | When `true`, Add/Edit/Delete icons open MUI dialogs and update the internal store. When `false`, callbacks are invoked directly instead. |
+| `onTaskClick` | `(task: GanttTask) => void` | — | Called when a task bar is clicked. |
+| `onMilestoneClick` | `(task: GanttTask) => void` | — | Called when a milestone diamond is clicked. |
+| `onAddTask` | `(parentTask?: GanttTask) => void` | — | Called when the Add icon is clicked (`enableBuiltinDialogs=false` only). |
+| `onEditTask` | `(task: GanttTask) => void` | — | Called when the Edit icon is clicked (`enableBuiltinDialogs=false` only). |
+| `onDeleteTask` | `(task: GanttTask) => void` | — | Called when the Delete icon is clicked (`enableBuiltinDialogs=false` only). |
+| `onStatusChange` | `(task: GanttTask, status: GanttTaskStatus) => void` | — | Called when a task status changes. |
+| `onTasksChange` | `(tasks: GanttTask[]) => void` | — | Called after every CRUD operation with the full updated task list. |
+| `onTaskCreated` | `(task: GanttTask) => void` | — | Called after a task is created via the built-in dialog (includes generated UUID). |
+| `onTaskUpdated` | `(task: GanttTask) => void` | — | Called after a task is updated via the built-in dialog. |
+| `onTaskDeleted` | `(taskId: string) => void` | — | Called after a task (and all its descendants) are deleted via the built-in dialog. |
+
+### GanttTask
+
+```ts
+type GanttTask = {
+  id: string;                   // Unique identifier (also used as React key and for dependencies)
+  parentId?: string;            // Omit for root tasks
+  name: string;
+  status: 'planned' | 'in-progress' | 'done' | 'blocked';
+  startDate: Date;
+  endDate: Date;
+  dependencies?: string[];      // IDs of predecessor tasks (Finish-to-Start arrows)
+  isMilestone?: boolean;        // Renders as a diamond; startDate ≈ endDate
+  progress?: number;            // 0–100, renders a semi-transparent overlay bar
+};
+```
+
+### GanttTranslations
+
+All UI strings can be overridden via the `translations` prop. Only pass the keys you want to change — all others fall back to the built-in German defaults.
+
+```ts
+type GanttTranslations = {
+  // Toolbar — scale buttons
+  scaleDays: string;            // Default: "Tage"
+  scaleWeeks: string;           // Default: "Wochen"
+  scaleMonths: string;          // Default: "Monate"
+  scaleQuarters: string;        // Default: "Quartale"
+  // Toolbar — date range
+  rangeFrom: string;            // Default: "Von"
+  rangeTo: string;              // Default: "Bis"
+  rangeResetTooltip: string;    // Default: "Bereich zurücksetzen"
+  // Panel headers
+  columnName: string;           // Default: "Name"
+  columnStatus: string;         // Default: "Status"
+  // Status chip labels
+  statusPlanned: string;        // Default: "Planned"
+  statusInProgress: string;     // Default: "In Progress"
+  statusDone: string;           // Default: "Done"
+  statusBlocked: string;        // Default: "Blocked"
+  // Timeline
+  weekColumnPrefix: string;     // Default: "KW"  (use "W" for English)
+  dateLocale: string;           // Default: "de-DE"
+  // Dialog titles and buttons
+  dialogAddTitle: string;
+  dialogEditTitle: string;
+  dialogDeleteTitle: string;
+  dialogSave: string;
+  dialogCancel: string;
+  dialogDelete: string;
+  // Dialog form field labels
+  dialogFieldName: string;
+  dialogFieldStartDate: string;
+  dialogFieldEndDate: string;
+  dialogFieldStatus: string;
+  dialogFieldMilestone: string;
+  dialogFieldParent: string;
+  dialogFieldParentNone: string;
+  // Delete confirmation ({name} is replaced by the task name)
+  dialogDeleteConfirm: string;
+};
+```
+
+---
+
 ### TagSelection Props
 
 | Prop | Type | Default | Description |
@@ -181,15 +373,14 @@ function App() {
 | `onTagDelete` | `(tag, selectedTags, allTags) => void` | — | Called when a tag is removed. |
 | `onTagsChange` | `(selectedTags, allTags) => void` | — | Called after every selection change. |
 | `onSearchChange` | `(searchValue: string) => void` | — | Called when the search input changes. |
-| `onDetailsToggle` | `(expanded: boolean) => void` | — | Reserved for a future "show all tags" panel. |
 
 ### TagSelectionItem
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `id` | `string` | Yes | Unique identifier used as React key and for store operations. |
+| `id` | `string` | Yes | Unique identifier. |
 | `label` | `string` | Yes | Display text of the tag. |
-| `selected` | `boolean` | No | Pre-selected state (e.g. for initial load). |
+| `selected` | `boolean` | No | Pre-selected on initial render. |
 | `disabled` | `boolean` | No | Prevents selection and deletion. |
 | `foregroundColor` | `string` | No | Text color of the chip. |
 | `backgroundColor` | `string` | No | Background and border color of the chip. |
@@ -208,8 +399,8 @@ function App() {
 | `inputSize` | `"small" \| "medium"` | `"medium"` | Size of the password input field. |
 | `passwordMinLength` | `number` | `8` | Minimum required password length. |
 | `translation` | `PasswordStrengthMeterTranslation` | English defaults | All display texts (see [Translations](#translations)). |
-| `meterColors` | `MeterColors` | Red → Green | Colors for each of the four strength levels. |
-| `checkColors` | `CheckColors` | Red / Green | Colors for the fulfilled/unfulfilled icons. |
+| `meterColors` | `MeterColors` | Red → Green gradient | Colors for each of the four strength levels. |
+| `checkColors` | `CheckColors` | Red / Green | Colors for the fulfilled/unfulfilled requirement icons. |
 | `onPasswordChange` | `(password, result: StrengthResult) => void` | — | Called on every keystroke with the current password and strength result. |
 
 **`StrengthResult` shape:**
@@ -217,7 +408,7 @@ function App() {
 ```ts
 type StrengthResult = {
   score: 0 | 1 | 2 | 3 | 4;
-  percent: number;           // 0, 25, 50, 75, or 100
+  percent: number;            // 0, 25, 50, 75, or 100
   meterStatus: 'weak' | 'ok' | 'good' | 'very good';
   length: number;
   hasLower: boolean;
@@ -233,9 +424,48 @@ type StrengthResult = {
 
 ### Translations
 
-Both components accept a `translation` prop for full i18n support without any external library.
+All three components support full i18n without any external library. Pass only the keys you want to override.
 
-**TagSelection (German example):**
+**GanttChart — English:**
+
+```tsx
+<GanttChart
+  tasks={tasks}
+  translations={{
+    scaleDays: 'Days',
+    scaleWeeks: 'Weeks',
+    scaleMonths: 'Months',
+    scaleQuarters: 'Quarters',
+    rangeFrom: 'From',
+    rangeTo: 'To',
+    rangeResetTooltip: 'Reset range',
+    weekColumnPrefix: 'W',
+    dateLocale: 'en-US',
+    columnName: 'Name',
+    columnStatus: 'Status',
+    statusPlanned: 'Planned',
+    statusInProgress: 'In Progress',
+    statusDone: 'Done',
+    statusBlocked: 'Blocked',
+    dialogAddTitle: 'Add Task',
+    dialogEditTitle: 'Edit Task',
+    dialogDeleteTitle: 'Delete Task',
+    dialogSave: 'Save',
+    dialogCancel: 'Cancel',
+    dialogDelete: 'Delete',
+    dialogFieldName: 'Name',
+    dialogFieldStartDate: 'Start Date',
+    dialogFieldEndDate: 'End Date',
+    dialogFieldStatus: 'Status',
+    dialogFieldMilestone: 'Is Milestone',
+    dialogFieldParent: 'Parent Task',
+    dialogFieldParentNone: '— None —',
+    dialogDeleteConfirm: 'Delete task "{name}"?',
+  }}
+/>
+```
+
+**TagSelection — German:**
 
 ```tsx
 <TagSelection
@@ -243,7 +473,6 @@ Both components accept a `translation` prop for full i18n support without any ex
   translation={{
     selectedTagsLabel:   'Ausgewählte Tags',
     autoCompleteLabel:   'Tags suchen und hinzufügen',
-    detailsLabel:        'Alle Tags',
     noSelectedTagsText:  'Keine Tags ausgewählt.',
     noAvailableTagsText: 'Keine Tags verfügbar.',
     placeholder:         'Suchen...',
@@ -251,7 +480,7 @@ Both components accept a `translation` prop for full i18n support without any ex
 />
 ```
 
-**PasswordStrengthMeter (German example):**
+**PasswordStrengthMeter — German:**
 
 ```tsx
 <PasswordStrengthMeter
@@ -271,7 +500,7 @@ Both components accept a `translation` prop for full i18n support without any ex
 
 ### Colors & Theming
 
-Both components use MUI's theme system wherever possible (e.g. `color="text.secondary"`, `borderColor: "divider"`). Custom colors can be passed via props:
+All components use MUI's theme system wherever possible (`color="text.secondary"`, `borderColor: "divider"`, etc.) and automatically adapt to light and dark mode. Custom colors can be passed via props where supported:
 
 ```tsx
 <PasswordStrengthMeter
@@ -308,7 +537,7 @@ npm run dev
 
 ### Storybook
 
-Storybook is used to develop and document components in isolation.
+Each component ships with Storybook stories covering all major use cases.
 
 ```bash
 # Start Storybook dev server (http://localhost:6006)
@@ -323,10 +552,10 @@ npm run build-storybook
 Tests are written with [Vitest](https://vitest.dev/) and [@testing-library/react](https://testing-library.com/docs/react-testing-library/intro/).
 
 ```bash
-# Run tests in watch mode (re-runs on file changes)
+# Run tests in watch mode
 npm run test
 
-# Run tests once (e.g. in CI)
+# Run tests once (CI)
 npm run test:run
 ```
 
@@ -336,19 +565,15 @@ npm run test:run
 npm run test:coverage
 ```
 
-Coverage reports are generated in `./coverage/`. Open `coverage/index.html` in your browser to view the full report.
-
-Coverage is configured to include all component source files (`src/components/**/*.{ts,tsx}`) and automatically excludes stories and type-only files.
+Coverage reports are generated in `./coverage/`. Open `coverage/index.html` to view the full report. Coverage is configured to include all component source files (`src/components/**/*.{ts,tsx}`) and excludes stories and type-only files.
 
 ---
 
 ## Publishing to npm
 
-This section explains how to publish the library to the npm registry. The steps apply whether you publish manually or through a CI/CD pipeline.
-
 ### 1. Prepare package.json
 
-Before the first publish, update `package.json` with the fields npm requires:
+Before the first publish, update `package.json`:
 
 ```json
 {
@@ -368,70 +593,39 @@ Before the first publish, update `package.json` with the fields npm requires:
   },
   "files": ["dist"],
   "sideEffects": false,
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/your-org/mui-ts-library.git"
-  }
+  "license": "MIT"
 }
 ```
 
-> **`"files": ["dist"]`** restricts what npm uploads — only the built output. Source files and dev configs are excluded automatically.
-
 ### 2. Versioning (SemVer)
 
-This library follows [Semantic Versioning](https://semver.org/):
-
-| Change type | Version bump | Example |
+| Change type | Bump | Example |
 |---|---|---|
 | Bug fix, non-breaking improvement | **Patch** | `1.0.0` → `1.0.1` |
 | New feature, backwards compatible | **Minor** | `1.0.0` → `1.1.0` |
-| Breaking change in public API | **Major** | `1.0.0` → `2.0.0` |
-
-Use npm to bump the version and create a git tag in one step:
+| Breaking API change | **Major** | `1.0.0` → `2.0.0` |
 
 ```bash
-npm version patch   # or minor, or major
+npm version patch   # or minor / major
 ```
 
-### 3. Build
-
-Always build before publishing so `dist/` reflects the latest source:
+### 3. Build & Publish
 
 ```bash
+# Always build before publishing
 npm run build
-```
 
-This runs TypeScript compilation (`tsc`) followed by Vite's library build. Output is placed in `dist/`.
-
-### 4. Dry Run
-
-Inspect exactly which files will be uploaded to npm without publishing:
-
-```bash
+# Inspect what will be uploaded (no actual publish)
 npm pack --dry-run
-```
 
-Review the output carefully. If unexpected files appear, restrict them via the `files` field in `package.json` or an `.npmignore` file.
-
-### 5. Publish
-
-```bash
-# Log in to npm (one-time setup, opens browser)
+# Publish
 npm login
-
-# Publish a public scoped package
 npm publish --access public
-
-# Publish an unscoped package
-npm publish
 ```
 
-> **Tip:** Pass `--access public` on the first publish of a scoped package (e.g. `@your-org/...`) unless it is intentionally private.
+### 4. Automate with GitHub Actions
 
-### 6. Automate with GitHub Actions
-
-Create `.github/workflows/publish.yml` to publish automatically when a version tag is pushed:
+Create `.github/workflows/publish.yml`:
 
 ```yaml
 name: Publish to npm
@@ -446,45 +640,30 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write   # required for npm provenance attestation
+      id-token: write
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run tests
-        run: npm run test:run
-
-      - name: Build
-        run: npm run build
-
-      - name: Publish
-        run: npm publish --access public --provenance
+      - run: npm ci
+      - run: npm run test:run
+      - run: npm run build
+      - run: npm publish --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 ```
 
-**Setup steps:**
-
-1. Generate an npm access token at [npmjs.com → Access Tokens → Generate New Token (Automation)](https://www.npmjs.com/settings/~/tokens)
-2. Add it to your GitHub repository: **Settings → Secrets and variables → Actions → New repository secret** → name it `NPM_TOKEN`
-3. Push a version tag to trigger the workflow:
+Add your npm automation token as `NPM_TOKEN` in **GitHub → Settings → Secrets → Actions**, then trigger a publish:
 
 ```bash
 npm version minor
 git push origin main --tags
 ```
-
-The workflow runs tests and build before publishing — a failed test will abort the publish automatically.
 
 ---
 
