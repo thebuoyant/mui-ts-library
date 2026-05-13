@@ -429,6 +429,38 @@ describe("GanttChart — enableBuiltinDialogs", () => {
     const endDateInput = screen.getByTestId("gantt-dialog-field-end") as HTMLInputElement;
     expect(endDateInput).toBeDisabled();
   });
+
+  it("auto-advances end date when start date is changed to be after end date", () => {
+    render(<GanttChart tasks={tasks} enableBuiltinDialogs />);
+
+    fireEvent.click(screen.getByTestId("gantt-add-task-root"));
+
+    const startInput = screen.getByTestId("gantt-dialog-field-start") as HTMLInputElement;
+    const endInput = screen.getByTestId("gantt-dialog-field-end") as HTMLInputElement;
+
+    // First pin start to an early date so end can be set to a later date.
+    fireEvent.change(startInput, { target: { value: "2025-02-01" } });
+    fireEvent.change(endInput, { target: { value: "2025-02-15" } });
+    // Now advance start past end — end should follow.
+    fireEvent.change(startInput, { target: { value: "2025-02-20" } });
+
+    expect(startInput.value).toBe("2025-02-20");
+    expect(endInput.value).toBe("2025-02-20");
+  });
+
+  it("clamps end date to start date when end date is changed to be before start date", () => {
+    render(<GanttChart tasks={tasks} enableBuiltinDialogs />);
+
+    fireEvent.click(screen.getByTestId("gantt-add-task-root"));
+
+    const startInput = screen.getByTestId("gantt-dialog-field-start") as HTMLInputElement;
+    const endInput = screen.getByTestId("gantt-dialog-field-end") as HTMLInputElement;
+
+    fireEvent.change(startInput, { target: { value: "2025-05-01" } });
+    fireEvent.change(endInput, { target: { value: "2025-04-01" } });
+
+    expect(endInput.value).toBe("2025-05-01");
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -585,6 +617,50 @@ describe("GanttChart — dependency arrows", () => {
 // ---------------------------------------------------------------------------
 // Phase 11 — Split-Pane, tabular layout, onTasksChange, onEditTask
 // ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// Timeline clipping — Tasks außerhalb des sichtbaren Bereichs
+// ---------------------------------------------------------------------------
+
+describe("GanttChart — timeline clipping", () => {
+  it("does not render a bar for a task entirely outside the timeline range", () => {
+    render(
+      <GanttChart
+        tasks={[{
+          id: "future",
+          name: "Far Future",
+          status: "planned",
+          startDate: new Date("2030-01-01"),
+          endDate: new Date("2030-06-30"),
+        }]}
+        defaultRangeStart={new Date("2025-01-01")}
+        defaultRangeEnd={new Date("2025-12-31")}
+      />,
+    );
+    expect(screen.queryByTestId("gantt-bar-future")).not.toBeInTheDocument();
+    // Zeile im Timeline soll trotzdem gerendert werden (Gridlinien + Border)
+    expect(screen.getByTestId("gantt-bar-row-future")).toBeInTheDocument();
+  });
+
+  it("does not render a milestone outside the timeline range", () => {
+    render(
+      <GanttChart
+        tasks={[{
+          id: "ms-far",
+          name: "Far Milestone",
+          status: "planned",
+          startDate: new Date("2030-06-01"),
+          endDate: new Date("2030-06-01"),
+          isMilestone: true,
+        }]}
+        defaultRangeStart={new Date("2025-01-01")}
+        defaultRangeEnd={new Date("2025-12-31")}
+      />,
+    );
+    expect(screen.queryByTestId("gantt-milestone-ms-far")).not.toBeInTheDocument();
+    expect(screen.getByTestId("gantt-bar-row-ms-far")).toBeInTheDocument();
+  });
+});
 
 describe("GanttChart — split pane", () => {
   it("renders the resize divider between panel and timeline", () => {

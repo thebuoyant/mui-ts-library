@@ -28,7 +28,7 @@ React 19, TypeScript 5.9, MUI v7, Zustand v5, Vite 8, Vitest 4, Storybook 10
 
 ---
 
-## Aktueller Stand: Phasen 1–11 abgeschlossen ✅ (158 Tests grün)
+## Aktueller Stand: Phasen 1–11 + Fixes abgeschlossen ✅ (162 Tests grün)
 
 ### Alle vorhandenen Dateien
 
@@ -287,7 +287,7 @@ onTasksChange?.(rawStore.getState().tasks); // synchron — Zustand-set ist sync
 
 ---
 
-## Phase 11 — Tabellarisches Layout + Split-Pane + onTasksChange + onEditTask ✅ abgeschlossen
+## Phase 11 + Fixes ✅ abgeschlossen (162 Tests)
 
 ### Implementiertes Verhalten
 
@@ -303,6 +303,18 @@ onTasksChange?.(rawStore.getState().tasks); // synchron — Zustand-set ist sync
 export function useRawGanttChartStore(): GanttChartStore
 ```
 
+### Fixes nach Phase 11
+
+- **Timeline-Clipping**: Balken und Meilensteine außerhalb der `displayRange` werden nicht mehr gerendert → `position: absolute`-Elemente dehnen den Scroll-Bereich nicht mehr aus
+- **GanttTaskDialog — Default-Datum**: Neues Standard-Datum = `clampDate(new Date(), range.start, range.end)` → neue Tasks liegen immer im sichtbaren Bereich
+- **GanttTaskDialog — Parent-Dropdown**: Flache Liste → DFS-Baum-Reihenfolge mit `depth`-Einzug (`└`-Symbol), eigene ID + alle Nachkommen im Edit-Modus ausgeschlossen
+- **Storybook**: Alle Callbacks als `fn()` aus `storybook/test` in meta `args` → erscheinen im Actions-Tab; `minPanelWidth: 200` / `maxPanelWidth: 600` als Defaults sichtbar
+- **GanttTaskDialog — End-Datum-Validierung**: End-Datum kann nicht mehr vor Start-Datum gesetzt werden:
+  - `handleStartDateChange`: advances `endDate` auf `startDate` wenn `endDate < startDate` (oder Meilenstein)
+  - `handleEndDateChange`: klemmt `endDate` auf `startDate` wenn der neue Wert < `startDate`
+  - `inputProps.min = form.startDate` auf dem End-Datum-Feld (Browser-Level-Constraint)
+  - `isValid` prüft zusätzlich `form.endDate >= form.startDate`
+
 ---
 
 ## So starten wir die nächste Session
@@ -310,5 +322,5 @@ export function useRawGanttChartStore(): GanttChartStore
 ```
 Bitte lies zuerst die claude-gantt-kickoff.md im Root des Projekts.
 Dann besprechen wir Phase 12.
-158 Tests müssen nach den Änderungen grün bleiben.
+162 Tests müssen nach den Änderungen grün bleiben.
 ```

@@ -1,5 +1,6 @@
-import { useEffect, useState, type InputHTMLAttributes } from "react";
+import { useEffect, useMemo, useState, type InputHTMLAttributes } from "react";
 import {
+  Box,
   Button,
   Checkbox,
   Dialog,
@@ -12,9 +13,10 @@ import {
   MenuItem,
   Select,
   TextField,
+  Typography,
 } from "@mui/material";
 import { useGanttChartStore, useGanttTranslations } from "./GanttChart";
-import type { GanttTask, GanttTaskStatus } from "./GanttChart.types";
+import type { GanttTask, GanttTaskNode, GanttTaskStatus } from "./GanttChart.types";
 
 type TaskFormState = {
   name: string;
@@ -27,6 +29,17 @@ type TaskFormState = {
 
 function toDateString(date: Date): string {
   return date.toISOString().slice(0, 10);
+}
+
+function clampDate(date: Date, start: Date, end: Date): Date {
+  if (date < start) return start;
+  if (date > end) return end;
+  return date;
+}
+
+// DFS-Traversal des Task-Baums — liefert Tasks in Anzeigereihenfolge mit depth-Info.
+function flattenTree(nodes: GanttTaskNode[]): GanttTaskNode[] {
+  return nodes.flatMap((n) => [n, ...flattenTree(n.children)]);
 }
 
 type GanttTaskDialogProps = {
@@ -47,12 +60,30 @@ export function GanttTaskDialog({
   onClose,
 }: GanttTaskDialogProps) {
   const t = useGanttTranslations();
-  const tasks = useGanttChartStore((s) => s.tasks);
+  const taskTree = useGanttChartStore((s) => s.taskTree);
+  const timelineRange = useGanttChartStore((s) => s.timelineRange);
+
+  // Task-Liste in Baum-Reihenfolge (DFS) für die übergeordnete-Aufgabe-Auswahl.
+  const flattenedTasks = useMemo(() => flattenTree(taskTree), [taskTree]);
+
+  // Im Edit-Modus: aktuellen Task + alle Nachkommen ausschließen (verhindert zirkuläre Hierarchie).
+  const excludedIds = useMemo(() => {
+    if (mode === "add" || !initialTask) return new Set<string>();
+    const collect = (node: GanttTaskNode): string[] => [node.id, ...node.children.flatMap(collect)];
+    const node = flattenedTasks.find((n) => n.id === initialTask.id);
+    return new Set(node ? collect(node) : [initialTask.id]);
+  }, [mode, initialTask, flattenedTasks]);
+
+  const parentOptions = flattenedTasks.filter((n) => !excludedIds.has(n.id));
+
+  const defaultDate = toDateString(
+    clampDate(new Date(), timelineRange.start, timelineRange.end),
+  );
 
   const [form, setForm] = useState<TaskFormState>({
     name: "",
-    startDate: toDateString(new Date()),
-    endDate: toDateString(new Date()),
+    startDate: defaultDate,
+    endDate: defaultDate,
     status: "planned",
     isMilestone: false,
     parentId: "",
@@ -60,6 +91,7 @@ export function GanttTaskDialog({
 
   useEffect(() => {
     if (!open) return;
+    const clamped = toDateString(clampDate(new Date(), timelineRange.start, timelineRange.end));
     if (mode === "edit" && initialTask) {
       setForm({
         name: initialTask.name,
@@ -72,21 +104,29 @@ export function GanttTaskDialog({
     } else {
       setForm({
         name: "",
-        startDate: toDateString(new Date()),
-        endDate: toDateString(new Date()),
+        startDate: clamped,
+        endDate: clamped,
         status: "planned",
         isMilestone: false,
         parentId: defaultParentId ?? "",
       });
     }
-  }, [open, mode, initialTask, defaultParentId]);
+  }, [open, mode, initialTask, defaultParentId, timelineRange]);
 
   const handleStartDateChange = (value: string) => {
     setForm((prev) => ({
       ...prev,
       startDate: value,
-      // Bei Meilensteinen: End-Datum synchron zum Start-Datum halten.
-      endDate: prev.isMilestone ? value : prev.endDate,
+      // Bei Meilensteinen synchron; sonst sicherstellen dass End-Datum nicht vor Start-Datum liegt.
+      endDate: prev.isMilestone || prev.endDate < value ? value : prev.endDate,
+    }));
+  };
+
+  const handleEndDateChange = (value: string) => {
+    setForm((prev) => ({
+      ...prev,
+      // End-Datum darf nicht vor Start-Datum liegen — auf Start klemmen falls nötig.
+      endDate: value < prev.startDate ? prev.startDate : value,
     }));
   };
 
@@ -98,7 +138,11 @@ export function GanttTaskDialog({
     }));
   };
 
-  const isValid = form.name.trim() !== "" && form.startDate !== "" && form.endDate !== "";
+  const isValid =
+    form.name.trim() !== "" &&
+    form.startDate !== "" &&
+    form.endDate !== "" &&
+    form.endDate >= form.startDate;
 
   const handleSave = () => {
     if (!isValid) return;
@@ -121,9 +165,6 @@ export function GanttTaskDialog({
     done: t.statusDone,
     blocked: t.statusBlocked,
   };
-
-  // Im Edit-Modus: eigene ID aus der Elterntask-Liste ausschließen (verhindert zirkuläre Hierarchie).
-  const parentOptions = tasks.filter((task) => mode === "add" || task.id !== initialTask?.id);
 
   return (
     <Dialog
@@ -160,13 +201,13 @@ export function GanttTaskDialog({
           label={t.dialogFieldEndDate}
           type="date"
           value={form.endDate}
-          onChange={(e) => setForm((prev) => ({ ...prev, endDate: e.target.value }))}
+          onChange={(e) => handleEndDateChange(e.target.value)}
           required
           fullWidth
           size="small"
           disabled={form.isMilestone}
           slotProps={{ inputLabel: { shrink: true } }}
-          inputProps={{ "data-testid": "gantt-dialog-field-end" }}
+          inputProps={{ "data-testid": "gantt-dialog-field-end", min: form.startDate }}
         />
         <FormControl size="small" fullWidth>
           <InputLabel>{t.dialogFieldStatus}</InputLabel>
@@ -207,7 +248,28 @@ export function GanttTaskDialog({
             <MenuItem value="">{t.dialogFieldParentNone}</MenuItem>
             {parentOptions.map((task) => (
               <MenuItem key={task.id} value={task.id}>
-                {task.name}
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    pl: task.depth * 2,
+                    gap: 0.75,
+                    width: "100%",
+                  }}
+                >
+                  {task.depth > 0 && (
+                    <Typography
+                      component="span"
+                      variant="caption"
+                      sx={{ color: "text.disabled", lineHeight: 1, flexShrink: 0 }}
+                    >
+                      {"└"}
+                    </Typography>
+                  )}
+                  <Typography variant="body2" noWrap>
+                    {task.name}
+                  </Typography>
+                </Box>
               </MenuItem>
             ))}
           </Select>

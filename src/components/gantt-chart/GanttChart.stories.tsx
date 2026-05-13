@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
 import { Box } from "@mui/material";
 import { GanttChart } from "./GanttChart";
 import type { GanttTask, GanttTranslations } from "./GanttChart.types";
@@ -182,6 +183,19 @@ const meta: Meta<typeof GanttChart> = {
     width: "auto",
     initialExpandAll: false,
     showToolbar: true,
+    minPanelWidth: 200,
+    maxPanelWidth: 600,
+    // Alle Callbacks als fn() damit sie im Storybook-Actions-Tab erscheinen.
+    onTaskClick: fn(),
+    onMilestoneClick: fn(),
+    onAddTask: fn(),
+    onEditTask: fn(),
+    onDeleteTask: fn(),
+    onStatusChange: fn(),
+    onTasksChange: fn(),
+    onTaskCreated: fn(),
+    onTaskUpdated: fn(),
+    onTaskDeleted: fn(),
   },
   argTypes: {
     timeScale: { control: "radio", options: ["days", "weeks", "months", "quarters"] },
@@ -221,16 +235,7 @@ export const Default: Story = {
   },
   render: (args) => (
     <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
-      <GanttChart
-        {...args}
-        onTaskClick={(task) => console.log("onTaskClick", task)}
-        onMilestoneClick={(task) => console.log("onMilestoneClick", task)}
-        onStatusChange={(task, status) => console.log("onStatusChange", task, status)}
-        onTaskCreated={(task) => console.log("onTaskCreated", task)}
-        onTaskUpdated={(task) => console.log("onTaskUpdated", task)}
-        onTaskDeleted={(id) => console.log("onTaskDeleted", id)}
-        onTasksChange={(tasks) => console.log("onTasksChange", tasks)}
-      />
+      <GanttChart {...args} />
     </Box>
   ),
 };
@@ -242,7 +247,7 @@ export const WeeksScale: Story = {
   },
   render: (args) => (
     <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
-      <GanttChart {...args} onTaskClick={(task) => console.log("onTaskClick", task)} />
+      <GanttChart {...args} />
     </Box>
   ),
 };
@@ -254,7 +259,7 @@ export const QuartersScale: Story = {
   },
   render: (args) => (
     <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
-      <GanttChart {...args} onTaskClick={(task) => console.log("onTaskClick", task)} />
+      <GanttChart {...args} />
     </Box>
   ),
 };
@@ -266,7 +271,7 @@ export const DaysScale: Story = {
   },
   render: (args) => (
     <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
-      <GanttChart {...args} onTaskClick={(task) => console.log("onTaskClick", task)} />
+      <GanttChart {...args} />
     </Box>
   ),
 };
@@ -281,15 +286,7 @@ export const FullyExpanded: Story = {
   },
   render: (args) => (
     <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
-      <GanttChart
-        {...args}
-        onTaskClick={(task) => console.log("onTaskClick", task)}
-        onStatusChange={(task, status) => console.log("onStatusChange", task, status)}
-        onTaskCreated={(task) => console.log("onTaskCreated", task)}
-        onTaskUpdated={(task) => console.log("onTaskUpdated", task)}
-        onTaskDeleted={(id) => console.log("onTaskDeleted", id)}
-        onTasksChange={(tasks) => console.log("onTasksChange", tasks)}
-      />
+      <GanttChart {...args} />
     </Box>
   ),
 };
@@ -360,7 +357,7 @@ export const WithDependencies: Story = {
   },
   render: (args) => (
     <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
-      <GanttChart {...args} onTaskClick={(task) => console.log("onTaskClick", task)} />
+      <GanttChart {...args} />
     </Box>
   ),
 };
@@ -374,10 +371,7 @@ export const CustomDateRange: Story = {
   },
   render: (args) => (
     <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
-      <GanttChart
-        {...args}
-        onTaskClick={(task) => console.log("onTaskClick", task)}
-      />
+      <GanttChart {...args} />
     </Box>
   ),
 };
@@ -391,15 +385,7 @@ export const EnglishTranslations: Story = {
   },
   render: (args) => (
     <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
-      <GanttChart
-        {...args}
-        onTaskClick={(task) => console.log("onTaskClick", task)}
-        onStatusChange={(task, status) => console.log("onStatusChange", task, status)}
-        onTaskCreated={(task) => console.log("onTaskCreated", task)}
-        onTaskUpdated={(task) => console.log("onTaskUpdated", task)}
-        onTaskDeleted={(id) => console.log("onTaskDeleted", id)}
-        onTasksChange={(tasks) => console.log("onTasksChange", tasks)}
-      />
+      <GanttChart {...args} />
     </Box>
   ),
 };
@@ -412,7 +398,7 @@ export const NoToolbar: Story = {
   },
   render: (args) => (
     <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
-      <GanttChart {...args} onTaskClick={(task) => console.log("onTaskClick", task)} />
+      <GanttChart {...args} />
     </Box>
   ),
 };
@@ -486,7 +472,7 @@ export const WithProgress: Story = {
   },
   render: (args) => (
     <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
-      <GanttChart {...args} onTaskClick={(task) => console.log("onTaskClick", task)} />
+      <GanttChart {...args} />
     </Box>
   ),
 };
@@ -499,14 +485,7 @@ export const WithBuiltinDialogs: Story = {
   },
   render: (args) => (
     <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
-      <GanttChart
-        {...args}
-        onTaskCreated={(task) => console.log("onTaskCreated", task)}
-        onTaskUpdated={(task) => console.log("onTaskUpdated", task)}
-        onTaskDeleted={(id) => console.log("onTaskDeleted", id)}
-        onStatusChange={(task, status) => console.log("onStatusChange", task, status)}
-        onTasksChange={(tasks) => console.log("onTasksChange", tasks)}
-      />
+      <GanttChart {...args} />
     </Box>
   ),
 };

@@ -259,55 +259,66 @@ export function GanttTimeline({
               }}
             >
               {task.isMilestone ? (
-                <Box
-                  data-testid={`gantt-milestone-${task.id}`}
-                  sx={{
-                    position: "absolute",
-                    left: `${left}%`,
-                    top: "50%",
-                    width: 12,
-                    height: 12,
-                    bgcolor: "warning.main",
-                    transform: "translate(-50%, -50%) rotate(45deg)",
-                    cursor: onMilestoneClick ? "pointer" : "default",
-                    "&:hover": onMilestoneClick ? { opacity: 0.8 } : undefined,
-                  }}
-                  onClick={() => onMilestoneClick?.(task)}
-                />
-              ) : (
-                <Box
-                  data-testid={`gantt-bar-${task.id}`}
-                  sx={{
-                    position: "absolute",
-                    left: `${left}%`,
-                    width: `${Math.max(width, 0.5)}%`,
-                    height: BAR_HEIGHT,
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    bgcolor: BAR_COLOR[task.status] ?? "grey.300",
-                    borderRadius: 1,
-                    overflow: "hidden",
-                    cursor: onTaskClick ? "pointer" : "default",
-                    "&:hover": onTaskClick ? { opacity: 0.8 } : undefined,
-                  }}
-                  onClick={() => onTaskClick?.(task)}
-                >
-                  {task.progress !== undefined && task.progress > 0 && (
-                    <Box
-                      data-testid={`gantt-progress-${task.id}`}
-                      sx={{
-                        position: "absolute",
-                        left: 0,
-                        top: 0,
-                        width: `${Math.min(task.progress, 100)}%`,
-                        height: "100%",
-                        bgcolor: "currentColor",
-                        opacity: 0.4,
-                      }}
-                    />
-                  )}
-                </Box>
-              )}
+                // Meilensteine außerhalb des sichtbaren Bereichs nicht rendern.
+                left >= 0 && left <= 100 ? (
+                  <Box
+                    data-testid={`gantt-milestone-${task.id}`}
+                    sx={{
+                      position: "absolute",
+                      left: `${left}%`,
+                      top: "50%",
+                      width: 12,
+                      height: 12,
+                      bgcolor: "warning.main",
+                      transform: "translate(-50%, -50%) rotate(45deg)",
+                      cursor: onMilestoneClick ? "pointer" : "default",
+                      "&:hover": onMilestoneClick ? { opacity: 0.8 } : undefined,
+                    }}
+                    onClick={() => onMilestoneClick?.(task)}
+                  />
+                ) : null
+              ) : (() => {
+                // Balken auf den sichtbaren Bereich [0%, 100%] klemmen damit absolute
+                // Elemente außerhalb der Timeline nicht den Scroll-Bereich ausdehnen.
+                const clampedLeft = Math.max(0, left);
+                const clampedRight = Math.min(100, left + Math.max(width, 0.5));
+                const clampedWidth = clampedRight - clampedLeft;
+                if (clampedWidth <= 0) return null;
+                return (
+                  <Box
+                    data-testid={`gantt-bar-${task.id}`}
+                    sx={{
+                      position: "absolute",
+                      left: `${clampedLeft}%`,
+                      width: `${clampedWidth}%`,
+                      height: BAR_HEIGHT,
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      bgcolor: BAR_COLOR[task.status] ?? "grey.300",
+                      borderRadius: 1,
+                      overflow: "hidden",
+                      cursor: onTaskClick ? "pointer" : "default",
+                      "&:hover": onTaskClick ? { opacity: 0.8 } : undefined,
+                    }}
+                    onClick={() => onTaskClick?.(task)}
+                  >
+                    {task.progress !== undefined && task.progress > 0 && (
+                      <Box
+                        data-testid={`gantt-progress-${task.id}`}
+                        sx={{
+                          position: "absolute",
+                          left: 0,
+                          top: 0,
+                          width: `${Math.min(task.progress, 100)}%`,
+                          height: "100%",
+                          bgcolor: "currentColor",
+                          opacity: 0.4,
+                        }}
+                      />
+                    )}
+                  </Box>
+                );
+              })()}
             </Box>
           );
         })}
