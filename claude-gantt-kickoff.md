@@ -28,7 +28,7 @@ React 19, TypeScript 5.9, MUI v7, Zustand v5, Vite 8, Vitest 4, Storybook 10
 
 ---
 
-## Aktueller Stand: Phasen 1–11 + Fixes abgeschlossen ✅ (162 Tests grün)
+## Aktueller Stand: Phasen 1–11 + Fixes abgeschlossen ✅ (164 Tests grün)
 
 ### Alle vorhandenen Dateien
 
@@ -287,7 +287,7 @@ onTasksChange?.(rawStore.getState().tasks); // synchron — Zustand-set ist sync
 
 ---
 
-## Phase 11 + Fixes ✅ abgeschlossen (162 Tests)
+## Phase 11 + Fixes ✅ abgeschlossen (164 Tests)
 
 ### Implementiertes Verhalten
 
@@ -309,6 +309,11 @@ export function useRawGanttChartStore(): GanttChartStore
 - **GanttTaskDialog — Default-Datum**: Neues Standard-Datum = `clampDate(new Date(), range.start, range.end)` → neue Tasks liegen immer im sichtbaren Bereich
 - **GanttTaskDialog — Parent-Dropdown**: Flache Liste → DFS-Baum-Reihenfolge mit `depth`-Einzug (`└`-Symbol), eigene ID + alle Nachkommen im Edit-Modus ausgeschlossen
 - **Storybook**: Alle Callbacks als `fn()` aus `storybook/test` in meta `args` → erscheinen im Actions-Tab; `minPanelWidth: 200` / `maxPanelWidth: 600` als Defaults sichtbar
+- **GanttTaskDialog — Scrollbares Parent-Dropdown**: `MenuProps={{ PaperProps: { sx: { maxHeight: 280 } } }}` + `OverflowTooltip`-Komponente (Tooltip nur wenn Text abgeschnitten ist, via `scrollWidth > clientWidth` auf `onMouseEnter`)
+- **Timeline-Standardbereich = aktuelles Quartal**: `getTimelineRange` ankert jetzt auf dem aktuellen Quartal; Tasks außerhalb werden mit ±1-Monat-Puffer einbezogen, das Quartal wird nie verkleinert. Alle Story-Daten auf 2026 aktualisiert.
+- **Auto-Scroll zu heute**: `GanttTimeline` scrollt beim ersten Rendern so, dass der heutige Tag horizontal in der Mitte des sichtbaren Bereichs liegt (`scrollLeft = todayX − viewportWidth/2`)
+- **Heute-Linie**: Farbe von `error.main` (Rot) auf `primary.main` geändert
+- **addTask / updateTask expandieren die Timeline-Range**: Nach jeder CRUD-Aktion wird `expandRangeForTask` aufgerufen — neu angelegte Tasks außerhalb des Bereichs sind sofort sichtbar
 - **GanttTaskDialog — End-Datum-Validierung**: End-Datum kann nicht mehr vor Start-Datum gesetzt werden:
   - `handleStartDateChange`: advances `endDate` auf `startDate` wenn `endDate < startDate` (oder Meilenstein)
   - `handleEndDateChange`: klemmt `endDate` auf `startDate` wenn der neue Wert < `startDate`
@@ -322,5 +327,111 @@ export function useRawGanttChartStore(): GanttChartStore
 ```
 Bitte lies zuerst die claude-gantt-kickoff.md im Root des Projekts.
 Dann besprechen wir Phase 12.
-162 Tests müssen nach den Änderungen grün bleiben.
+164 Tests müssen nach den Änderungen grün bleiben.
 ```
+
+---
+
+## Geplante Phasen (noch nicht implementiert)
+
+### Phase 12 — Drag & Drop: Balken verschieben + Resize ⭐ höchste Priorität
+
+Der größte UX-Sprung: Nutzer ziehen Balken direkt in der Timeline.
+
+**Balken verschieben (horizontales Drag)**
+- `onMouseDown` auf dem Balken → `document.mousemove` berechnet Delta in Tagen → lokale Shadow-State-Verschiebung → `onMouseUp` committed `updateTask` im Store
+- Cursor: `grab` → `grabbing` während Drag
+- Visuelle Rückmeldung: Balken leicht transparent + Tooltip mit neuen Datumsangaben
+
+**Resize rechter Rand (nur endDate)**
+- Schmaler `cursor: ew-resize` Streifen (6px) am rechten Balkenrand
+- Gleiche Mousemove-Logik, nur `endDate` ändert sich
+
+**Snap auf Tagesgrenzen**
+- Pixeldelta → Tage: `Math.round(deltaPx / dayWidthPx)` — glätte auf volle Tage
+
+**Neue Props**
+```ts
+draggable?: boolean;        // Balken verschiebbar (Default: false)
+resizable?: boolean;        // Endatum per Drag änderbar (Default: false)
+onTaskMoved?: (task: GanttTask, newStart: Date, newEnd: Date) => void;
+onTaskResized?: (task: GanttTask, newEnd: Date) => void;
+```
+
+**Wichtig:** `onMouseDown` auf Drag-Handle vs. `onClick` trennen — ab `>= 5px` Bewegung gilt es als Drag, sonst als Click.
+
+---
+
+### Phase 13 — Timeline-Komfort: Heute-Button + Wochenend-Highlight + Zoom
+
+**"Heute"-Button in der Toolbar**
+- Neues Icon in `GanttToolbar` (z. B. `TodayIcon` aus MUI Icons)
+- Klick → `scrollRef.current.scrollLeft = todayX - viewportWidth / 2` (identisch mit dem Mount-Effekt)
+- Button ist disabled wenn `todayX === null` (heute außerhalb der Range)
+
+**Wochenend-Hervorhebung in der Tages-Skala**
+- In `GanttTimeline`: bei `timeScale === "days"` jede Spalte prüfen ob `dayOfWeek === 0 || 6`
+- Samstag/Sonntag: leicht grauer Hintergrund (`action.hover` oder `action.disabledBackground`)
+- Auch im Header: Tageszahl fett/gedimmt je Wochentag
+
+**Zoom per Strg+Mausrad**
+- `onWheel` auf dem Timeline-Container mit `ctrlKey === true`
+- Skalen-Reihenfolge: `days → weeks → months → quarters` (und zurück)
+- `e.preventDefault()` damit der Browser nicht selbst zoomt
+- Neue Prop `zoomable?: boolean` (Default: false)
+
+---
+
+### Phase 14 — Inline-Editierung + Schnellaktionen
+
+**Task-Name Inline-Edit**
+- Doppelklick auf den Namen → `TextField` mit `autoFocus` ersetzt die `Typography`
+- Enter / Blur → `updateTask` direkt, kein Dialog nötig
+- Escape → Abbrechen
+
+**Schnell-Statuswechsel direkt am Balken**
+- Rechtsklick auf Balken (oder Balken-Doppelklick) → MUI `Menu` mit den 4 Statuswerten
+- `onStatusChange?.(task, newStatus)` feuert + Store-Update
+
+**Fortschritt per Drag setzen**
+- Wenn `progress` gesetzt: Klick+Drag auf dem Progress-Overlay → `progress` aktualisieren (0–100)
+- Tooltip zeigt aktuellen %-Wert während des Drags
+
+---
+
+### Phase 15 — Abhängigkeiten im Dialog + kritischer Pfad
+
+**Abhängigkeiten im Edit-Dialog verwalten**
+- Neues Multiselect-Feld "Vorgänger" im `GanttTaskDialog`
+- DFS-geordnete Liste wie beim Parent-Dropdown, aber MultiSelect
+- Zirkuläre Abhängigkeiten ausschließen (eigene ID + Nachkommen ausblenden)
+
+**Kritischer Pfad hervorheben**
+- Neue Prop `showCriticalPath?: boolean`
+- Berechnung: längste Kette von Abhängigkeiten bis zum letzten Task
+- Balken auf dem kritischen Pfad erhalten einen farbigen Rand (`error.main` o. ä.)
+
+---
+
+### Phase 16 — Virtualisierung für große Datensätze
+
+Ab ca. 200+ Tasks wird das DOM schwer. Lösung: nur sichtbare Zeilen rendern.
+
+- Virtuelle Liste in `GanttTaskPanel` + `GanttTimeline` mit identischem `overscan`
+- Beide müssen synchron scrollen (Vertical-Scroll-Sync bereits vorhanden)
+- Implementierung via `@tanstack/react-virtual` (passt gut zu React 19 + kein eigenes ScrollContainer-Pattern nötig)
+- Neue Prop `virtualizeRows?: boolean` (Default: false — opt-in um bestehende Stories nicht zu brechen)
+
+---
+
+### Phase 17 — Export
+
+**PNG/SVG-Export**
+- Neuer Export-Button in der Toolbar (optional, Prop `showExport?: boolean`)
+- `html-to-image` oder `dom-to-svg` — rendert den sichtbaren Chart-Bereich
+- Dateiname: `gantt-export-{ISO-Datum}.png`
+
+**Print-CSS**
+- `@media print`: Toolbar ausblenden, Scrollbereich aufklappen, Seitenumbrüche zwischen Monaten
+
+---
