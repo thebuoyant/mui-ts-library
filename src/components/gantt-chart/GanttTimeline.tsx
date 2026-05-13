@@ -1,6 +1,6 @@
 import { useId, useMemo } from "react";
 import { type RefObject, type UIEventHandler } from "react";
-import { Box } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import { useGanttChartStore, useGanttTranslations } from "./GanttChart";
 import type { GanttTask } from "./GanttChart.types";
 import type { GanttTaskNode } from "./GanttChart.types";
@@ -124,6 +124,7 @@ export function GanttTimeline({
   onTaskClick,
   onMilestoneClick,
 }: GanttTimelineProps) {
+  const theme = useTheme();
   const taskTree = useGanttChartStore((s) => s.taskTree);
   const expandedIds = useGanttChartStore((s) => s.expandedIds);
   const timelineRange = useGanttChartStore((s) => s.timelineRange);
@@ -212,6 +213,15 @@ export function GanttTimeline({
     [visibleTasks, displayRange, totalWidth],
   );
 
+  // X-Position des heutigen Datums — null wenn außerhalb des sichtbaren Bereichs.
+  const todayX = useMemo(() => {
+    const now = Date.now();
+    const start = displayRange.start.getTime();
+    const end = displayRange.end.getTime();
+    if (now < start || now > end) return null;
+    return ((now - start) / (end - start)) * totalWidth;
+  }, [displayRange, totalWidth]);
+
   const gridColumnWidth =
     timeScale === "days"
       ? COLUMN_WIDTH_DAY
@@ -276,18 +286,34 @@ export function GanttTimeline({
                     transform: "translateY(-50%)",
                     bgcolor: BAR_COLOR[task.status] ?? "grey.300",
                     borderRadius: 1,
+                    overflow: "hidden",
                     cursor: onTaskClick ? "pointer" : "default",
                     "&:hover": onTaskClick ? { opacity: 0.8 } : undefined,
                   }}
                   onClick={() => onTaskClick?.(task)}
-                />
+                >
+                  {task.progress !== undefined && task.progress > 0 && (
+                    <Box
+                      data-testid={`gantt-progress-${task.id}`}
+                      sx={{
+                        position: "absolute",
+                        left: 0,
+                        top: 0,
+                        width: `${Math.min(task.progress, 100)}%`,
+                        height: "100%",
+                        bgcolor: "currentColor",
+                        opacity: 0.4,
+                      }}
+                    />
+                  )}
+                </Box>
               )}
             </Box>
           );
         })}
 
         {/* SVG-Layer über allen Balken — pointer-events: none damit Klicks durchgehen. */}
-        {dependencyLines.length > 0 && (
+        {(dependencyLines.length > 0 || todayX !== null) && (
           <svg
             data-testid="gantt-dependency-arrows"
             style={{
@@ -300,18 +326,20 @@ export function GanttTimeline({
               overflow: "visible",
             }}
           >
-            <defs>
-              <marker
-                id={arrowMarkerId}
-                markerWidth="6"
-                markerHeight="4"
-                refX="5"
-                refY="2"
-                orient="auto"
-              >
-                <polygon points="0 0, 6 2, 0 4" fill="currentColor" />
-              </marker>
-            </defs>
+            {dependencyLines.length > 0 && (
+              <defs>
+                <marker
+                  id={arrowMarkerId}
+                  markerWidth="6"
+                  markerHeight="4"
+                  refX="5"
+                  refY="2"
+                  orient="auto"
+                >
+                  <polygon points="0 0, 6 2, 0 4" fill="currentColor" />
+                </marker>
+              </defs>
+            )}
             {dependencyLines.map((line) => (
               <path
                 key={line.key}
@@ -324,6 +352,18 @@ export function GanttTimeline({
                 markerEnd={`url(#${arrowMarkerId})`}
               />
             ))}
+            {todayX !== null && (
+              <line
+                data-testid="gantt-today-line"
+                x1={todayX}
+                y1={0}
+                x2={todayX}
+                y2={visibleTasks.length * ROW_HEIGHT}
+                stroke={theme.palette.error.main}
+                strokeWidth={1.5}
+                strokeDasharray="4 2"
+              />
+            )}
           </svg>
         )}
       </Box>

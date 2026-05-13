@@ -190,6 +190,8 @@ const meta: Meta<typeof GanttChart> = {
     initialExpandAll: { control: "boolean" },
     showToolbar: { control: "boolean" },
     enableBuiltinDialogs: { control: "boolean" },
+    minPanelWidth: { control: "number" },
+    maxPanelWidth: { control: "number" },
     // Date objects aren't directly controllable — use the CustomDateRange story instead.
     defaultRangeStart: { control: false },
     defaultRangeEnd: { control: false },
@@ -197,8 +199,10 @@ const meta: Meta<typeof GanttChart> = {
     onTaskClick: { control: false },
     onMilestoneClick: { control: false },
     onAddTask: { control: false },
+    onEditTask: { control: false },
     onDeleteTask: { control: false },
     onStatusChange: { control: false },
+    onTasksChange: { control: false },
     onTaskCreated: { control: false },
     onTaskUpdated: { control: false },
     onTaskDeleted: { control: false },
@@ -213,6 +217,7 @@ export const Default: Story = {
   args: {
     tasks: sampleTasks,
     timeScale: "months",
+    enableBuiltinDialogs: true,
   },
   render: (args) => (
     <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
@@ -220,9 +225,11 @@ export const Default: Story = {
         {...args}
         onTaskClick={(task) => console.log("onTaskClick", task)}
         onMilestoneClick={(task) => console.log("onMilestoneClick", task)}
-        onAddTask={(parent) => console.log("onAddTask", parent)}
-        onDeleteTask={(task) => console.log("onDeleteTask", task)}
         onStatusChange={(task, status) => console.log("onStatusChange", task, status)}
+        onTaskCreated={(task) => console.log("onTaskCreated", task)}
+        onTaskUpdated={(task) => console.log("onTaskUpdated", task)}
+        onTaskDeleted={(id) => console.log("onTaskDeleted", id)}
+        onTasksChange={(tasks) => console.log("onTasksChange", tasks)}
       />
     </Box>
   ),
@@ -270,15 +277,18 @@ export const FullyExpanded: Story = {
     timeScale: "months",
     initialExpandAll: true,
     height: 700,
+    enableBuiltinDialogs: true,
   },
   render: (args) => (
     <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
       <GanttChart
         {...args}
         onTaskClick={(task) => console.log("onTaskClick", task)}
-        onAddTask={(task) => console.log("onAddTask", task)}
-        onDeleteTask={(task) => console.log("onDeleteTask", task)}
         onStatusChange={(task, status) => console.log("onStatusChange", task, status)}
+        onTaskCreated={(task) => console.log("onTaskCreated", task)}
+        onTaskUpdated={(task) => console.log("onTaskUpdated", task)}
+        onTaskDeleted={(id) => console.log("onTaskDeleted", id)}
+        onTasksChange={(tasks) => console.log("onTasksChange", tasks)}
       />
     </Box>
   ),
@@ -377,15 +387,18 @@ export const EnglishTranslations: Story = {
     tasks: sampleTasks,
     timeScale: "months",
     translations: EN_TRANSLATIONS,
+    enableBuiltinDialogs: true,
   },
   render: (args) => (
     <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
       <GanttChart
         {...args}
         onTaskClick={(task) => console.log("onTaskClick", task)}
-        onAddTask={(task) => console.log("onAddTask", task)}
-        onDeleteTask={(task) => console.log("onDeleteTask", task)}
         onStatusChange={(task, status) => console.log("onStatusChange", task, status)}
+        onTaskCreated={(task) => console.log("onTaskCreated", task)}
+        onTaskUpdated={(task) => console.log("onTaskUpdated", task)}
+        onTaskDeleted={(id) => console.log("onTaskDeleted", id)}
+        onTasksChange={(tasks) => console.log("onTasksChange", tasks)}
       />
     </Box>
   ),
@@ -417,6 +430,67 @@ export const MinimalFlat: Story = {
   ),
 };
 
+const progressTasks: GanttTask[] = [
+  {
+    id: "project",
+    name: "E-Commerce Platform v2.0",
+    status: "in-progress",
+    startDate: new Date("2025-01-01"),
+    endDate: new Date("2025-12-31"),
+    progress: 45,
+  },
+  {
+    id: "phase-1",
+    parentId: "project",
+    name: "Phase 1 — Backend",
+    status: "done",
+    startDate: new Date("2025-01-01"),
+    endDate: new Date("2025-03-31"),
+    progress: 100,
+  },
+  {
+    id: "phase-2",
+    parentId: "project",
+    name: "Phase 2 — Frontend",
+    status: "in-progress",
+    startDate: new Date("2025-04-01"),
+    endDate: new Date("2025-07-31"),
+    progress: 60,
+  },
+  {
+    id: "phase-3",
+    parentId: "project",
+    name: "Phase 3 — QA & Release",
+    status: "planned",
+    startDate: new Date("2025-08-01"),
+    endDate: new Date("2025-11-30"),
+    progress: 0,
+  },
+  {
+    id: "go-live",
+    parentId: "project",
+    name: "Go-Live",
+    status: "planned",
+    startDate: new Date("2025-12-01"),
+    endDate: new Date("2025-12-01"),
+    isMilestone: true,
+  },
+];
+
+export const WithProgress: Story = {
+  args: {
+    tasks: progressTasks,
+    timeScale: "months",
+    initialExpandAll: true,
+    height: 400,
+  },
+  render: (args) => (
+    <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
+      <GanttChart {...args} onTaskClick={(task) => console.log("onTaskClick", task)} />
+    </Box>
+  ),
+};
+
 export const WithBuiltinDialogs: Story = {
   args: {
     tasks: sampleTasks,
@@ -431,6 +505,7 @@ export const WithBuiltinDialogs: Story = {
         onTaskUpdated={(task) => console.log("onTaskUpdated", task)}
         onTaskDeleted={(id) => console.log("onTaskDeleted", id)}
         onStatusChange={(task, status) => console.log("onStatusChange", task, status)}
+        onTasksChange={(tasks) => console.log("onTasksChange", tasks)}
       />
     </Box>
   ),

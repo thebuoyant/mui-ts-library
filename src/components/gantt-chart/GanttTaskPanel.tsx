@@ -4,10 +4,10 @@ import { Box, Chip, IconButton, Menu, MenuItem, Typography } from "@mui/material
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import { useGanttChartStore, useGanttTranslations } from "./GanttChart";
+import { useGanttChartStore, useGanttTranslations, useRawGanttChartStore } from "./GanttChart";
 import type { GanttTask, GanttTaskNode, GanttTaskStatus, GanttTranslations } from "./GanttChart.types";
 import { getVisibleTasks } from "./util/gantt-chart.util";
-import { ROW_HEIGHT, HEADER_HEIGHT, LEFT_PANEL_WIDTH } from "./GanttChart.constants";
+import { ROW_HEIGHT, HEADER_HEIGHT, ACTIONS_COL_WIDTH, STATUS_COL_WIDTH } from "./GanttChart.constants";
 import { GanttTaskDialog } from "./GanttTaskDialog";
 import { GanttDeleteDialog } from "./GanttDeleteDialog";
 
@@ -47,6 +47,7 @@ type GanttTaskRowProps = {
   task: GanttTaskNode;
   expandedIds: Set<string>;
   toggleExpand: (id: string) => void;
+  hasActionsColumn: boolean;
   onTaskClick?: (task: GanttTask) => void;
   onAddTask?: (task: GanttTask) => void;
   onEditTask?: (task: GanttTask) => void;
@@ -58,6 +59,7 @@ function GanttTaskRow({
   task,
   expandedIds,
   toggleExpand,
+  hasActionsColumn,
   onTaskClick,
   onAddTask,
   onEditTask,
@@ -75,9 +77,6 @@ function GanttTaskRow({
         height: ROW_HEIGHT,
         display: "flex",
         alignItems: "center",
-        pl: 1 + task.depth * 2,
-        pr: 1,
-        gap: 0.75,
         borderBottom: "1px solid",
         borderRight: "1px solid",
         borderColor: "divider",
@@ -86,45 +85,61 @@ function GanttTaskRow({
       }}
       onClick={() => onTaskClick?.(task)}
     >
-      {/* Feste Breite für Expand/Collapse hält die Namenspalte stabil ausgerichtet. */}
-      <Box sx={{ width: 16, flexShrink: 0, display: "flex", justifyContent: "center" }}>
-        {task.children.length > 0 && (
-          <Box
-            component="span"
-            sx={{ fontSize: 9, userSelect: "none", cursor: "pointer" }}
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleExpand(task.id);
-            }}
-          >
-            {expandedIds.has(task.id) ? "▼" : "▶"}
-          </Box>
-        )}
-      </Box>
-
-      {/* Status-Dot, bei Meilensteinen als Raute */}
+      {/* Name-Spalte — flex, enthält Einzug + Expand-Icon + Status-Dot + Text */}
       <Box
         sx={{
-          width: 8,
-          height: 8,
-          borderRadius: task.isMilestone ? 0 : "50%",
-          transform: task.isMilestone ? "rotate(45deg)" : undefined,
-          flexShrink: 0,
-          bgcolor: STATUS_DOT_COLOR[task.status] ?? "grey.400",
+          flex: 1,
+          minWidth: 0,
+          display: "flex",
+          alignItems: "center",
+          gap: 0.75,
+          pl: 1 + task.depth * 2,
+          pr: 0.5,
+          height: "100%",
         }}
-      />
+      >
+        <Box sx={{ width: 16, flexShrink: 0, display: "flex", justifyContent: "center" }}>
+          {task.children.length > 0 && (
+            <Box
+              component="span"
+              sx={{ fontSize: 9, userSelect: "none", cursor: "pointer" }}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleExpand(task.id);
+              }}
+            >
+              {expandedIds.has(task.id) ? "▼" : "▶"}
+            </Box>
+          )}
+        </Box>
 
-      <Typography variant="body2" noWrap sx={{ flex: 1, minWidth: 0 }}>
-        {task.name}
-      </Typography>
+        <Box
+          sx={{
+            width: 8,
+            height: 8,
+            borderRadius: task.isMilestone ? 0 : "50%",
+            transform: task.isMilestone ? "rotate(45deg)" : undefined,
+            flexShrink: 0,
+            bgcolor: STATUS_DOT_COLOR[task.status] ?? "grey.400",
+          }}
+        />
 
-      {(onAddTask || onDeleteTask || onEditTask) && (
+        <Typography variant="body2" noWrap sx={{ flex: 1, minWidth: 0 }}>
+          {task.name}
+        </Typography>
+      </Box>
+
+      {/* Aktions-Spalte — feste Breite, immer vorhanden wenn hasActionsColumn */}
+      {hasActionsColumn && (
         <Box
           className="gantt-row-actions"
           sx={{
-            display: "flex",
-            gap: 0.25,
+            width: ACTIONS_COL_WIDTH,
             flexShrink: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            pr: 0.5,
           }}
         >
           {onEditTask && (
@@ -166,47 +181,57 @@ function GanttTaskRow({
         </Box>
       )}
 
-      <Chip
-        label={getStatusLabel(task.status, t)}
-        size="small"
-        variant="outlined"
-        color={STATUS_CHIP_COLOR[task.status] ?? "default"}
+      {/* Status-Spalte — feste Breite */}
+      <Box
         sx={{
+          width: STATUS_COL_WIDTH,
           flexShrink: 0,
-          height: 20,
-          fontSize: 10,
-          cursor: onStatusChange ? "pointer" : "default",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
-        onClick={
-          onStatusChange
-            ? (e) => {
-                e.stopPropagation();
-                setAnchorEl(e.currentTarget);
-              }
-            : undefined
-        }
-      />
+      >
+        <Chip
+          label={getStatusLabel(task.status, t)}
+          size="small"
+          variant="outlined"
+          color={STATUS_CHIP_COLOR[task.status] ?? "default"}
+          sx={{
+            height: 20,
+            fontSize: 10,
+            cursor: onStatusChange ? "pointer" : "default",
+          }}
+          onClick={
+            onStatusChange
+              ? (e) => {
+                  e.stopPropagation();
+                  setAnchorEl(e.currentTarget);
+                }
+              : undefined
+          }
+        />
 
-      {onStatusChange && (
-        <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={() => setAnchorEl(null)}
-        >
-          {(["planned", "in-progress", "done", "blocked"] as GanttTaskStatus[]).map((s) => (
-            <MenuItem
-              key={s}
-              selected={task.status === s}
-              onClick={() => {
-                onStatusChange(task, s);
-                setAnchorEl(null);
-              }}
-            >
-              {getStatusLabel(s, t)}
-            </MenuItem>
-          ))}
-        </Menu>
-      )}
+        {onStatusChange && (
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={() => setAnchorEl(null)}
+          >
+            {(["planned", "in-progress", "done", "blocked"] as GanttTaskStatus[]).map((s) => (
+              <MenuItem
+                key={s}
+                selected={task.status === s}
+                onClick={() => {
+                  onStatusChange(task, s);
+                  setAnchorEl(null);
+                }}
+              >
+                {getStatusLabel(s, t)}
+              </MenuItem>
+            ))}
+          </Menu>
+        )}
+      </Box>
     </Box>
   );
 }
@@ -218,10 +243,13 @@ function GanttTaskRow({
 type GanttTaskPanelProps = {
   scrollRef: RefObject<HTMLDivElement | null>;
   onScroll: UIEventHandler<HTMLDivElement>;
+  panelWidth: number;
   onTaskClick?: (task: GanttTask) => void;
   onAddTask?: (task: GanttTask) => void;
+  onEditTask?: (task: GanttTask) => void;
   onDeleteTask?: (task: GanttTask) => void;
   onStatusChange?: (task: GanttTask, status: GanttTaskStatus) => void;
+  onTasksChange?: (tasks: GanttTask[]) => void;
   enableBuiltinDialogs?: boolean;
   onTaskCreated?: (task: GanttTask) => void;
   onTaskUpdated?: (task: GanttTask) => void;
@@ -231,16 +259,20 @@ type GanttTaskPanelProps = {
 export function GanttTaskPanel({
   scrollRef,
   onScroll,
+  panelWidth,
   onTaskClick,
   onAddTask,
+  onEditTask,
   onDeleteTask,
   onStatusChange,
+  onTasksChange,
   enableBuiltinDialogs,
   onTaskCreated,
   onTaskUpdated,
   onTaskDeleted,
 }: GanttTaskPanelProps) {
   const t = useGanttTranslations();
+  const rawStore = useRawGanttChartStore();
   const taskTree = useGanttChartStore((s) => s.taskTree);
   const expandedIds = useGanttChartStore((s) => s.expandedIds);
   const toggleExpand = useGanttChartStore((s) => s.toggleExpand);
@@ -265,6 +297,7 @@ export function GanttTaskPanel({
   const handleAddSave = (data: Omit<GanttTask, "id">) => {
     const newTask: GanttTask = { ...data, id: crypto.randomUUID() };
     storeAddTask(newTask);
+    onTasksChange?.(rawStore.getState().tasks);
     onTaskCreated?.(newTask);
     setAddOpen(false);
   };
@@ -273,6 +306,7 @@ export function GanttTaskPanel({
     if (!activeTask) return;
     const updatedTask: GanttTask = { ...data, id: activeTask.id };
     storeUpdateTask(updatedTask);
+    onTasksChange?.(rawStore.getState().tasks);
     onTaskUpdated?.(updatedTask);
     setEditOpen(false);
   };
@@ -280,6 +314,7 @@ export function GanttTaskPanel({
   const handleDeleteConfirm = () => {
     if (!activeTask) return;
     storeDeleteTask(activeTask.id);
+    onTasksChange?.(rawStore.getState().tasks);
     onTaskDeleted?.(activeTask.id);
     setDeleteOpen(false);
   };
@@ -291,11 +326,13 @@ export function GanttTaskPanel({
 
   const rowOnEdit = enableBuiltinDialogs
     ? (task: GanttTask) => { setActiveTask(task); setEditOpen(true); }
-    : undefined;
+    : onEditTask;
 
   const rowOnDelete = enableBuiltinDialogs
     ? (task: GanttTask) => { setActiveTask(task); setDeleteOpen(true); }
     : onDeleteTask;
+
+  const hasActionsColumn = !!(rowOnAdd || rowOnEdit || rowOnDelete);
 
   // Tages-Skala hat einen zweizeiligen Header (Monat + Tag) → Panel-Header muss gleich hoch sein.
   const headerHeight = timeScale === "days" ? HEADER_HEIGHT * 2 : HEADER_HEIGHT;
@@ -305,7 +342,7 @@ export function GanttTaskPanel({
       ref={scrollRef}
       onScroll={onScroll}
       sx={{
-        width: LEFT_PANEL_WIDTH,
+        width: panelWidth,
         flexShrink: 0,
         overflowY: "auto",
         overflowX: "hidden",
@@ -325,24 +362,40 @@ export function GanttTaskPanel({
           flexDirection: "column",
         }}
       >
-        {/* Erste Zeile: Spalten-Labels — bei Tages-Skala mit Trenn-Border unten */}
+        {/* Erste Zeile: Spalten-Labels — gleiche Spaltenstruktur wie die Task-Zeilen */}
         <Box
           sx={{
             height: HEADER_HEIGHT,
             display: "flex",
             alignItems: "center",
-            px: 2,
-            gap: 1,
             borderBottom: timeScale === "days" ? "1px solid" : undefined,
             borderColor: timeScale === "days" ? "divider" : undefined,
           }}
         >
-          <Typography variant="caption" color="text.secondary" sx={{ flex: 1 }}>
-            {t.columnName}
-          </Typography>
-          <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
-            {t.columnStatus}
-          </Typography>
+          {/* Name-Spalte */}
+          <Box sx={{ flex: 1, minWidth: 0, pl: 2 }}>
+            <Typography variant="caption" color="text.secondary">
+              {t.columnName}
+            </Typography>
+          </Box>
+          {/* Aktions-Spalten-Platzhalter — sorgt für korrekte Ausrichtung mit den Zeilen */}
+          {hasActionsColumn && (
+            <Box sx={{ width: ACTIONS_COL_WIDTH, flexShrink: 0 }} />
+          )}
+          {/* Status-Spalte */}
+          <Box
+            sx={{
+              width: STATUS_COL_WIDTH,
+              flexShrink: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Typography variant="caption" color="text.secondary">
+              {t.columnStatus}
+            </Typography>
+          </Box>
         </Box>
         {/* Zweite Zeile nur bei Tages-Skala — leer, richtet sich an den Tag-Nummern aus */}
         {timeScale === "days" && <Box sx={{ flex: 1 }} />}
@@ -354,6 +407,7 @@ export function GanttTaskPanel({
           task={task}
           expandedIds={expandedIds}
           toggleExpand={toggleExpand}
+          hasActionsColumn={hasActionsColumn}
           onTaskClick={onTaskClick}
           onAddTask={rowOnAdd}
           onEditTask={rowOnEdit}

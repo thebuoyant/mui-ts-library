@@ -247,7 +247,7 @@ describe("GanttChart — toolbar", () => {
 describe("GanttChart — onAddTask / onDeleteTask", () => {
   it("calls onAddTask with the task when the add icon is clicked", () => {
     const onAddTask = vi.fn();
-    render(<GanttChart tasks={tasks} onAddTask={onAddTask} />);
+    render(<GanttChart tasks={tasks} onAddTask={onAddTask} enableBuiltinDialogs={false} />);
 
     fireEvent.click(screen.getByTestId("gantt-add-task-root"));
 
@@ -257,7 +257,7 @@ describe("GanttChart — onAddTask / onDeleteTask", () => {
 
   it("calls onDeleteTask with the task when the delete icon is clicked", () => {
     const onDeleteTask = vi.fn();
-    render(<GanttChart tasks={tasks} onDeleteTask={onDeleteTask} />);
+    render(<GanttChart tasks={tasks} onDeleteTask={onDeleteTask} enableBuiltinDialogs={false} />);
 
     fireEvent.click(screen.getByTestId("gantt-delete-task-child"));
 
@@ -268,7 +268,7 @@ describe("GanttChart — onAddTask / onDeleteTask", () => {
   it("does not call onTaskClick when the add icon is clicked", () => {
     const onTaskClick = vi.fn();
     const onAddTask = vi.fn();
-    render(<GanttChart tasks={tasks} onTaskClick={onTaskClick} onAddTask={onAddTask} />);
+    render(<GanttChart tasks={tasks} onTaskClick={onTaskClick} onAddTask={onAddTask} enableBuiltinDialogs={false} />);
 
     fireEvent.click(screen.getByTestId("gantt-add-task-root"));
 
@@ -297,8 +297,14 @@ describe("GanttChart — onStatusChange", () => {
 // ---------------------------------------------------------------------------
 
 describe("GanttChart — enableBuiltinDialogs", () => {
-  it("does not show the edit icon when enableBuiltinDialogs is not set", () => {
+  it("shows the edit icon by default (enableBuiltinDialogs defaults to true)", () => {
     render(<GanttChart tasks={tasks} />);
+
+    expect(screen.getByTestId("gantt-edit-task-root")).toBeInTheDocument();
+  });
+
+  it("does not show the edit icon when enableBuiltinDialogs is false", () => {
+    render(<GanttChart tasks={tasks} enableBuiltinDialogs={false} />);
 
     expect(screen.queryByTestId("gantt-edit-task-root")).not.toBeInTheDocument();
   });
@@ -426,6 +432,75 @@ describe("GanttChart — enableBuiltinDialogs", () => {
 });
 
 // ---------------------------------------------------------------------------
+// Phase 10 — Progress-Balken + Today-Linie
+// ---------------------------------------------------------------------------
+
+describe("GanttChart — progress bar", () => {
+  it("renders a progress bar for a task with progress > 0", () => {
+    const progressTasks: GanttTask[] = [
+      {
+        id: "work",
+        name: "Work",
+        status: "in-progress",
+        startDate: new Date("2025-01-01"),
+        endDate: new Date("2025-03-31"),
+        progress: 60,
+      },
+    ];
+    render(<GanttChart tasks={progressTasks} />);
+
+    expect(screen.getByTestId("gantt-progress-work")).toBeInTheDocument();
+  });
+
+  it("does not render a progress bar when progress is undefined", () => {
+    render(<GanttChart tasks={tasks} />);
+
+    expect(screen.queryByTestId("gantt-progress-root")).not.toBeInTheDocument();
+  });
+
+  it("does not render a progress bar when progress is 0", () => {
+    const zeroTasks: GanttTask[] = [
+      {
+        id: "zero",
+        name: "Zero",
+        status: "planned",
+        startDate: new Date("2025-01-01"),
+        endDate: new Date("2025-03-31"),
+        progress: 0,
+      },
+    ];
+    render(<GanttChart tasks={zeroTasks} />);
+
+    expect(screen.queryByTestId("gantt-progress-zero")).not.toBeInTheDocument();
+  });
+});
+
+describe("GanttChart — today line", () => {
+  it("renders the today line when today falls within the timeline range", () => {
+    vi.useFakeTimers();
+    // tasks-Range mit Puffer: Dez 2024 – Apr 2025 → 2025-02-15 liegt darin.
+    vi.setSystemTime(new Date("2025-02-15"));
+
+    render(<GanttChart tasks={tasks} />);
+
+    expect(screen.getByTestId("gantt-today-line")).toBeInTheDocument();
+
+    vi.useRealTimers();
+  });
+
+  it("does not render the today line when today is outside the timeline range", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2030-06-01"));
+
+    render(<GanttChart tasks={tasks} />);
+
+    expect(screen.queryByTestId("gantt-today-line")).not.toBeInTheDocument();
+
+    vi.useRealTimers();
+  });
+});
+
+// ---------------------------------------------------------------------------
 // SVG-Abhängigkeitspfeile
 // ---------------------------------------------------------------------------
 
@@ -504,5 +579,81 @@ describe("GanttChart — dependency arrows", () => {
     // parent einklappen → hidden-pred verschwindet → Pfeil ebenfalls weg
     fireEvent.click(screen.getByText("▼"));
     expect(screen.queryByTestId("gantt-dep-hidden-pred-successor")).not.toBeInTheDocument();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Phase 11 — Split-Pane, tabular layout, onTasksChange, onEditTask
+// ---------------------------------------------------------------------------
+
+describe("GanttChart — split pane", () => {
+  it("renders the resize divider between panel and timeline", () => {
+    render(<GanttChart tasks={tasks} />);
+
+    expect(screen.getByTestId("gantt-panel-divider")).toBeInTheDocument();
+  });
+});
+
+describe("GanttChart — onTasksChange", () => {
+  it("calls onTasksChange with the updated task list after adding a task", () => {
+    const onTasksChange = vi.fn();
+    render(<GanttChart tasks={tasks} enableBuiltinDialogs onTasksChange={onTasksChange} />);
+
+    fireEvent.click(screen.getByTestId("gantt-add-task-root"));
+    fireEvent.change(screen.getByTestId("gantt-dialog-field-name"), { target: { value: "New Task" } });
+    fireEvent.click(screen.getByTestId("gantt-dialog-save"));
+
+    expect(onTasksChange).toHaveBeenCalledOnce();
+    const updated = onTasksChange.mock.calls[0][0] as GanttTask[];
+    expect(updated.some((t) => t.name === "New Task")).toBe(true);
+  });
+
+  it("calls onTasksChange with the updated task list after updating a task", () => {
+    const onTasksChange = vi.fn();
+    render(<GanttChart tasks={tasks} enableBuiltinDialogs onTasksChange={onTasksChange} />);
+
+    fireEvent.click(screen.getByTestId("gantt-edit-task-root"));
+    fireEvent.change(screen.getByTestId("gantt-dialog-field-name"), { target: { value: "Renamed Root" } });
+    fireEvent.click(screen.getByTestId("gantt-dialog-save"));
+
+    expect(onTasksChange).toHaveBeenCalledOnce();
+    const updated = onTasksChange.mock.calls[0][0] as GanttTask[];
+    expect(updated.some((t) => t.id === "root" && t.name === "Renamed Root")).toBe(true);
+  });
+
+  it("calls onTasksChange with the updated task list after deleting a task", () => {
+    const onTasksChange = vi.fn();
+    render(<GanttChart tasks={tasks} enableBuiltinDialogs onTasksChange={onTasksChange} />);
+
+    fireEvent.click(screen.getByTestId("gantt-delete-task-child"));
+    fireEvent.click(screen.getByTestId("gantt-dialog-delete-confirm"));
+
+    expect(onTasksChange).toHaveBeenCalledOnce();
+    const updated = onTasksChange.mock.calls[0][0] as GanttTask[];
+    expect(updated.some((t) => t.id === "child")).toBe(false);
+  });
+});
+
+describe("GanttChart — onEditTask direct callback", () => {
+  it("calls onEditTask with the task when the edit icon is clicked (direct callback mode)", () => {
+    const onEditTask = vi.fn();
+    render(<GanttChart tasks={tasks} enableBuiltinDialogs={false} onEditTask={onEditTask} />);
+
+    fireEvent.click(screen.getByTestId("gantt-edit-task-root"));
+
+    expect(onEditTask).toHaveBeenCalledOnce();
+    expect(onEditTask).toHaveBeenCalledWith(expect.objectContaining({ id: "root" }));
+  });
+
+  it("does not call onTaskClick when the edit icon is clicked in direct callback mode", () => {
+    const onTaskClick = vi.fn();
+    const onEditTask = vi.fn();
+    render(
+      <GanttChart tasks={tasks} enableBuiltinDialogs={false} onTaskClick={onTaskClick} onEditTask={onEditTask} />,
+    );
+
+    fireEvent.click(screen.getByTestId("gantt-edit-task-root"));
+
+    expect(onTaskClick).not.toHaveBeenCalled();
   });
 });

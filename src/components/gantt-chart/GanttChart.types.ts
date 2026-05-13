@@ -15,6 +15,8 @@ export type GanttTask = {
   dependencies?: string[];
   // Meilensteine haben keine Dauer (startDate ≈ endDate) und werden als Raute dargestellt.
   isMilestone?: boolean;
+  // Fortschritt in Prozent (0–100) — wird als halbopaker Overlay-Balken gerendert.
+  progress?: number;
 };
 
 // Interner Knoten für den aufgebauten Task-Baum — nicht Teil der öffentlichen API.
@@ -115,13 +117,20 @@ export type GanttChartProps = {
   defaultRangeEnd?: Date;
   // Texte überschreiben für einfache Lokalisierung — nur abweichende Keys angeben.
   translations?: Partial<GanttTranslations>;
-  // Wenn true, öffnen Add/Edit/Delete-Icons MUI-Dialoge statt direkt Callbacks aufzurufen.
+  // Mindestbreite des linken Panels in Pixeln (Standard: 200).
+  minPanelWidth?: number;
+  // Maximalbreite des linken Panels in Pixeln (Standard: 600).
+  maxPanelWidth?: number;
+  // Wenn true (Standard), öffnen Add/Edit/Delete-Icons MUI-Dialoge statt Callbacks direkt aufzurufen.
   enableBuiltinDialogs?: boolean;
   onTaskClick?: (task: GanttTask) => void;
   onMilestoneClick?: (task: GanttTask) => void;
   onAddTask?: (parentTask?: GanttTask) => void;
+  onEditTask?: (task: GanttTask) => void;
   onDeleteTask?: (task: GanttTask) => void;
   onStatusChange?: (task: GanttTask, status: GanttTaskStatus) => void;
+  // Wird nach jeder CRUD-Aktion mit der vollständigen aktuellen Task-Liste aufgerufen.
+  onTasksChange?: (tasks: GanttTask[]) => void;
   // Dialog-Callbacks — werden nur ausgelöst wenn enableBuiltinDialogs=true
   onTaskCreated?: (task: GanttTask) => void;
   onTaskUpdated?: (task: GanttTask) => void;

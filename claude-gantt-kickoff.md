@@ -28,27 +28,27 @@ React 19, TypeScript 5.9, MUI v7, Zustand v5, Vite 8, Vitest 4, Storybook 10
 
 ---
 
-## Aktueller Stand: Phasen 1–9+i18n+Layout-Fixes abgeschlossen ✅ (146 Tests grün)
+## Aktueller Stand: Phasen 1–11 abgeschlossen ✅ (158 Tests grün)
 
 ### Alle vorhandenen Dateien
 
 | Datei                           | Inhalt                                                                               |
 | ------------------------------- | ------------------------------------------------------------------------------------ |
-| `GanttChart.types.ts`           | `GanttTaskStatus`, `GanttTimeScale`, `GanttTask`, `GanttTaskNode`, `GanttTranslations`, `GanttChartProps` |
+| `GanttChart.types.ts`           | `GanttTaskStatus`, `GanttTimeScale`, `GanttTask` (inkl. `progress?`), `GanttTaskNode`, `GanttTranslations`, `GanttChartProps` |
 | `GanttChart.store.ts`           | Zustand-Store: `tasks`, `taskTree`, `expandedIds`, `timeScale`, `timelineRange`, `isRangeCustomized` + `addTask`, `updateTask`, `deleteTask` |
 | `GanttChart.store.test.ts`      | 14 Store-Tests                                                                       |
 | `GanttChart.constants.ts`       | alle Layout-Konstanten                                                               |
 | `util/gantt-chart.util.ts`      | Datum- und Baum-Hilfsfunktionen                                                      |
 | `util/gantt-chart.util.test.ts` | 34 Util-Tests                                                                        |
-| `GanttChart.tsx`                | Haupt-Komponente: Store-Kontext, Translations-Kontext, `resolveSize`, Scroll-Sync    |
-| `GanttChart.test.tsx`           | 98 Komponenten-Tests                                                                 |
-| `GanttTaskPanel.tsx`            | Linkes Panel: `GanttTaskRow` mit Hover-Icons (Add/Edit/Delete) + Dialog-State        |
+| `GanttChart.tsx`                | Haupt-Komponente: Store-Kontext, Translations-Kontext, `resolveSize`, Scroll-Sync, Split-Pane-Divider |
+| `GanttChart.test.tsx`           | 110 Komponenten-Tests                                                                |
+| `GanttTaskPanel.tsx`            | Linkes Panel: Tabellarisches Layout (Name-Spalte flex, Aktionen-Spalte fix, Status-Spalte fix), Dialog-State, `panelWidth` prop |
 | `GanttTaskDialog.tsx`           | MUI Dialog für Add + Edit (Formularfelder inkl. Meilenstein-Checkbox + Elterntask)   |
 | `GanttDeleteDialog.tsx`         | MUI Bestätigungs-Dialog für Löschen                                                  |
 | `GanttTimelineHeader.tsx`       | Header mit optionalem zwei-Ebenen-Modus (`groups`) für Tages-Skala                  |
-| `GanttTimeline.tsx`             | Rechtes Panel: Balken, Meilensteine, Gitterlinien, SVG-Pfeile                        |
+| `GanttTimeline.tsx`             | Rechtes Panel: Balken + Progress-Overlay, Meilensteine, Gitterlinien, SVG (Pfeile + Today-Linie) |
 | `GanttToolbar.tsx`              | Toolbar: Skala-Switcher + Von/Bis-Date-Inputs + Reset-Button                        |
-| `GanttChart.stories.tsx`        | 11 Stories mit argTypes und meta args                                                |
+| `GanttChart.stories.tsx`        | 12 Stories mit argTypes und meta args                                                |
 
 ### GanttTimeScale — implementierter Stand
 
@@ -64,12 +64,15 @@ React 19, TypeScript 5.9, MUI v7, Zustand v5, Vite 8, Vitest 4, Storybook 10
 ```ts
 ROW_HEIGHT = 40;
 HEADER_HEIGHT = 40;        // border-box Höhe inkl. borderBottom (1px)
-LEFT_PANEL_WIDTH = 320;    // wurde von 280 auf 320 erhöht
+LEFT_PANEL_WIDTH = 320;    // Anfangsbreite des Panels
 COLUMN_WIDTH_DAY = 20;
 COLUMN_WIDTH_WEEK = 40;
 COLUMN_WIDTH_MONTH = 120;
 COLUMN_WIDTH_QUARTER = 360;
 BAR_HEIGHT = 16;
+STATUS_COL_WIDTH = 90;     // Phase 11: feste Breite der Status-Spalte
+ACTIONS_COL_WIDTH = 96;    // Phase 11: feste Breite der Aktions-Icons-Spalte
+DIVIDER_WIDTH = 4;         // Phase 11: Breite des Split-Pane-Dividers
 ```
 
 ---
@@ -115,8 +118,6 @@ Sowohl `GanttTaskPanel`-Header als auch `GanttTimelineHeader` müssen **exakt di
 - `GanttTimelineHeader` hat `overflow: visible` damit Items (height: 40px) nicht geclippt werden
 - Für Tages-Skala: beide haben `height: HEADER_HEIGHT * 2` (= 80px total)
 
-Ohne diese Angleichung starten Task-Panel-Zeilen und Timeline-Balken-Zeilen vertikal versetzt → horizontale Trennlinien wirken um 1px zu kurz.
-
 ### 5. Days-Skala Zwei-Ebenen-Header
 
 - `GanttTimelineHeader`: wenn `groups` gesetzt → Gruppen-Box mit `height: HEADER_HEIGHT, borderBottom: 1px solid`, dann Spalten-Row darunter
@@ -131,8 +132,6 @@ return {
   end: endOfMonth(addMonths(latest, 1)),          // 1 Monat Puffer danach
 };
 ```
-
-Ohne den Puffer landen Meilensteine am letzten Task-Datum bei ~100% Position und werden rechts abgeschnitten.
 
 ### 7. resolveSize — "auto" für height/width
 
@@ -153,11 +152,62 @@ Der `borderRight` (vertikaler Separator zwischen Panel und Timeline) liegt auf d
 
 ### 9. Circular Import (bewusst)
 
-`GanttTaskPanel`, `GanttTimeline`, `GanttToolbar`, `GanttTaskDialog`, `GanttDeleteDialog` importieren `useGanttChartStore`/`useGanttTranslations` aus `./GanttChart`. Identisch mit TagSelection-Pattern.
+`GanttTaskPanel`, `GanttTimeline`, `GanttToolbar`, `GanttTaskDialog`, `GanttDeleteDialog` importieren `useGanttChartStore` / `useGanttTranslations` / `useRawGanttChartStore` aus `./GanttChart`. Identisch mit TagSelection-Pattern.
 
 ### 10. Action-Icons — immer sichtbar (kein Hover-Opacity-Pattern)
 
-Icons (Add/Edit/Delete) haben **keine** `opacity: 0` / `:hover`-Logik mehr. Sie sind immer sichtbar wenn die entsprechende Callback-Prop oder `enableBuiltinDialogs=true` gesetzt ist.
+Icons (Add/Edit/Delete) haben **keine** `opacity: 0` / `:hover`-Logik mehr. Sie sind immer sichtbar wenn `enableBuiltinDialogs=true` (Standard) oder direkte Callbacks gesetzt sind.
+
+### 11. Tabellarisches Layout — Phase 11
+
+`GanttTaskRow` hat drei feste Spalten in einer `display: flex`-Zeile:
+1. **Name-Spalte** (`flex: 1, minWidth: 0`): Einzug (`pl: 1 + depth * 2`) + Expand-Icon (16px) + Status-Dot (8px) + Typografie noWrap
+2. **Aktions-Spalte** (`width: ACTIONS_COL_WIDTH = 96px`, nur wenn `hasActionsColumn`): Edit + Add + Delete Icons
+3. **Status-Spalte** (`width: STATUS_COL_WIDTH = 90px`): Chip zentriert
+
+`hasActionsColumn = !!(rowOnAdd || rowOnEdit || rowOnDelete)` — auch der Panel-Header zeigt die gleiche Spaltenstruktur.
+
+### 12. Split-Pane — Phase 11
+
+```tsx
+const [panelWidth, setPanelWidth] = useState(LEFT_PANEL_WIDTH);
+
+const handleDividerMouseDown = useCallback((e: React.MouseEvent) => {
+  e.preventDefault();
+  const startX = e.clientX;
+  const startWidth = panelWidth;
+  const onMouseMove = (ev: MouseEvent) => {
+    const delta = ev.clientX - startX;
+    const newWidth = Math.max(minPanelWidth, Math.min(maxPanelWidth, startWidth + delta));
+    setPanelWidth(newWidth);
+  };
+  const onMouseUp = () => {
+    document.removeEventListener("mousemove", onMouseMove);
+    document.removeEventListener("mouseup", onMouseUp);
+  };
+  document.addEventListener("mousemove", onMouseMove);
+  document.addEventListener("mouseup", onMouseUp);
+}, [panelWidth, minPanelWidth, maxPanelWidth]);
+```
+
+Der Divider hat `data-testid="gantt-panel-divider"`.
+
+### 13. useRawGanttChartStore — Phase 11
+
+Exportiert aus `GanttChart.tsx`:
+```ts
+export function useRawGanttChartStore(): GanttChartStore {
+  const store = useContext(GanttChartStoreContext);
+  if (!store) throw new Error("GanttChartStoreContext is missing.");
+  return store;
+}
+```
+
+Wird in `GanttTaskPanel` nach jedem CRUD-Aufruf verwendet:
+```ts
+storeAddTask(newTask);
+onTasksChange?.(rawStore.getState().tasks); // synchron — Zustand-set ist synchron
+```
 
 ---
 
@@ -174,12 +224,16 @@ Icons (Add/Edit/Delete) haben **keine** `opacity: 0` / `:hover`-Logik mehr. Sie 
   defaultRangeStart={new Date(...)}      // optionaler initialer Von-Wert (setzt isRangeCustomized)
   defaultRangeEnd={new Date(...)}        // optionaler initialer Bis-Wert
   translations={{ scaleDays: "Days" }}   // Partial<GanttTranslations> — nur abweichende Keys
-  enableBuiltinDialogs={true}            // default: false — öffnet Dialoge statt direkter Callbacks
+  minPanelWidth={200}                    // Mindestbreite des linken Panels, Default: 200
+  maxPanelWidth={600}                    // Maximalbreite des linken Panels, Default: 600
+  enableBuiltinDialogs={true}            // DEFAULT: true — öffnet Dialoge statt direkter Callbacks
   onTaskClick={(task) => ...}
   onMilestoneClick={(task) => ...}
   onAddTask={(parentTask?) => ...}       // nur wenn enableBuiltinDialogs=false
+  onEditTask={(task) => ...}             // nur wenn enableBuiltinDialogs=false (Phase 11)
   onDeleteTask={(task) => ...}           // nur wenn enableBuiltinDialogs=false
   onStatusChange={(task, status) => ...}
+  onTasksChange={(tasks) => ...}         // nach jeder CRUD-Aktion mit aktueller Task-Liste (Phase 11)
   onTaskCreated={(task) => ...}          // enthält generierte UUID (enableBuiltinDialogs=true)
   onTaskUpdated={(task) => ...}          // (enableBuiltinDialogs=true)
   onTaskDeleted={(taskId) => ...}        // (enableBuiltinDialogs=true)
@@ -200,92 +254,54 @@ Icons (Add/Edit/Delete) haben **keine** `opacity: 0` / `:hover`-Logik mehr. Sie 
 
 ---
 
-## Storybook — 11 Stories
+## Storybook — 12 Stories
 
-| Story               | Besonderheit                                            |
-| ------------------- | ------------------------------------------------------- |
-| Default             | Months-Skala, onAdd/Delete/StatusChange verdrahtet      |
-| WeeksScale          | KW-Header                                               |
-| QuartersScale       | Q1-Q4                                                   |
-| DaysScale           | Zwei-Ebenen-Header, TAGE-Button aktiv                   |
-| FullyExpanded       | `initialExpandAll: true`, height: 700                   |
-| WithDependencies    | Fan-in, Fan-out, Z-Pfeile, height: 400                  |
-| CustomDateRange     | `defaultRangeStart/End` = ganzes Jahr 2025              |
-| EnglishTranslations | `translations: EN_TRANSLATIONS`, W-prefix statt KW     |
-| NoToolbar           | `showToolbar: false`                                    |
-| MinimalFlat         | Nur Root-Tasks gefiltert, maxWidth: 700, height: 300    |
-| WithBuiltinDialogs  | `enableBuiltinDialogs: true`, onTaskCreated/Updated/Deleted verdrahtet |
-
-Meta `args`: `height: 500, width: "auto", initialExpandAll: false, showToolbar: true`
-Meta `argTypes`: `timeScale` (radio), `height`/`width` (text), `initialExpandAll`/`showToolbar`/`enableBuiltinDialogs` (boolean)
-Render-Funktionen nutzen `args.height` (kein hardcodierter Wert im Box-Wrapper).
+| Story               | Besonderheit                                                        |
+| ------------------- | ------------------------------------------------------------------- |
+| Default             | Months-Skala, `enableBuiltinDialogs=true`, onTaskCreated/Updated/Deleted/Change verdrahtet |
+| WeeksScale          | KW-Header                                                           |
+| QuartersScale       | Q1-Q4                                                               |
+| DaysScale           | Zwei-Ebenen-Header, TAGE-Button aktiv                               |
+| FullyExpanded       | `initialExpandAll: true`, height: 700, built-in dialogs             |
+| WithDependencies    | Fan-in, Fan-out, Z-Pfeile, height: 400                              |
+| CustomDateRange     | `defaultRangeStart/End` = ganzes Jahr 2025                          |
+| EnglishTranslations | `translations: EN_TRANSLATIONS`, W-prefix statt KW, built-in dialogs |
+| NoToolbar           | `showToolbar: false`                                                |
+| MinimalFlat         | Nur Root-Tasks gefiltert, maxWidth: 700, height: 300                |
+| WithProgress        | `progress` auf allen Tasks, Today-Linie sichtbar, `initialExpandAll: true` |
+| WithBuiltinDialogs  | `enableBuiltinDialogs: true`, alle Dialog-Callbacks verdrahtet      |
 
 ---
 
 ## Phase 9 — CRUD Dialoge ✅ abgeschlossen
 
-### Implementiertes Verhalten
-
-- `enableBuiltinDialogs=false` (default): Hover-Icons rufen `onAddTask` / `onDeleteTask` direkt auf (bisheriges Verhalten, kein Edit-Icon)
-- `enableBuiltinDialogs=true`: Edit/Add/Delete-Icons öffnen je einen MUI Dialog; Store wird sofort aktualisiert; danach werden `onTaskCreated` / `onTaskUpdated` / `onTaskDeleted` gefeuert
-
-### Dialog-State-Architektur
-
-- Dialog-State (`addOpen`, `editOpen`, `deleteOpen`, `activeTask`) lebt in `GanttTaskPanel`
-- Dialoge werden nur gerendert wenn `enableBuiltinDialogs=true` (kein unnötiger DOM-Overhead)
-- ID-Generierung für neue Tasks via `crypto.randomUUID()`
-- Kaskadierendes Löschen: `deleteTask(id)` entfernt Task + alle Nachkommen rekursiv
-- Icons sind **immer sichtbar** (kein Hover-Opacity-Pattern mehr)
-
-### Formularfelder (GanttTaskDialog)
-
-```
-Name (TextField, required)
-Startdatum (TextField type="date", required)
-Enddatum (TextField type="date", required)
-Status (Select: planned / in-progress / done / blocked)
-Ist Meilenstein (Checkbox — setzt startDate = endDate automatisch)
-Übergeordnete Aufgabe (Select der vorhandenen Tasks, optional)
-```
-
-### Props-Erweiterungen
-
-```tsx
-enableBuiltinDialogs?: boolean   // default: false
-onTaskCreated?: (task: Omit<GanttTask, "id">) => void
-onTaskUpdated?: (task: GanttTask) => void
-onTaskDeleted?: (taskId: string) => void
-```
-
-### Verhalten
-
-- `enableBuiltinDialogs=false` (default): Hover-Icons rufen `onAddTask` / `onDeleteTask` direkt auf (bisheriges Verhalten)
-- `enableBuiltinDialogs=true`: Add-Icon öffnet `GanttTaskDialog` im "Neu"-Modus; Edit-Icon (neues drittes Icon auf hover) öffnet im "Bearbeiten"-Modus; Delete-Icon öffnet `GanttDeleteDialog`
-
-### Doppelter Hover-Icon-Satz wenn enableBuiltinDialogs
-
-```tsx
-<EditIcon />   → öffnet Edit-Dialog
-<AddIcon />    → öffnet Add-Dialog (parentTask = current task)
-<DeleteIcon /> → öffnet Delete-Dialog
-```
+- `enableBuiltinDialogs=false`: Icons rufen `onAddTask` / `onDeleteTask` direkt auf (kein Edit-Icon)
+- `enableBuiltinDialogs=true` (jetzt Standard): Edit/Add/Delete-Icons öffnen MUI Dialoge; Store wird sofort aktualisiert; dann `onTaskCreated` / `onTaskUpdated` / `onTaskDeleted` / `onTasksChange`
 
 ---
 
-## Phase 10 — Progress-Balken + Today-Linie (nach Phase 9)
+## Phase 10 — Progress-Balken + Today-Linie ✅ abgeschlossen
 
-### Progress-Balken
+- `GanttTask.progress?: number` (0–100) → halbopaker Overlay-Balken im Haupt-Balken
+- Today-Linie: rote gestrichelte SVG-Linie bei `Date.now()` im SVG-Layer
+
+---
+
+## Phase 11 — Tabellarisches Layout + Split-Pane + onTasksChange + onEditTask ✅ abgeschlossen
+
+### Implementiertes Verhalten
+
+- **Tabellarisches Layout**: Jede Task-Zeile hat 3 Spalten (Name flex, Aktionen 96px, Status 90px); Header-Zeile gleiche Struktur → perfekte vertikale Ausrichtung unabhängig von Einzugstiefe
+- **Split-Pane**: Divider zwischen Panel und Timeline (`data-testid="gantt-panel-divider"`), per Drag resizable; `minPanelWidth` / `maxPanelWidth` Props
+- **`enableBuiltinDialogs` Default**: Geändert von `false` → `true` — Dialoge sind jetzt standardmäßig aktiv
+- **`onEditTask`**: Direkter Edit-Callback für `enableBuiltinDialogs=false`-Modus
+- **`onTasksChange`**: Feuert nach jeder CRUD-Aktion mit der vollständigen aktuellen `GanttTask[]`-Liste; nutzt `rawStore.getState().tasks` (synchron nach Zustand-set)
+
+### Neue Exports aus GanttChart.tsx
 
 ```ts
-// GanttTask Erweiterung:
-progress?: number; // 0–100
+export function useRawGanttChartStore(): GanttChartStore
 ```
-
-In `GanttTimeline.tsx`: inneres `<Box>` mit `width: ${progress}%`, `bgcolor: "currentColor"`, `opacity: 0.4` über dem Haupt-Balken.
-
-### Today-Linie
-
-In `GanttTimeline.tsx` SVG-Layer: berechnete X-Position von `new Date()` relativ zu `displayRange`, dann `<line x1={x} y1={0} x2={x} y2={totalHeight} stroke="error.main" strokeWidth={1.5} strokeDasharray="4 2" />`.
 
 ---
 
@@ -293,6 +309,6 @@ In `GanttTimeline.tsx` SVG-Layer: berechnete X-Position von `new Date()` relativ
 
 ```
 Bitte lies zuerst die claude-gantt-kickoff.md im Root des Projekts.
-Dann implementiere Phase 10: Progress-Balken + Today-Linie.
-146 Tests müssen nach den Änderungen grün bleiben.
+Dann besprechen wir Phase 12.
+158 Tests müssen nach den Änderungen grün bleiben.
 ```

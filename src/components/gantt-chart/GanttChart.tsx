@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useStore } from "zustand";
 import { Box } from "@mui/material";
 import {
@@ -11,6 +11,7 @@ import { getTimelineRange } from "./util/gantt-chart.util";
 import { GanttTaskPanel } from "./GanttTaskPanel";
 import { GanttTimeline } from "./GanttTimeline";
 import { GanttToolbar } from "./GanttToolbar";
+import { LEFT_PANEL_WIDTH, DIVIDER_WIDTH } from "./GanttChart.constants";
 
 // ---------------------------------------------------------------------------
 // Store-Kontext
@@ -28,6 +29,12 @@ export function useGanttChartStore<T>(
   }
 
   return useStore(store, selector);
+}
+
+export function useRawGanttChartStore(): GanttChartStore {
+  const store = useContext(GanttChartStoreContext);
+  if (!store) throw new Error("GanttChartStoreContext is missing.");
+  return store;
 }
 
 // ---------------------------------------------------------------------------
@@ -60,15 +67,19 @@ function GanttChartInner({
   onTaskClick,
   onMilestoneClick,
   onAddTask,
+  onEditTask,
   onDeleteTask,
   onStatusChange,
-  enableBuiltinDialogs,
+  onTasksChange,
+  enableBuiltinDialogs = true,
   onTaskCreated,
   onTaskUpdated,
   onTaskDeleted,
   showToolbar = true,
   height,
   width,
+  minPanelWidth = 200,
+  maxPanelWidth = 600,
 }: GanttChartInnerProps) {
   const resolvedHeight = resolveSize(height, 400);
   const resolvedWidth = resolveSize(width, "100%");
@@ -77,6 +88,8 @@ function GanttChartInner({
   const rightRef = useRef<HTMLDivElement>(null);
   // Verhindert gegenseitiges Auslösen der Scroll-Handler (Feedback-Loop).
   const isSyncing = useRef(false);
+
+  const [panelWidth, setPanelWidth] = useState(LEFT_PANEL_WIDTH);
 
   useEffect(() => {
     setTasks(tasks);
@@ -100,6 +113,26 @@ function GanttChartInner({
     isSyncing.current = false;
   };
 
+  const handleDividerMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      const startX = e.clientX;
+      const startWidth = panelWidth;
+      const onMouseMove = (ev: MouseEvent) => {
+        const delta = ev.clientX - startX;
+        const newWidth = Math.max(minPanelWidth, Math.min(maxPanelWidth, startWidth + delta));
+        setPanelWidth(newWidth);
+      };
+      const onMouseUp = () => {
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
+      };
+      document.addEventListener("mousemove", onMouseMove);
+      document.addEventListener("mouseup", onMouseUp);
+    },
+    [panelWidth, minPanelWidth, maxPanelWidth],
+  );
+
   return (
     <Box
       sx={{
@@ -119,14 +152,28 @@ function GanttChartInner({
         <GanttTaskPanel
           scrollRef={leftRef}
           onScroll={handleLeftScroll}
+          panelWidth={panelWidth}
           onTaskClick={onTaskClick}
           onAddTask={onAddTask}
+          onEditTask={onEditTask}
           onDeleteTask={onDeleteTask}
           onStatusChange={onStatusChange}
+          onTasksChange={onTasksChange}
           enableBuiltinDialogs={enableBuiltinDialogs}
           onTaskCreated={onTaskCreated}
           onTaskUpdated={onTaskUpdated}
           onTaskDeleted={onTaskDeleted}
+        />
+        <Box
+          data-testid="gantt-panel-divider"
+          sx={{
+            width: DIVIDER_WIDTH,
+            flexShrink: 0,
+            bgcolor: "divider",
+            cursor: "col-resize",
+            "&:hover": { bgcolor: "action.hover" },
+          }}
+          onMouseDown={handleDividerMouseDown}
         />
         <GanttTimeline
           scrollRef={rightRef}
@@ -151,17 +198,21 @@ export function GanttChart({
   defaultRangeStart,
   defaultRangeEnd,
   translations,
-  enableBuiltinDialogs,
+  enableBuiltinDialogs = true,
   onTaskClick,
   onMilestoneClick,
   onAddTask,
+  onEditTask,
   onDeleteTask,
   onStatusChange,
+  onTasksChange,
   onTaskCreated,
   onTaskUpdated,
   onTaskDeleted,
   height,
   width,
+  minPanelWidth,
+  maxPanelWidth,
 }: GanttChartProps) {
   const mergedTranslations = useMemo(
     () => ({ ...DEFAULT_GANTT_TRANSLATIONS, ...translations }),
@@ -190,14 +241,18 @@ export function GanttChart({
           onTaskClick={onTaskClick}
           onMilestoneClick={onMilestoneClick}
           onAddTask={onAddTask}
+          onEditTask={onEditTask}
           onDeleteTask={onDeleteTask}
           onStatusChange={onStatusChange}
+          onTasksChange={onTasksChange}
           onTaskCreated={onTaskCreated}
           onTaskUpdated={onTaskUpdated}
           onTaskDeleted={onTaskDeleted}
           showToolbar={showToolbar}
           height={height}
           width={width}
+          minPanelWidth={minPanelWidth}
+          maxPanelWidth={maxPanelWidth}
         />
       </GanttChartStoreContext.Provider>
     </GanttTranslationsContext.Provider>
