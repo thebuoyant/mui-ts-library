@@ -34,6 +34,9 @@ const EN_TRANSLATIONS: GanttTranslations = {
   dialogFieldParent: "Parent Task",
   dialogFieldParentNone: "— None —",
   dialogDeleteConfirm: "Delete task \"{name}\"?",
+  scrollToTodayTooltip: "Scroll to today",
+  expandAllTooltip: "Expand all",
+  collapseAllTooltip: "Collapse all",
 };
 
 const sampleTasks: GanttTask[] = [
@@ -204,6 +207,7 @@ const meta: Meta<typeof GanttChart> = {
     initialExpandAll: { control: "boolean" },
     showToolbar: { control: "boolean" },
     enableBuiltinDialogs: { control: "boolean" },
+    zoomable: { control: "boolean" },
     minPanelWidth: { control: "number" },
     maxPanelWidth: { control: "number" },
     // Date objects aren't directly controllable — use the CustomDateRange story instead.
@@ -482,6 +486,21 @@ export const WithBuiltinDialogs: Story = {
     tasks: sampleTasks,
     timeScale: "months",
     enableBuiltinDialogs: true,
+  },
+  render: (args) => (
+    <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
+      <GanttChart {...args} />
+    </Box>
+  ),
+};
+
+export const ZoomAndToday: Story = {
+  args: {
+    tasks: sampleTasks,
+    timeScale: "months",
+    zoomable: true,
+    enableBuiltinDialogs: true,
+    height: 500,
   },
   render: (args) => (
     <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>

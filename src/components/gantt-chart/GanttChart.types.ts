@@ -66,6 +66,10 @@ export type GanttTranslations = {
   dialogFieldParentNone: string;
   // Dialoge — Bestätigungstext ({name} wird durch den Task-Namen ersetzt)
   dialogDeleteConfirm: string;
+  // Toolbar — Heute-Button + Expand/Collapse
+  scrollToTodayTooltip: string;
+  expandAllTooltip: string;
+  collapseAllTooltip: string;
 };
 
 // Standardwerte entsprechen dem aktuell gerenderten Verhalten (DE Toolbar, EN Status).
@@ -99,6 +103,9 @@ export const DEFAULT_GANTT_TRANSLATIONS: GanttTranslations = {
   dialogFieldParent: "Übergeordnete Aufgabe",
   dialogFieldParentNone: "— Keine —",
   dialogDeleteConfirm: "Soll die Aufgabe \"{name}\" wirklich gelöscht werden?",
+  scrollToTodayTooltip: "Zum heutigen Tag",
+  expandAllTooltip: "Alle aufklappen",
+  collapseAllTooltip: "Alle zuklappen",
 };
 
 export type GanttChartProps = {
@@ -123,6 +130,8 @@ export type GanttChartProps = {
   maxPanelWidth?: number;
   // Wenn true (Standard), öffnen Add/Edit/Delete-Icons MUI-Dialoge statt Callbacks direkt aufzurufen.
   enableBuiltinDialogs?: boolean;
+  // Wenn true, ändert Strg+Mausrad die Zeitskala (days ↔ weeks ↔ months ↔ quarters).
+  zoomable?: boolean;
   onTaskClick?: (task: GanttTask) => void;
   onMilestoneClick?: (task: GanttTask) => void;
   onAddTask?: (parentTask?: GanttTask) => void;

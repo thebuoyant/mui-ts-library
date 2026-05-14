@@ -740,3 +740,92 @@ describe("GanttChart — onEditTask direct callback", () => {
     expect(onTaskClick).not.toHaveBeenCalled();
   });
 });
+
+// ---------------------------------------------------------------------------
+// Phase 13 — Heute-Button + Wochenend-Highlight + Zoom
+// ---------------------------------------------------------------------------
+
+describe("GanttChart — scroll-to-today button", () => {
+  it("renders the scroll-to-today button in the toolbar", () => {
+    render(<GanttChart tasks={tasks} />);
+
+    expect(screen.getByTestId("gantt-scroll-to-today")).toBeInTheDocument();
+  });
+
+  it("disables the scroll-to-today button when today is outside the timeline range", () => {
+    render(
+      <GanttChart
+        tasks={tasks}
+        defaultRangeStart={new Date("2020-01-01")}
+        defaultRangeEnd={new Date("2020-12-31")}
+      />,
+    );
+
+    const btn = screen.getByTestId("gantt-scroll-to-today");
+    expect(btn).toBeDisabled();
+  });
+});
+
+describe("GanttChart — weekend highlight", () => {
+  it("renders weekend strips in the days scale", () => {
+    render(<GanttChart tasks={tasks} timeScale="days" />);
+
+    expect(screen.getByTestId("gantt-weekend-strips")).toBeInTheDocument();
+  });
+
+  it("does not render weekend strips in the months scale", () => {
+    render(<GanttChart tasks={tasks} timeScale="months" />);
+
+    expect(screen.queryByTestId("gantt-weekend-strips")).not.toBeInTheDocument();
+  });
+});
+
+describe("GanttChart — zoom (Ctrl+wheel)", () => {
+  it("changes time scale from months to weeks on ctrl+wheel up when zoomable", () => {
+    render(<GanttChart tasks={tasks} timeScale="months" zoomable />);
+
+    expect(screen.getByTestId("gantt-scale-months").closest("button")).toHaveAttribute("aria-pressed", "true");
+
+    fireEvent.wheel(screen.getByTestId("gantt-timeline-scroll"), { ctrlKey: true, deltaY: -100 });
+
+    expect(screen.getByTestId("gantt-scale-weeks").closest("button")).toHaveAttribute("aria-pressed", "true");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Phase 13 — Expand/Collapse All
+// ---------------------------------------------------------------------------
+
+describe("GanttChart — expand/collapse all button", () => {
+  it("renders the expand/collapse-all button in the toolbar", () => {
+    render(<GanttChart tasks={tasks} />);
+
+    expect(screen.getByTestId("gantt-expand-collapse-all")).toBeInTheDocument();
+  });
+
+  it("hides child rows after collapsing all when starting fully expanded", () => {
+    render(<GanttChart tasks={tasks} initialExpandAll />);
+
+    // Child is visible before collapse
+    expect(screen.getByTestId("gantt-bar-row-child")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId("gantt-expand-collapse-all"));
+
+    // After collapse-all, child is no longer rendered
+    expect(screen.queryByTestId("gantt-bar-row-child")).not.toBeInTheDocument();
+  });
+
+  it("restores child rows after expanding all following a collapse", () => {
+    render(<GanttChart tasks={tasks} initialExpandAll />);
+
+    const btn = screen.getByTestId("gantt-expand-collapse-all");
+
+    // First click: collapse all
+    fireEvent.click(btn);
+    expect(screen.queryByTestId("gantt-bar-row-child")).not.toBeInTheDocument();
+
+    // Second click: expand all
+    fireEvent.click(btn);
+    expect(screen.getByTestId("gantt-bar-row-child")).toBeInTheDocument();
+  });
+});

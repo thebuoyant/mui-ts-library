@@ -28,7 +28,7 @@ React 19, TypeScript 5.9, MUI v7, Zustand v5, Vite 8, Vitest 4, Storybook 10
 
 ---
 
-## Aktueller Stand: Phasen 1–11 + Fixes abgeschlossen ✅ (164 Tests grün)
+## Aktueller Stand: Phasen 1–13 + Expand/Collapse All abgeschlossen ✅ (172 Tests grün)
 
 ### Alle vorhandenen Dateien
 
@@ -47,7 +47,7 @@ React 19, TypeScript 5.9, MUI v7, Zustand v5, Vite 8, Vitest 4, Storybook 10
 | `GanttDeleteDialog.tsx`         | MUI Bestätigungs-Dialog für Löschen                                                  |
 | `GanttTimelineHeader.tsx`       | Header mit optionalem zwei-Ebenen-Modus (`groups`) für Tages-Skala                  |
 | `GanttTimeline.tsx`             | Rechtes Panel: Balken + Progress-Overlay, Meilensteine, Gitterlinien, SVG (Pfeile + Today-Linie) |
-| `GanttToolbar.tsx`              | Toolbar: Skala-Switcher + Von/Bis-Date-Inputs + Reset-Button                        |
+| `GanttToolbar.tsx`              | Toolbar: Skala-Switcher + Von/Bis-Date-Inputs + Reset-Button + Heute-Button + Expand/Collapse-All-Button |
 | `GanttChart.stories.tsx`        | 12 Stories mit argTypes und meta args                                                |
 
 ### GanttTimeScale — implementierter Stand
@@ -326,8 +326,8 @@ export function useRawGanttChartStore(): GanttChartStore
 
 ```
 Bitte lies zuerst die claude-gantt-kickoff.md im Root des Projekts.
-Dann besprechen wir Phase 12.
-164 Tests müssen nach den Änderungen grün bleiben.
+Dann besprechen wir Phase 12 oder die nächste geplante Phase.
+172 Tests müssen nach den Änderungen grün bleiben.
 ```
 
 ---
@@ -362,23 +362,47 @@ onTaskResized?: (task: GanttTask, newEnd: Date) => void;
 
 ---
 
-### Phase 13 — Timeline-Komfort: Heute-Button + Wochenend-Highlight + Zoom
+### Phase 13 ✅ abgeschlossen (172 Tests)
 
-**"Heute"-Button in der Toolbar**
-- Neues Icon in `GanttToolbar` (z. B. `TodayIcon` aus MUI Icons)
-- Klick → `scrollRef.current.scrollLeft = todayX - viewportWidth / 2` (identisch mit dem Mount-Effekt)
-- Button ist disabled wenn `todayX === null` (heute außerhalb der Range)
+**"Heute"-Button**
+- `TodayIcon` in `GanttToolbar`, Prop `onScrollToToday?: () => void`
+- `scrollToToday` in `GanttChartInner` via `getDisplayRange` + `rightRef.current.scrollWidth`
+- Disabled wenn `Date.now()` außerhalb `timelineRange` — `isTodayInRange` direkt in `GanttToolbar` berechnet
+- `data-testid="gantt-scroll-to-today"`; neue Translation: `scrollToTodayTooltip`
 
-**Wochenend-Hervorhebung in der Tages-Skala**
-- In `GanttTimeline`: bei `timeScale === "days"` jede Spalte prüfen ob `dayOfWeek === 0 || 6`
-- Samstag/Sonntag: leicht grauer Hintergrund (`action.hover` oder `action.disabledBackground`)
-- Auch im Header: Tageszahl fett/gedimmt je Wochentag
+**Wochenend-Hervorhebung (Tages-Skala)**
+- `isWeekend?: boolean` in `HeaderColumn` — Header-Zellen mit `bgcolor: "action.hover"`, Text `color: "text.disabled"`
+- Weekend-Strip-Layer: absolut positioniertes `Box`-Container über allen Zeilen (`data-testid="gantt-weekend-strips"`), `pointerEvents: none`
+- Nur bei `timeScale === "days"` gerendert
 
 **Zoom per Strg+Mausrad**
-- `onWheel` auf dem Timeline-Container mit `ctrlKey === true`
-- Skalen-Reihenfolge: `days → weeks → months → quarters` (und zurück)
-- `e.preventDefault()` damit der Browser nicht selbst zoomt
 - Neue Prop `zoomable?: boolean` (Default: false)
+- `useEffect` in `GanttChartInner` mit `addEventListener("wheel", ..., { passive: false })` auf `rightRef.current`
+- Skalen-Reihenfolge: `days ↔ weeks ↔ months ↔ quarters`
+
+**Neue Utility-Funktion**
+```ts
+// util/gantt-chart.util.ts
+export function getDisplayRange(timelineRange: TimelineRange, timeScale: GanttTimeScale): TimelineRange
+```
+Wird von `GanttTimeline` (ersetzt lokales `useMemo`) und `GanttChartInner` (`scrollToToday`) geteilt.
+
+**Neue data-testids**
+- `gantt-scroll-to-today` — Heute-Button
+- `gantt-weekend-strips` — Wochenend-Hintergrund-Layer
+- `gantt-timeline-scroll` — scrollbares Timeline-Container-div
+
+---
+
+### Expand/Collapse All ✅ abgeschlossen (172 Tests)
+
+**Expand/Collapse-All-Button in der Toolbar**
+- `UnfoldMoreIcon` / `UnfoldLessIcon` aus `@mui/icons-material`
+- Zustand: `allExpanded = tasks.length > 0 && tasks.every((t) => expandedIds.has(t.id))`
+- Klick auf `expandAll` (Store-Aktion: `expandedIds = new Set(tasks.map(t => t.id))`) oder `collapseAll` (Store-Aktion: `expandedIds = new Set()`)
+- Icon und Tooltip wechseln je nach `allExpanded`-Zustand
+- `data-testid="gantt-expand-collapse-all"`
+- Neue Translations: `expandAllTooltip: "Alle aufklappen"`, `collapseAllTooltip: "Alle zuklappen"`
 
 ---
 

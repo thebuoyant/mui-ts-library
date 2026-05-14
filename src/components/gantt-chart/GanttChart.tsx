@@ -7,7 +7,8 @@ import {
 } from "./GanttChart.store";
 import type { GanttChartProps, GanttTranslations } from "./GanttChart.types";
 import { DEFAULT_GANTT_TRANSLATIONS } from "./GanttChart.types";
-import { getTimelineRange } from "./util/gantt-chart.util";
+import { getDisplayRange, getTimelineRange } from "./util/gantt-chart.util";
+import type { GanttTimeScale } from "./GanttChart.types";
 import { GanttTaskPanel } from "./GanttTaskPanel";
 import { GanttTimeline } from "./GanttTimeline";
 import { GanttToolbar } from "./GanttToolbar";
@@ -62,6 +63,8 @@ function resolveSize(value: number | string | undefined, fallback: number | stri
 
 type GanttChartInnerProps = GanttChartProps;
 
+const SCALE_ORDER: GanttTimeScale[] = ["days", "weeks", "months", "quarters"];
+
 function GanttChartInner({
   tasks,
   onTaskClick,
@@ -80,10 +83,14 @@ function GanttChartInner({
   width,
   minPanelWidth = 200,
   maxPanelWidth = 600,
+  zoomable = false,
 }: GanttChartInnerProps) {
   const resolvedHeight = resolveSize(height, 400);
   const resolvedWidth = resolveSize(width, "100%");
   const setTasks = useGanttChartStore((s) => s.setTasks);
+  const timeScale = useGanttChartStore((s) => s.timeScale);
+  const setTimeScale = useGanttChartStore((s) => s.setTimeScale);
+  const timelineRange = useGanttChartStore((s) => s.timelineRange);
   const leftRef = useRef<HTMLDivElement>(null);
   const rightRef = useRef<HTMLDivElement>(null);
   // Verhindert gegenseitiges Auslösen der Scroll-Handler (Feedback-Loop).
@@ -112,6 +119,31 @@ function GanttChartInner({
     }
     isSyncing.current = false;
   };
+
+  const scrollToToday = useCallback(() => {
+    if (!rightRef.current) return;
+    const displayRange = getDisplayRange(timelineRange, timeScale);
+    const now = Date.now();
+    const start = displayRange.start.getTime();
+    const end = displayRange.end.getTime();
+    const todayX = ((now - start) / (end - start)) * rightRef.current.scrollWidth;
+    rightRef.current.scrollLeft = Math.max(0, todayX - rightRef.current.clientWidth / 2);
+  }, [timelineRange, timeScale]);
+
+  // Strg+Mausrad → Zeitskala wechseln (opt-in via zoomable-Prop).
+  useEffect(() => {
+    if (!zoomable || !rightRef.current) return;
+    const el = rightRef.current;
+    const handleWheel = (e: WheelEvent) => {
+      if (!e.ctrlKey) return;
+      e.preventDefault();
+      const idx = SCALE_ORDER.indexOf(timeScale);
+      if (e.deltaY < 0 && idx > 0) setTimeScale(SCALE_ORDER[idx - 1]);
+      else if (e.deltaY > 0 && idx < SCALE_ORDER.length - 1) setTimeScale(SCALE_ORDER[idx + 1]);
+    };
+    el.addEventListener("wheel", handleWheel, { passive: false });
+    return () => el.removeEventListener("wheel", handleWheel);
+  }, [zoomable, timeScale, setTimeScale]);
 
   const handleDividerMouseDown = useCallback(
     (e: React.MouseEvent) => {
@@ -146,7 +178,7 @@ function GanttChartInner({
         overflow: "hidden",
       }}
     >
-      {showToolbar && <GanttToolbar />}
+      {showToolbar && <GanttToolbar onScrollToToday={scrollToToday} />}
 
       <Box sx={{ display: "flex", flex: 1, overflow: "hidden" }}>
         <GanttTaskPanel
@@ -199,6 +231,7 @@ export function GanttChart({
   defaultRangeEnd,
   translations,
   enableBuiltinDialogs = true,
+  zoomable = false,
   onTaskClick,
   onMilestoneClick,
   onAddTask,
@@ -238,6 +271,7 @@ export function GanttChart({
           tasks={tasks}
           timeScale={timeScale}
           enableBuiltinDialogs={enableBuiltinDialogs}
+          zoomable={zoomable}
           onTaskClick={onTaskClick}
           onMilestoneClick={onMilestoneClick}
           onAddTask={onAddTask}

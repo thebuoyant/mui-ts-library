@@ -1,5 +1,8 @@
 import { Box, IconButton, TextField, ToggleButton, ToggleButtonGroup, Tooltip } from "@mui/material";
 import RestoreIcon from "@mui/icons-material/Restore";
+import TodayIcon from "@mui/icons-material/Today";
+import UnfoldLessIcon from "@mui/icons-material/UnfoldLess";
+import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 import { useGanttChartStore, useGanttTranslations } from "./GanttChart";
 import type { GanttTimeScale } from "./GanttChart.types";
 
@@ -17,7 +20,7 @@ function parseDateInput(value: string): Date | null {
   return new Date(y, m - 1, d, 0, 0, 0, 0);
 }
 
-export function GanttToolbar() {
+export function GanttToolbar({ onScrollToToday }: { onScrollToToday?: () => void }) {
   const t = useGanttTranslations();
   const timeScale = useGanttChartStore((s) => s.timeScale);
   const setTimeScale = useGanttChartStore((s) => s.setTimeScale);
@@ -25,6 +28,16 @@ export function GanttToolbar() {
   const isRangeCustomized = useGanttChartStore((s) => s.isRangeCustomized);
   const setTimelineRange = useGanttChartStore((s) => s.setTimelineRange);
   const resetTimelineRange = useGanttChartStore((s) => s.resetTimelineRange);
+  const tasks = useGanttChartStore((s) => s.tasks);
+  const expandedIds = useGanttChartStore((s) => s.expandedIds);
+  const expandAll = useGanttChartStore((s) => s.expandAll);
+  const collapseAll = useGanttChartStore((s) => s.collapseAll);
+
+  const allExpanded = tasks.length > 0 && tasks.every((t) => expandedIds.has(t.id));
+
+  const now = Date.now();
+  const isTodayInRange =
+    now >= timelineRange.start.getTime() && now <= timelineRange.end.getTime();
 
   const SCALE_LABELS: Record<GanttTimeScale, string> = {
     days: t.scaleDays,
@@ -77,6 +90,33 @@ export function GanttToolbar() {
       </ToggleButtonGroup>
 
       <Box sx={{ ml: "auto", display: "flex", alignItems: "center", gap: 1 }}>
+        <Tooltip title={allExpanded ? t.collapseAllTooltip : t.expandAllTooltip}>
+          <IconButton
+            size="small"
+            onClick={allExpanded ? collapseAll : expandAll}
+            data-testid="gantt-expand-collapse-all"
+          >
+            {allExpanded ? (
+              <UnfoldLessIcon fontSize="small" />
+            ) : (
+              <UnfoldMoreIcon fontSize="small" />
+            )}
+          </IconButton>
+        </Tooltip>
+        {onScrollToToday && (
+          <Tooltip title={t.scrollToTodayTooltip}>
+            <span>
+              <IconButton
+                size="small"
+                onClick={onScrollToToday}
+                disabled={!isTodayInRange}
+                data-testid="gantt-scroll-to-today"
+              >
+                <TodayIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
+        )}
         <TextField
           type="date"
           size="small"

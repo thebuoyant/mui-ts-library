@@ -6,15 +6,13 @@ import type { GanttTask } from "./GanttChart.types";
 import type { GanttTaskNode } from "./GanttChart.types";
 import {
   calculateTaskPosition,
-  endOfQuarter,
   getDaysInRange,
+  getDisplayRange,
   getISOWeekNumber,
   getMonthsInRange,
   getQuartersInRange,
   getVisibleTasks,
   getWeeksInRange,
-  startOfQuarter,
-  startOfWeek,
 } from "./util/gantt-chart.util";
 import type { TimelineRange } from "./util/gantt-chart.util";
 import { GanttTimelineHeader } from "./GanttTimelineHeader";
@@ -143,18 +141,10 @@ export function GanttTimeline({
   );
 
   // Anzeigebereich auf Spalten-Grenzen ausweiten damit Balken-Prozente korrekt ausgerichtet sind.
-  const displayRange = useMemo((): TimelineRange => {
-    if (timeScale === "weeks") {
-      return { start: startOfWeek(timelineRange.start), end: timelineRange.end };
-    }
-    if (timeScale === "quarters") {
-      return {
-        start: startOfQuarter(timelineRange.start),
-        end: endOfQuarter(timelineRange.end),
-      };
-    }
-    return timelineRange;
-  }, [timeScale, timelineRange]);
+  const displayRange = useMemo(
+    () => getDisplayRange(timelineRange, timeScale),
+    [timelineRange, timeScale],
+  );
 
   const columns = useMemo((): HeaderColumn[] => {
     if (timeScale === "days") {
@@ -162,6 +152,7 @@ export function GanttTimeline({
         key: d.toISOString(),
         label: String(d.getDate()),
         width: COLUMN_WIDTH_DAY,
+        isWeekend: d.getDay() === 0 || d.getDay() === 6,
       }));
     }
     if (timeScale === "weeks") {
@@ -213,6 +204,17 @@ export function GanttTimeline({
     [visibleTasks, displayRange, totalWidth],
   );
 
+  // Positionen der Wochenend-Spalten für das Hintergrund-Highlight (nur Tages-Skala).
+  const weekendStrips = useMemo(() => {
+    if (timeScale !== "days") return [];
+    let x = 0;
+    return columns.flatMap((col) => {
+      const strip = col.isWeekend ? [{ key: col.key, left: x }] : [];
+      x += col.width;
+      return strip;
+    });
+  }, [timeScale, columns]);
+
   // X-Position des heutigen Datums — null wenn außerhalb des sichtbaren Bereichs.
   const todayX = useMemo(() => {
     const now = Date.now();
@@ -242,10 +244,40 @@ export function GanttTimeline({
   const headerTotalHeight = groups ? HEADER_HEIGHT * 2 : HEADER_HEIGHT;
 
   return (
-    <Box ref={scrollRef} onScroll={onScroll} sx={{ flex: 1, overflow: "auto" }}>
+    <Box ref={scrollRef} onScroll={onScroll} data-testid="gantt-timeline-scroll" sx={{ flex: 1, overflow: "auto" }}>
       {/* position: relative ist Pflicht damit der SVG-Layer korrekt absolut positioniert wird. */}
       <Box sx={{ minWidth: totalWidth, position: "relative" }}>
         <GanttTimelineHeader columns={columns} groups={groups} />
+
+        {/* Wochenend-Hintergrund — ein Layer für alle Zeilen, pointerEvents: none damit Klicks durchgehen. */}
+        {weekendStrips.length > 0 && (
+          <Box
+            aria-hidden
+            data-testid="gantt-weekend-strips"
+            sx={{
+              position: "absolute",
+              top: headerTotalHeight,
+              left: 0,
+              width: totalWidth,
+              height: visibleTasks.length * ROW_HEIGHT,
+              pointerEvents: "none",
+            }}
+          >
+            {weekendStrips.map((strip) => (
+              <Box
+                key={strip.key}
+                sx={{
+                  position: "absolute",
+                  left: strip.left,
+                  width: COLUMN_WIDTH_DAY,
+                  top: 0,
+                  height: "100%",
+                  bgcolor: "action.hover",
+                }}
+              />
+            ))}
+          </Box>
+        )}
 
         {visibleTasks.map((task) => {
           const { left, width } = calculateTaskPosition(task, displayRange);

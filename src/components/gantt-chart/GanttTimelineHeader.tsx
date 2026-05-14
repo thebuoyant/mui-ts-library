@@ -5,6 +5,7 @@ export type HeaderColumn = {
   key: string;
   label: string;
   width: number;
+  isWeekend?: boolean;
 };
 
 // Obere Gruppenzeile für den Zwei-Ebenen-Header (z. B. Monate über Tages-Spalten).
@@ -20,7 +21,7 @@ type GanttTimelineHeaderProps = {
   groups?: HeaderGroup[];
 };
 
-function HeaderRow({ items }: { items: Array<{ key: string; label: string; width: number }> }) {
+function HeaderRow({ items }: { items: Array<{ key: string; label: string; width: number; isWeekend?: boolean }> }) {
   return (
     <Box sx={{ display: "flex" }}>
       {items.map((item) => (
@@ -35,9 +36,13 @@ function HeaderRow({ items }: { items: Array<{ key: string; label: string; width
             justifyContent: "center",
             borderRight: "1px solid",
             borderColor: "divider",
+            bgcolor: item.isWeekend ? "action.hover" : "transparent",
           }}
         >
-          <Typography variant="caption" color="text.secondary">
+          <Typography
+            variant="caption"
+            color={item.isWeekend ? "text.disabled" : "text.secondary"}
+          >
             {item.label}
           </Typography>
         </Box>

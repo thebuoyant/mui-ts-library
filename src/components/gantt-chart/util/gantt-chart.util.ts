@@ -1,4 +1,4 @@
-import type { GanttTask, GanttTaskNode } from "../GanttChart.types";
+import type { GanttTask, GanttTaskNode, GanttTimeScale } from "../GanttChart.types";
 
 // ---------------------------------------------------------------------------
 // Timeline-Bereich
@@ -31,6 +31,18 @@ export function getTimelineRange(tasks: GanttTask[]): TimelineRange {
     start: taskStart < quarterStart ? taskStart : quarterStart,
     end: taskEnd > quarterEnd ? taskEnd : quarterEnd,
   };
+}
+
+// Skala-spezifische Erweiterung des timelineRange auf Spalten-Grenzen.
+// Wird von GanttTimeline und GanttChartInner (für scrollToToday) geteilt.
+export function getDisplayRange(timelineRange: TimelineRange, timeScale: GanttTimeScale): TimelineRange {
+  if (timeScale === "weeks") {
+    return { start: startOfWeek(timelineRange.start), end: timelineRange.end };
+  }
+  if (timeScale === "quarters") {
+    return { start: startOfQuarter(timelineRange.start), end: endOfQuarter(timelineRange.end) };
+  }
+  return timelineRange;
 }
 
 // ---------------------------------------------------------------------------
