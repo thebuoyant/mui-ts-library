@@ -84,6 +84,10 @@ function GanttChartInner({
   minPanelWidth = 200,
   maxPanelWidth = 600,
   zoomable = false,
+  draggable = false,
+  resizable = false,
+  onTaskMoved,
+  onTaskResized,
 }: GanttChartInnerProps) {
   const resolvedHeight = resolveSize(height, 400);
   const resolvedWidth = resolveSize(width, "100%");
@@ -212,6 +216,11 @@ function GanttChartInner({
           onScroll={handleRightScroll}
           onTaskClick={onTaskClick}
           onMilestoneClick={onMilestoneClick}
+          draggable={draggable}
+          resizable={resizable}
+          onTaskMoved={onTaskMoved}
+          onTaskResized={onTaskResized}
+          onTasksChange={onTasksChange}
         />
       </Box>
     </Box>
@@ -232,6 +241,9 @@ export function GanttChart({
   translations,
   enableBuiltinDialogs = true,
   zoomable = false,
+  draggable = false,
+  resizable = false,
+  cascadeDependencies = false,
   onTaskClick,
   onMilestoneClick,
   onAddTask,
@@ -239,6 +251,8 @@ export function GanttChart({
   onDeleteTask,
   onStatusChange,
   onTasksChange,
+  onTaskMoved,
+  onTaskResized,
   onTaskCreated,
   onTaskUpdated,
   onTaskDeleted,
@@ -255,13 +269,14 @@ export function GanttChart({
 
   const [store] = useState(() => {
     const hasCustomRange = defaultRangeStart !== undefined || defaultRangeEnd !== undefined;
-    if (!hasCustomRange) return createGanttChartStore(tasks, timeScale, initialExpandAll);
-
+    if (!hasCustomRange) {
+      return createGanttChartStore(tasks, timeScale, initialExpandAll, undefined, cascadeDependencies);
+    }
     const autoRange = getTimelineRange(tasks);
     return createGanttChartStore(tasks, timeScale, initialExpandAll, {
       start: defaultRangeStart ?? autoRange.start,
       end: defaultRangeEnd ?? autoRange.end,
-    });
+    }, cascadeDependencies);
   });
 
   return (
@@ -272,6 +287,8 @@ export function GanttChart({
           timeScale={timeScale}
           enableBuiltinDialogs={enableBuiltinDialogs}
           zoomable={zoomable}
+          draggable={draggable}
+          resizable={resizable}
           onTaskClick={onTaskClick}
           onMilestoneClick={onMilestoneClick}
           onAddTask={onAddTask}
@@ -279,6 +296,8 @@ export function GanttChart({
           onDeleteTask={onDeleteTask}
           onStatusChange={onStatusChange}
           onTasksChange={onTasksChange}
+          onTaskMoved={onTaskMoved}
+          onTaskResized={onTaskResized}
           onTaskCreated={onTaskCreated}
           onTaskUpdated={onTaskUpdated}
           onTaskDeleted={onTaskDeleted}

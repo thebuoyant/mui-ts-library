@@ -184,8 +184,13 @@ const meta: Meta<typeof GanttChart> = {
   args: {
     height: 500,
     width: "auto",
-    initialExpandAll: false,
+    initialExpandAll: true,
     showToolbar: true,
+    enableBuiltinDialogs: true,
+    zoomable: true,
+    draggable: true,
+    resizable: true,
+    cascadeDependencies: true,
     minPanelWidth: 200,
     maxPanelWidth: 600,
     // Alle Callbacks als fn() damit sie im Storybook-Actions-Tab erscheinen.
@@ -208,6 +213,11 @@ const meta: Meta<typeof GanttChart> = {
     showToolbar: { control: "boolean" },
     enableBuiltinDialogs: { control: "boolean" },
     zoomable: { control: "boolean" },
+    draggable: { control: "boolean" },
+    resizable: { control: "boolean" },
+    cascadeDependencies: { control: "boolean" },
+    onTaskMoved: { control: false },
+    onTaskResized: { control: false },
     minPanelWidth: { control: "number" },
     maxPanelWidth: { control: "number" },
     // Date objects aren't directly controllable — use the CustomDateRange story instead.
@@ -504,6 +514,26 @@ export const ZoomAndToday: Story = {
   },
   render: (args) => (
     <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
+      <GanttChart {...args} />
+    </Box>
+  ),
+};
+
+export const DragAndResize: Story = {
+  args: {
+    tasks: sampleTasks,
+    timeScale: "months",
+    draggable: true,
+    resizable: true,
+    initialExpandAll: true,
+    enableBuiltinDialogs: true,
+    height: 600,
+    onTaskMoved: fn(),
+    onTaskResized: fn(),
+    onTasksChange: fn(),
+  },
+  render: (args) => (
+    <Box sx={{ width: "100%", maxWidth: 1100, height: args.height }}>
       <GanttChart {...args} />
     </Box>
   ),

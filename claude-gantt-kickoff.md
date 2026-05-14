@@ -28,7 +28,7 @@ React 19, TypeScript 5.9, MUI v7, Zustand v5, Vite 8, Vitest 4, Storybook 10
 
 ---
 
-## Aktueller Stand: Phasen 1–13 + Expand/Collapse All abgeschlossen ✅ (172 Tests grün)
+## Aktueller Stand: Phasen 1–13 + Expand/Collapse All + Phase 12 + Cascade Dependencies abgeschlossen ✅ (181 Tests grün)
 
 ### Alle vorhandenen Dateien
 
@@ -48,7 +48,7 @@ React 19, TypeScript 5.9, MUI v7, Zustand v5, Vite 8, Vitest 4, Storybook 10
 | `GanttTimelineHeader.tsx`       | Header mit optionalem zwei-Ebenen-Modus (`groups`) für Tages-Skala                  |
 | `GanttTimeline.tsx`             | Rechtes Panel: Balken + Progress-Overlay, Meilensteine, Gitterlinien, SVG (Pfeile + Today-Linie) |
 | `GanttToolbar.tsx`              | Toolbar: Skala-Switcher + Von/Bis-Date-Inputs + Reset-Button + Heute-Button + Expand/Collapse-All-Button |
-| `GanttChart.stories.tsx`        | 12 Stories mit argTypes und meta args                                                |
+| `GanttChart.stories.tsx`        | 13 Stories mit argTypes und meta args                                                |
 
 ### GanttTimeScale — implementierter Stand
 
@@ -227,13 +227,18 @@ onTasksChange?.(rawStore.getState().tasks); // synchron — Zustand-set ist sync
   minPanelWidth={200}                    // Mindestbreite des linken Panels, Default: 200
   maxPanelWidth={600}                    // Maximalbreite des linken Panels, Default: 600
   enableBuiltinDialogs={true}            // DEFAULT: true — öffnet Dialoge statt direkter Callbacks
+  draggable={false}                      // Balken horizontal verschiebbar
+  resizable={false}                      // endDate per Drag am rechten Rand änderbar
+  cascadeDependencies={false}            // Nachfolger bei Datumsänderung automatisch mitverschieben
   onTaskClick={(task) => ...}
   onMilestoneClick={(task) => ...}
   onAddTask={(parentTask?) => ...}       // nur wenn enableBuiltinDialogs=false
   onEditTask={(task) => ...}             // nur wenn enableBuiltinDialogs=false (Phase 11)
   onDeleteTask={(task) => ...}           // nur wenn enableBuiltinDialogs=false
   onStatusChange={(task, status) => ...}
-  onTasksChange={(tasks) => ...}         // nach jeder CRUD-Aktion mit aktueller Task-Liste (Phase 11)
+  onTasksChange={(tasks) => ...}         // nach jeder CRUD-Aktion und nach Drag/Resize mit aktueller Task-Liste
+  onTaskMoved={(task, newStart, newEnd) => ...}  // nach Drag-Verschiebung eines Balkens
+  onTaskResized={(task, newEnd) => ...}           // nach Resize am rechten Balkenrand
   onTaskCreated={(task) => ...}          // enthält generierte UUID (enableBuiltinDialogs=true)
   onTaskUpdated={(task) => ...}          // (enableBuiltinDialogs=true)
   onTaskDeleted={(taskId) => ...}        // (enableBuiltinDialogs=true)
@@ -326,39 +331,102 @@ export function useRawGanttChartStore(): GanttChartStore
 
 ```
 Bitte lies zuerst die claude-gantt-kickoff.md im Root des Projekts.
-Dann besprechen wir Phase 12 oder die nächste geplante Phase.
-172 Tests müssen nach den Änderungen grün bleiben.
+Dann besprechen wir die nächste geplante Phase.
+181 Tests müssen nach den Änderungen grün bleiben.
 ```
 
 ---
 
-## Geplante Phasen (noch nicht implementiert)
+## Abgeschlossene Phasen
 
-### Phase 12 — Drag & Drop: Balken verschieben + Resize ⭐ höchste Priorität
+### Phase 12 ✅ abgeschlossen (177 Tests)
 
-Der größte UX-Sprung: Nutzer ziehen Balken direkt in der Timeline.
+**Drag & Drop: Balken verschieben + Resize**
 
-**Balken verschieben (horizontales Drag)**
-- `onMouseDown` auf dem Balken → `document.mousemove` berechnet Delta in Tagen → lokale Shadow-State-Verschiebung → `onMouseUp` committed `updateTask` im Store
-- Cursor: `grab` → `grabbing` während Drag
-- Visuelle Rückmeldung: Balken leicht transparent + Tooltip mit neuen Datumsangaben
-
-**Resize rechter Rand (nur endDate)**
-- Schmaler `cursor: ew-resize` Streifen (6px) am rechten Balkenrand
-- Gleiche Mousemove-Logik, nur `endDate` ändert sich
-
-**Snap auf Tagesgrenzen**
-- Pixeldelta → Tage: `Math.round(deltaPx / dayWidthPx)` — glätte auf volle Tage
+**Neue Util-Funktion**
+```ts
+// util/gantt-chart.util.ts
+export function addDays(date: Date, days: number): Date
+```
 
 **Neue Props**
 ```ts
-draggable?: boolean;        // Balken verschiebbar (Default: false)
-resizable?: boolean;        // Endatum per Drag änderbar (Default: false)
+draggable?: boolean;        // Balken horizontal verschiebbar (Default: false)
+resizable?: boolean;        // endDate per Drag am rechten Rand änderbar (Default: false)
 onTaskMoved?: (task: GanttTask, newStart: Date, newEnd: Date) => void;
 onTaskResized?: (task: GanttTask, newEnd: Date) => void;
 ```
 
-**Wichtig:** `onMouseDown` auf Drag-Handle vs. `onClick` trennen — ab `>= 5px` Bewegung gilt es als Drag, sonst als Click.
+**Implementierung in `GanttTimeline.tsx`**
+- `dragInitRef` (DragInit | null) — fester Drag-Start-Zustand (Ref, kein State)
+- `activeDragRef` (für Zugriff aus mouseup-Closure ohne stale state)
+- `activeDrag` (State) — löst Re-render für Balken-Positionsupdate aus
+- `suppressClickRef` — verhindert `onClick` nach Drag ≥ 5px
+- `dayWidthPxRef` — immer aktueller Wert von `totalWidth / totalDays`, kein stale closure
+- Callback-Refs (`onTaskMovedRef`, `onTaskResizedRef`, `onTasksChangeRef`) damit Props-Updates in Event-Handler-Closures sichtbar sind
+- `document.body.style.cursor` für globalen Cursor während Drag
+- `updateTask` aus Store + `rawStore.getState().tasks` für synchronen onTasksChange-Aufruf
+- `effectiveTask` — während Drag adjustierte Task-Daten für Positionsberechnung und Datum-Label
+
+**Visuelle Rückmeldung während Drag**
+- Balken: `opacity: 0.75` + Cursor `grab`/`grabbing`/`ew-resize`
+- Datum-Label (`top: 2px` im Row-Box): `"DD. Mon – DD. Mon"` (move) oder `"→ DD. Mon"` (resize)
+- Label nur sichtbar wenn `deltaDays !== 0`
+
+**Click vs. Drag Unterscheidung**
+- `suppressClickRef.current = true` wenn `abs(deltaPx) >= 5`
+- Bar's `onClick` prüft `suppressClickRef.current` und unterdrückt ggf. `onTaskClick`
+
+**Snap auf Tagesgrenzen**
+```ts
+const deltaDays = Math.round(deltaPx / dayWidthPxRef.current);
+```
+
+**Neue data-testids**
+- `gantt-resize-handle-{taskId}` — Resize-Handle am rechten Balkenrand
+
+**Neue Story**
+- `DragAndResize` — `draggable: true`, `resizable: true`, `initialExpandAll: true`
+
+---
+
+### Cascade Dependencies ✅ abgeschlossen (181 Tests)
+
+**Automatisches Verschieben von Nachfolger-Tasks bei Datumsänderungen**
+
+**Neue Prop**
+```ts
+cascadeDependencies?: boolean;  // Default: false
+```
+
+**Neue Util-Funktion**
+```ts
+// util/gantt-chart.util.ts
+export function cascadeDateUpdate(
+  tasks: GanttTask[],
+  changedTaskId: string,
+  deltaMs: number,
+): GanttTask[]
+```
+
+BFS-Traversierung: Vorgänger→Nachfolger-Map aufbauen → alle direkten und indirekten Finish-to-Start-Nachfolger um `deltaMs` verschieben. Zirkuläre Abhängigkeiten durch `visited`-Set abgefangen. Original-Reihenfolge der Task-Liste bleibt erhalten.
+
+**Store-Integration in `updateTask`**
+```ts
+if (state.cascadeDependencies && original) {
+  const deltaMs = task.endDate.getTime() - original.endDate.getTime();
+  tasks = cascadeDateUpdate(tasks, task.id, deltaMs);
+}
+```
+Gilt für Drag-Move, Drag-Resize und Dialog-Edit gleichermassen (alles läuft durch `updateTask`).
+
+**Verhalten**
+- Vorwärts (Task verlängert/nach rechts gezogen) → Nachfolger werden nach rechts verschoben
+- Rückwärts (Task verkürzt/nach links gezogen) → Nachfolger werden nach links verschoben
+- Kaskade ist transitiv: A → B → C: Änderung an A kaskadiert bis C
+- Ohne `cascadeDependencies=true` ändert sich das bestehende Verhalten nicht
+
+## Geplante Phasen (noch nicht implementiert)
 
 ---
 

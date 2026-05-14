@@ -159,6 +159,54 @@ export function addMonths(date: Date, months: number): Date {
   return new Date(date.getFullYear(), date.getMonth() + months, date.getDate());
 }
 
+export function addDays(date: Date, days: number): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days, 0, 0, 0, 0);
+}
+
+/**
+ * Verschiebt alle Finish-to-Start-Nachfolger des geänderten Tasks um dasselbe Zeit-Delta.
+ * Läuft via BFS durch den Abhängigkeitsgraphen — zyklische Abhängigkeiten werden durch
+ * das `visited`-Set abgefangen.
+ */
+export function cascadeDateUpdate(
+  tasks: GanttTask[],
+  changedTaskId: string,
+  deltaMs: number,
+): GanttTask[] {
+  if (deltaMs === 0) return tasks;
+
+  // Vorgänger→Nachfolger-Map aufbauen.
+  const successorMap = new Map<string, string[]>();
+  for (const task of tasks) {
+    for (const depId of task.dependencies ?? []) {
+      if (!successorMap.has(depId)) successorMap.set(depId, []);
+      successorMap.get(depId)!.push(task.id);
+    }
+  }
+
+  const updatedMap = new Map<string, GanttTask>(tasks.map((t) => [t.id, t]));
+  const queue = [...(successorMap.get(changedTaskId) ?? [])];
+  const visited = new Set<string>();
+
+  while (queue.length > 0) {
+    const succId = queue.shift()!;
+    if (visited.has(succId)) continue;
+    visited.add(succId);
+
+    const succ = updatedMap.get(succId)!;
+    updatedMap.set(succId, {
+      ...succ,
+      startDate: new Date(succ.startDate.getTime() + deltaMs),
+      endDate: new Date(succ.endDate.getTime() + deltaMs),
+    });
+
+    queue.push(...(successorMap.get(succId) ?? []));
+  }
+
+  // Original-Reihenfolge beibehalten.
+  return tasks.map((t) => updatedMap.get(t.id)!);
+}
+
 /**
  * Gibt alle Monatsersten zwischen start und end zurück.
  * Wird für den Timeline-Header benötigt.

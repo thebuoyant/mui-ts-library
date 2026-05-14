@@ -1,10 +1,11 @@
-import { useEffect, useId, useMemo } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { type RefObject, type UIEventHandler } from "react";
 import { Box, useTheme } from "@mui/material";
-import { useGanttChartStore, useGanttTranslations } from "./GanttChart";
+import { useGanttChartStore, useGanttTranslations, useRawGanttChartStore } from "./GanttChart";
 import type { GanttTask } from "./GanttChart.types";
 import type { GanttTaskNode } from "./GanttChart.types";
 import {
+  addDays,
   calculateTaskPosition,
   getDaysInRange,
   getDisplayRange,
@@ -33,6 +34,8 @@ const BAR_COLOR: Record<string, string> = {
   done: "success.main",
   blocked: "error.main",
 };
+
+const MS_PER_DAY = 86_400_000;
 
 // ---------------------------------------------------------------------------
 // SVG-Abhängigkeitspfeile
@@ -106,6 +109,20 @@ function computeDependencyLines(
 }
 
 // ---------------------------------------------------------------------------
+// Drag-State-Typen
+// ---------------------------------------------------------------------------
+
+type DragType = "move" | "resize";
+
+type DragInit = {
+  type: DragType;
+  taskId: string;
+  startX: number;
+  originalStart: Date;
+  originalEnd: Date;
+};
+
+// ---------------------------------------------------------------------------
 // Komponente
 // ---------------------------------------------------------------------------
 
@@ -114,6 +131,11 @@ type GanttTimelineProps = {
   onScroll: UIEventHandler<HTMLDivElement>;
   onTaskClick?: (task: GanttTask) => void;
   onMilestoneClick?: (task: GanttTask) => void;
+  draggable?: boolean;
+  resizable?: boolean;
+  onTaskMoved?: (task: GanttTask, newStart: Date, newEnd: Date) => void;
+  onTaskResized?: (task: GanttTask, newEnd: Date) => void;
+  onTasksChange?: (tasks: GanttTask[]) => void;
 };
 
 export function GanttTimeline({
@@ -121,12 +143,19 @@ export function GanttTimeline({
   onScroll,
   onTaskClick,
   onMilestoneClick,
+  draggable = false,
+  resizable = false,
+  onTaskMoved,
+  onTaskResized,
+  onTasksChange,
 }: GanttTimelineProps) {
   const theme = useTheme();
   const taskTree = useGanttChartStore((s) => s.taskTree);
   const expandedIds = useGanttChartStore((s) => s.expandedIds);
   const timelineRange = useGanttChartStore((s) => s.timelineRange);
   const timeScale = useGanttChartStore((s) => s.timeScale);
+  const updateTask = useGanttChartStore((s) => s.updateTask);
+  const rawStore = useRawGanttChartStore();
   const t = useGanttTranslations();
 
   // Jede Instanz braucht eine eigene Marker-ID damit mehrere GanttCharts auf einer Seite
@@ -243,6 +272,95 @@ export function GanttTimeline({
   // Zwei-Ebenen-Header (Tages-Skala) ist doppelt so hoch → SVG-Offset anpassen.
   const headerTotalHeight = groups ? HEADER_HEIGHT * 2 : HEADER_HEIGHT;
 
+  // ---------------------------------------------------------------------------
+  // Drag & Resize
+  // ---------------------------------------------------------------------------
+
+  const dayWidthPxRef = useRef(1);
+  dayWidthPxRef.current = totalWidth > 0
+    ? totalWidth / ((displayRange.end.getTime() - displayRange.start.getTime()) / MS_PER_DAY)
+    : 1;
+
+  // Ref für den Drag-Start (stabile Werte — keine Re-render nötig).
+  const dragInitRef = useRef<DragInit | null>(null);
+  // Ref für das aktuelle Delta (für Zugriff aus mouseup-Closure ohne stale state).
+  const activeDragRef = useRef<{ taskId: string; type: DragType; deltaDays: number } | null>(null);
+  // State löst Re-render aus damit Balken-Position während Drag aktualisiert wird.
+  const [activeDrag, setActiveDrag] = useState<{ taskId: string; type: DragType; deltaDays: number } | null>(null);
+  // Verhindert onClick nach echtem Drag (Maus bewegt sich ≥ 5px).
+  const suppressClickRef = useRef(false);
+
+  // Refs damit die Callbacks immer die aktuellen Prop-Werte lesen ohne useCallback-Rebuilds.
+  const onTaskMovedRef = useRef(onTaskMoved);
+  onTaskMovedRef.current = onTaskMoved;
+  const onTaskResizedRef = useRef(onTaskResized);
+  onTaskResizedRef.current = onTaskResized;
+  const onTasksChangeRef = useRef(onTasksChange);
+  onTasksChangeRef.current = onTasksChange;
+
+  const handleBarMouseDown = (e: React.MouseEvent, task: GanttTaskNode, type: DragType) => {
+    e.stopPropagation();
+    suppressClickRef.current = false;
+    dragInitRef.current = {
+      type,
+      taskId: task.id,
+      startX: e.clientX,
+      originalStart: task.startDate,
+      originalEnd: task.endDate,
+    };
+
+    document.body.style.cursor = type === "resize" ? "ew-resize" : "grabbing";
+
+    const onMouseMove = (ev: MouseEvent) => {
+      const init = dragInitRef.current;
+      if (!init) return;
+      const deltaPx = ev.clientX - init.startX;
+      const deltaDays = Math.round(deltaPx / dayWidthPxRef.current);
+      if (Math.abs(deltaPx) >= 5) suppressClickRef.current = true;
+      const drag = { taskId: init.taskId, type: init.type, deltaDays };
+      activeDragRef.current = drag;
+      setActiveDrag(drag);
+    };
+
+    const onMouseUp = () => {
+      document.body.style.cursor = "";
+      const init = dragInitRef.current;
+      const drag = activeDragRef.current;
+
+      if (init && drag && suppressClickRef.current && drag.deltaDays !== 0) {
+        const currentTask = rawStore.getState().tasks.find((t) => t.id === init.taskId);
+        if (currentTask) {
+          if (drag.type === "move") {
+            const newStart = addDays(init.originalStart, drag.deltaDays);
+            const newEnd = addDays(init.originalEnd, drag.deltaDays);
+            updateTask({ ...currentTask, startDate: newStart, endDate: newEnd });
+            onTaskMovedRef.current?.(currentTask, newStart, newEnd);
+          } else {
+            const rawNewEnd = addDays(init.originalEnd, drag.deltaDays);
+            const newEnd = rawNewEnd > init.originalStart
+              ? rawNewEnd
+              : addDays(init.originalStart, 1);
+            updateTask({ ...currentTask, endDate: newEnd });
+            onTaskResizedRef.current?.(currentTask, newEnd);
+          }
+          onTasksChangeRef.current?.(rawStore.getState().tasks);
+        }
+      }
+
+      dragInitRef.current = null;
+      activeDragRef.current = null;
+      setActiveDrag(null);
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
+    };
+
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+  };
+
+  const formatDragDate = (d: Date) =>
+    d.toLocaleDateString(t.dateLocale, { day: "2-digit", month: "short" });
+
   return (
     <Box ref={scrollRef} onScroll={onScroll} data-testid="gantt-timeline-scroll" sx={{ flex: 1, overflow: "auto" }}>
       {/* position: relative ist Pflicht damit der SVG-Layer korrekt absolut positioniert wird. */}
@@ -280,7 +398,26 @@ export function GanttTimeline({
         )}
 
         {visibleTasks.map((task) => {
-          const { left, width } = calculateTaskPosition(task, displayRange);
+          // Drag-adjustierte Task-Daten für Positionsberechnung und Datumsanzeige.
+          const isDragging = activeDrag?.taskId === task.id;
+          let effectiveTask: GanttTask = task;
+          if (isDragging && activeDrag) {
+            if (activeDrag.type === "move") {
+              effectiveTask = {
+                ...task,
+                startDate: addDays(task.startDate, activeDrag.deltaDays),
+                endDate: addDays(task.endDate, activeDrag.deltaDays),
+              };
+            } else {
+              const rawEnd = addDays(task.endDate, activeDrag.deltaDays);
+              effectiveTask = {
+                ...task,
+                endDate: rawEnd > task.startDate ? rawEnd : addDays(task.startDate, 1),
+              };
+            }
+          }
+
+          const { left, width } = calculateTaskPosition(effectiveTask, displayRange);
 
           return (
             <Box
@@ -324,38 +461,96 @@ export function GanttTimeline({
                 const clampedWidth = clampedRight - clampedLeft;
                 if (clampedWidth <= 0) return null;
                 return (
-                  <Box
-                    data-testid={`gantt-bar-${task.id}`}
-                    sx={{
-                      position: "absolute",
-                      left: `${clampedLeft}%`,
-                      width: `${clampedWidth}%`,
-                      height: BAR_HEIGHT,
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      bgcolor: BAR_COLOR[task.status] ?? "grey.300",
-                      borderRadius: 1,
-                      overflow: "hidden",
-                      cursor: onTaskClick ? "pointer" : "default",
-                      "&:hover": onTaskClick ? { opacity: 0.8 } : undefined,
-                    }}
-                    onClick={() => onTaskClick?.(task)}
-                  >
-                    {task.progress !== undefined && task.progress > 0 && (
+                  <>
+                    {/* Datum-Label erscheint über dem Balken während des Drags. */}
+                    {isDragging && activeDrag && activeDrag.deltaDays !== 0 && (
                       <Box
-                        data-testid={`gantt-progress-${task.id}`}
                         sx={{
                           position: "absolute",
-                          left: 0,
-                          top: 0,
-                          width: `${Math.min(task.progress, 100)}%`,
-                          height: "100%",
-                          bgcolor: "currentColor",
-                          opacity: 0.4,
+                          left: `${clampedLeft}%`,
+                          top: 2,
+                          bgcolor: "grey.800",
+                          color: "common.white",
+                          borderRadius: 0.5,
+                          px: 0.75,
+                          lineHeight: "18px",
+                          fontSize: "0.65rem",
+                          whiteSpace: "nowrap",
+                          pointerEvents: "none",
+                          zIndex: 100,
                         }}
-                      />
+                      >
+                        {activeDrag.type === "move"
+                          ? `${formatDragDate(effectiveTask.startDate)} – ${formatDragDate(effectiveTask.endDate)}`
+                          : `→ ${formatDragDate(effectiveTask.endDate)}`}
+                      </Box>
                     )}
-                  </Box>
+                    <Box
+                      data-testid={`gantt-bar-${task.id}`}
+                      sx={{
+                        position: "absolute",
+                        left: `${clampedLeft}%`,
+                        width: `${clampedWidth}%`,
+                        height: BAR_HEIGHT,
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        bgcolor: BAR_COLOR[task.status] ?? "grey.300",
+                        borderRadius: 1,
+                        overflow: "hidden",
+                        opacity: isDragging ? 0.75 : 1,
+                        cursor: isDragging
+                          ? "grabbing"
+                          : draggable
+                            ? "grab"
+                            : onTaskClick
+                              ? "pointer"
+                              : "default",
+                        userSelect: "none",
+                        "&:hover": (draggable || onTaskClick) ? { opacity: isDragging ? 0.75 : 0.8 } : undefined,
+                      }}
+                      onMouseDown={draggable ? (e) => handleBarMouseDown(e, task, "move") : undefined}
+                      onClick={() => {
+                        if (suppressClickRef.current) {
+                          suppressClickRef.current = false;
+                          return;
+                        }
+                        onTaskClick?.(task);
+                      }}
+                    >
+                      {task.progress !== undefined && task.progress > 0 && (
+                        <Box
+                          data-testid={`gantt-progress-${task.id}`}
+                          sx={{
+                            position: "absolute",
+                            left: 0,
+                            top: 0,
+                            width: `${Math.min(task.progress, 100)}%`,
+                            height: "100%",
+                            bgcolor: "currentColor",
+                            opacity: 0.4,
+                          }}
+                        />
+                      )}
+                      {/* Resize-Handle am rechten Balkenrand. */}
+                      {resizable && (
+                        <Box
+                          data-testid={`gantt-resize-handle-${task.id}`}
+                          sx={{
+                            position: "absolute",
+                            right: 0,
+                            top: 0,
+                            width: 6,
+                            height: "100%",
+                            cursor: "ew-resize",
+                          }}
+                          onMouseDown={(e) => {
+                            e.stopPropagation();
+                            handleBarMouseDown(e, task, "resize");
+                          }}
+                        />
+                      )}
+                    </Box>
+                  </>
                 );
               })()}
             </Box>

@@ -1,6 +1,6 @@
 import { createStore } from "zustand/vanilla";
 import type { GanttTask, GanttTaskNode, GanttTimeScale } from "./GanttChart.types";
-import { addMonths, buildTaskTree, endOfMonth, getTimelineRange, getVisibleTasks, startOfMonth } from "./util/gantt-chart.util";
+import { addMonths, buildTaskTree, cascadeDateUpdate, endOfMonth, getTimelineRange, getVisibleTasks, startOfMonth } from "./util/gantt-chart.util";
 import type { TimelineRange } from "./util/gantt-chart.util";
 
 export type GanttChartStoreState = {
@@ -13,6 +13,8 @@ export type GanttChartStoreState = {
   timelineRange: TimelineRange;
   // true sobald der Nutzer den Bereich manuell gesetzt hat — verhindert Auto-Reset durch setTasks.
   isRangeCustomized: boolean;
+  // Wenn true, werden beim updateTask alle Finish-to-Start-Nachfolger um dasselbe Delta verschoben.
+  cascadeDependencies: boolean;
 
   setTasks: (tasks: GanttTask[]) => void;
   addTask: (task: GanttTask) => void;
@@ -52,6 +54,7 @@ export function createGanttChartStore(
   initialTimeScale: GanttTimeScale = "months",
   initialExpandAll = false,
   initialRange?: TimelineRange,
+  cascadeDependencies = false,
 ) {
   const autoRange = getTimelineRange(initialTasks);
 
@@ -66,6 +69,7 @@ export function createGanttChartStore(
     timelineRange: initialRange ?? autoRange,
     // Manuell übergebener Bereich wird als customized markiert → setTasks überschreibt ihn nicht.
     isRangeCustomized: initialRange !== undefined,
+    cascadeDependencies,
 
     setTasks: (tasks) => {
       set((state) => ({
@@ -89,12 +93,20 @@ export function createGanttChartStore(
 
     updateTask: (task) => {
       set((state) => {
-        const tasks = state.tasks.map((t) => (t.id === task.id ? task : t));
-        return {
-          tasks,
-          taskTree: buildTaskTree(tasks),
-          timelineRange: expandRangeForTask(state.timelineRange, task),
-        };
+        const original = state.tasks.find((t) => t.id === task.id);
+        let tasks = state.tasks.map((t) => (t.id === task.id ? task : t));
+
+        if (state.cascadeDependencies && original) {
+          const deltaMs = task.endDate.getTime() - original.endDate.getTime();
+          tasks = cascadeDateUpdate(tasks, task.id, deltaMs);
+        }
+
+        let timelineRange = expandRangeForTask(state.timelineRange, task);
+        for (const t of tasks) {
+          timelineRange = expandRangeForTask(timelineRange, t);
+        }
+
+        return { tasks, taskTree: buildTaskTree(tasks), timelineRange };
       });
     },
 

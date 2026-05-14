@@ -132,12 +132,20 @@ export type GanttChartProps = {
   enableBuiltinDialogs?: boolean;
   // Wenn true, ändert Strg+Mausrad die Zeitskala (days ↔ weeks ↔ months ↔ quarters).
   zoomable?: boolean;
+  // Drag & Drop — Balken horizontal verschieben (Default: false).
+  draggable?: boolean;
+  // Resize — endDate am rechten Balkenrand per Drag ändern (Default: false).
+  resizable?: boolean;
+  // Wenn true, werden beim Verschieben/Resizen alle Finish-to-Start-Nachfolger automatisch mitverschoben.
+  cascadeDependencies?: boolean;
   onTaskClick?: (task: GanttTask) => void;
   onMilestoneClick?: (task: GanttTask) => void;
   onAddTask?: (parentTask?: GanttTask) => void;
   onEditTask?: (task: GanttTask) => void;
   onDeleteTask?: (task: GanttTask) => void;
   onStatusChange?: (task: GanttTask, status: GanttTaskStatus) => void;
+  onTaskMoved?: (task: GanttTask, newStart: Date, newEnd: Date) => void;
+  onTaskResized?: (task: GanttTask, newEnd: Date) => void;
   // Wird nach jeder CRUD-Aktion mit der vollständigen aktuellen Task-Liste aufgerufen.
   onTasksChange?: (tasks: GanttTask[]) => void;
   // Dialog-Callbacks — werden nur ausgelöst wenn enableBuiltinDialogs=true

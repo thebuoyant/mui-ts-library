@@ -829,3 +829,94 @@ describe("GanttChart — expand/collapse all button", () => {
     expect(screen.getByTestId("gantt-bar-row-child")).toBeInTheDocument();
   });
 });
+
+// ---------------------------------------------------------------------------
+// Phase 12 — Drag & Drop: Balken verschieben + Resize
+// ---------------------------------------------------------------------------
+
+describe("GanttChart — drag (draggable prop)", () => {
+  it("renders bars with grab cursor when draggable=true", () => {
+    render(<GanttChart tasks={tasks} draggable />);
+
+    const bar = screen.getByTestId("gantt-bar-root");
+    expect(bar).toBeInTheDocument();
+    // cursor wird via sx gesetzt — wir prüfen nur dass das Element existiert und kein Fehler auftritt
+  });
+
+  it("calls onTaskMoved after a drag sequence with movement >= 5px", () => {
+    const onTaskMoved = vi.fn();
+    render(
+      <GanttChart
+        tasks={tasks}
+        draggable
+        timeScale="days"
+        defaultRangeStart={new Date("2025-01-01")}
+        defaultRangeEnd={new Date("2025-12-31")}
+        onTaskMoved={onTaskMoved}
+      />,
+    );
+
+    const bar = screen.getByTestId("gantt-bar-root");
+
+    // Drag: 40px nach rechts (> 5px Schwelle)
+    fireEvent.mouseDown(bar, { clientX: 100 });
+    fireEvent.mouseMove(document, { clientX: 140 });
+    fireEvent.mouseUp(document);
+
+    expect(onTaskMoved).toHaveBeenCalledTimes(1);
+    expect(onTaskMoved).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "root" }),
+      expect.any(Date),
+      expect.any(Date),
+    );
+  });
+
+  it("does not call onTaskMoved when drag movement is below threshold", () => {
+    const onTaskMoved = vi.fn();
+    render(
+      <GanttChart tasks={tasks} draggable onTaskMoved={onTaskMoved} />,
+    );
+
+    const bar = screen.getByTestId("gantt-bar-root");
+
+    // Keine Bewegung — nur mouseDown + mouseUp
+    fireEvent.mouseDown(bar, { clientX: 100 });
+    fireEvent.mouseUp(document);
+
+    expect(onTaskMoved).not.toHaveBeenCalled();
+  });
+});
+
+describe("GanttChart — resize (resizable prop)", () => {
+  it("renders resize handles when resizable=true", () => {
+    render(<GanttChart tasks={tasks} resizable />);
+
+    expect(screen.getByTestId("gantt-resize-handle-root")).toBeInTheDocument();
+  });
+
+  it("calls onTaskResized after a resize drag", () => {
+    const onTaskResized = vi.fn();
+    render(
+      <GanttChart
+        tasks={tasks}
+        resizable
+        timeScale="days"
+        defaultRangeStart={new Date("2025-01-01")}
+        defaultRangeEnd={new Date("2025-12-31")}
+        onTaskResized={onTaskResized}
+      />,
+    );
+
+    const handle = screen.getByTestId("gantt-resize-handle-root");
+
+    fireEvent.mouseDown(handle, { clientX: 200 });
+    fireEvent.mouseMove(document, { clientX: 240 });
+    fireEvent.mouseUp(document);
+
+    expect(onTaskResized).toHaveBeenCalledTimes(1);
+    expect(onTaskResized).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "root" }),
+      expect.any(Date),
+    );
+  });
+});
