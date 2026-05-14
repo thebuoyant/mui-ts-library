@@ -15,6 +15,12 @@ export type GanttChartStoreState = {
   isRangeCustomized: boolean;
   // Wenn true, werden beim updateTask alle Finish-to-Start-Nachfolger um dasselbe Delta verschoben.
   cascadeDependencies: boolean;
+  // Ausgangsskala für den Reset-Button.
+  defaultTimeScale: GanttTimeScale;
+  // Ausgangszustand des Expand-All — für resetView.
+  initialExpandAll: boolean;
+  // true sobald expandAll/collapseAll aufgerufen wurde — aktiviert den Reset-Button.
+  isExpandedCustomized: boolean;
 
   setTasks: (tasks: GanttTask[]) => void;
   addTask: (task: GanttTask) => void;
@@ -27,6 +33,8 @@ export type GanttChartStoreState = {
   setTimeScale: (scale: GanttTimeScale) => void;
   setTimelineRange: (range: TimelineRange) => void;
   resetTimelineRange: () => void;
+  // Setzt Zeitskala und Datumsbereich auf den Ausgangszustand zurück.
+  resetView: () => void;
 
   // Gibt die aktuell sichtbare, geordnete Flachliste zurück.
   getVisibleTasks: () => GanttTaskNode[];
@@ -70,6 +78,9 @@ export function createGanttChartStore(
     // Manuell übergebener Bereich wird als customized markiert → setTasks überschreibt ihn nicht.
     isRangeCustomized: initialRange !== undefined,
     cascadeDependencies,
+    defaultTimeScale: initialTimeScale,
+    initialExpandAll,
+    isExpandedCustomized: false,
 
     setTasks: (tasks) => {
       set((state) => ({
@@ -138,11 +149,12 @@ export function createGanttChartStore(
     expandAll: () => {
       set((state) => ({
         expandedIds: new Set(state.tasks.map((t) => t.id)),
+        isExpandedCustomized: true,
       }));
     },
 
     collapseAll: () => {
-      set({ expandedIds: new Set() });
+      set({ expandedIds: new Set(), isExpandedCustomized: true });
     },
 
     setTimeScale: (timeScale) => {
@@ -157,6 +169,18 @@ export function createGanttChartStore(
       set((state) => ({
         timelineRange: getTimelineRange(state.tasks),
         isRangeCustomized: false,
+      }));
+    },
+
+    resetView: () => {
+      set((state) => ({
+        timeScale: state.defaultTimeScale,
+        timelineRange: getTimelineRange(state.tasks),
+        isRangeCustomized: false,
+        isExpandedCustomized: false,
+        expandedIds: state.initialExpandAll
+          ? new Set(state.tasks.map((t) => t.id))
+          : new Set(state.tasks.filter((t) => !t.parentId).map((t) => t.id)),
       }));
     },
 

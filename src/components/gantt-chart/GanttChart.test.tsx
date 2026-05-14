@@ -834,6 +834,73 @@ describe("GanttChart — expand/collapse all button", () => {
 // Phase 12 — Drag & Drop: Balken verschieben + Resize
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Toolbar-Konfiguration
+// ---------------------------------------------------------------------------
+
+describe("GanttChart — toolbarConfig", () => {
+  it("hides individual scale buttons via toolbarConfig", () => {
+    render(
+      <GanttChart
+        tasks={tasks}
+        toolbarConfig={{ showScaleDays: false, showScaleWeeks: false }}
+      />,
+    );
+
+    expect(screen.queryByTestId("gantt-scale-days")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("gantt-scale-weeks")).not.toBeInTheDocument();
+    expect(screen.getByTestId("gantt-scale-months")).toBeInTheDocument();
+    expect(screen.getByTestId("gantt-scale-quarters")).toBeInTheDocument();
+  });
+
+  it("hides expand/collapse button via toolbarConfig", () => {
+    render(<GanttChart tasks={tasks} toolbarConfig={{ showExpandCollapseAll: false }} />);
+
+    expect(screen.queryByTestId("gantt-expand-collapse-all")).not.toBeInTheDocument();
+  });
+
+  it("hides date range inputs via toolbarConfig", () => {
+    render(<GanttChart tasks={tasks} toolbarConfig={{ showDateRange: false }} />);
+
+    expect(screen.queryByTestId("gantt-range-start")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("gantt-range-end")).not.toBeInTheDocument();
+  });
+
+  it("shows reset-view button and disables it when view is at default", () => {
+    render(<GanttChart tasks={tasks} timeScale="months" />);
+
+    const btn = screen.getByTestId("gantt-reset-view");
+    expect(btn).toBeInTheDocument();
+    expect(btn).toBeDisabled();
+  });
+
+  it("enables reset-view button after time scale changes", () => {
+    render(<GanttChart tasks={tasks} timeScale="months" />);
+
+    fireEvent.click(screen.getByTestId("gantt-scale-weeks"));
+
+    expect(screen.getByTestId("gantt-reset-view")).not.toBeDisabled();
+  });
+
+  it("resets time scale and range after clicking reset-view", () => {
+    render(<GanttChart tasks={tasks} timeScale="months" />);
+
+    // Change scale
+    fireEvent.click(screen.getByTestId("gantt-scale-weeks"));
+    expect(screen.getByTestId("gantt-scale-weeks").closest("button")).toHaveAttribute("aria-pressed", "true");
+
+    // Reset
+    fireEvent.click(screen.getByTestId("gantt-reset-view"));
+    expect(screen.getByTestId("gantt-scale-months").closest("button")).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("hides reset-view button via toolbarConfig", () => {
+    render(<GanttChart tasks={tasks} toolbarConfig={{ showResetView: false }} />);
+
+    expect(screen.queryByTestId("gantt-reset-view")).not.toBeInTheDocument();
+  });
+});
+
 describe("GanttChart — drag (draggable prop)", () => {
   it("renders bars with grab cursor when draggable=true", () => {
     render(<GanttChart tasks={tasks} draggable />);

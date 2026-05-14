@@ -16,7 +16,8 @@ A type-safe React component library built with **TypeScript** and **MUI (Materia
 - [Props Reference](#props-reference)
   - [GanttChart Props](#ganttchart-props)
   - [GanttTask](#gantttask)
-  - [GanttTranslations](#gannttranslations)
+  - [GanttToolbarConfig](#gantttoolbarconfig)
+  - [GanttTranslations](#gantttranslations)
   - [TagSelection Props](#tagselection-props)
   - [TagSelectionItem](#tagselectionitem)
   - [PasswordStrengthMeter Props](#passwordstrengthmeter-props)
@@ -33,7 +34,7 @@ A type-safe React component library built with **TypeScript** and **MUI (Materia
 
 | Component | Description |
 |---|---|
-| `GanttChart` | Interactive project timeline with hierarchical tasks, milestones, dependencies, drag-to-scroll, built-in CRUD dialogs, and live today-line |
+| `GanttChart` | Full-featured project timeline with hierarchical tasks, milestones, dependency arrows, drag & drop, cascade dependencies, progress tracking, zoom, split pane, built-in CRUD dialogs, and configurable toolbar |
 | `TagSelection` | Multi-tag picker with search autocomplete, chip display, and full callback API |
 | `PasswordStrengthMeter` | Password input with live strength scoring, animated meter, and requirements checklist |
 
@@ -80,7 +81,23 @@ Wrap your app in MUI's `ThemeProvider` as usual. No additional provider is neede
 
 ### GanttChart
 
-A full-featured project timeline component with hierarchical tasks, milestones, dependency arrows, progress tracking, and built-in CRUD dialogs.
+A full-featured project timeline component built on top of MUI. Key features:
+
+- **Hierarchical tasks** via `parentId` — unlimited nesting depth, expand/collapse per node or all at once
+- **Milestones** rendered as diamonds (`isMilestone: true`)
+- **Progress bars** — semi-transparent overlay for 0–100% completion
+- **Dependency arrows** — Z-shaped SVG arrows for Finish-to-Start relationships
+- **Cascade dependencies** — automatically shift successor tasks when a predecessor's dates change
+- **4 time scales** — Days, Weeks, Months, Quarters with instant switching
+- **Zoom** — Ctrl + scroll wheel cycles through scales (`zoomable`)
+- **Drag & drop** — move bars horizontally (`draggable`) or resize the end date (`resizable`)
+- **Today line** — dashed vertical marker at the current day; scroll-to-today button
+- **Weekend highlights** — shaded columns on the days scale
+- **Split pane** — drag the divider to resize the task panel (bounded by `minPanelWidth` / `maxPanelWidth`)
+- **Built-in CRUD dialogs** — Add / Edit / Delete with validation and parent-task selection
+- **Configurable toolbar** — show or hide every toolbar element individually via `toolbarConfig`
+- **Reset View** — one-click restore of the initial scale, date range, and expand state
+- **Full i18n** — override any UI string via the `translations` prop (German defaults)
 
 ```tsx
 import { GanttChart } from 'mui-ts-library';
@@ -131,10 +148,15 @@ function App() {
       tasks={tasks}
       timeScale="months"
       height={500}
+      draggable
+      resizable
+      cascadeDependencies
       onTaskCreated={(task) => console.log('Created:', task)}
       onTaskUpdated={(task) => console.log('Updated:', task)}
       onTaskDeleted={(id) => console.log('Deleted:', id)}
       onTasksChange={(all) => console.log('All tasks:', all)}
+      onTaskMoved={(task, newStart, newEnd) => console.log('Moved:', task.name, newStart, newEnd)}
+      onTaskResized={(task, newEnd) => console.log('Resized:', task.name, newEnd)}
     />
   );
 }
@@ -154,6 +176,23 @@ function App() {
 />
 ```
 
+**With custom toolbar configuration:**
+
+```tsx
+import type { GanttToolbarConfig } from 'mui-ts-library';
+
+const toolbarConfig: GanttToolbarConfig = {
+  showScaleDays: false,       // hide the "Days" scale button
+  showScaleQuarters: false,   // hide the "Quarters" scale button
+  showDateRange: false,       // hide the From/To date pickers
+};
+
+<GanttChart
+  tasks={tasks}
+  toolbarConfig={toolbarConfig}
+/>
+```
+
 **With custom date range and English translations:**
 
 ```tsx
@@ -166,6 +205,11 @@ const EN: Partial<GanttTranslations> = {
   scaleQuarters: 'Quarters',
   rangeFrom: 'From',
   rangeTo: 'To',
+  rangeResetTooltip: 'Reset range',
+  scrollToTodayTooltip: 'Scroll to today',
+  expandAllTooltip: 'Expand all',
+  collapseAllTooltip: 'Collapse all',
+  resetViewTooltip: 'Reset view',
   weekColumnPrefix: 'W',
   dateLocale: 'en-US',
   dialogAddTitle: 'Add Task',
@@ -267,44 +311,96 @@ function App() {
 
 ### GanttChart Props
 
+**Layout & Display**
+
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `tasks` | `GanttTask[]` | — | **Required.** Full flat list of tasks (hierarchy is derived via `parentId`). |
+| `tasks` | `GanttTask[]` | — | **Required.** Full flat list of tasks. Hierarchy is derived via `parentId`. |
 | `timeScale` | `"days" \| "weeks" \| "months" \| "quarters"` | `"months"` | Initial time scale of the timeline. |
 | `height` | `number \| string \| "auto"` | `400` | Chart height. `"auto"` fills the parent container. |
 | `width` | `number \| string \| "auto"` | `"100%"` | Chart width. `"auto"` fills the parent container. |
 | `initialExpandAll` | `boolean` | `false` | Expand all nodes on mount instead of only root tasks. |
-| `showToolbar` | `boolean` | `true` | Show/hide the scale switcher and date-range toolbar. |
-| `defaultRangeStart` | `Date` | current quarter | Overrides the auto-computed start of the visible range. |
-| `defaultRangeEnd` | `Date` | current quarter | Overrides the auto-computed end of the visible range. |
-| `translations` | `Partial<GanttTranslations>` | German defaults | Override individual display strings for i18n (see [Translations](#translations)). |
-| `minPanelWidth` | `number` | `200` | Minimum width of the left task panel in pixels. |
-| `maxPanelWidth` | `number` | `600` | Maximum width of the left task panel in pixels. |
-| `enableBuiltinDialogs` | `boolean` | `true` | When `true`, Add/Edit/Delete icons open MUI dialogs and update the internal store. When `false`, callbacks are invoked directly instead. |
-| `onTaskClick` | `(task: GanttTask) => void` | — | Called when a task bar is clicked. |
-| `onMilestoneClick` | `(task: GanttTask) => void` | — | Called when a milestone diamond is clicked. |
-| `onAddTask` | `(parentTask?: GanttTask) => void` | — | Called when the Add icon is clicked (`enableBuiltinDialogs=false` only). |
-| `onEditTask` | `(task: GanttTask) => void` | — | Called when the Edit icon is clicked (`enableBuiltinDialogs=false` only). |
-| `onDeleteTask` | `(task: GanttTask) => void` | — | Called when the Delete icon is clicked (`enableBuiltinDialogs=false` only). |
-| `onStatusChange` | `(task: GanttTask, status: GanttTaskStatus) => void` | — | Called when a task status changes. |
-| `onTasksChange` | `(tasks: GanttTask[]) => void` | — | Called after every CRUD operation with the full updated task list. |
-| `onTaskCreated` | `(task: GanttTask) => void` | — | Called after a task is created via the built-in dialog (includes generated UUID). |
-| `onTaskUpdated` | `(task: GanttTask) => void` | — | Called after a task is updated via the built-in dialog. |
-| `onTaskDeleted` | `(taskId: string) => void` | — | Called after a task (and all its descendants) are deleted via the built-in dialog. |
+| `minPanelWidth` | `number` | `200` | Minimum width (px) of the left task panel. |
+| `maxPanelWidth` | `number` | `600` | Maximum width (px) of the left task panel. |
+| `defaultRangeStart` | `Date` | auto | Overrides the auto-computed start of the visible range. |
+| `defaultRangeEnd` | `Date` | auto | Overrides the auto-computed end of the visible range. |
+| `translations` | `Partial<GanttTranslations>` | German | Override display strings for i18n (see [Translations](#translations)). |
+
+**Toolbar**
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `showToolbar` | `boolean` | `true` | Show or hide the entire toolbar. |
+| `toolbarConfig` | `GanttToolbarConfig` | all `true` | Fine-grained visibility control for each toolbar element (see [GanttToolbarConfig](#gantttoolbarconfig)). |
+
+**Interactivity**
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `draggable` | `boolean` | `false` | Allow task bars to be moved horizontally by dragging. |
+| `resizable` | `boolean` | `false` | Allow the end date to be changed by dragging the right edge of a bar. |
+| `zoomable` | `boolean` | `false` | Enable Ctrl + scroll wheel to cycle through time scales. |
+| `cascadeDependencies` | `boolean` | `false` | When a task's dates change, automatically shift all Finish-to-Start successors by the same delta. |
+| `enableBuiltinDialogs` | `boolean` | `true` | When `true`, Add/Edit/Delete icons open MUI dialogs. When `false`, the `onAddTask` / `onEditTask` / `onDeleteTask` callbacks are invoked directly. |
+
+**Callbacks — interactions**
+
+| Prop | Type | Description |
+|---|---|---|
+| `onTaskClick` | `(task: GanttTask) => void` | Called when a task bar is clicked (suppressed after a drag). |
+| `onMilestoneClick` | `(task: GanttTask) => void` | Called when a milestone diamond is clicked. |
+| `onTaskMoved` | `(task: GanttTask, newStart: Date, newEnd: Date) => void` | Called after a bar is dragged to a new position. |
+| `onTaskResized` | `(task: GanttTask, newEnd: Date) => void` | Called after the right edge of a bar is dragged to a new end date. |
+| `onStatusChange` | `(task: GanttTask, status: GanttTaskStatus) => void` | Called when a task status is changed. |
+
+**Callbacks — CRUD (built-in dialogs mode)**
+
+| Prop | Type | Description |
+|---|---|---|
+| `onTaskCreated` | `(task: GanttTask) => void` | Called after a task is created via the built-in dialog (includes the generated UUID). |
+| `onTaskUpdated` | `(task: GanttTask) => void` | Called after a task is updated via the built-in dialog. |
+| `onTaskDeleted` | `(taskId: string) => void` | Called after a task and all its descendants are deleted. |
+| `onTasksChange` | `(tasks: GanttTask[]) => void` | Called after every mutation (CRUD, drag, resize) with the full updated task list. |
+
+**Callbacks — external control mode (`enableBuiltinDialogs={false}`)**
+
+| Prop | Type | Description |
+|---|---|---|
+| `onAddTask` | `(parentTask?: GanttTask) => void` | Called when the Add icon is clicked. |
+| `onEditTask` | `(task: GanttTask) => void` | Called when the Edit icon is clicked. |
+| `onDeleteTask` | `(task: GanttTask) => void` | Called when the Delete icon is clicked. |
 
 ### GanttTask
 
 ```ts
 type GanttTask = {
-  id: string;                   // Unique identifier (also used as React key and for dependencies)
-  parentId?: string;            // Omit for root tasks
+  id: string;               // Unique identifier — used as React key and referenced by dependencies
+  parentId?: string;        // Omit for root-level tasks
   name: string;
   status: 'planned' | 'in-progress' | 'done' | 'blocked';
   startDate: Date;
   endDate: Date;
-  dependencies?: string[];      // IDs of predecessor tasks (Finish-to-Start arrows)
-  isMilestone?: boolean;        // Renders as a diamond; startDate ≈ endDate
-  progress?: number;            // 0–100, renders a semi-transparent overlay bar
+  dependencies?: string[];  // IDs of Finish-to-Start predecessor tasks
+  isMilestone?: boolean;    // Renders as a diamond; set startDate === endDate
+  progress?: number;        // 0–100 — renders a semi-transparent overlay bar inside the task bar
+};
+```
+
+### GanttToolbarConfig
+
+All fields are optional and default to `true`. Pass only the keys you want to change.
+
+```ts
+type GanttToolbarConfig = {
+  showScaleDays?: boolean;          // "Days" scale button
+  showScaleWeeks?: boolean;         // "Weeks" scale button
+  showScaleMonths?: boolean;        // "Months" scale button
+  showScaleQuarters?: boolean;      // "Quarters" scale button
+  showExpandCollapseAll?: boolean;  // Expand / Collapse all button
+  showScrollToToday?: boolean;      // Scroll-to-today button
+  showDateRange?: boolean;          // From / To date pickers
+  showRangeReset?: boolean;         // Restore-range button (visible only when range is customized)
+  showResetView?: boolean;          // Reset-view button (restores scale + range + expand state)
 };
 ```
 
@@ -315,25 +411,30 @@ All UI strings can be overridden via the `translations` prop. Only pass the keys
 ```ts
 type GanttTranslations = {
   // Toolbar — scale buttons
-  scaleDays: string;            // Default: "Tage"
-  scaleWeeks: string;           // Default: "Wochen"
-  scaleMonths: string;          // Default: "Monate"
-  scaleQuarters: string;        // Default: "Quartale"
+  scaleDays: string;              // Default: "Tage"
+  scaleWeeks: string;             // Default: "Wochen"
+  scaleMonths: string;            // Default: "Monate"
+  scaleQuarters: string;          // Default: "Quartale"
   // Toolbar — date range
-  rangeFrom: string;            // Default: "Von"
-  rangeTo: string;              // Default: "Bis"
-  rangeResetTooltip: string;    // Default: "Bereich zurücksetzen"
+  rangeFrom: string;              // Default: "Von"
+  rangeTo: string;                // Default: "Bis"
+  rangeResetTooltip: string;      // Default: "Bereich zurücksetzen"
+  // Toolbar — action buttons
+  scrollToTodayTooltip: string;   // Default: "Heute anzeigen"
+  expandAllTooltip: string;       // Default: "Alle aufklappen"
+  collapseAllTooltip: string;     // Default: "Alle zuklappen"
+  resetViewTooltip: string;       // Default: "Ansicht zurücksetzen"
   // Panel headers
-  columnName: string;           // Default: "Name"
-  columnStatus: string;         // Default: "Status"
+  columnName: string;             // Default: "Name"
+  columnStatus: string;           // Default: "Status"
   // Status chip labels
-  statusPlanned: string;        // Default: "Planned"
-  statusInProgress: string;     // Default: "In Progress"
-  statusDone: string;           // Default: "Done"
-  statusBlocked: string;        // Default: "Blocked"
+  statusPlanned: string;          // Default: "Geplant"
+  statusInProgress: string;       // Default: "In Arbeit"
+  statusDone: string;             // Default: "Fertig"
+  statusBlocked: string;          // Default: "Blockiert"
   // Timeline
-  weekColumnPrefix: string;     // Default: "KW"  (use "W" for English)
-  dateLocale: string;           // Default: "de-DE"
+  weekColumnPrefix: string;       // Default: "KW" (use "W" for English)
+  dateLocale: string;             // Default: "de-DE"
   // Dialog titles and buttons
   dialogAddTitle: string;
   dialogEditTitle: string;
@@ -349,7 +450,7 @@ type GanttTranslations = {
   dialogFieldMilestone: string;
   dialogFieldParent: string;
   dialogFieldParentNone: string;
-  // Delete confirmation ({name} is replaced by the task name)
+  // Delete confirmation template — {name} is replaced by the task name
   dialogDeleteConfirm: string;
 };
 ```
@@ -439,6 +540,10 @@ All three components support full i18n without any external library. Pass only t
     rangeFrom: 'From',
     rangeTo: 'To',
     rangeResetTooltip: 'Reset range',
+    scrollToTodayTooltip: 'Scroll to today',
+    expandAllTooltip: 'Expand all',
+    collapseAllTooltip: 'Collapse all',
+    resetViewTooltip: 'Reset view',
     weekColumnPrefix: 'W',
     dateLocale: 'en-US',
     columnName: 'Name',

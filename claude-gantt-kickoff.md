@@ -28,7 +28,7 @@ React 19, TypeScript 5.9, MUI v7, Zustand v5, Vite 8, Vitest 4, Storybook 10
 
 ---
 
-## Aktueller Stand: Phasen 1–13 + Expand/Collapse All + Phase 12 + Cascade Dependencies abgeschlossen ✅ (181 Tests grün)
+## Aktueller Stand: Phasen 1–13 + Expand/Collapse All + Phase 12 + Cascade Dependencies + Toolbar-Konfiguration abgeschlossen ✅ (188 Tests grün, README aktuell)
 
 ### Alle vorhandenen Dateien
 
@@ -259,7 +259,7 @@ onTasksChange?.(rawStore.getState().tasks); // synchron — Zustand-set ist sync
 
 ---
 
-## Storybook — 12 Stories
+## Storybook — 14 Stories
 
 | Story               | Besonderheit                                                        |
 | ------------------- | ------------------------------------------------------------------- |
@@ -269,12 +269,14 @@ onTasksChange?.(rawStore.getState().tasks); // synchron — Zustand-set ist sync
 | DaysScale           | Zwei-Ebenen-Header, TAGE-Button aktiv                               |
 | FullyExpanded       | `initialExpandAll: true`, height: 700, built-in dialogs             |
 | WithDependencies    | Fan-in, Fan-out, Z-Pfeile, height: 400                              |
-| CustomDateRange     | `defaultRangeStart/End` = ganzes Jahr 2025                          |
+| CustomDateRange     | `defaultRangeStart/End` = ganzes Jahr 2026                          |
 | EnglishTranslations | `translations: EN_TRANSLATIONS`, W-prefix statt KW, built-in dialogs |
 | NoToolbar           | `showToolbar: false`                                                |
 | MinimalFlat         | Nur Root-Tasks gefiltert, maxWidth: 700, height: 300                |
 | WithProgress        | `progress` auf allen Tasks, Today-Linie sichtbar, `initialExpandAll: true` |
 | WithBuiltinDialogs  | `enableBuiltinDialogs: true`, alle Dialog-Callbacks verdrahtet      |
+| ZoomAndToday        | `zoomable: true`, built-in dialogs, height: 500                     |
+| DragAndResize       | `draggable: true`, `resizable: true`, `initialExpandAll: true`, `cascadeDependencies: true` |
 
 ---
 
@@ -332,7 +334,7 @@ export function useRawGanttChartStore(): GanttChartStore
 ```
 Bitte lies zuerst die claude-gantt-kickoff.md im Root des Projekts.
 Dann besprechen wir die nächste geplante Phase.
-181 Tests müssen nach den Änderungen grün bleiben.
+188 Tests müssen nach den Änderungen grün bleiben.
 ```
 
 ---
@@ -425,6 +427,50 @@ Gilt für Drag-Move, Drag-Resize und Dialog-Edit gleichermassen (alles läuft du
 - Rückwärts (Task verkürzt/nach links gezogen) → Nachfolger werden nach links verschoben
 - Kaskade ist transitiv: A → B → C: Änderung an A kaskadiert bis C
 - Ohne `cascadeDependencies=true` ändert sich das bestehende Verhalten nicht
+
+---
+
+### Toolbar-Konfiguration ✅ abgeschlossen (188 Tests)
+
+**Feingranulare Kontrolle über jeden Toolbar-Bestandteil**
+
+**Neuer Typ**
+```ts
+export type GanttToolbarConfig = {
+  showScaleDays?: boolean;        // Default: true
+  showScaleWeeks?: boolean;       // Default: true
+  showScaleMonths?: boolean;      // Default: true
+  showScaleQuarters?: boolean;    // Default: true
+  showExpandCollapseAll?: boolean; // Default: true
+  showScrollToToday?: boolean;    // Default: true
+  showDateRange?: boolean;        // Von/Bis-Inputs — Default: true
+  showRangeReset?: boolean;       // Restore-Button — Default: true
+  showResetView?: boolean;        // Reset-Button (Skala + Range) — Default: true
+};
+```
+
+**Neue Prop**
+```ts
+toolbarConfig?: GanttToolbarConfig;  // nur abweichende Keys angeben
+```
+
+**Reset-View-Button**
+- Icon: `RestartAltIcon`
+- Setzt Zeitskala auf `defaultTimeScale` (in Store gespeichert) und Datumsbereich auf Auto-Range zurück
+- Disabled wenn `timeScale === defaultTimeScale && !isRangeCustomized`
+- `data-testid="gantt-reset-view"`
+
+**Store-Additions**
+- `defaultTimeScale: GanttTimeScale` — gespeicherte Ausgangsskala
+- `resetView()` — Action die `timeScale`, `timelineRange` und `isRangeCustomized` zurücksetzt
+
+**Neue Translation**
+- `resetViewTooltip: "Ansicht zurücksetzen"`
+
+**Implementation**
+- `DEFAULT_TOOLBAR_CONFIG` in `GanttChart.tsx` — alle Felder `true`
+- `resolvedToolbarConfig = { ...DEFAULT_TOOLBAR_CONFIG, ...toolbarConfig }` via `useMemo`
+- Wird als `config: Required<GanttToolbarConfig>` an `GanttToolbar` übergeben
 
 ## Geplante Phasen (noch nicht implementiert)
 
@@ -525,5 +571,96 @@ Ab ca. 200+ Tasks wird das DOM schwer. Lösung: nur sichtbare Zeilen rendern.
 
 **Print-CSS**
 - `@media print`: Toolbar ausblenden, Scrollbereich aufklappen, Seitenumbrüche zwischen Monaten
+
+---
+
+## Ideen für weitere Phasen / Improvements
+
+### Idee A — Undo / Redo
+
+- Store-History als Snapshot-Stack (max. ~50 Einträge)
+- `undo()` / `redo()` als Store-Aktionen
+- Keyboard-Shortcuts: Ctrl+Z / Ctrl+Y
+- Toolbar-Buttons mit `UndoIcon` / `RedoIcon` (optional über `toolbarConfig`)
+- Interagiert gut mit Drag & Drop, Dialog-CRUD und Cascade-Dependencies
+
+### Idee B — Inline-Editierung von Task-Namen
+
+- Doppelklick auf den Task-Namen → `TextField` mit `autoFocus` ersetzt `Typography`
+- Enter / Blur → `updateTask`, Escape → Abbrechen
+- Vermeidet den Dialog-Overhead für schnelle Umbenennung
+- Neue Prop `inlineEdit?: boolean` (Default: false)
+
+### Idee C — Schnell-Statuswechsel per Rechtsklick / Kontextmenü
+
+- Rechtsklick auf Balken → MUI `Menu` mit den 4 Status-Optionen
+- `onStatusChange?.(task, newStatus)` feuert + direktes Store-Update
+- Alternativ: Doppelklick auf Balken öffnet das Menü (besser für Touch)
+
+### Idee D — Fortschritt per Drag setzen
+
+- Klick + Drag auf das Progress-Overlay → `progress` (0–100) live aktualisieren
+- Tooltip zeigt aktuellen %-Wert während des Drags
+- Neue Prop `progressDraggable?: boolean` (Default: false)
+- Callback: `onProgressChange?: (task, progress) => void`
+
+### Idee E — Abhängigkeiten im Dialog verwalten
+
+- Multiselect-Feld "Vorgänger" im `GanttTaskDialog`
+- DFS-geordnete Liste wie beim Parent-Dropdown
+- Zirkuläre Abhängigkeiten ausschließen (eigene ID + alle Nachkommen ausblenden)
+- Ermöglicht vollständiges Dependency-Management ohne manuelles `dependencies[]`-Array
+
+### Idee F — Kritischer Pfad
+
+- Neue Prop `showCriticalPath?: boolean`
+- Berechnung: längste Abhängigkeitskette bis zum letzten Task (CPM)
+- Balken auf dem kritischen Pfad erhalten einen farbigen Rand (`error.main` oder konfigurierbares Theming)
+- Wird als SVG-Overlay oder durch Klassen auf den Bar-Elementen visualisiert
+
+### Idee G — Baseline / Soll-Ist-Vergleich
+
+- Neuer optionaler Typ `GanttTaskBaseline { id; baselineStart; baselineEnd }`
+- Prop `baselines?: GanttTaskBaseline[]`
+- Visualisierung als dünner transparenter Balken hinter dem aktuellen Balken
+- Nützlich für Plan-vs.-Actual-Darstellungen
+
+### Idee H — Custom Columns im Task-Panel
+
+- Prop `extraColumns?: GanttColumnDef[]` mit `{ key; label; width; render: (task) => ReactNode }`
+- Werden rechts von der Status-Spalte eingereiht
+- Ermöglicht z. B. Assignee-Avatar, Datum, Budget-Felder ohne Fork
+
+### Idee I — Swimlanes / Gruppierung
+
+- Prop `groupBy?: (task: GanttTask) => string` — Tasks werden nach Rückgabewert in beschriftete Abschnitte gruppiert
+- Trennlinien + Gruppen-Header-Zeile im Panel und in der Timeline
+- Kombinierbar mit der bestehenden Hierarchie (parentId innerhalb einer Gruppe)
+
+### Idee J — Import aus CSV / Zwischenablage
+
+- Toolbar-Button "Import" → Textarea-Dialog, erwartet CSV mit Spalten `id,name,start,end,parentId,status`
+- Parsed und ruft `setTasks` auf — optionales `onImport` Callback
+- Passend zu Phase 17 (Export): vollständiger Round-Trip
+
+### Idee K — Virtualisierung für große Datensätze
+
+- Ab ca. 200+ Tasks wird das DOM schwer
+- Virtuelle Liste in `GanttTaskPanel` + `GanttTimeline` mit identischem `overscan`
+- Implementierung via `@tanstack/react-virtual`
+- Neue Prop `virtualizeRows?: boolean` (Default: false — opt-in)
+- Beide Panels müssen synchron scrollen (Vertical-Scroll-Sync bereits vorhanden)
+
+### Idee L — Timeline-Annotationen / Marker
+
+- Prop `markers?: { date: Date; label?: string; color?: string }[]`
+- Werden als vertikale Linien in der Timeline gerendert (ähnlich Today-Linie, aber konfigurierbar)
+- Nützlich für Sprint-Grenzen, Freeze-Dates, Meilensteine außerhalb der Task-Liste
+
+### Idee M — Theming per Task-Kategorie / Farbe
+
+- Optionales Feld `GanttTask.color?: string` — überschreibt die Status-Farbe für diesen Balken
+- Alternativ: Prop `getTaskColor?: (task: GanttTask) => string`
+- Ermöglicht team-basierte Farbgebung ohne Statusänderung
 
 ---

@@ -37,6 +37,7 @@ const EN_TRANSLATIONS: GanttTranslations = {
   scrollToTodayTooltip: "Scroll to today",
   expandAllTooltip: "Expand all",
   collapseAllTooltip: "Collapse all",
+  resetViewTooltip: "Reset view",
 };
 
 const sampleTasks: GanttTask[] = [
@@ -216,6 +217,7 @@ const meta: Meta<typeof GanttChart> = {
     draggable: { control: "boolean" },
     resizable: { control: "boolean" },
     cascadeDependencies: { control: "boolean" },
+    toolbarConfig: { control: false },
     onTaskMoved: { control: false },
     onTaskResized: { control: false },
     minPanelWidth: { control: "number" },

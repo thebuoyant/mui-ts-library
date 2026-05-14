@@ -5,7 +5,7 @@ import {
   createGanttChartStore,
   type GanttChartStore,
 } from "./GanttChart.store";
-import type { GanttChartProps, GanttTranslations } from "./GanttChart.types";
+import type { GanttChartProps, GanttToolbarConfig, GanttTranslations } from "./GanttChart.types";
 import { DEFAULT_GANTT_TRANSLATIONS } from "./GanttChart.types";
 import { getDisplayRange, getTimelineRange } from "./util/gantt-chart.util";
 import type { GanttTimeScale } from "./GanttChart.types";
@@ -65,6 +65,18 @@ type GanttChartInnerProps = GanttChartProps;
 
 const SCALE_ORDER: GanttTimeScale[] = ["days", "weeks", "months", "quarters"];
 
+const DEFAULT_TOOLBAR_CONFIG: Required<GanttToolbarConfig> = {
+  showScaleDays: true,
+  showScaleWeeks: true,
+  showScaleMonths: true,
+  showScaleQuarters: true,
+  showExpandCollapseAll: true,
+  showScrollToToday: true,
+  showDateRange: true,
+  showRangeReset: true,
+  showResetView: true,
+};
+
 function GanttChartInner({
   tasks,
   onTaskClick,
@@ -79,6 +91,7 @@ function GanttChartInner({
   onTaskUpdated,
   onTaskDeleted,
   showToolbar = true,
+  toolbarConfig,
   height,
   width,
   minPanelWidth = 200,
@@ -90,6 +103,11 @@ function GanttChartInner({
   onTaskResized,
 }: GanttChartInnerProps) {
   const resolvedHeight = resolveSize(height, 400);
+  const resolvedToolbarConfig = useMemo(
+    () => ({ ...DEFAULT_TOOLBAR_CONFIG, ...toolbarConfig }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [toolbarConfig],
+  );
   const resolvedWidth = resolveSize(width, "100%");
   const setTasks = useGanttChartStore((s) => s.setTasks);
   const timeScale = useGanttChartStore((s) => s.timeScale);
@@ -182,7 +200,7 @@ function GanttChartInner({
         overflow: "hidden",
       }}
     >
-      {showToolbar && <GanttToolbar onScrollToToday={scrollToToday} />}
+      {showToolbar && <GanttToolbar onScrollToToday={scrollToToday} config={resolvedToolbarConfig} />}
 
       <Box sx={{ display: "flex", flex: 1, overflow: "hidden" }}>
         <GanttTaskPanel
@@ -240,6 +258,7 @@ export function GanttChart({
   defaultRangeEnd,
   translations,
   enableBuiltinDialogs = true,
+  toolbarConfig,
   zoomable = false,
   draggable = false,
   resizable = false,
@@ -286,6 +305,8 @@ export function GanttChart({
           tasks={tasks}
           timeScale={timeScale}
           enableBuiltinDialogs={enableBuiltinDialogs}
+          showToolbar={showToolbar}
+          toolbarConfig={toolbarConfig}
           zoomable={zoomable}
           draggable={draggable}
           resizable={resizable}
@@ -301,7 +322,6 @@ export function GanttChart({
           onTaskCreated={onTaskCreated}
           onTaskUpdated={onTaskUpdated}
           onTaskDeleted={onTaskDeleted}
-          showToolbar={showToolbar}
           height={height}
           width={width}
           minPanelWidth={minPanelWidth}

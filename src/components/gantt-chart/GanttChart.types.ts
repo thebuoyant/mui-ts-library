@@ -66,10 +66,11 @@ export type GanttTranslations = {
   dialogFieldParentNone: string;
   // Dialoge — Bestätigungstext ({name} wird durch den Task-Namen ersetzt)
   dialogDeleteConfirm: string;
-  // Toolbar — Heute-Button + Expand/Collapse
+  // Toolbar — Heute-Button + Expand/Collapse + Reset
   scrollToTodayTooltip: string;
   expandAllTooltip: string;
   collapseAllTooltip: string;
+  resetViewTooltip: string;
 };
 
 // Standardwerte entsprechen dem aktuell gerenderten Verhalten (DE Toolbar, EN Status).
@@ -106,6 +107,20 @@ export const DEFAULT_GANTT_TRANSLATIONS: GanttTranslations = {
   scrollToTodayTooltip: "Zum heutigen Tag",
   expandAllTooltip: "Alle aufklappen",
   collapseAllTooltip: "Alle zuklappen",
+  resetViewTooltip: "Ansicht zurücksetzen",
+};
+
+// Feingranulare Konfiguration der Toolbar-Elemente — alle Felder optional (Default: true/sichtbar).
+export type GanttToolbarConfig = {
+  showScaleDays?: boolean;
+  showScaleWeeks?: boolean;
+  showScaleMonths?: boolean;
+  showScaleQuarters?: boolean;
+  showExpandCollapseAll?: boolean;
+  showScrollToToday?: boolean;
+  showDateRange?: boolean;   // Von/Bis-Inputs
+  showRangeReset?: boolean;  // Restore-Button (erscheint wenn Bereich angepasst)
+  showResetView?: boolean;   // Reset-Button (Skala + Bereich zurücksetzen)
 };
 
 export type GanttChartProps = {
@@ -119,6 +134,8 @@ export type GanttChartProps = {
   initialExpandAll?: boolean;
   // Toolbar mit Skalen-Switcher und Datumsbereich ein-/ausblenden (Standard: true).
   showToolbar?: boolean;
+  // Feingranulare Toolbar-Konfiguration — nur abweichende Keys angeben, Rest bleibt sichtbar.
+  toolbarConfig?: GanttToolbarConfig;
   // Optionaler initialer Sichtbereich — überschreibt die automatische Berechnung aus den Tasks.
   defaultRangeStart?: Date;
   defaultRangeEnd?: Date;

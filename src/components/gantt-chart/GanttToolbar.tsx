@@ -1,10 +1,11 @@
 import { Box, IconButton, TextField, ToggleButton, ToggleButtonGroup, Tooltip } from "@mui/material";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import RestoreIcon from "@mui/icons-material/Restore";
 import TodayIcon from "@mui/icons-material/Today";
 import UnfoldLessIcon from "@mui/icons-material/UnfoldLess";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 import { useGanttChartStore, useGanttTranslations } from "./GanttChart";
-import type { GanttTimeScale } from "./GanttChart.types";
+import type { GanttTimeScale, GanttToolbarConfig } from "./GanttChart.types";
 
 // Timezone-sicheres Format für type="date"-Inputs (lokales Datum, nicht UTC).
 function toDateInputValue(date: Date): string {
@@ -20,20 +21,29 @@ function parseDateInput(value: string): Date | null {
   return new Date(y, m - 1, d, 0, 0, 0, 0);
 }
 
-export function GanttToolbar({ onScrollToToday }: { onScrollToToday?: () => void }) {
+type GanttToolbarProps = {
+  onScrollToToday?: () => void;
+  config: Required<GanttToolbarConfig>;
+};
+
+export function GanttToolbar({ onScrollToToday, config }: GanttToolbarProps) {
   const t = useGanttTranslations();
   const timeScale = useGanttChartStore((s) => s.timeScale);
+  const defaultTimeScale = useGanttChartStore((s) => s.defaultTimeScale);
   const setTimeScale = useGanttChartStore((s) => s.setTimeScale);
   const timelineRange = useGanttChartStore((s) => s.timelineRange);
   const isRangeCustomized = useGanttChartStore((s) => s.isRangeCustomized);
+  const isExpandedCustomized = useGanttChartStore((s) => s.isExpandedCustomized);
   const setTimelineRange = useGanttChartStore((s) => s.setTimelineRange);
   const resetTimelineRange = useGanttChartStore((s) => s.resetTimelineRange);
+  const resetView = useGanttChartStore((s) => s.resetView);
   const tasks = useGanttChartStore((s) => s.tasks);
   const expandedIds = useGanttChartStore((s) => s.expandedIds);
   const expandAll = useGanttChartStore((s) => s.expandAll);
   const collapseAll = useGanttChartStore((s) => s.collapseAll);
 
   const allExpanded = tasks.length > 0 && tasks.every((t) => expandedIds.has(t.id));
+  const isViewChanged = timeScale !== defaultTimeScale || isRangeCustomized || isExpandedCustomized;
 
   const now = Date.now();
   const isTodayInRange =
@@ -45,6 +55,17 @@ export function GanttToolbar({ onScrollToToday }: { onScrollToToday?: () => void
     months: t.scaleMonths,
     quarters: t.scaleQuarters,
   };
+
+  const SCALE_VISIBLE: Record<GanttTimeScale, boolean> = {
+    days: config.showScaleDays,
+    weeks: config.showScaleWeeks,
+    months: config.showScaleMonths,
+    quarters: config.showScaleQuarters,
+  };
+
+  const visibleScales = (Object.keys(SCALE_LABELS) as GanttTimeScale[]).filter(
+    (s) => SCALE_VISIBLE[s],
+  );
 
   const handleStartChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const start = parseDateInput(e.target.value);
@@ -75,35 +96,40 @@ export function GanttToolbar({ onScrollToToday }: { onScrollToToday?: () => void
         bgcolor: "background.paper",
       }}
     >
-      <ToggleButtonGroup
-        value={timeScale}
-        exclusive
-        onChange={handleScaleChange}
-        size="small"
-        aria-label={t.scaleMonths}
-      >
-        {(Object.keys(SCALE_LABELS) as GanttTimeScale[]).map((scale) => (
-          <ToggleButton key={scale} value={scale} data-testid={`gantt-scale-${scale}`}>
-            {SCALE_LABELS[scale]}
-          </ToggleButton>
-        ))}
-      </ToggleButtonGroup>
+      {visibleScales.length > 0 && (
+        <ToggleButtonGroup
+          value={timeScale}
+          exclusive
+          onChange={handleScaleChange}
+          size="small"
+          aria-label={t.scaleMonths}
+        >
+          {visibleScales.map((scale) => (
+            <ToggleButton key={scale} value={scale} data-testid={`gantt-scale-${scale}`}>
+              {SCALE_LABELS[scale]}
+            </ToggleButton>
+          ))}
+        </ToggleButtonGroup>
+      )}
 
       <Box sx={{ ml: "auto", display: "flex", alignItems: "center", gap: 1 }}>
-        <Tooltip title={allExpanded ? t.collapseAllTooltip : t.expandAllTooltip}>
-          <IconButton
-            size="small"
-            onClick={allExpanded ? collapseAll : expandAll}
-            data-testid="gantt-expand-collapse-all"
-          >
-            {allExpanded ? (
-              <UnfoldLessIcon fontSize="small" />
-            ) : (
-              <UnfoldMoreIcon fontSize="small" />
-            )}
-          </IconButton>
-        </Tooltip>
-        {onScrollToToday && (
+        {config.showExpandCollapseAll && (
+          <Tooltip title={allExpanded ? t.collapseAllTooltip : t.expandAllTooltip}>
+            <IconButton
+              size="small"
+              onClick={allExpanded ? collapseAll : expandAll}
+              data-testid="gantt-expand-collapse-all"
+            >
+              {allExpanded ? (
+                <UnfoldLessIcon fontSize="small" />
+              ) : (
+                <UnfoldMoreIcon fontSize="small" />
+              )}
+            </IconButton>
+          </Tooltip>
+        )}
+
+        {config.showScrollToToday && onScrollToToday && (
           <Tooltip title={t.scrollToTodayTooltip}>
             <span>
               <IconButton
@@ -117,27 +143,33 @@ export function GanttToolbar({ onScrollToToday }: { onScrollToToday?: () => void
             </span>
           </Tooltip>
         )}
-        <TextField
-          type="date"
-          size="small"
-          label={t.rangeFrom}
-          value={toDateInputValue(timelineRange.start)}
-          onChange={handleStartChange}
-          slotProps={{ inputLabel: { shrink: true } }}
-          sx={{ width: 148 }}
-          inputProps={{ "data-testid": "gantt-range-start" }}
-        />
-        <TextField
-          type="date"
-          size="small"
-          label={t.rangeTo}
-          value={toDateInputValue(timelineRange.end)}
-          onChange={handleEndChange}
-          slotProps={{ inputLabel: { shrink: true } }}
-          sx={{ width: 148 }}
-          inputProps={{ "data-testid": "gantt-range-end" }}
-        />
-        {isRangeCustomized && (
+
+        {config.showDateRange && (
+          <>
+            <TextField
+              type="date"
+              size="small"
+              label={t.rangeFrom}
+              value={toDateInputValue(timelineRange.start)}
+              onChange={handleStartChange}
+              slotProps={{ inputLabel: { shrink: true } }}
+              sx={{ width: 148 }}
+              inputProps={{ "data-testid": "gantt-range-start" }}
+            />
+            <TextField
+              type="date"
+              size="small"
+              label={t.rangeTo}
+              value={toDateInputValue(timelineRange.end)}
+              onChange={handleEndChange}
+              slotProps={{ inputLabel: { shrink: true } }}
+              sx={{ width: 148 }}
+              inputProps={{ "data-testid": "gantt-range-end" }}
+            />
+          </>
+        )}
+
+        {config.showRangeReset && isRangeCustomized && (
           <Tooltip title={t.rangeResetTooltip}>
             <IconButton
               size="small"
@@ -146,6 +178,21 @@ export function GanttToolbar({ onScrollToToday }: { onScrollToToday?: () => void
             >
               <RestoreIcon fontSize="small" />
             </IconButton>
+          </Tooltip>
+        )}
+
+        {config.showResetView && (
+          <Tooltip title={t.resetViewTooltip}>
+            <span>
+              <IconButton
+                size="small"
+                onClick={resetView}
+                disabled={!isViewChanged}
+                data-testid="gantt-reset-view"
+              >
+                <RestartAltIcon fontSize="small" />
+              </IconButton>
+            </span>
           </Tooltip>
         )}
       </Box>
