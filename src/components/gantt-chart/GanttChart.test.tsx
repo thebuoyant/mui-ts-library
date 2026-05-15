@@ -1313,3 +1313,45 @@ describe("GanttChart — showCriticalPath", () => {
     expect(screen.getByTestId("gantt-milestone-ms")).toBeInTheDocument();
   });
 });
+
+// ---------------------------------------------------------------------------
+// Phase 16 — virtualizeRows
+// ---------------------------------------------------------------------------
+
+function buildVirtualTasks(count: number): GanttTask[] {
+  return Array.from({ length: count }, (_, i) => ({
+    id: `vt-${i}`,
+    name: `Task ${i + 1}`,
+    status: (["planned", "in-progress", "done", "blocked"] as const)[i % 4],
+    startDate: new Date("2025-01-01"),
+    endDate: new Date("2025-03-31"),
+  }));
+}
+
+describe("GanttChart — virtualizeRows", () => {
+  it("renders without crashing with virtualizeRows=true and many tasks", () => {
+    render(<GanttChart tasks={buildVirtualTasks(300)} virtualizeRows />);
+  });
+
+  it("renders fewer DOM rows than total tasks when virtualizeRows=true (jsdom has clientHeight=0 so only overscan rows are in DOM)", () => {
+    const totalTasks = 50;
+    render(<GanttChart tasks={buildVirtualTasks(totalTasks)} virtualizeRows />);
+    // Overscan=5 → at most 10 rows rendered (5 top + 5 bottom) — far fewer than 50.
+    const rows = document.querySelectorAll(".gantt-task-row");
+    expect(rows.length).toBeLessThan(totalTasks);
+  });
+
+  it("renders all rows normally when virtualizeRows=false (default)", () => {
+    const totalTasks = 20;
+    render(<GanttChart tasks={buildVirtualTasks(totalTasks)} />);
+    const rows = document.querySelectorAll(".gantt-task-row");
+    expect(rows.length).toBe(totalTasks);
+  });
+
+  it("renders the timeline scroll container when virtualizeRows=true", () => {
+    // In jsdom the virtualizer may render 0 timeline rows (no layout),
+    // so we just verify the scroll container is present and the component doesn't crash.
+    render(<GanttChart tasks={buildVirtualTasks(50)} virtualizeRows />);
+    expect(screen.getByTestId("gantt-timeline-scroll")).toBeInTheDocument();
+  });
+});

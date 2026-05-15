@@ -1,4 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { type RefObject, type UIEventHandler } from "react";
 import { Box, Menu, MenuItem, useTheme } from "@mui/material";
 import { useGanttChartStore, useGanttTranslations, useRawGanttChartStore } from "./GanttChart";
@@ -140,6 +141,7 @@ type GanttTimelineProps = {
   resizable?: boolean;
   progressDraggable?: boolean;
   showCriticalPath?: boolean;
+  virtualizeRows?: boolean;
   onTaskMoved?: (task: GanttTask, newStart: Date, newEnd: Date) => void;
   onTaskResized?: (task: GanttTask, newEnd: Date) => void;
   onTasksChange?: (tasks: GanttTask[]) => void;
@@ -155,6 +157,7 @@ export function GanttTimeline({
   resizable = false,
   progressDraggable = false,
   showCriticalPath = false,
+  virtualizeRows = false,
   onTaskMoved,
   onTaskResized,
   onTasksChange,
@@ -249,6 +252,13 @@ export function GanttTimeline({
     () => showCriticalPath ? computeCriticalPath(allTasks) : new Set<string>(),
     [showCriticalPath, allTasks],
   );
+
+  const rowVirtualizer = useVirtualizer({
+    count: visibleTasks.length,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => ROW_HEIGHT,
+    overscan: 5,
+  });
 
   // Positionen der Wochenend-Spalten für das Hintergrund-Highlight (nur Tages-Skala).
   const weekendStrips = useMemo(() => {
@@ -475,220 +485,228 @@ export function GanttTimeline({
           </Box>
         )}
 
-        {visibleTasks.map((task) => {
-          // Drag-adjustierte Task-Daten für Positionsberechnung und Datumsanzeige.
-          const isDragging = activeDrag?.taskId === task.id;
-          let effectiveTask: GanttTask = task;
-          if (isDragging && activeDrag) {
-            if (activeDrag.type === "move") {
-              effectiveTask = {
-                ...task,
-                startDate: addDays(task.startDate, activeDrag.deltaDays),
-                endDate: addDays(task.endDate, activeDrag.deltaDays),
-              };
-            } else if (activeDrag.type === "resize") {
-              const rawEnd = addDays(task.endDate, activeDrag.deltaDays);
-              effectiveTask = {
-                ...task,
-                endDate: rawEnd > task.startDate ? rawEnd : addDays(task.startDate, 1),
-              };
-            } else if (activeDrag.type === "progress" && activeDrag.newProgress !== undefined) {
-              effectiveTask = { ...task, progress: activeDrag.newProgress };
+        {(() => {
+          // Lokale Hilfsfunktion — rendert eine Zeile; virtualTop macht sie absolut positioniert.
+          const renderBarRow = (task: GanttTaskNode, rowKey: React.Key, virtualTop?: number) => {
+            const isDragging = activeDrag?.taskId === task.id;
+            let effectiveTask: GanttTask = task;
+            if (isDragging && activeDrag) {
+              if (activeDrag.type === "move") {
+                effectiveTask = {
+                  ...task,
+                  startDate: addDays(task.startDate, activeDrag.deltaDays),
+                  endDate: addDays(task.endDate, activeDrag.deltaDays),
+                };
+              } else if (activeDrag.type === "resize") {
+                const rawEnd = addDays(task.endDate, activeDrag.deltaDays);
+                effectiveTask = {
+                  ...task,
+                  endDate: rawEnd > task.startDate ? rawEnd : addDays(task.startDate, 1),
+                };
+              } else if (activeDrag.type === "progress" && activeDrag.newProgress !== undefined) {
+                effectiveTask = { ...task, progress: activeDrag.newProgress };
+              }
             }
-          }
 
-          const { left, width } = calculateTaskPosition(effectiveTask, displayRange);
+            const { left, width } = calculateTaskPosition(effectiveTask, displayRange);
 
-          return (
-            <Box
-              key={task.id}
-              data-testid={`gantt-bar-row-${task.id}`}
-              sx={{
-                height: ROW_HEIGHT,
-                position: "relative",
-                borderBottom: "1px solid",
-                borderColor: "divider",
-                backgroundImage: (theme) =>
-                  `linear-gradient(to right, transparent calc(${gridColumnWidth}px - 1px), ${theme.palette.divider} calc(${gridColumnWidth}px - 1px), ${theme.palette.divider} ${gridColumnWidth}px)`,
-                backgroundSize: `${gridColumnWidth}px 100%`,
-                backgroundRepeat: "repeat-x",
-              }}
-            >
-              {task.isMilestone ? (
-                // Meilensteine außerhalb des sichtbaren Bereichs nicht rendern.
-                left >= 0 && left <= 100 ? (
-                  <Box
-                    data-testid={`gantt-milestone-${task.id}`}
-                    sx={{
-                      position: "absolute",
-                      left: `${left}%`,
-                      top: "50%",
-                      width: 12,
-                      height: 12,
-                      bgcolor: "warning.main",
-                      transform: "translate(-50%, -50%) rotate(45deg)",
-                      cursor: onMilestoneClick ? "pointer" : "default",
-                      boxShadow: criticalTaskIds.has(task.id)
-                        ? `0 0 0 2.5px ${theme.palette.error.main}`
-                        : undefined,
-                      "&:hover": onMilestoneClick ? { opacity: 0.8 } : undefined,
-                    }}
-                    onClick={() => onMilestoneClick?.(task)}
-                  />
-                ) : null
-              ) : (() => {
-                // Balken auf den sichtbaren Bereich [0%, 100%] klemmen damit absolute
-                // Elemente außerhalb der Timeline nicht den Scroll-Bereich ausdehnen.
-                const clampedLeft = Math.max(0, left);
-                const clampedRight = Math.min(100, left + Math.max(width, 0.5));
-                const clampedWidth = clampedRight - clampedLeft;
-                if (clampedWidth <= 0) return null;
-                return (
-                  <>
-                    {/* Label über dem Balken während move/resize-Drag. */}
-                    {isDragging && activeDrag && activeDrag.type !== "progress" && activeDrag.deltaDays !== 0 && (
-                      <Box
-                        sx={{
-                          position: "absolute",
-                          left: `${clampedLeft}%`,
-                          top: 2,
-                          bgcolor: "grey.800",
-                          color: "common.white",
-                          borderRadius: 0.5,
-                          px: 0.75,
-                          lineHeight: "18px",
-                          fontSize: "0.65rem",
-                          whiteSpace: "nowrap",
-                          pointerEvents: "none",
-                          zIndex: 100,
-                        }}
-                      >
-                        {activeDrag.type === "move"
-                          ? `${formatDragDate(effectiveTask.startDate)} – ${formatDragDate(effectiveTask.endDate)}`
-                          : `→ ${formatDragDate(effectiveTask.endDate)}`}
-                      </Box>
-                    )}
-                    {/* Fortschritts-Label während progress-Drag. */}
-                    {isDragging && activeDrag?.type === "progress" && activeDrag.newProgress !== undefined && (
-                      <Box
-                        sx={{
-                          position: "absolute",
-                          left: `${clampedLeft}%`,
-                          top: 2,
-                          bgcolor: "grey.800",
-                          color: "common.white",
-                          borderRadius: 0.5,
-                          px: 0.75,
-                          lineHeight: "18px",
-                          fontSize: "0.65rem",
-                          whiteSpace: "nowrap",
-                          pointerEvents: "none",
-                          zIndex: 100,
-                        }}
-                      >
-                        {activeDrag.newProgress}%
-                      </Box>
-                    )}
+            return (
+              <Box
+                key={rowKey}
+                data-testid={`gantt-bar-row-${task.id}`}
+                style={virtualTop !== undefined
+                  ? { position: "absolute", top: virtualTop, left: 0, width: "100%" }
+                  : undefined}
+                sx={{
+                  height: ROW_HEIGHT,
+                  position: "relative",
+                  borderBottom: "1px solid",
+                  borderColor: "divider",
+                  backgroundImage: (theme) =>
+                    `linear-gradient(to right, transparent calc(${gridColumnWidth}px - 1px), ${theme.palette.divider} calc(${gridColumnWidth}px - 1px), ${theme.palette.divider} ${gridColumnWidth}px)`,
+                  backgroundSize: `${gridColumnWidth}px 100%`,
+                  backgroundRepeat: "repeat-x",
+                }}
+              >
+                {task.isMilestone ? (
+                  left >= 0 && left <= 100 ? (
                     <Box
-                      data-testid={`gantt-bar-${task.id}`}
+                      data-testid={`gantt-milestone-${task.id}`}
                       sx={{
                         position: "absolute",
-                        left: `${clampedLeft}%`,
-                        width: `${clampedWidth}%`,
-                        height: BAR_HEIGHT,
+                        left: `${left}%`,
                         top: "50%",
-                        transform: "translateY(-50%)",
-                        bgcolor: BAR_COLOR[task.status] ?? "grey.300",
-                        borderRadius: 1,
-                        overflow: "hidden",
-                        opacity: isDragging ? 0.75 : 1,
+                        width: 12,
+                        height: 12,
+                        bgcolor: "warning.main",
+                        transform: "translate(-50%, -50%) rotate(45deg)",
+                        cursor: onMilestoneClick ? "pointer" : "default",
                         boxShadow: criticalTaskIds.has(task.id)
-                          ? `inset 0 0 0 2.5px ${theme.palette.error.main}`
+                          ? `0 0 0 2.5px ${theme.palette.error.main}`
                           : undefined,
-                        cursor: isDragging
-                          ? "grabbing"
-                          : draggable
-                            ? "grab"
-                            : onTaskClick
-                              ? "pointer"
-                              : "default",
-                        userSelect: "none",
-                        "&:hover": (draggable || onTaskClick) ? { opacity: isDragging ? 0.75 : 0.8 } : undefined,
+                        "&:hover": onMilestoneClick ? { opacity: 0.8 } : undefined,
                       }}
-                      onMouseDown={draggable ? (e) => handleBarMouseDown(e, task, "move") : undefined}
-                      onContextMenu={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setContextMenu({ task, mouseX: e.clientX, mouseY: e.clientY });
-                      }}
-                      onClick={() => {
-                        if (suppressClickRef.current) {
-                          suppressClickRef.current = false;
-                          return;
-                        }
-                        onTaskClick?.(task);
-                      }}
-                    >
-                      {effectiveTask.progress !== undefined && effectiveTask.progress > 0 && (
+                      onClick={() => onMilestoneClick?.(task)}
+                    />
+                  ) : null
+                ) : (() => {
+                  const clampedLeft = Math.max(0, left);
+                  const clampedRight = Math.min(100, left + Math.max(width, 0.5));
+                  const clampedWidth = clampedRight - clampedLeft;
+                  if (clampedWidth <= 0) return null;
+                  return (
+                    <>
+                      {isDragging && activeDrag && activeDrag.type !== "progress" && activeDrag.deltaDays !== 0 && (
                         <Box
-                          data-testid={`gantt-progress-${task.id}`}
                           sx={{
                             position: "absolute",
-                            left: 0,
-                            top: 0,
-                            width: `${Math.min(effectiveTask.progress, 100)}%`,
-                            height: "100%",
-                            bgcolor: "currentColor",
-                            opacity: 0.4,
+                            left: `${clampedLeft}%`,
+                            top: 2,
+                            bgcolor: "grey.800",
+                            color: "common.white",
+                            borderRadius: 0.5,
+                            px: 0.75,
+                            lineHeight: "18px",
+                            fontSize: "0.65rem",
+                            whiteSpace: "nowrap",
+                            pointerEvents: "none",
+                            zIndex: 100,
                           }}
-                        />
+                        >
+                          {activeDrag.type === "move"
+                            ? `${formatDragDate(effectiveTask.startDate)} – ${formatDragDate(effectiveTask.endDate)}`
+                            : `→ ${formatDragDate(effectiveTask.endDate)}`}
+                        </Box>
                       )}
-                      {/* Progress-Drag-Handle — zeigt aktuelle progress%-Position. */}
-                      {progressDraggable && (
+                      {isDragging && activeDrag?.type === "progress" && activeDrag.newProgress !== undefined && (
                         <Box
-                          data-testid={`gantt-progress-handle-${task.id}`}
                           sx={{
                             position: "absolute",
-                            left: `${Math.min(effectiveTask.progress ?? 0, 100)}%`,
-                            top: 0,
-                            width: 6,
-                            height: "100%",
-                            transform: "translateX(-50%)",
-                            cursor: "ew-resize",
-                            bgcolor: "rgba(255,255,255,0.35)",
+                            left: `${clampedLeft}%`,
+                            top: 2,
+                            bgcolor: "grey.800",
+                            color: "common.white",
+                            borderRadius: 0.5,
+                            px: 0.75,
+                            lineHeight: "18px",
+                            fontSize: "0.65rem",
+                            whiteSpace: "nowrap",
+                            pointerEvents: "none",
+                            zIndex: 100,
                           }}
-                          onMouseDown={(e) => {
-                            e.stopPropagation();
-                            const barWidthPx = (clampedWidth / 100) * totalWidth;
-                            handleProgressMouseDown(e, task, effectiveTask.progress ?? 0, barWidthPx);
-                          }}
-                        />
+                        >
+                          {activeDrag.newProgress}%
+                        </Box>
                       )}
-                      {/* Resize-Handle am rechten Balkenrand. */}
-                      {resizable && (
-                        <Box
-                          data-testid={`gantt-resize-handle-${task.id}`}
-                          sx={{
-                            position: "absolute",
-                            right: 0,
-                            top: 0,
-                            width: 6,
-                            height: "100%",
-                            cursor: "ew-resize",
-                          }}
-                          onMouseDown={(e) => {
-                            e.stopPropagation();
-                            handleBarMouseDown(e, task, "resize");
-                          }}
-                        />
-                      )}
-                    </Box>
-                  </>
-                );
-              })()}
+                      <Box
+                        data-testid={`gantt-bar-${task.id}`}
+                        sx={{
+                          position: "absolute",
+                          left: `${clampedLeft}%`,
+                          width: `${clampedWidth}%`,
+                          height: BAR_HEIGHT,
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          bgcolor: BAR_COLOR[task.status] ?? "grey.300",
+                          borderRadius: 1,
+                          overflow: "hidden",
+                          opacity: isDragging ? 0.75 : 1,
+                          boxShadow: criticalTaskIds.has(task.id)
+                            ? `inset 0 0 0 2.5px ${theme.palette.error.main}`
+                            : undefined,
+                          cursor: isDragging
+                            ? "grabbing"
+                            : draggable
+                              ? "grab"
+                              : onTaskClick
+                                ? "pointer"
+                                : "default",
+                          userSelect: "none",
+                          "&:hover": (draggable || onTaskClick) ? { opacity: isDragging ? 0.75 : 0.8 } : undefined,
+                        }}
+                        onMouseDown={draggable ? (e) => handleBarMouseDown(e, task, "move") : undefined}
+                        onContextMenu={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setContextMenu({ task, mouseX: e.clientX, mouseY: e.clientY });
+                        }}
+                        onClick={() => {
+                          if (suppressClickRef.current) {
+                            suppressClickRef.current = false;
+                            return;
+                          }
+                          onTaskClick?.(task);
+                        }}
+                      >
+                        {effectiveTask.progress !== undefined && effectiveTask.progress > 0 && (
+                          <Box
+                            data-testid={`gantt-progress-${task.id}`}
+                            sx={{
+                              position: "absolute",
+                              left: 0,
+                              top: 0,
+                              width: `${Math.min(effectiveTask.progress, 100)}%`,
+                              height: "100%",
+                              bgcolor: "currentColor",
+                              opacity: 0.4,
+                            }}
+                          />
+                        )}
+                        {progressDraggable && (
+                          <Box
+                            data-testid={`gantt-progress-handle-${task.id}`}
+                            sx={{
+                              position: "absolute",
+                              left: `${Math.min(effectiveTask.progress ?? 0, 100)}%`,
+                              top: 0,
+                              width: 6,
+                              height: "100%",
+                              transform: "translateX(-50%)",
+                              cursor: "ew-resize",
+                              bgcolor: "rgba(255,255,255,0.35)",
+                            }}
+                            onMouseDown={(e) => {
+                              e.stopPropagation();
+                              const barWidthPx = (clampedWidth / 100) * totalWidth;
+                              handleProgressMouseDown(e, task, effectiveTask.progress ?? 0, barWidthPx);
+                            }}
+                          />
+                        )}
+                        {resizable && (
+                          <Box
+                            data-testid={`gantt-resize-handle-${task.id}`}
+                            sx={{
+                              position: "absolute",
+                              right: 0,
+                              top: 0,
+                              width: 6,
+                              height: "100%",
+                              cursor: "ew-resize",
+                            }}
+                            onMouseDown={(e) => {
+                              e.stopPropagation();
+                              handleBarMouseDown(e, task, "resize");
+                            }}
+                          />
+                        )}
+                      </Box>
+                    </>
+                  );
+                })()}
+              </Box>
+            );
+          };
+
+          return virtualizeRows ? (
+            <Box sx={{ position: "relative", height: rowVirtualizer.getTotalSize() }}>
+              {rowVirtualizer.getVirtualItems().map((vRow) =>
+                renderBarRow(visibleTasks[vRow.index], vRow.key, vRow.start)
+              )}
             </Box>
+          ) : (
+            <>{visibleTasks.map((task) => renderBarRow(task, task.id))}</>
           );
-        })}
+        })()}
 
         {/* Kontext-Menü für Schnell-Statuswechsel per Rechtsklick auf einen Balken. */}
         <Menu

@@ -343,6 +343,7 @@ function App() {
 | `inlineEdit` | `boolean` | `false` | Double-click on a task name in the left panel to edit it inline. |
 | `progressDraggable` | `boolean` | `false` | Show a drag handle inside task bars to set `progress` (0–100) directly. |
 | `showCriticalPath` | `boolean` | `false` | Highlight bars on the critical path (longest dependency chain) with a red inset border. |
+| `virtualizeRows` | `boolean` | `false` | Only render rows in the visible viewport (recommended for 200+ tasks). Uses `@tanstack/react-virtual` internally. |
 | `cascadeDependencies` | `boolean` | `false` | When a task's dates change, automatically shift all Finish-to-Start successors by the same delta. |
 | `enableBuiltinDialogs` | `boolean` | `true` | When `true`, Add/Edit/Delete icons open MUI dialogs. When `false`, the `onAddTask` / `onEditTask` / `onDeleteTask` callbacks are invoked directly. |
 

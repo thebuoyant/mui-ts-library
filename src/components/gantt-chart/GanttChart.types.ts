@@ -166,6 +166,8 @@ export type GanttChartProps = {
   inlineEdit?: boolean;
   // Fortschritt per Drag am Progress-Handle direkt im Balken setzen (Default: false).
   progressDraggable?: boolean;
+  // Wenn true, werden nur sichtbare Zeilen gerendert (für 200+ Tasks empfohlen). Default: false.
+  virtualizeRows?: boolean;
   onTaskClick?: (task: GanttTask) => void;
   onMilestoneClick?: (task: GanttTask) => void;
   onAddTask?: (parentTask?: GanttTask) => void;

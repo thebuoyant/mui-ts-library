@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { type RefObject, type UIEventHandler } from "react";
 import { Box, Chip, IconButton, Menu, MenuItem, TextField, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
@@ -290,6 +291,7 @@ type GanttTaskPanelProps = {
   onTaskUpdated?: (task: GanttTask) => void;
   onTaskDeleted?: (taskId: string) => void;
   inlineEdit?: boolean;
+  virtualizeRows?: boolean;
 };
 
 export function GanttTaskPanel({
@@ -307,6 +309,7 @@ export function GanttTaskPanel({
   onTaskUpdated,
   onTaskDeleted,
   inlineEdit,
+  virtualizeRows = false,
 }: GanttTaskPanelProps) {
   const t = useGanttTranslations();
   const rawStore = useRawGanttChartStore();
@@ -323,6 +326,13 @@ export function GanttTaskPanel({
     () => getVisibleTasks(taskTree, expandedIds),
     [taskTree, expandedIds],
   );
+
+  const rowVirtualizer = useVirtualizer({
+    count: visibleTasks.length,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => ROW_HEIGHT,
+    overscan: 5,
+  });
 
   // Dialog-State
   const [addOpen, setAddOpen] = useState(false);
@@ -445,22 +455,54 @@ export function GanttTaskPanel({
         {timeScale === "days" && <Box sx={{ flex: 1 }} />}
       </Box>
 
-      {visibleTasks.map((task) => (
-        <GanttTaskRow
-          key={task.id}
-          task={task}
-          expandedIds={expandedIds}
-          toggleExpand={toggleExpand}
-          hasActionsColumn={hasActionsColumn}
-          onTaskClick={onTaskClick}
-          onAddTask={rowOnAdd}
-          onEditTask={rowOnEdit}
-          onDeleteTask={rowOnDelete}
-          onStatusChange={onStatusChange}
-          inlineEdit={inlineEdit}
-          onInlineRename={inlineEdit ? handleInlineRename : undefined}
-        />
-      ))}
+      {virtualizeRows ? (
+        <Box sx={{ position: "relative", height: rowVirtualizer.getTotalSize() }}>
+          {rowVirtualizer.getVirtualItems().map((vRow) => (
+            <Box
+              key={vRow.key}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: ROW_HEIGHT,
+                transform: `translateY(${vRow.start}px)`,
+              }}
+            >
+              <GanttTaskRow
+                task={visibleTasks[vRow.index]}
+                expandedIds={expandedIds}
+                toggleExpand={toggleExpand}
+                hasActionsColumn={hasActionsColumn}
+                onTaskClick={onTaskClick}
+                onAddTask={rowOnAdd}
+                onEditTask={rowOnEdit}
+                onDeleteTask={rowOnDelete}
+                onStatusChange={onStatusChange}
+                inlineEdit={inlineEdit}
+                onInlineRename={inlineEdit ? handleInlineRename : undefined}
+              />
+            </Box>
+          ))}
+        </Box>
+      ) : (
+        visibleTasks.map((task) => (
+          <GanttTaskRow
+            key={task.id}
+            task={task}
+            expandedIds={expandedIds}
+            toggleExpand={toggleExpand}
+            hasActionsColumn={hasActionsColumn}
+            onTaskClick={onTaskClick}
+            onAddTask={rowOnAdd}
+            onEditTask={rowOnEdit}
+            onDeleteTask={rowOnDelete}
+            onStatusChange={onStatusChange}
+            inlineEdit={inlineEdit}
+            onInlineRename={inlineEdit ? handleInlineRename : undefined}
+          />
+        ))
+      )}
 
       {enableBuiltinDialogs && (
         <>

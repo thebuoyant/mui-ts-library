@@ -102,6 +102,7 @@ function GanttChartInner({
   inlineEdit = false,
   progressDraggable = false,
   showCriticalPath = false,
+  virtualizeRows = false,
   onTaskMoved,
   onTaskResized,
 }: GanttChartInnerProps) {
@@ -221,6 +222,7 @@ function GanttChartInner({
           onTaskUpdated={onTaskUpdated}
           onTaskDeleted={onTaskDeleted}
           inlineEdit={inlineEdit}
+          virtualizeRows={virtualizeRows}
         />
         <Box
           data-testid="gantt-panel-divider"
@@ -242,6 +244,7 @@ function GanttChartInner({
           resizable={resizable}
           progressDraggable={progressDraggable}
           showCriticalPath={showCriticalPath}
+          virtualizeRows={virtualizeRows}
           onTaskMoved={onTaskMoved}
           onTaskResized={onTaskResized}
           onTasksChange={onTasksChange}
@@ -272,6 +275,7 @@ export function GanttChart({
   inlineEdit = false,
   progressDraggable = false,
   showCriticalPath = false,
+  virtualizeRows = false,
   cascadeDependencies = false,
   onTaskClick,
   onMilestoneClick,
@@ -323,6 +327,7 @@ export function GanttChart({
           inlineEdit={inlineEdit}
           progressDraggable={progressDraggable}
           showCriticalPath={showCriticalPath}
+          virtualizeRows={virtualizeRows}
           onTaskClick={onTaskClick}
           onMilestoneClick={onMilestoneClick}
           onAddTask={onAddTask}

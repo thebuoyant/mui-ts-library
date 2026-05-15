@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { fn } from "storybook/test";
 import { Box } from "@mui/material";
 import { GanttChart } from "./GanttChart";
-import type { GanttTask, GanttTranslations } from "./GanttChart.types";
+import type { GanttTask, GanttTaskStatus, GanttTranslations } from "./GanttChart.types";
 
 const EN_TRANSLATIONS: GanttTranslations = {
   scaleDays: "Days",
@@ -197,6 +197,7 @@ const meta: Meta<typeof GanttChart> = {
     inlineEdit: true,
     progressDraggable: true,
     showCriticalPath: false,
+    virtualizeRows: false,
     minPanelWidth: 200,
     maxPanelWidth: 600,
     // Alle Callbacks als fn() damit sie im Storybook-Actions-Tab erscheinen.
@@ -227,6 +228,7 @@ const meta: Meta<typeof GanttChart> = {
     inlineEdit: { control: "boolean" },
     progressDraggable: { control: "boolean" },
     showCriticalPath: { control: "boolean" },
+    virtualizeRows: { control: "boolean" },
     toolbarConfig: { control: false },
     onTaskMoved: { control: false },
     onTaskResized: { control: false },
@@ -546,6 +548,84 @@ export const DragAndResize: Story = {
   },
   render: (args) => (
     <Box sx={{ width: "100%", maxWidth: 1100, height: args.height }}>
+      <GanttChart {...args} />
+    </Box>
+  ),
+};
+
+// ---------------------------------------------------------------------------
+// LargeDataset — Phase 16: Virtualisierung
+// ---------------------------------------------------------------------------
+
+function generateLargeTasks(): GanttTask[] {
+  const statuses: GanttTaskStatus[] = ["planned", "in-progress", "done", "blocked"];
+  const tasks: GanttTask[] = [];
+  let counter = 0;
+
+  const d = (year: number, month: number, day: number) => new Date(year, month - 1, day);
+
+  for (let p = 0; p < 4; p++) {
+    const programId = `prog-${p}`;
+    tasks.push({
+      id: programId,
+      name: `Program ${p + 1}`,
+      status: statuses[counter++ % 4],
+      startDate: d(2025, 1 + p * 3, 1),
+      endDate: d(2026, 3 + p * 3, 30),
+    });
+
+    for (let r = 0; r < 4; r++) {
+      const releaseId = `prog-${p}-rel-${r}`;
+      tasks.push({
+        id: releaseId,
+        parentId: programId,
+        name: `Release ${r + 1}`,
+        status: statuses[counter++ % 4],
+        startDate: d(2025, 1 + p * 3 + r, 1),
+        endDate: d(2025, 2 + p * 3 + r, 28),
+      });
+
+      for (let t = 0; t < 5; t++) {
+        const teamId = `prog-${p}-rel-${r}-team-${t}`;
+        tasks.push({
+          id: teamId,
+          parentId: releaseId,
+          name: `Team ${t + 1}`,
+          status: statuses[counter++ % 4],
+          startDate: d(2025, 1 + p * 3 + r, 1 + t * 4),
+          endDate: d(2025, 1 + p * 3 + r, 5 + t * 5),
+        });
+
+        for (let s = 0; s < 4; s++) {
+          tasks.push({
+            id: `prog-${p}-rel-${r}-team-${t}-sprint-${s}`,
+            parentId: teamId,
+            name: `Sprint ${s + 1}`,
+            status: statuses[counter++ % 4],
+            startDate: d(2025, 1 + p * 3 + r, 1 + s * 7),
+            endDate: d(2025, 1 + p * 3 + r, 7 + s * 7),
+          });
+        }
+      }
+    }
+  }
+
+  return tasks;
+}
+
+const largeTasks = generateLargeTasks();
+
+export const LargeDataset: Story = {
+  args: {
+    tasks: largeTasks,
+    timeScale: "months",
+    initialExpandAll: true,
+    virtualizeRows: true,
+    height: 600,
+    enableBuiltinDialogs: true,
+  },
+  render: (args) => (
+    <Box sx={{ width: "100%", height: args.height }}>
       <GanttChart {...args} />
     </Box>
   ),
