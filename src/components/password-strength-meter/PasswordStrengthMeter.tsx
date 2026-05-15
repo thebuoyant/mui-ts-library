@@ -43,10 +43,12 @@ function RequirementItem({
       <Typography variant="caption">{label}</Typography>
       {fulfilled ? (
         <CheckCircleOutlineIcon
+          data-testid="psm-req-success"
           style={{ fontSize: 16, color: checkColors.success }}
         />
       ) : (
         <ErrorOutlineIcon
+          data-testid="psm-req-failure"
           style={{ fontSize: 16, color: checkColors.failure }}
         />
       )}
@@ -141,11 +143,13 @@ export function PasswordStrengthMeter({
           size={inputSize}
           value={password}
           onChange={handleOnChange}
+          inputProps={{ "data-testid": "psm-input" }}
           endAdornment={
             showPasswordAdornment ? (
               <InputAdornment position="end">
                 <IconButton
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  data-testid="psm-toggle"
+                  aria-label={showPassword ? t.hidePasswordLabel : t.showPasswordLabel}
                   onClick={handleClickShowPassword}
                   onMouseDown={handleMouseDownPassword}
                   onMouseUp={handleMouseUpPassword}
@@ -165,7 +169,7 @@ export function PasswordStrengthMeter({
         // ohne diese Attribute ist er für assistive Technologien unsichtbar.
         <Box
           role="progressbar"
-          aria-label="Password strength"
+          aria-label={t.meterAriaLabel}
           aria-valuenow={strengthResult.percent}
           aria-valuemin={0}
           aria-valuemax={100}
@@ -180,7 +184,7 @@ export function PasswordStrengthMeter({
           }}
         >
           <Box
-            className="meter-result"
+            data-testid="psm-meter"
             sx={{
               height: "100%",
               width: `${strengthResult.percent}%`,
@@ -193,7 +197,7 @@ export function PasswordStrengthMeter({
       )}
 
       {showSummary && (
-        <Box sx={{ mt: 0.5, p: 0.5 }}>
+        <Box data-testid="psm-summary" sx={{ mt: 0.5, p: 0.5 }}>
           <Typography
             variant="caption"
             gutterBottom
@@ -205,7 +209,7 @@ export function PasswordStrengthMeter({
           <Stack direction="row" spacing={6}>
             <Stack direction="column">
               <RequirementItem
-                label={`${t.summaryMinCharsLeft} ${passwordMinLength} ${t.summaryMinCharsRight}`}
+                label={t.summaryMinChars.replace("{n}", String(passwordMinLength))}
                 fulfilled={strengthResult.length >= passwordMinLength}
                 checkColors={checkColors}
               />

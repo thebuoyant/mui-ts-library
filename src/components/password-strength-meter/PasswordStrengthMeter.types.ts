@@ -28,25 +28,28 @@ export type MeterColors = {
 export type PasswordStrengthMeterTranslation = {
   label: string;
   summaryHeaderLabel: string;
-  // Der Mindestlängen-Text ist in zwei Teile aufgeteilt, damit die Zahl (passwordMinLength)
-  // dynamisch eingefügt werden kann: z. B. "At least" + 8 + "characters".
-  summaryMinCharsLeft: string;
-  summaryMinCharsRight: string;
+  // {n} wird zur Laufzeit durch passwordMinLength ersetzt, z. B. "At least 8 characters".
+  summaryMinChars: string;
   summaryCapitalLetter: string;
   summaryLowerCaseLetter: string;
   summaryNumber: string;
   summarySpecialChar: string;
+  showPasswordLabel: string;
+  hidePasswordLabel: string;
+  meterAriaLabel: string;
 };
 
 export const DEFAULT_PASSWORD_TRANSLATIONS: PasswordStrengthMeterTranslation = {
   label: "Password",
   summaryHeaderLabel: "Requirements for your password",
-  summaryMinCharsLeft: "At least",
-  summaryMinCharsRight: "characters",
+  summaryMinChars: "At least {n} characters",
   summaryCapitalLetter: "At least 1 capital letter",
   summaryLowerCaseLetter: "At least 1 lowercase letter",
   summaryNumber: "At least 1 number",
   summarySpecialChar: "At least 1 special character",
+  showPasswordLabel: "Show password",
+  hidePasswordLabel: "Hide password",
+  meterAriaLabel: "Password strength",
 };
 
 export const DEFAULT_METER_COLORS: MeterColors = {

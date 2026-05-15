@@ -72,7 +72,7 @@ describe("PasswordStrengthMeter", () => {
     );
 
     const input = screen.getByLabelText("Password");
-    const meter = document.querySelector(".meter-result") as HTMLDivElement;
+    const meter = screen.getByTestId("psm-meter");
 
     await user.type(input, "Qw7!mnOp");
 
@@ -134,7 +134,7 @@ describe("PasswordStrengthMeter", () => {
     render(<PasswordStrengthMeter value="Qw7!mnOp" />);
 
     const input = screen.getByLabelText("Password") as HTMLInputElement;
-    const meter = document.querySelector(".meter-result") as HTMLDivElement;
+    const meter = screen.getByTestId("psm-meter");
 
     expect(input.value).toBe("Qw7!mnOp");
     expect(meter).toHaveStyle({ width: "75%" });
@@ -175,8 +175,7 @@ describe("PasswordStrengthMeter", () => {
         translation={{
           label: "Passwort",
           summaryHeaderLabel: "Anforderungen",
-          summaryMinCharsLeft: "Mindestens",
-          summaryMinCharsRight: "Zeichen",
+          summaryMinChars: "Mindestens {n} Zeichen",
           summaryCapitalLetter: "Großbuchstabe",
           summaryLowerCaseLetter: "Kleinbuchstabe",
           summaryNumber: "Zahl",
@@ -198,15 +197,11 @@ describe("PasswordStrengthMeter", () => {
 
     await user.type(screen.getByLabelText("Password"), "Qw7!mnOp");
 
-    const successIcons = document.querySelectorAll(
-      '[data-testid="CheckCircleOutlineIcon"]',
-    );
-    const failureIcons = document.querySelectorAll(
-      '[data-testid="ErrorOutlineIcon"]',
-    );
+    const successIcons = screen.getAllByTestId("psm-req-success");
+    const failureIcons = screen.queryAllByTestId("psm-req-failure");
 
-    expect(successIcons.length).toBe(5);
-    expect(failureIcons.length).toBe(0);
+    expect(successIcons).toHaveLength(5);
+    expect(failureIcons).toHaveLength(0);
   });
 
   it("Should hide the adornment, meter and summary blocks when configured", () => {

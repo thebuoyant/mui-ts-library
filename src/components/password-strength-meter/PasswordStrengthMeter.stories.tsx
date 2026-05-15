@@ -92,12 +92,14 @@ export const GermanTranslation: Story = {
     translation: {
       label: "Passwort",
       summaryHeaderLabel: "Anforderungen an Ihr Passwort",
-      summaryMinCharsLeft: "Mindestens",
-      summaryMinCharsRight: "Zeichen",
+      summaryMinChars: "Mindestens {n} Zeichen",
       summaryCapitalLetter: "Mindestens 1 Großbuchstabe",
       summaryLowerCaseLetter: "Mindestens 1 Kleinbuchstabe",
       summaryNumber: "Mindestens 1 Zahl",
       summarySpecialChar: "Mindestens 1 Sonderzeichen",
+      showPasswordLabel: "Passwort anzeigen",
+      hidePasswordLabel: "Passwort verbergen",
+      meterAriaLabel: "Passwortstärke",
     },
   },
   render: (args) => (
