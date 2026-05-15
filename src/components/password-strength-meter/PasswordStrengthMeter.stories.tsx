@@ -1,11 +1,34 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Box, TextField } from "@mui/material";
+import { fn } from "storybook/test";
+import { Box, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { PasswordStrengthMeter } from "./PasswordStrengthMeter";
 
 const meta: Meta<typeof PasswordStrengthMeter> = {
   title: "Components/PasswordStrengthMeter",
   component: PasswordStrengthMeter,
+  args: {
+    showPasswordAdornment: true,
+    showMeter: true,
+    showSummary: true,
+    inputSize: "medium",
+    passwordMinLength: 8,
+    onPasswordChange: fn(),
+  },
+  argTypes: {
+    showPasswordAdornment: { control: "boolean" },
+    showMeter: { control: "boolean" },
+    showSummary: { control: "boolean" },
+    inputSize: { control: "radio", options: ["small", "medium"] },
+    passwordMinLength: { control: "number" },
+    // Controlled via render in the Controlled story — not directly editable.
+    value: { control: false },
+    // Complex objects — use dedicated stories instead.
+    translation: { control: false },
+    meterColors: { control: false },
+    checkColors: { control: false },
+    onPasswordChange: { control: false },
+  },
 };
 
 export default meta;
@@ -13,31 +36,88 @@ export default meta;
 type Story = StoryObj<typeof PasswordStrengthMeter>;
 
 export const Default: Story = {
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <PasswordStrengthMeter {...args} />
+    </Box>
+  ),
+};
+
+export const SmallInput: Story = {
   args: {
-    passwordMinLength: 8,
-    showPasswordAdornment: true,
-    showMeter: true,
-    showSummary: true,
     inputSize: "small",
+  },
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <PasswordStrengthMeter {...args} />
+    </Box>
+  ),
+};
+
+export const NoMeter: Story = {
+  args: {
+    showMeter: false,
+  },
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <PasswordStrengthMeter {...args} />
+    </Box>
+  ),
+};
+
+export const NoSummary: Story = {
+  args: {
+    showSummary: false,
+  },
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <PasswordStrengthMeter {...args} />
+    </Box>
+  ),
+};
+
+export const NoAdornment: Story = {
+  args: {
+    showPasswordAdornment: false,
+  },
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <PasswordStrengthMeter {...args} />
+    </Box>
+  ),
+};
+
+export const GermanTranslation: Story = {
+  args: {
     translation: {
-      label: "Password",
-      summaryHeaderLabel: "Requirements for your password",
-      summaryMinCharsLeft: "At least",
-      summaryMinCharsRight: "characters",
-      summaryCapitalLetter: "At least 1 capital letter",
-      summaryLowerCaseLetter: "At least 1 lowercase letter",
-      summaryNumber: "At least 1 number",
-      summarySpecialChar: "At least 1 special character",
+      label: "Passwort",
+      summaryHeaderLabel: "Anforderungen an Ihr Passwort",
+      summaryMinCharsLeft: "Mindestens",
+      summaryMinCharsRight: "Zeichen",
+      summaryCapitalLetter: "Mindestens 1 Großbuchstabe",
+      summaryLowerCaseLetter: "Mindestens 1 Kleinbuchstabe",
+      summaryNumber: "Mindestens 1 Zahl",
+      summarySpecialChar: "Mindestens 1 Sonderzeichen",
     },
+  },
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <PasswordStrengthMeter {...args} />
+    </Box>
+  ),
+};
+
+export const CustomColors: Story = {
+  args: {
     meterColors: {
-      weak: "#cc0000",
-      ok: "#fdc010",
-      good: "#8bc34a",
-      veryGood: "#43a047",
+      weak: "#e91e63",
+      ok: "#ff9800",
+      good: "#2196f3",
+      veryGood: "#9c27b0",
     },
     checkColors: {
-      failure: "#cc0000",
-      success: "#43a047",
+      failure: "#e91e63",
+      success: "#9c27b0",
     },
   },
   render: (args) => (
@@ -50,7 +130,7 @@ export const Default: Story = {
 // Zeigt den kontrollierten Modus: Das Passwort wird von außen verwaltet,
 // z. B. wenn die Komponente in ein bestehendes Formular eingebettet wird.
 export const Controlled: Story = {
-  render: () => {
+  render: (args) => {
     const [password, setPassword] = useState("");
 
     return (
@@ -60,16 +140,19 @@ export const Controlled: Story = {
           size="small"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          helperText="Dieses Feld steuert den PasswordStrengthMeter von außen."
+          helperText="This field drives the PasswordStrengthMeter from outside."
         />
         <PasswordStrengthMeter
+          {...args}
           value={password}
           showPasswordAdornment={false}
-          inputSize="small"
           onPasswordChange={(_, result) => {
-            console.log("Strength:", result.meterStatus);
+            args.onPasswordChange?.(_, result);
           }}
         />
+        <Typography variant="caption" color="text.secondary">
+          Current value: "{password}"
+        </Typography>
       </Box>
     );
   },

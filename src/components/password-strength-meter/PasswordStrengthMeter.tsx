@@ -13,23 +13,19 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { useId, useMemo, useState } from "react";
-import {
-  scorePassword,
-  type StrengthResult,
-} from "./util/password-strength.util";
+import { scorePassword } from "./util/password-strength.util";
 import type {
   CheckColors,
   MeterColors,
   PasswordStrengthMeterProps,
   PasswordStrengthMeterTranslation,
+  StrengthResult,
 } from "./PasswordStrengthMeter.types";
-
-export type {
-  CheckColors,
-  MeterColors,
-  PasswordStrengthMeterTranslation,
-  PasswordStrengthMeterProps,
-};
+import {
+  DEFAULT_CHECK_COLORS,
+  DEFAULT_METER_COLORS,
+  DEFAULT_PASSWORD_TRANSLATIONS,
+} from "./PasswordStrengthMeter.types";
 
 type RequirementItemProps = {
   label: string;
@@ -64,29 +60,14 @@ export function PasswordStrengthMeter({
   showMeter = true,
   showSummary = true,
   inputSize = "medium",
-  translation = {
-    label: "Password",
-    summaryHeaderLabel: "Requirements for your password",
-    summaryMinCharsLeft: "At least",
-    summaryMinCharsRight: "characters",
-    summaryCapitalLetter: "At least 1 capital letter",
-    summaryLowerCaseLetter: "At least 1 lowercase letter",
-    summaryNumber: "At least 1 number",
-    summarySpecialChar: "At least 1 special character",
-  },
-  meterColors = {
-    weak: "#cc0000",
-    ok: "#fdc010",
-    good: "#8bc34a",
-    veryGood: "#43a047",
-  },
+  translation,
+  meterColors,
   passwordMinLength = 8,
-  checkColors = {
-    failure: "#cc0000",
-    success: "#43a047",
-  },
+  checkColors = DEFAULT_CHECK_COLORS,
   onPasswordChange,
 }: PasswordStrengthMeterProps) {
+  const t: PasswordStrengthMeterTranslation = { ...DEFAULT_PASSWORD_TRANSLATIONS, ...translation };
+  const resolvedMeterColors: MeterColors = { ...DEFAULT_METER_COLORS, ...meterColors };
   // useId() erzeugt eine pro-Instanz eindeutige ID – verhindert Konflikte
   // wenn mehrere PasswordStrengthMeter auf der gleichen Seite gerendert werden.
   const uniqueId = useId();
@@ -103,8 +84,6 @@ export function PasswordStrengthMeter({
     () => scorePassword(password, passwordMinLength),
     [password, passwordMinLength],
   );
-
-  const { label } = translation;
 
   const handleClickShowPassword = () => {
     setShowPassword((show) => !show);
@@ -140,16 +119,11 @@ export function PasswordStrengthMeter({
 
   const calculateStrengthColor = (result: StrengthResult): string => {
     switch (result.meterStatus) {
-      case "weak":
-        return meterColors.weak;
-      case "ok":
-        return meterColors.ok;
-      case "good":
-        return meterColors.good;
-      case "very good":
-        return meterColors.veryGood;
-      default:
-        return "transparent";
+      case "weak":    return resolvedMeterColors.weak;
+      case "ok":      return resolvedMeterColors.ok;
+      case "good":    return resolvedMeterColors.good;
+      case "very good": return resolvedMeterColors.veryGood;
+      default:        return "transparent";
     }
   };
 
@@ -157,7 +131,7 @@ export function PasswordStrengthMeter({
     <Stack>
       <FormControl variant="outlined" fullWidth>
         <InputLabel htmlFor={inputId} size={inputSize}>
-          {label}
+          {t.label}
         </InputLabel>
 
         <OutlinedInput
@@ -182,7 +156,7 @@ export function PasswordStrengthMeter({
               </InputAdornment>
             ) : null
           }
-          label={label}
+          label={t.label}
         />
       </FormControl>
 
@@ -225,23 +199,23 @@ export function PasswordStrengthMeter({
             gutterBottom
             sx={{ display: "block", fontSize: 14 }}
           >
-            {translation.summaryHeaderLabel}
+            {t.summaryHeaderLabel}
           </Typography>
 
           <Stack direction="row" spacing={6}>
             <Stack direction="column">
               <RequirementItem
-                label={`${translation.summaryMinCharsLeft} ${passwordMinLength} ${translation.summaryMinCharsRight}`}
+                label={`${t.summaryMinCharsLeft} ${passwordMinLength} ${t.summaryMinCharsRight}`}
                 fulfilled={strengthResult.length >= passwordMinLength}
                 checkColors={checkColors}
               />
               <RequirementItem
-                label={translation.summaryCapitalLetter}
+                label={t.summaryCapitalLetter}
                 fulfilled={strengthResult.hasUpper}
                 checkColors={checkColors}
               />
               <RequirementItem
-                label={translation.summaryLowerCaseLetter}
+                label={t.summaryLowerCaseLetter}
                 fulfilled={strengthResult.hasLower}
                 checkColors={checkColors}
               />
@@ -249,12 +223,12 @@ export function PasswordStrengthMeter({
 
             <Stack direction="column">
               <RequirementItem
-                label={translation.summaryNumber}
+                label={t.summaryNumber}
                 fulfilled={strengthResult.hasDigit}
                 checkColors={checkColors}
               />
               <RequirementItem
-                label={translation.summarySpecialChar}
+                label={t.summarySpecialChar}
                 fulfilled={strengthResult.hasSymbol}
                 checkColors={checkColors}
               />

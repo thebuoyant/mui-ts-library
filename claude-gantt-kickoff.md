@@ -762,10 +762,4 @@ const resolvedTheme = { ...ganttTheme, statusColors: { ...statusColors, ...gantt
 - Werden als vertikale Linien in der Timeline gerendert (ähnlich Today-Linie, aber konfigurierbar)
 - Nützlich für Sprint-Grenzen, Freeze-Dates, Meilensteine außerhalb der Task-Liste
 
-### Idee M — Theming per Task-Kategorie / Farbe
-
-- Optionales Feld `GanttTask.color?: string` — überschreibt die Status-Farbe für diesen Balken
-- Alternativ: Prop `getTaskColor?: (task: GanttTask) => string`
-- Ermöglicht team-basierte Farbgebung ohne Statusänderung
-
----
+### Idee M — Theming per Task-Kategorie / Farbe ✅ als Phase 18 implementiert (`GanttTask.color`)

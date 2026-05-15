@@ -1,17 +1,4 @@
-export type StrengthScore = 0 | 1 | 2 | 3 | 4;
-
-export type MeterStatus = "weak" | "ok" | "good" | "very good";
-
-export type StrengthResult = {
-  score: StrengthScore;
-  percent: number; // 0..100, immer score * 25
-  meterStatus: MeterStatus;
-  length: number;
-  hasLower: boolean;
-  hasUpper: boolean;
-  hasDigit: boolean;
-  hasSymbol: boolean;
-};
+import type { MeterStatus, StrengthResult, StrengthScore } from "../PasswordStrengthMeter.types";
 
 const clampScore = (value: number): StrengthScore => {
   return Math.max(0, Math.min(4, Math.round(value))) as StrengthScore;

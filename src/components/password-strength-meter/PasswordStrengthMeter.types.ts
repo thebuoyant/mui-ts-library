@@ -1,4 +1,17 @@
-import type { StrengthResult } from "./util/password-strength.util";
+export type StrengthScore = 0 | 1 | 2 | 3 | 4;
+
+export type MeterStatus = "weak" | "ok" | "good" | "very good";
+
+export type StrengthResult = {
+  score: StrengthScore;
+  percent: number; // 0..100, immer score * 25
+  meterStatus: MeterStatus;
+  length: number;
+  hasLower: boolean;
+  hasUpper: boolean;
+  hasDigit: boolean;
+  hasSymbol: boolean;
+};
 
 export type CheckColors = {
   failure: string;
@@ -25,6 +38,29 @@ export type PasswordStrengthMeterTranslation = {
   summarySpecialChar: string;
 };
 
+export const DEFAULT_PASSWORD_TRANSLATIONS: PasswordStrengthMeterTranslation = {
+  label: "Password",
+  summaryHeaderLabel: "Requirements for your password",
+  summaryMinCharsLeft: "At least",
+  summaryMinCharsRight: "characters",
+  summaryCapitalLetter: "At least 1 capital letter",
+  summaryLowerCaseLetter: "At least 1 lowercase letter",
+  summaryNumber: "At least 1 number",
+  summarySpecialChar: "At least 1 special character",
+};
+
+export const DEFAULT_METER_COLORS: MeterColors = {
+  weak: "#cc0000",
+  ok: "#fdc010",
+  good: "#8bc34a",
+  veryGood: "#43a047",
+};
+
+export const DEFAULT_CHECK_COLORS: CheckColors = {
+  failure: "#cc0000",
+  success: "#43a047",
+};
+
 export type PasswordStrengthMeterProps = {
   // Wenn gesetzt, wird die Komponente kontrolliert: das Passwort kommt von außen,
   // Änderungen werden über onPasswordChange nach oben gegeben.
@@ -33,8 +69,10 @@ export type PasswordStrengthMeterProps = {
   showMeter?: boolean;
   showSummary?: boolean;
   inputSize?: "small" | "medium";
-  translation?: PasswordStrengthMeterTranslation;
-  meterColors?: MeterColors;
+  // Nur abweichende Keys angeben — Rest fällt auf DEFAULT_PASSWORD_TRANSLATIONS zurück.
+  translation?: Partial<PasswordStrengthMeterTranslation>;
+  // Nur abweichende Keys angeben — Rest fällt auf DEFAULT_METER_COLORS zurück.
+  meterColors?: Partial<MeterColors>;
   passwordMinLength?: number;
   checkColors?: CheckColors;
   onPasswordChange?: (password: string, strengthResult: StrengthResult) => void;
