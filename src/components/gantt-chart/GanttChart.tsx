@@ -99,6 +99,8 @@ function GanttChartInner({
   zoomable = false,
   draggable = false,
   resizable = false,
+  inlineEdit = false,
+  progressDraggable = false,
   onTaskMoved,
   onTaskResized,
 }: GanttChartInnerProps) {
@@ -217,6 +219,7 @@ function GanttChartInner({
           onTaskCreated={onTaskCreated}
           onTaskUpdated={onTaskUpdated}
           onTaskDeleted={onTaskDeleted}
+          inlineEdit={inlineEdit}
         />
         <Box
           data-testid="gantt-panel-divider"
@@ -236,9 +239,11 @@ function GanttChartInner({
           onMilestoneClick={onMilestoneClick}
           draggable={draggable}
           resizable={resizable}
+          progressDraggable={progressDraggable}
           onTaskMoved={onTaskMoved}
           onTaskResized={onTaskResized}
           onTasksChange={onTasksChange}
+          onStatusChange={onStatusChange}
         />
       </Box>
     </Box>
@@ -262,6 +267,8 @@ export function GanttChart({
   zoomable = false,
   draggable = false,
   resizable = false,
+  inlineEdit = false,
+  progressDraggable = false,
   cascadeDependencies = false,
   onTaskClick,
   onMilestoneClick,
@@ -310,6 +317,8 @@ export function GanttChart({
           zoomable={zoomable}
           draggable={draggable}
           resizable={resizable}
+          inlineEdit={inlineEdit}
+          progressDraggable={progressDraggable}
           onTaskClick={onTaskClick}
           onMilestoneClick={onMilestoneClick}
           onAddTask={onAddTask}

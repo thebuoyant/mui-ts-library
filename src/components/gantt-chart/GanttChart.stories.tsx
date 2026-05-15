@@ -192,6 +192,8 @@ const meta: Meta<typeof GanttChart> = {
     draggable: true,
     resizable: true,
     cascadeDependencies: true,
+    inlineEdit: true,
+    progressDraggable: true,
     minPanelWidth: 200,
     maxPanelWidth: 600,
     // Alle Callbacks als fn() damit sie im Storybook-Actions-Tab erscheinen.
@@ -205,6 +207,8 @@ const meta: Meta<typeof GanttChart> = {
     onTaskCreated: fn(),
     onTaskUpdated: fn(),
     onTaskDeleted: fn(),
+    onTaskMoved: fn(),
+    onTaskResized: fn(),
   },
   argTypes: {
     timeScale: { control: "radio", options: ["days", "weeks", "months", "quarters"] },
@@ -217,6 +221,8 @@ const meta: Meta<typeof GanttChart> = {
     draggable: { control: "boolean" },
     resizable: { control: "boolean" },
     cascadeDependencies: { control: "boolean" },
+    inlineEdit: { control: "boolean" },
+    progressDraggable: { control: "boolean" },
     toolbarConfig: { control: false },
     onTaskMoved: { control: false },
     onTaskResized: { control: false },

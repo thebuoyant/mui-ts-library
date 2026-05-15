@@ -987,3 +987,164 @@ describe("GanttChart — resize (resizable prop)", () => {
     );
   });
 });
+
+// ---------------------------------------------------------------------------
+// Phase 14 — Inline-Edit, Schnell-Statuswechsel, Fortschritt per Drag
+// ---------------------------------------------------------------------------
+
+describe("GanttChart — inlineEdit", () => {
+  it("shows a text field after double-clicking the task name when inlineEdit=true", () => {
+    render(<GanttChart tasks={tasks} inlineEdit />);
+
+    fireEvent.dblClick(screen.getByText("Root Task"));
+
+    expect(screen.getByTestId("gantt-inline-edit-root")).toBeInTheDocument();
+  });
+
+  it("does not show a text field on double-click when inlineEdit=false", () => {
+    render(<GanttChart tasks={tasks} />);
+
+    fireEvent.dblClick(screen.getByText("Root Task"));
+
+    expect(screen.queryByTestId("gantt-inline-edit-root")).not.toBeInTheDocument();
+  });
+
+  it("saves the new name and hides the field after pressing Enter", () => {
+    render(<GanttChart tasks={tasks} inlineEdit />);
+
+    fireEvent.dblClick(screen.getByText("Root Task"));
+
+    const input = screen.getByTestId("gantt-inline-edit-root");
+    fireEvent.change(input, { target: { value: "Renamed Root" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+
+    expect(screen.queryByTestId("gantt-inline-edit-root")).not.toBeInTheDocument();
+    expect(screen.getByText("Renamed Root")).toBeInTheDocument();
+  });
+
+  it("cancels editing without saving after pressing Escape", () => {
+    render(<GanttChart tasks={tasks} inlineEdit />);
+
+    fireEvent.dblClick(screen.getByText("Root Task"));
+
+    const input = screen.getByTestId("gantt-inline-edit-root");
+    fireEvent.change(input, { target: { value: "Should Not Save" } });
+    fireEvent.keyDown(input, { key: "Escape" });
+
+    expect(screen.queryByTestId("gantt-inline-edit-root")).not.toBeInTheDocument();
+    expect(screen.getByText("Root Task")).toBeInTheDocument();
+    expect(screen.queryByText("Should Not Save")).not.toBeInTheDocument();
+  });
+
+  it("saves the new name on blur", () => {
+    render(<GanttChart tasks={tasks} inlineEdit />);
+
+    fireEvent.dblClick(screen.getByText("Root Task"));
+
+    const input = screen.getByTestId("gantt-inline-edit-root");
+    fireEvent.change(input, { target: { value: "Blur Saved" } });
+    fireEvent.blur(input);
+
+    expect(screen.queryByTestId("gantt-inline-edit-root")).not.toBeInTheDocument();
+    expect(screen.getByText("Blur Saved")).toBeInTheDocument();
+  });
+
+  it("calls onTasksChange after an inline rename", () => {
+    const onTasksChange = vi.fn();
+    render(<GanttChart tasks={tasks} inlineEdit onTasksChange={onTasksChange} />);
+
+    fireEvent.dblClick(screen.getByText("Root Task"));
+    const input = screen.getByTestId("gantt-inline-edit-root");
+    fireEvent.change(input, { target: { value: "Changed" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+
+    expect(onTasksChange).toHaveBeenCalledOnce();
+    const updated = onTasksChange.mock.calls[0][0] as GanttTask[];
+    expect(updated.some((t) => t.id === "root" && t.name === "Changed")).toBe(true);
+  });
+});
+
+describe("GanttChart — status context menu (right-click on bar)", () => {
+  it("shows a status menu after right-clicking a task bar", () => {
+    render(<GanttChart tasks={tasks} />);
+
+    fireEvent.contextMenu(screen.getByTestId("gantt-bar-root"));
+
+    expect(screen.getByTestId("gantt-status-menu-done")).toBeInTheDocument();
+  });
+
+  it("updates the task status after selecting a menu item", () => {
+    render(<GanttChart tasks={tasks} />);
+
+    fireEvent.contextMenu(screen.getByTestId("gantt-bar-root"));
+    fireEvent.click(screen.getByTestId("gantt-status-menu-done"));
+
+    // Chip der Root-Zeile muss "Done" zeigen — nicht mehr "In Progress"
+    const rootRow = screen.getByTestId("gantt-task-row-root");
+    expect(rootRow.querySelector(".MuiChip-root")).toHaveTextContent("Done");
+    expect(rootRow.querySelector(".MuiChip-root")).not.toHaveTextContent("In Progress");
+  });
+
+  it("calls onStatusChange when a status is selected from the context menu", () => {
+    const onStatusChange = vi.fn();
+    render(<GanttChart tasks={tasks} onStatusChange={onStatusChange} />);
+
+    fireEvent.contextMenu(screen.getByTestId("gantt-bar-root"));
+    fireEvent.click(screen.getByTestId("gantt-status-menu-planned"));
+
+    expect(onStatusChange).toHaveBeenCalledOnce();
+    expect(onStatusChange).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "root" }),
+      "planned",
+    );
+  });
+});
+
+const progressTaskList: GanttTask[] = [
+  {
+    id: "work",
+    name: "Work",
+    status: "in-progress",
+    startDate: new Date("2025-01-01"),
+    endDate: new Date("2025-03-31"),
+    progress: 50,
+  },
+];
+
+describe("GanttChart — progressDraggable", () => {
+  it("renders a progress handle when progressDraggable=true", () => {
+    render(<GanttChart tasks={progressTaskList} progressDraggable />);
+
+    expect(screen.getByTestId("gantt-progress-handle-work")).toBeInTheDocument();
+  });
+
+  it("does not render a progress handle when progressDraggable=false", () => {
+    render(<GanttChart tasks={progressTaskList} />);
+
+    expect(screen.queryByTestId("gantt-progress-handle-work")).not.toBeInTheDocument();
+  });
+
+  it("calls onTasksChange with updated progress after a progress drag", () => {
+    const onTasksChange = vi.fn();
+    render(
+      <GanttChart
+        tasks={progressTaskList}
+        progressDraggable
+        timeScale="days"
+        defaultRangeStart={new Date("2025-01-01")}
+        defaultRangeEnd={new Date("2025-12-31")}
+        onTasksChange={onTasksChange}
+      />,
+    );
+
+    const handle = screen.getByTestId("gantt-progress-handle-work");
+
+    fireEvent.mouseDown(handle, { clientX: 100 });
+    fireEvent.mouseMove(document, { clientX: 160 });
+    fireEvent.mouseUp(document);
+
+    expect(onTasksChange).toHaveBeenCalledTimes(1);
+    const updated = onTasksChange.mock.calls[0][0] as GanttTask[];
+    expect(updated[0].progress).toBeDefined();
+  });
+});

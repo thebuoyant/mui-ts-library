@@ -155,6 +155,10 @@ export type GanttChartProps = {
   resizable?: boolean;
   // Wenn true, werden beim Verschieben/Resizen alle Finish-to-Start-Nachfolger automatisch mitverschoben.
   cascadeDependencies?: boolean;
+  // Doppelklick auf Task-Namen startet Inline-Editierung (Default: false).
+  inlineEdit?: boolean;
+  // Fortschritt per Drag am Progress-Handle direkt im Balken setzen (Default: false).
+  progressDraggable?: boolean;
   onTaskClick?: (task: GanttTask) => void;
   onMilestoneClick?: (task: GanttTask) => void;
   onAddTask?: (parentTask?: GanttTask) => void;

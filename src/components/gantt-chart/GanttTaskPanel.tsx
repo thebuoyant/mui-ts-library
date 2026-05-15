@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { type RefObject, type UIEventHandler } from "react";
-import { Box, Chip, IconButton, Menu, MenuItem, Typography } from "@mui/material";
+import { Box, Chip, IconButton, Menu, MenuItem, TextField, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -53,6 +53,8 @@ type GanttTaskRowProps = {
   onEditTask?: (task: GanttTask) => void;
   onDeleteTask?: (task: GanttTask) => void;
   onStatusChange?: (task: GanttTask, status: GanttTaskStatus) => void;
+  inlineEdit?: boolean;
+  onInlineRename?: (task: GanttTask, newName: string) => void;
 };
 
 function GanttTaskRow({
@@ -65,9 +67,19 @@ function GanttTaskRow({
   onEditTask,
   onDeleteTask,
   onStatusChange,
+  inlineEdit,
+  onInlineRename,
 }: GanttTaskRowProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [editingName, setEditingName] = useState<string | null>(null);
   const t = useGanttTranslations();
+
+  const commitRename = () => {
+    if (editingName !== null && editingName.trim()) {
+      onInlineRename?.(task, editingName.trim());
+    }
+    setEditingName(null);
+  };
 
   return (
     <Box
@@ -124,9 +136,32 @@ function GanttTaskRow({
           }}
         />
 
-        <Typography variant="body2" noWrap sx={{ flex: 1, minWidth: 0 }}>
-          {task.name}
-        </Typography>
+        {editingName !== null ? (
+          <TextField
+            size="small"
+            variant="standard"
+            value={editingName}
+            autoFocus
+            onChange={(e) => setEditingName(e.target.value)}
+            onBlur={commitRename}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") { e.preventDefault(); commitRename(); }
+              if (e.key === "Escape") { e.stopPropagation(); setEditingName(null); }
+            }}
+            onClick={(e) => e.stopPropagation()}
+            sx={{ flex: 1, minWidth: 0 }}
+            inputProps={{ "data-testid": `gantt-inline-edit-${task.id}` }}
+          />
+        ) : (
+          <Typography
+            variant="body2"
+            noWrap
+            sx={{ flex: 1, minWidth: 0, cursor: inlineEdit ? "text" : "inherit" }}
+            onDoubleClick={inlineEdit ? (e) => { e.stopPropagation(); setEditingName(task.name); } : undefined}
+          >
+            {task.name}
+          </Typography>
+        )}
       </Box>
 
       {/* Aktions-Spalte — feste Breite, immer vorhanden wenn hasActionsColumn */}
@@ -254,6 +289,7 @@ type GanttTaskPanelProps = {
   onTaskCreated?: (task: GanttTask) => void;
   onTaskUpdated?: (task: GanttTask) => void;
   onTaskDeleted?: (taskId: string) => void;
+  inlineEdit?: boolean;
 };
 
 export function GanttTaskPanel({
@@ -270,6 +306,7 @@ export function GanttTaskPanel({
   onTaskCreated,
   onTaskUpdated,
   onTaskDeleted,
+  inlineEdit,
 }: GanttTaskPanelProps) {
   const t = useGanttTranslations();
   const rawStore = useRawGanttChartStore();
@@ -317,6 +354,13 @@ export function GanttTaskPanel({
     onTasksChange?.(rawStore.getState().tasks);
     onTaskDeleted?.(activeTask.id);
     setDeleteOpen(false);
+  };
+
+  const handleInlineRename = (task: GanttTask, newName: string) => {
+    const updated = { ...task, name: newName };
+    storeUpdateTask(updated);
+    onTasksChange?.(rawStore.getState().tasks);
+    onTaskUpdated?.(updated);
   };
 
   // Row-Action-Handler: bei enableBuiltinDialogs Dialoge öffnen, sonst Props direkt durchreichen.
@@ -413,6 +457,8 @@ export function GanttTaskPanel({
           onEditTask={rowOnEdit}
           onDeleteTask={rowOnDelete}
           onStatusChange={onStatusChange}
+          inlineEdit={inlineEdit}
+          onInlineRename={inlineEdit ? handleInlineRename : undefined}
         />
       ))}
 

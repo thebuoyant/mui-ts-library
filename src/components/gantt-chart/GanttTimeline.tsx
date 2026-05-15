@@ -1,8 +1,8 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { type RefObject, type UIEventHandler } from "react";
-import { Box, useTheme } from "@mui/material";
+import { Box, Menu, MenuItem, useTheme } from "@mui/material";
 import { useGanttChartStore, useGanttTranslations, useRawGanttChartStore } from "./GanttChart";
-import type { GanttTask } from "./GanttChart.types";
+import type { GanttTask, GanttTaskStatus } from "./GanttChart.types";
 import type { GanttTaskNode } from "./GanttChart.types";
 import {
   addDays,
@@ -112,7 +112,7 @@ function computeDependencyLines(
 // Drag-State-Typen
 // ---------------------------------------------------------------------------
 
-type DragType = "move" | "resize";
+type DragType = "move" | "resize" | "progress";
 
 type DragInit = {
   type: DragType;
@@ -120,7 +120,11 @@ type DragInit = {
   startX: number;
   originalStart: Date;
   originalEnd: Date;
+  initialProgress?: number;
+  barWidthPx?: number;
 };
+
+type ActiveDrag = { taskId: string; type: DragType; deltaDays: number; newProgress?: number };
 
 // ---------------------------------------------------------------------------
 // Komponente
@@ -133,9 +137,11 @@ type GanttTimelineProps = {
   onMilestoneClick?: (task: GanttTask) => void;
   draggable?: boolean;
   resizable?: boolean;
+  progressDraggable?: boolean;
   onTaskMoved?: (task: GanttTask, newStart: Date, newEnd: Date) => void;
   onTaskResized?: (task: GanttTask, newEnd: Date) => void;
   onTasksChange?: (tasks: GanttTask[]) => void;
+  onStatusChange?: (task: GanttTask, status: GanttTaskStatus) => void;
 };
 
 export function GanttTimeline({
@@ -145,9 +151,11 @@ export function GanttTimeline({
   onMilestoneClick,
   draggable = false,
   resizable = false,
+  progressDraggable = false,
   onTaskMoved,
   onTaskResized,
   onTasksChange,
+  onStatusChange,
 }: GanttTimelineProps) {
   const theme = useTheme();
   const taskTree = useGanttChartStore((s) => s.taskTree);
@@ -284,11 +292,14 @@ export function GanttTimeline({
   // Ref für den Drag-Start (stabile Werte — keine Re-render nötig).
   const dragInitRef = useRef<DragInit | null>(null);
   // Ref für das aktuelle Delta (für Zugriff aus mouseup-Closure ohne stale state).
-  const activeDragRef = useRef<{ taskId: string; type: DragType; deltaDays: number } | null>(null);
+  const activeDragRef = useRef<ActiveDrag | null>(null);
   // State löst Re-render aus damit Balken-Position während Drag aktualisiert wird.
-  const [activeDrag, setActiveDrag] = useState<{ taskId: string; type: DragType; deltaDays: number } | null>(null);
+  const [activeDrag, setActiveDrag] = useState<ActiveDrag | null>(null);
   // Verhindert onClick nach echtem Drag (Maus bewegt sich ≥ 5px).
   const suppressClickRef = useRef(false);
+
+  // Context-Menu-State für Schnell-Statuswechsel per Rechtsklick.
+  const [contextMenu, setContextMenu] = useState<{ task: GanttTaskNode; mouseX: number; mouseY: number } | null>(null);
 
   // Refs damit die Callbacks immer die aktuellen Prop-Werte lesen ohne useCallback-Rebuilds.
   const onTaskMovedRef = useRef(onTaskMoved);
@@ -297,6 +308,8 @@ export function GanttTimeline({
   onTaskResizedRef.current = onTaskResized;
   const onTasksChangeRef = useRef(onTasksChange);
   onTasksChangeRef.current = onTasksChange;
+  const onStatusChangeRef = useRef(onStatusChange);
+  onStatusChangeRef.current = onStatusChange;
 
   const handleBarMouseDown = (e: React.MouseEvent, task: GanttTaskNode, type: DragType) => {
     e.stopPropagation();
@@ -313,11 +326,11 @@ export function GanttTimeline({
 
     const onMouseMove = (ev: MouseEvent) => {
       const init = dragInitRef.current;
-      if (!init) return;
+      if (!init || init.type === "progress") return;
       const deltaPx = ev.clientX - init.startX;
       const deltaDays = Math.round(deltaPx / dayWidthPxRef.current);
       if (Math.abs(deltaPx) >= 5) suppressClickRef.current = true;
-      const drag = { taskId: init.taskId, type: init.type, deltaDays };
+      const drag: ActiveDrag = { taskId: init.taskId, type: init.type, deltaDays };
       activeDragRef.current = drag;
       setActiveDrag(drag);
     };
@@ -343,6 +356,62 @@ export function GanttTimeline({
             updateTask({ ...currentTask, endDate: newEnd });
             onTaskResizedRef.current?.(currentTask, newEnd);
           }
+          onTasksChangeRef.current?.(rawStore.getState().tasks);
+        }
+      }
+
+      dragInitRef.current = null;
+      activeDragRef.current = null;
+      setActiveDrag(null);
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
+    };
+
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+  };
+
+  const handleProgressMouseDown = (
+    e: React.MouseEvent,
+    task: GanttTaskNode,
+    initialProgress: number,
+    barWidthPx: number,
+  ) => {
+    e.stopPropagation();
+    suppressClickRef.current = false;
+    dragInitRef.current = {
+      type: "progress",
+      taskId: task.id,
+      startX: e.clientX,
+      originalStart: task.startDate,
+      originalEnd: task.endDate,
+      initialProgress,
+      barWidthPx,
+    };
+
+    document.body.style.cursor = "ew-resize";
+
+    const onMouseMove = (ev: MouseEvent) => {
+      const init = dragInitRef.current;
+      if (!init || init.type !== "progress") return;
+      const deltaPx = ev.clientX - init.startX;
+      if (Math.abs(deltaPx) >= 5) suppressClickRef.current = true;
+      const deltaPercent = (deltaPx / (init.barWidthPx ?? 1)) * 100;
+      const newProgress = Math.round(Math.max(0, Math.min(100, (init.initialProgress ?? 0) + deltaPercent)));
+      const drag: ActiveDrag = { taskId: init.taskId, type: "progress", deltaDays: 0, newProgress };
+      activeDragRef.current = drag;
+      setActiveDrag(drag);
+    };
+
+    const onMouseUp = () => {
+      document.body.style.cursor = "";
+      const init = dragInitRef.current;
+      const drag = activeDragRef.current;
+
+      if (init && drag && drag.type === "progress" && drag.newProgress !== undefined && suppressClickRef.current) {
+        const currentTask = rawStore.getState().tasks.find((t) => t.id === init.taskId);
+        if (currentTask) {
+          updateTask({ ...currentTask, progress: drag.newProgress });
           onTasksChangeRef.current?.(rawStore.getState().tasks);
         }
       }
@@ -408,12 +477,14 @@ export function GanttTimeline({
                 startDate: addDays(task.startDate, activeDrag.deltaDays),
                 endDate: addDays(task.endDate, activeDrag.deltaDays),
               };
-            } else {
+            } else if (activeDrag.type === "resize") {
               const rawEnd = addDays(task.endDate, activeDrag.deltaDays);
               effectiveTask = {
                 ...task,
                 endDate: rawEnd > task.startDate ? rawEnd : addDays(task.startDate, 1),
               };
+            } else if (activeDrag.type === "progress" && activeDrag.newProgress !== undefined) {
+              effectiveTask = { ...task, progress: activeDrag.newProgress };
             }
           }
 
@@ -462,8 +533,8 @@ export function GanttTimeline({
                 if (clampedWidth <= 0) return null;
                 return (
                   <>
-                    {/* Datum-Label erscheint über dem Balken während des Drags. */}
-                    {isDragging && activeDrag && activeDrag.deltaDays !== 0 && (
+                    {/* Label über dem Balken während move/resize-Drag. */}
+                    {isDragging && activeDrag && activeDrag.type !== "progress" && activeDrag.deltaDays !== 0 && (
                       <Box
                         sx={{
                           position: "absolute",
@@ -483,6 +554,27 @@ export function GanttTimeline({
                         {activeDrag.type === "move"
                           ? `${formatDragDate(effectiveTask.startDate)} – ${formatDragDate(effectiveTask.endDate)}`
                           : `→ ${formatDragDate(effectiveTask.endDate)}`}
+                      </Box>
+                    )}
+                    {/* Fortschritts-Label während progress-Drag. */}
+                    {isDragging && activeDrag?.type === "progress" && activeDrag.newProgress !== undefined && (
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          left: `${clampedLeft}%`,
+                          top: 2,
+                          bgcolor: "grey.800",
+                          color: "common.white",
+                          borderRadius: 0.5,
+                          px: 0.75,
+                          lineHeight: "18px",
+                          fontSize: "0.65rem",
+                          whiteSpace: "nowrap",
+                          pointerEvents: "none",
+                          zIndex: 100,
+                        }}
+                      >
+                        {activeDrag.newProgress}%
                       </Box>
                     )}
                     <Box
@@ -509,6 +601,11 @@ export function GanttTimeline({
                         "&:hover": (draggable || onTaskClick) ? { opacity: isDragging ? 0.75 : 0.8 } : undefined,
                       }}
                       onMouseDown={draggable ? (e) => handleBarMouseDown(e, task, "move") : undefined}
+                      onContextMenu={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setContextMenu({ task, mouseX: e.clientX, mouseY: e.clientY });
+                      }}
                       onClick={() => {
                         if (suppressClickRef.current) {
                           suppressClickRef.current = false;
@@ -517,17 +614,38 @@ export function GanttTimeline({
                         onTaskClick?.(task);
                       }}
                     >
-                      {task.progress !== undefined && task.progress > 0 && (
+                      {effectiveTask.progress !== undefined && effectiveTask.progress > 0 && (
                         <Box
                           data-testid={`gantt-progress-${task.id}`}
                           sx={{
                             position: "absolute",
                             left: 0,
                             top: 0,
-                            width: `${Math.min(task.progress, 100)}%`,
+                            width: `${Math.min(effectiveTask.progress, 100)}%`,
                             height: "100%",
                             bgcolor: "currentColor",
                             opacity: 0.4,
+                          }}
+                        />
+                      )}
+                      {/* Progress-Drag-Handle — zeigt aktuelle progress%-Position. */}
+                      {progressDraggable && (
+                        <Box
+                          data-testid={`gantt-progress-handle-${task.id}`}
+                          sx={{
+                            position: "absolute",
+                            left: `${Math.min(effectiveTask.progress ?? 0, 100)}%`,
+                            top: 0,
+                            width: 6,
+                            height: "100%",
+                            transform: "translateX(-50%)",
+                            cursor: "ew-resize",
+                            bgcolor: "rgba(255,255,255,0.35)",
+                          }}
+                          onMouseDown={(e) => {
+                            e.stopPropagation();
+                            const barWidthPx = (clampedWidth / 100) * totalWidth;
+                            handleProgressMouseDown(e, task, effectiveTask.progress ?? 0, barWidthPx);
                           }}
                         />
                       )}
@@ -556,6 +674,46 @@ export function GanttTimeline({
             </Box>
           );
         })}
+
+        {/* Kontext-Menü für Schnell-Statuswechsel per Rechtsklick auf einen Balken. */}
+        <Menu
+          open={contextMenu !== null}
+          onClose={() => setContextMenu(null)}
+          anchorReference="anchorPosition"
+          anchorPosition={
+            contextMenu !== null
+              ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+              : undefined
+          }
+        >
+          {(["planned", "in-progress", "done", "blocked"] as GanttTaskStatus[]).map((s) => {
+            const labels: Record<GanttTaskStatus, string> = {
+              planned: t.statusPlanned,
+              "in-progress": t.statusInProgress,
+              done: t.statusDone,
+              blocked: t.statusBlocked,
+            };
+            return (
+              <MenuItem
+                key={s}
+                selected={contextMenu?.task.status === s}
+                data-testid={`gantt-status-menu-${s}`}
+                onClick={() => {
+                  if (!contextMenu) return;
+                  const currentTask =
+                    rawStore.getState().tasks.find((tt) => tt.id === contextMenu.task.id) ??
+                    contextMenu.task;
+                  updateTask({ ...currentTask, status: s });
+                  onStatusChangeRef.current?.(currentTask, s);
+                  onTasksChangeRef.current?.(rawStore.getState().tasks);
+                  setContextMenu(null);
+                }}
+              >
+                {labels[s]}
+              </MenuItem>
+            );
+          })}
+        </Menu>
 
         {/* SVG-Layer über allen Balken — pointer-events: none damit Klicks durchgehen. */}
         {(dependencyLines.length > 0 || todayX !== null) && (
