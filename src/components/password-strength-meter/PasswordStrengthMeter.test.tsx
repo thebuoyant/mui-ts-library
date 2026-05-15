@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { createRef } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { PasswordStrengthMeter } from "./PasswordStrengthMeter";
 
@@ -202,6 +203,33 @@ describe("PasswordStrengthMeter", () => {
 
     expect(successIcons).toHaveLength(5);
     expect(failureIcons).toHaveLength(0);
+  });
+
+  it("Should pass a name to the native input", () => {
+    render(<PasswordStrengthMeter name="newPassword" />);
+    expect(screen.getByTestId("psm-input")).toHaveAttribute("name", "newPassword");
+  });
+
+  it("Should disable the input and the toggle button when disabled is true", () => {
+    render(<PasswordStrengthMeter disabled />);
+    expect(screen.getByTestId("psm-input")).toBeDisabled();
+    expect(screen.getByTestId("psm-toggle")).toBeDisabled();
+  });
+
+  it("Should render helperText below the input", () => {
+    render(<PasswordStrengthMeter error helperText="Password is required" />);
+    expect(screen.getByText("Password is required")).toBeInTheDocument();
+  });
+
+  it("Should pass autoComplete to the native input", () => {
+    render(<PasswordStrengthMeter autoComplete="new-password" />);
+    expect(screen.getByTestId("psm-input")).toHaveAttribute("autocomplete", "new-password");
+  });
+
+  it("Should attach inputRef to the native input element", () => {
+    const ref = createRef<HTMLInputElement>();
+    render(<PasswordStrengthMeter inputRef={ref} />);
+    expect(ref.current).toBe(screen.getByTestId("psm-input"));
   });
 
   it("Should hide the adornment, meter and summary blocks when configured", () => {

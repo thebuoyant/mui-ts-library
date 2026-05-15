@@ -1,6 +1,7 @@
 import {
   Box,
   FormControl,
+  FormHelperText,
   IconButton,
   InputAdornment,
   InputLabel,
@@ -58,6 +59,12 @@ function RequirementItem({
 
 export function PasswordStrengthMeter({
   value,
+  name,
+  inputRef,
+  disabled = false,
+  error = false,
+  helperText,
+  autoComplete,
   showPasswordAdornment = true,
   showMeter = true,
   showSummary = true,
@@ -131,7 +138,7 @@ export function PasswordStrengthMeter({
 
   return (
     <Stack>
-      <FormControl variant="outlined" fullWidth>
+      <FormControl variant="outlined" fullWidth error={error}>
         <InputLabel htmlFor={inputId} size={inputSize}>
           {t.label}
         </InputLabel>
@@ -143,12 +150,15 @@ export function PasswordStrengthMeter({
           size={inputSize}
           value={password}
           onChange={handleOnChange}
-          inputProps={{ "data-testid": "psm-input" }}
+          disabled={disabled}
+          inputRef={inputRef}
+          inputProps={{ "data-testid": "psm-input", name, autoComplete }}
           endAdornment={
             showPasswordAdornment ? (
               <InputAdornment position="end">
                 <IconButton
                   data-testid="psm-toggle"
+                  disabled={disabled}
                   aria-label={showPassword ? t.hidePasswordLabel : t.showPasswordLabel}
                   onClick={handleClickShowPassword}
                   onMouseDown={handleMouseDownPassword}
@@ -162,6 +172,7 @@ export function PasswordStrengthMeter({
           }
           label={t.label}
         />
+        {helperText && <FormHelperText>{helperText}</FormHelperText>}
       </FormControl>
 
       {showMeter && (

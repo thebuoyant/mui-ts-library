@@ -13,16 +13,25 @@ const meta: Meta<typeof PasswordStrengthMeter> = {
     showSummary: true,
     inputSize: "medium",
     passwordMinLength: 8,
+    disabled: false,
+    error: false,
     onPasswordChange: fn(),
   },
   argTypes: {
     showPasswordAdornment: { control: "boolean" },
     showMeter: { control: "boolean" },
     showSummary: { control: "boolean" },
+    disabled: { control: "boolean" },
+    error: { control: "boolean" },
+    helperText: { control: "text" },
     inputSize: { control: "radio", options: ["small", "medium"] },
     passwordMinLength: { control: "number" },
     // Controlled via render in the Controlled story — not directly editable.
     value: { control: false },
+    // Form-integration props — use dedicated stories or pass via render.
+    name: { control: false },
+    inputRef: { control: false },
+    autoComplete: { control: false },
     // Complex objects — use dedicated stories instead.
     translation: { control: false },
     meterColors: { control: false },
@@ -121,6 +130,29 @@ export const CustomColors: Story = {
       failure: "#e91e63",
       success: "#9c27b0",
     },
+  },
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <PasswordStrengthMeter {...args} />
+    </Box>
+  ),
+};
+
+export const Disabled: Story = {
+  args: {
+    disabled: true,
+  },
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <PasswordStrengthMeter {...args} />
+    </Box>
+  ),
+};
+
+export const WithError: Story = {
+  args: {
+    error: true,
+    helperText: "Password does not meet the requirements.",
   },
   render: (args) => (
     <Box sx={{ maxWidth: 420 }}>

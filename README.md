@@ -305,6 +305,30 @@ function App() {
 />
 ```
 
+**With React Hook Form:**
+
+```tsx
+import { useForm } from 'react-hook-form';
+import { PasswordStrengthMeter } from 'mui-ts-library';
+
+function SignUpForm() {
+  const { register, handleSubmit, formState: { errors } } = useForm<{ password: string }>();
+  const { ref, ...rest } = register('password', { required: 'Password is required' });
+
+  return (
+    <form onSubmit={handleSubmit(console.log)}>
+      <PasswordStrengthMeter
+        {...rest}
+        inputRef={ref}
+        autoComplete="new-password"
+        error={!!errors.password}
+        helperText={errors.password?.message}
+      />
+    </form>
+  );
+}
+```
+
 ---
 
 ## Props Reference
@@ -389,6 +413,7 @@ type GanttTask = {
   dependencies?: string[];  // IDs of Finish-to-Start predecessor tasks
   isMilestone?: boolean;    // Renders as a diamond; set startDate === endDate
   progress?: number;        // 0–100 — renders a semi-transparent overlay bar inside the task bar
+  color?: string;           // Per-task color override — takes priority over ganttTheme.statusColors
 };
 ```
 
@@ -506,17 +531,31 @@ type GanttTranslations = {
 
 ### PasswordStrengthMeter Props
 
+**Core**
+
 | Prop | Type | Default | Description |
 |---|---|---|---|
+| `value` | `string` | — | Controlled mode: password value managed externally. |
 | `showPasswordAdornment` | `boolean` | `true` | Show the show/hide password toggle button. |
 | `showMeter` | `boolean` | `true` | Show the animated strength meter bar. |
 | `showSummary` | `boolean` | `true` | Show the requirements checklist. |
 | `inputSize` | `"small" \| "medium"` | `"medium"` | Size of the password input field. |
 | `passwordMinLength` | `number` | `8` | Minimum required password length. |
-| `translation` | `PasswordStrengthMeterTranslation` | English defaults | All display texts (see [Translations](#translations)). |
-| `meterColors` | `MeterColors` | Red → Green gradient | Colors for each of the four strength levels. |
+| `translation` | `Partial<PasswordStrengthMeterTranslation>` | English defaults | Override any display text (see [Translations](#translations)). Only pass keys you want to change. |
+| `meterColors` | `Partial<MeterColors>` | Red → Green gradient | Colors for each of the four strength levels. Only pass keys you want to change. |
 | `checkColors` | `CheckColors` | Red / Green | Colors for the fulfilled/unfulfilled requirement icons. |
 | `onPasswordChange` | `(password, result: StrengthResult) => void` | — | Called on every keystroke with the current password and strength result. |
+
+**Form integration**
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `name` | `string` | — | Native `name` attribute — used by `<form>` submission and `register()` in React Hook Form / Formik. |
+| `inputRef` | `React.Ref<HTMLInputElement>` | — | Ref forwarded to the underlying `<input>` — use with `register().ref` for React Hook Form. |
+| `disabled` | `boolean` | `false` | Disables the input and the show/hide toggle. |
+| `error` | `boolean` | `false` | Puts the input into error state (red border, red helper text). |
+| `helperText` | `string` | — | Helper or validation message rendered below the input. Turns red when `error` is `true`. |
+| `autoComplete` | `string` | — | Native `autocomplete` attribute — use `"new-password"` or `"current-password"` for browser hints. |
 
 **`StrengthResult` shape:**
 
@@ -613,12 +652,14 @@ All three components support full i18n without any external library. Pass only t
   translation={{
     label:                  'Passwort',
     summaryHeaderLabel:     'Anforderungen an dein Passwort',
-    summaryMinCharsLeft:    'Mindestens',
-    summaryMinCharsRight:   'Zeichen',
+    summaryMinChars:        'Mindestens {n} Zeichen',
     summaryCapitalLetter:   'Mindestens 1 Großbuchstabe',
     summaryLowerCaseLetter: 'Mindestens 1 Kleinbuchstabe',
     summaryNumber:          'Mindestens 1 Zahl',
     summarySpecialChar:     'Mindestens 1 Sonderzeichen',
+    showPasswordLabel:      'Passwort anzeigen',
+    hidePasswordLabel:      'Passwort verbergen',
+    meterAriaLabel:         'Passwortstärke',
   }}
 />
 ```

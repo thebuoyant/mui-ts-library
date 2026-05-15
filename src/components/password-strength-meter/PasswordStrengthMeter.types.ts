@@ -1,3 +1,5 @@
+import type React from "react";
+
 export type StrengthScore = 0 | 1 | 2 | 3 | 4;
 
 export type MeterStatus = "weak" | "ok" | "good" | "very good";
@@ -68,6 +70,13 @@ export type PasswordStrengthMeterProps = {
   // Wenn gesetzt, wird die Komponente kontrolliert: das Passwort kommt von außen,
   // Änderungen werden über onPasswordChange nach oben gegeben.
   value?: string;
+  // Form-Integration: kompatibel mit React Hook Form register(), Formik und nativen Forms.
+  name?: string;
+  inputRef?: React.Ref<HTMLInputElement>;
+  disabled?: boolean;
+  error?: boolean;
+  helperText?: string;
+  autoComplete?: string;
   showPasswordAdornment?: boolean;
   showMeter?: boolean;
   showSummary?: boolean;
