@@ -30,7 +30,7 @@ export type MeterColors = {
 export type PasswordStrengthMeterTranslation = {
   label: string;
   summaryHeaderLabel: string;
-  // {n} wird zur Laufzeit durch passwordMinLength ersetzt, z. B. "At least 8 characters".
+  // {n} wird zur Laufzeit durch passwordMinLength ersetzt, z. B. "Mindestens 8 Zeichen".
   summaryMinChars: string;
   summaryCapitalLetter: string;
   summaryLowerCaseLetter: string;

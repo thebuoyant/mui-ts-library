@@ -52,7 +52,7 @@ function TestWrapper({
         onSearchChange(value);
       }}
       onTagSelect={(tag) => {
-        // Simulate the store clearing searchValue after selection.
+        // Simuliert das Leeren des searchValue durch den Store nach einer Auswahl.
         setSearchValue("");
         onTagSelect(tag);
       }}

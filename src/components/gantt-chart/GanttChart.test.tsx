@@ -32,11 +32,11 @@ const tasks: GanttTask[] = [
 ];
 
 describe("GanttChart", () => {
-  it("renders without crashing", () => {
+  it("Should render without crashing", () => {
     render(<GanttChart tasks={tasks} />);
   });
 
-  it("shows root and all direct children since root is expanded by default", () => {
+  it("Should show root and all direct children since root is expanded by default", () => {
     render(<GanttChart tasks={tasks} />);
 
     expect(screen.getByText("Root Task")).toBeInTheDocument();
@@ -44,7 +44,7 @@ describe("GanttChart", () => {
     expect(screen.getByText("Sprint End")).toBeInTheDocument();
   });
 
-  it("hides child tasks after collapsing the parent", () => {
+  it("Should hide child tasks after collapsing the parent", () => {
     render(<GanttChart tasks={tasks} />);
 
     fireEvent.click(screen.getByText("▼"));
@@ -53,7 +53,7 @@ describe("GanttChart", () => {
     expect(screen.queryByText("Sprint End")).not.toBeInTheDocument();
   });
 
-  it("shows child tasks again after re-expanding the parent", () => {
+  it("Should show child tasks again after re-expanding the parent", () => {
     render(<GanttChart tasks={tasks} />);
 
     fireEvent.click(screen.getByText("▼"));
@@ -62,7 +62,7 @@ describe("GanttChart", () => {
     expect(screen.getByText("Child Task")).toBeInTheDocument();
   });
 
-  it("calls onTaskClick when a task row is clicked", () => {
+  it("Should call onTaskClick when a task row is clicked", () => {
     const onTaskClick = vi.fn();
     render(<GanttChart tasks={tasks} onTaskClick={onTaskClick} />);
 
@@ -72,7 +72,7 @@ describe("GanttChart", () => {
     expect(onTaskClick).toHaveBeenCalledWith(expect.objectContaining({ id: "child" }));
   });
 
-  it("calls onMilestoneClick when a milestone diamond is clicked", () => {
+  it("Should call onMilestoneClick when a milestone diamond is clicked", () => {
     const onMilestoneClick = vi.fn();
     render(<GanttChart tasks={tasks} onMilestoneClick={onMilestoneClick} />);
 
@@ -82,21 +82,21 @@ describe("GanttChart", () => {
     expect(onMilestoneClick).toHaveBeenCalledWith(expect.objectContaining({ id: "milestone" }));
   });
 
-  it("renders a bar for each non-milestone visible task", () => {
+  it("Should render a bar for each non-milestone visible task", () => {
     render(<GanttChart tasks={tasks} />);
 
     expect(screen.getByTestId("gantt-bar-root")).toBeInTheDocument();
     expect(screen.getByTestId("gantt-bar-child")).toBeInTheDocument();
   });
 
-  it("renders a milestone diamond instead of a bar for milestone tasks", () => {
+  it("Should render a milestone diamond instead of a bar for milestone tasks", () => {
     render(<GanttChart tasks={tasks} />);
 
     expect(screen.getByTestId("gantt-milestone-milestone")).toBeInTheDocument();
     expect(screen.queryByTestId("gantt-bar-milestone")).not.toBeInTheDocument();
   });
 
-  it("does not show bar rows for hidden (collapsed) children", () => {
+  it("Should not show bar rows for hidden (collapsed) children", () => {
     render(<GanttChart tasks={tasks} />);
 
     fireEvent.click(screen.getByText("▼"));
@@ -105,7 +105,7 @@ describe("GanttChart", () => {
     expect(screen.queryByTestId("gantt-milestone-milestone")).not.toBeInTheDocument();
   });
 
-  it("renders a status chip for each visible task row", () => {
+  it("Should render a status chip for each visible task row", () => {
     render(<GanttChart tasks={tasks} />);
 
     // "In Progress" für root (status = "in-progress"), "Planned" für child und milestone
@@ -113,14 +113,14 @@ describe("GanttChart", () => {
     expect(screen.getAllByText("Planned")).toHaveLength(2);
   });
 
-  it("renders the weeks scale header with KW labels", () => {
+  it("Should render the weeks scale header with KW labels", () => {
     render(<GanttChart tasks={tasks} timeScale="weeks" />);
 
     const kwLabels = screen.getAllByText(/^KW\d+$/);
     expect(kwLabels.length).toBeGreaterThan(0);
   });
 
-  it("renders the days scale header with day number labels and a two-row header", () => {
+  it("Should render the days scale header with day number labels and a two-row header", () => {
     render(<GanttChart tasks={tasks} timeScale="days" />);
 
     // Tages-Spalten zeigen Zahlen 1–31 — "15" muss für jeden Monat im Range vorhanden sein
@@ -132,7 +132,7 @@ describe("GanttChart", () => {
     expect(monthLabels.length).toBeGreaterThan(0);
   });
 
-  it("shows all tasks at all depths when initialExpandAll is true", () => {
+  it("Should show all tasks at all depths when initialExpandAll is true", () => {
     const deepTasks: GanttTask[] = [
       {
         id: "root",
@@ -171,19 +171,19 @@ describe("GanttChart", () => {
 // ---------------------------------------------------------------------------
 
 describe("GanttChart — toolbar", () => {
-  it("renders the toolbar by default", () => {
+  it("Should render the toolbar by default", () => {
     render(<GanttChart tasks={tasks} />);
 
     expect(screen.getByTestId("gantt-toolbar")).toBeInTheDocument();
   });
 
-  it("does not render the toolbar when showToolbar is false", () => {
+  it("Should not render the toolbar when showToolbar is false", () => {
     render(<GanttChart tasks={tasks} showToolbar={false} />);
 
     expect(screen.queryByTestId("gantt-toolbar")).not.toBeInTheDocument();
   });
 
-  it("changes the time scale when a scale button is clicked", () => {
+  it("Should change the time scale when a scale button is clicked", () => {
     render(<GanttChart tasks={tasks} />);
 
     fireEvent.click(screen.getByTestId("gantt-scale-weeks"));
@@ -192,7 +192,7 @@ describe("GanttChart — toolbar", () => {
     expect(screen.getAllByText(/^KW\d+$/).length).toBeGreaterThan(0);
   });
 
-  it("initialises the visible date range from defaultRangeStart and defaultRangeEnd", () => {
+  it("Should initialise the visible date range from defaultRangeStart and defaultRangeEnd", () => {
     render(
       <GanttChart
         tasks={tasks}
@@ -205,7 +205,7 @@ describe("GanttChart — toolbar", () => {
     expect(screen.getByTestId("gantt-range-reset")).toBeInTheDocument();
   });
 
-  it("renders translated labels when translations prop is provided", () => {
+  it("Should render translated labels when translations prop is provided", () => {
     render(
       <GanttChart
         tasks={tasks}
@@ -219,7 +219,7 @@ describe("GanttChart — toolbar", () => {
     expect(screen.getByText("Days")).toBeInTheDocument();
   });
 
-  it("shows a reset button only after the date range has been customized", () => {
+  it("Should show a reset button only after the date range has been customized", () => {
     render(<GanttChart tasks={tasks} />);
 
     expect(screen.queryByTestId("gantt-range-reset")).not.toBeInTheDocument();
@@ -230,7 +230,7 @@ describe("GanttChart — toolbar", () => {
     expect(screen.getByTestId("gantt-range-reset")).toBeInTheDocument();
   });
 
-  it("hides the reset button and restores the auto range after clicking reset", () => {
+  it("Should hide the reset button and restores the auto range after clicking reset", () => {
     render(<GanttChart tasks={tasks} />);
 
     fireEvent.change(screen.getByTestId("gantt-range-start"), { target: { value: "2024-01-01" } });
@@ -246,7 +246,7 @@ describe("GanttChart — toolbar", () => {
 // ---------------------------------------------------------------------------
 
 describe("GanttChart — onAddTask / onDeleteTask", () => {
-  it("calls onAddTask with the task when the add icon is clicked", () => {
+  it("Should call onAddTask with the task when the add icon is clicked", () => {
     const onAddTask = vi.fn();
     render(<GanttChart tasks={tasks} onAddTask={onAddTask} enableBuiltinDialogs={false} />);
 
@@ -256,7 +256,7 @@ describe("GanttChart — onAddTask / onDeleteTask", () => {
     expect(onAddTask).toHaveBeenCalledWith(expect.objectContaining({ id: "root" }));
   });
 
-  it("calls onDeleteTask with the task when the delete icon is clicked", () => {
+  it("Should call onDeleteTask with the task when the delete icon is clicked", () => {
     const onDeleteTask = vi.fn();
     render(<GanttChart tasks={tasks} onDeleteTask={onDeleteTask} enableBuiltinDialogs={false} />);
 
@@ -266,7 +266,7 @@ describe("GanttChart — onAddTask / onDeleteTask", () => {
     expect(onDeleteTask).toHaveBeenCalledWith(expect.objectContaining({ id: "child" }));
   });
 
-  it("does not call onTaskClick when the add icon is clicked", () => {
+  it("Should not call onTaskClick when the add icon is clicked", () => {
     const onTaskClick = vi.fn();
     const onAddTask = vi.fn();
     render(<GanttChart tasks={tasks} onTaskClick={onTaskClick} onAddTask={onAddTask} enableBuiltinDialogs={false} />);
@@ -278,7 +278,7 @@ describe("GanttChart — onAddTask / onDeleteTask", () => {
 });
 
 describe("GanttChart — onStatusChange", () => {
-  it("calls onStatusChange when a status menu item is clicked", () => {
+  it("Should call onStatusChange when a status menu item is clicked", () => {
     const onStatusChange = vi.fn();
     render(<GanttChart tasks={tasks} onStatusChange={onStatusChange} />);
 
@@ -298,25 +298,25 @@ describe("GanttChart — onStatusChange", () => {
 // ---------------------------------------------------------------------------
 
 describe("GanttChart — enableBuiltinDialogs", () => {
-  it("shows the edit icon by default (enableBuiltinDialogs defaults to true)", () => {
+  it("Should show the edit icon by default (enableBuiltinDialogs defaults to true)", () => {
     render(<GanttChart tasks={tasks} />);
 
     expect(screen.getByTestId("gantt-edit-task-root")).toBeInTheDocument();
   });
 
-  it("does not show the edit icon when enableBuiltinDialogs is false", () => {
+  it("Should not show the edit icon when enableBuiltinDialogs is false", () => {
     render(<GanttChart tasks={tasks} enableBuiltinDialogs={false} />);
 
     expect(screen.queryByTestId("gantt-edit-task-root")).not.toBeInTheDocument();
   });
 
-  it("shows the edit icon on each row when enableBuiltinDialogs is true", () => {
+  it("Should show the edit icon on each row when enableBuiltinDialogs is true", () => {
     render(<GanttChart tasks={tasks} enableBuiltinDialogs />);
 
     expect(screen.getByTestId("gantt-edit-task-root")).toBeInTheDocument();
   });
 
-  it("opens the add dialog when the add icon is clicked", () => {
+  it("Should open the add dialog when the add icon is clicked", () => {
     render(<GanttChart tasks={tasks} enableBuiltinDialogs />);
 
     fireEvent.click(screen.getByTestId("gantt-add-task-root"));
@@ -325,7 +325,7 @@ describe("GanttChart — enableBuiltinDialogs", () => {
     expect(screen.getByText("Aufgabe hinzufügen")).toBeInTheDocument();
   });
 
-  it("opens the edit dialog when the edit icon is clicked", () => {
+  it("Should open the edit dialog when the edit icon is clicked", () => {
     render(<GanttChart tasks={tasks} enableBuiltinDialogs />);
 
     fireEvent.click(screen.getByTestId("gantt-edit-task-root"));
@@ -334,7 +334,7 @@ describe("GanttChart — enableBuiltinDialogs", () => {
     expect(screen.getByText("Aufgabe bearbeiten")).toBeInTheDocument();
   });
 
-  it("opens the delete dialog when the delete icon is clicked", () => {
+  it("Should open the delete dialog when the delete icon is clicked", () => {
     render(<GanttChart tasks={tasks} enableBuiltinDialogs />);
 
     fireEvent.click(screen.getByTestId("gantt-delete-task-child"));
@@ -342,7 +342,7 @@ describe("GanttChart — enableBuiltinDialogs", () => {
     expect(screen.getByTestId("gantt-delete-dialog")).toBeInTheDocument();
   });
 
-  it("calls onTaskCreated with correct data after submitting the add dialog", () => {
+  it("Should call onTaskCreated with correct data after submitting the add dialog", () => {
     const onTaskCreated = vi.fn();
     render(<GanttChart tasks={tasks} enableBuiltinDialogs onTaskCreated={onTaskCreated} />);
 
@@ -356,7 +356,7 @@ describe("GanttChart — enableBuiltinDialogs", () => {
     );
   });
 
-  it("calls onTaskUpdated with the updated task after submitting the edit dialog", () => {
+  it("Should call onTaskUpdated with the updated task after submitting the edit dialog", () => {
     const onTaskUpdated = vi.fn();
     render(<GanttChart tasks={tasks} enableBuiltinDialogs onTaskUpdated={onTaskUpdated} />);
 
@@ -370,7 +370,7 @@ describe("GanttChart — enableBuiltinDialogs", () => {
     );
   });
 
-  it("calls onTaskDeleted with the task id after confirming the delete dialog", () => {
+  it("Should call onTaskDeleted with the task id after confirming the delete dialog", () => {
     const onTaskDeleted = vi.fn();
     render(<GanttChart tasks={tasks} enableBuiltinDialogs onTaskDeleted={onTaskDeleted} />);
 
@@ -381,7 +381,7 @@ describe("GanttChart — enableBuiltinDialogs", () => {
     expect(onTaskDeleted).toHaveBeenCalledWith("child");
   });
 
-  it("does not call onTaskDeleted when the delete dialog is cancelled", () => {
+  it("Should not call onTaskDeleted when the delete dialog is cancelled", () => {
     const onTaskDeleted = vi.fn();
     render(<GanttChart tasks={tasks} enableBuiltinDialogs onTaskDeleted={onTaskDeleted} />);
 
@@ -391,7 +391,7 @@ describe("GanttChart — enableBuiltinDialogs", () => {
     expect(onTaskDeleted).not.toHaveBeenCalled();
   });
 
-  it("pre-fills the edit dialog with the task's current name", () => {
+  it("Should pre-fill the edit dialog with the task's current name", () => {
     render(<GanttChart tasks={tasks} enableBuiltinDialogs />);
 
     fireEvent.click(screen.getByTestId("gantt-edit-task-root"));
@@ -400,7 +400,7 @@ describe("GanttChart — enableBuiltinDialogs", () => {
     expect(nameInput.value).toBe("Root Task");
   });
 
-  it("reflects the added task in the panel immediately after confirming the add dialog", () => {
+  it("Should reflect the added task in the panel immediately after confirming the add dialog", () => {
     render(<GanttChart tasks={tasks} enableBuiltinDialogs />);
 
     fireEvent.click(screen.getByTestId("gantt-add-task-root"));
@@ -410,7 +410,7 @@ describe("GanttChart — enableBuiltinDialogs", () => {
     expect(screen.getByText("Brand New Task")).toBeInTheDocument();
   });
 
-  it("removes the task from the panel immediately after confirming the delete dialog", () => {
+  it("Should remove the task from the panel immediately after confirming the delete dialog", () => {
     render(<GanttChart tasks={tasks} enableBuiltinDialogs />);
 
     expect(screen.getByText("Child Task")).toBeInTheDocument();
@@ -421,7 +421,7 @@ describe("GanttChart — enableBuiltinDialogs", () => {
     expect(screen.queryByText("Child Task")).not.toBeInTheDocument();
   });
 
-  it("disables the end date field when the milestone checkbox is checked", () => {
+  it("Should disable the end date field when the milestone checkbox is checked", () => {
     render(<GanttChart tasks={tasks} enableBuiltinDialogs />);
 
     fireEvent.click(screen.getByTestId("gantt-add-task-root"));
@@ -431,7 +431,7 @@ describe("GanttChart — enableBuiltinDialogs", () => {
     expect(endDateInput).toBeDisabled();
   });
 
-  it("auto-advances end date when start date is changed to be after end date", () => {
+  it("Should auto-advance end date when start date is changed to be after end date", () => {
     render(<GanttChart tasks={tasks} enableBuiltinDialogs />);
 
     fireEvent.click(screen.getByTestId("gantt-add-task-root"));
@@ -449,7 +449,7 @@ describe("GanttChart — enableBuiltinDialogs", () => {
     expect(endInput.value).toBe("2025-02-20");
   });
 
-  it("clamps end date to start date when end date is changed to be before start date", () => {
+  it("Should clamp end date to start date when end date is changed to be before start date", () => {
     render(<GanttChart tasks={tasks} enableBuiltinDialogs />);
 
     fireEvent.click(screen.getByTestId("gantt-add-task-root"));
@@ -469,7 +469,7 @@ describe("GanttChart — enableBuiltinDialogs", () => {
 // ---------------------------------------------------------------------------
 
 describe("GanttChart — progress bar", () => {
-  it("renders a progress bar for a task with progress > 0", () => {
+  it("Should render a progress bar for a task with progress > 0", () => {
     const progressTasks: GanttTask[] = [
       {
         id: "work",
@@ -485,13 +485,13 @@ describe("GanttChart — progress bar", () => {
     expect(screen.getByTestId("gantt-progress-work")).toBeInTheDocument();
   });
 
-  it("does not render a progress bar when progress is undefined", () => {
+  it("Should not render a progress bar when progress is undefined", () => {
     render(<GanttChart tasks={tasks} />);
 
     expect(screen.queryByTestId("gantt-progress-root")).not.toBeInTheDocument();
   });
 
-  it("does not render a progress bar when progress is 0", () => {
+  it("Should not render a progress bar when progress is 0", () => {
     const zeroTasks: GanttTask[] = [
       {
         id: "zero",
@@ -509,7 +509,7 @@ describe("GanttChart — progress bar", () => {
 });
 
 describe("GanttChart — today line", () => {
-  it("renders the today line when today falls within the timeline range", () => {
+  it("Should render the today line when today falls within the timeline range", () => {
     vi.useFakeTimers();
     // tasks-Range mit Puffer: Dez 2024 – Apr 2025 → 2025-02-15 liegt darin.
     vi.setSystemTime(new Date("2025-02-15"));
@@ -521,7 +521,7 @@ describe("GanttChart — today line", () => {
     vi.useRealTimers();
   });
 
-  it("does not render the today line when today is outside the timeline range", () => {
+  it("Should not render the today line when today is outside the timeline range", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2030-06-01"));
 
@@ -563,13 +563,13 @@ const tasksWithDeps: GanttTask[] = [
 ];
 
 describe("GanttChart — dependency arrows", () => {
-  it("renders an SVG arrow between two visible tasks", () => {
+  it("Should render an SVG arrow between two visible tasks", () => {
     render(<GanttChart tasks={tasksWithDeps} />);
 
     expect(screen.getByTestId("gantt-dep-pred-succ")).toBeInTheDocument();
   });
 
-  it("does not render an SVG arrow when the predecessor ID does not exist in the task list", () => {
+  it("Should not render an SVG arrow when the predecessor ID does not exist in the task list", () => {
     const tasksMissingDep: GanttTask[] = [
       {
         id: "only",
@@ -585,7 +585,7 @@ describe("GanttChart — dependency arrows", () => {
     expect(screen.queryByTestId(/^gantt-dep-/)).not.toBeInTheDocument();
   });
 
-  it("hides the arrow when the predecessor becomes invisible after collapsing its parent", () => {
+  it("Should hide the arrow when the predecessor becomes invisible after collapsing its parent", () => {
     const tasksHiddenDep: GanttTask[] = [
       {
         id: "parent",
@@ -631,7 +631,7 @@ describe("GanttChart — dependency arrows", () => {
 // ---------------------------------------------------------------------------
 
 describe("GanttChart — timeline clipping", () => {
-  it("does not render a bar for a task entirely outside the timeline range", () => {
+  it("Should not render a bar for a task entirely outside the timeline range", () => {
     render(
       <GanttChart
         tasks={[{
@@ -650,7 +650,7 @@ describe("GanttChart — timeline clipping", () => {
     expect(screen.getByTestId("gantt-bar-row-future")).toBeInTheDocument();
   });
 
-  it("does not render a milestone outside the timeline range", () => {
+  it("Should not render a milestone outside the timeline range", () => {
     render(
       <GanttChart
         tasks={[{
@@ -671,7 +671,7 @@ describe("GanttChart — timeline clipping", () => {
 });
 
 describe("GanttChart — split pane", () => {
-  it("renders the resize divider between panel and timeline", () => {
+  it("Should render the resize divider between panel and timeline", () => {
     render(<GanttChart tasks={tasks} />);
 
     expect(screen.getByTestId("gantt-panel-divider")).toBeInTheDocument();
@@ -679,7 +679,7 @@ describe("GanttChart — split pane", () => {
 });
 
 describe("GanttChart — onTasksChange", () => {
-  it("calls onTasksChange with the updated task list after adding a task", () => {
+  it("Should call onTasksChange with the updated task list after adding a task", () => {
     const onTasksChange = vi.fn();
     render(<GanttChart tasks={tasks} enableBuiltinDialogs onTasksChange={onTasksChange} />);
 
@@ -692,7 +692,7 @@ describe("GanttChart — onTasksChange", () => {
     expect(updated.some((t) => t.name === "New Task")).toBe(true);
   });
 
-  it("calls onTasksChange with the updated task list after updating a task", () => {
+  it("Should call onTasksChange with the updated task list after updating a task", () => {
     const onTasksChange = vi.fn();
     render(<GanttChart tasks={tasks} enableBuiltinDialogs onTasksChange={onTasksChange} />);
 
@@ -705,7 +705,7 @@ describe("GanttChart — onTasksChange", () => {
     expect(updated.some((t) => t.id === "root" && t.name === "Renamed Root")).toBe(true);
   });
 
-  it("calls onTasksChange with the updated task list after deleting a task", () => {
+  it("Should call onTasksChange with the updated task list after deleting a task", () => {
     const onTasksChange = vi.fn();
     render(<GanttChart tasks={tasks} enableBuiltinDialogs onTasksChange={onTasksChange} />);
 
@@ -719,7 +719,7 @@ describe("GanttChart — onTasksChange", () => {
 });
 
 describe("GanttChart — onEditTask direct callback", () => {
-  it("calls onEditTask with the task when the edit icon is clicked (direct callback mode)", () => {
+  it("Should call onEditTask with the task when the edit icon is clicked (direct callback mode)", () => {
     const onEditTask = vi.fn();
     render(<GanttChart tasks={tasks} enableBuiltinDialogs={false} onEditTask={onEditTask} />);
 
@@ -729,7 +729,7 @@ describe("GanttChart — onEditTask direct callback", () => {
     expect(onEditTask).toHaveBeenCalledWith(expect.objectContaining({ id: "root" }));
   });
 
-  it("does not call onTaskClick when the edit icon is clicked in direct callback mode", () => {
+  it("Should not call onTaskClick when the edit icon is clicked in direct callback mode", () => {
     const onTaskClick = vi.fn();
     const onEditTask = vi.fn();
     render(
@@ -747,13 +747,13 @@ describe("GanttChart — onEditTask direct callback", () => {
 // ---------------------------------------------------------------------------
 
 describe("GanttChart — scroll-to-today button", () => {
-  it("renders the scroll-to-today button in the toolbar", () => {
+  it("Should render the scroll-to-today button in the toolbar", () => {
     render(<GanttChart tasks={tasks} />);
 
     expect(screen.getByTestId("gantt-scroll-to-today")).toBeInTheDocument();
   });
 
-  it("disables the scroll-to-today button when today is outside the timeline range", () => {
+  it("Should disable the scroll-to-today button when today is outside the timeline range", () => {
     render(
       <GanttChart
         tasks={tasks}
@@ -768,13 +768,13 @@ describe("GanttChart — scroll-to-today button", () => {
 });
 
 describe("GanttChart — weekend highlight", () => {
-  it("renders weekend strips in the days scale", () => {
+  it("Should render weekend strips in the days scale", () => {
     render(<GanttChart tasks={tasks} timeScale="days" />);
 
     expect(screen.getByTestId("gantt-weekend-strips")).toBeInTheDocument();
   });
 
-  it("does not render weekend strips in the months scale", () => {
+  it("Should not render weekend strips in the months scale", () => {
     render(<GanttChart tasks={tasks} timeScale="months" />);
 
     expect(screen.queryByTestId("gantt-weekend-strips")).not.toBeInTheDocument();
@@ -782,7 +782,7 @@ describe("GanttChart — weekend highlight", () => {
 });
 
 describe("GanttChart — zoom (Ctrl+wheel)", () => {
-  it("changes time scale from months to weeks on ctrl+wheel up when zoomable", () => {
+  it("Should change time scale from months to weeks on ctrl+wheel up when zoomable", () => {
     render(<GanttChart tasks={tasks} timeScale="months" zoomable />);
 
     expect(screen.getByTestId("gantt-scale-months").closest("button")).toHaveAttribute("aria-pressed", "true");
@@ -798,13 +798,13 @@ describe("GanttChart — zoom (Ctrl+wheel)", () => {
 // ---------------------------------------------------------------------------
 
 describe("GanttChart — expand/collapse all button", () => {
-  it("renders the expand/collapse-all button in the toolbar", () => {
+  it("Should render the expand/collapse-all button in the toolbar", () => {
     render(<GanttChart tasks={tasks} />);
 
     expect(screen.getByTestId("gantt-expand-collapse-all")).toBeInTheDocument();
   });
 
-  it("hides child rows after collapsing all when starting fully expanded", () => {
+  it("Should hide child rows after collapsing all when starting fully expanded", () => {
     render(<GanttChart tasks={tasks} initialExpandAll />);
 
     // Child is visible before collapse
@@ -816,7 +816,7 @@ describe("GanttChart — expand/collapse all button", () => {
     expect(screen.queryByTestId("gantt-bar-row-child")).not.toBeInTheDocument();
   });
 
-  it("restores child rows after expanding all following a collapse", () => {
+  it("Should restore child rows after expanding all following a collapse", () => {
     render(<GanttChart tasks={tasks} initialExpandAll />);
 
     const btn = screen.getByTestId("gantt-expand-collapse-all");
@@ -840,7 +840,7 @@ describe("GanttChart — expand/collapse all button", () => {
 // ---------------------------------------------------------------------------
 
 describe("GanttChart — toolbarConfig", () => {
-  it("hides individual scale buttons via toolbarConfig", () => {
+  it("Should hide individual scale buttons via toolbarConfig", () => {
     render(
       <GanttChart
         tasks={tasks}
@@ -854,20 +854,20 @@ describe("GanttChart — toolbarConfig", () => {
     expect(screen.getByTestId("gantt-scale-quarters")).toBeInTheDocument();
   });
 
-  it("hides expand/collapse button via toolbarConfig", () => {
+  it("Should hide expand/collapse button via toolbarConfig", () => {
     render(<GanttChart tasks={tasks} toolbarConfig={{ showExpandCollapseAll: false }} />);
 
     expect(screen.queryByTestId("gantt-expand-collapse-all")).not.toBeInTheDocument();
   });
 
-  it("hides date range inputs via toolbarConfig", () => {
+  it("Should hide date range inputs via toolbarConfig", () => {
     render(<GanttChart tasks={tasks} toolbarConfig={{ showDateRange: false }} />);
 
     expect(screen.queryByTestId("gantt-range-start")).not.toBeInTheDocument();
     expect(screen.queryByTestId("gantt-range-end")).not.toBeInTheDocument();
   });
 
-  it("shows reset-view button and disables it when view is at default", () => {
+  it("Should show reset-view button and disables it when view is at default", () => {
     render(<GanttChart tasks={tasks} timeScale="months" />);
 
     const btn = screen.getByTestId("gantt-reset-view");
@@ -875,7 +875,7 @@ describe("GanttChart — toolbarConfig", () => {
     expect(btn).toBeDisabled();
   });
 
-  it("enables reset-view button after time scale changes", () => {
+  it("Should enable reset-view button after time scale changes", () => {
     render(<GanttChart tasks={tasks} timeScale="months" />);
 
     fireEvent.click(screen.getByTestId("gantt-scale-weeks"));
@@ -883,7 +883,7 @@ describe("GanttChart — toolbarConfig", () => {
     expect(screen.getByTestId("gantt-reset-view")).not.toBeDisabled();
   });
 
-  it("resets time scale and range after clicking reset-view", () => {
+  it("Should reset time scale and range after clicking reset-view", () => {
     render(<GanttChart tasks={tasks} timeScale="months" />);
 
     // Change scale
@@ -895,7 +895,7 @@ describe("GanttChart — toolbarConfig", () => {
     expect(screen.getByTestId("gantt-scale-months").closest("button")).toHaveAttribute("aria-pressed", "true");
   });
 
-  it("hides reset-view button via toolbarConfig", () => {
+  it("Should hide reset-view button via toolbarConfig", () => {
     render(<GanttChart tasks={tasks} toolbarConfig={{ showResetView: false }} />);
 
     expect(screen.queryByTestId("gantt-reset-view")).not.toBeInTheDocument();
@@ -903,7 +903,7 @@ describe("GanttChart — toolbarConfig", () => {
 });
 
 describe("GanttChart — drag (draggable prop)", () => {
-  it("renders bars with grab cursor when draggable=true", () => {
+  it("Should render bars with grab cursor when draggable=true", () => {
     render(<GanttChart tasks={tasks} draggable />);
 
     const bar = screen.getByTestId("gantt-bar-root");
@@ -911,7 +911,7 @@ describe("GanttChart — drag (draggable prop)", () => {
     // cursor wird via sx gesetzt — wir prüfen nur dass das Element existiert und kein Fehler auftritt
   });
 
-  it("calls onTaskMoved after a drag sequence with movement >= 5px", () => {
+  it("Should call onTaskMoved after a drag sequence with movement >= 5px", () => {
     const onTaskMoved = vi.fn();
     render(
       <GanttChart
@@ -939,7 +939,7 @@ describe("GanttChart — drag (draggable prop)", () => {
     );
   });
 
-  it("does not call onTaskMoved when drag movement is below threshold", () => {
+  it("Should not call onTaskMoved when drag movement is below threshold", () => {
     const onTaskMoved = vi.fn();
     render(
       <GanttChart tasks={tasks} draggable onTaskMoved={onTaskMoved} />,
@@ -956,13 +956,13 @@ describe("GanttChart — drag (draggable prop)", () => {
 });
 
 describe("GanttChart — resize (resizable prop)", () => {
-  it("renders resize handles when resizable=true", () => {
+  it("Should render resize handles when resizable=true", () => {
     render(<GanttChart tasks={tasks} resizable />);
 
     expect(screen.getByTestId("gantt-resize-handle-root")).toBeInTheDocument();
   });
 
-  it("calls onTaskResized after a resize drag", () => {
+  it("Should call onTaskResized after a resize drag", () => {
     const onTaskResized = vi.fn();
     render(
       <GanttChart
@@ -994,7 +994,7 @@ describe("GanttChart — resize (resizable prop)", () => {
 // ---------------------------------------------------------------------------
 
 describe("GanttChart — inlineEdit", () => {
-  it("shows a text field after double-clicking the task name when inlineEdit=true", () => {
+  it("Should show a text field after double-clicking the task name when inlineEdit=true", () => {
     render(<GanttChart tasks={tasks} inlineEdit />);
 
     fireEvent.dblClick(screen.getByText("Root Task"));
@@ -1002,7 +1002,7 @@ describe("GanttChart — inlineEdit", () => {
     expect(screen.getByTestId("gantt-inline-edit-root")).toBeInTheDocument();
   });
 
-  it("does not show a text field on double-click when inlineEdit=false", () => {
+  it("Should not show a text field on double-click when inlineEdit=false", () => {
     render(<GanttChart tasks={tasks} />);
 
     fireEvent.dblClick(screen.getByText("Root Task"));
@@ -1010,7 +1010,7 @@ describe("GanttChart — inlineEdit", () => {
     expect(screen.queryByTestId("gantt-inline-edit-root")).not.toBeInTheDocument();
   });
 
-  it("saves the new name and hides the field after pressing Enter", () => {
+  it("Should save the new name and hides the field after pressing Enter", () => {
     render(<GanttChart tasks={tasks} inlineEdit />);
 
     fireEvent.dblClick(screen.getByText("Root Task"));
@@ -1023,7 +1023,7 @@ describe("GanttChart — inlineEdit", () => {
     expect(screen.getByText("Renamed Root")).toBeInTheDocument();
   });
 
-  it("cancels editing without saving after pressing Escape", () => {
+  it("Should cancel editing without saving after pressing Escape", () => {
     render(<GanttChart tasks={tasks} inlineEdit />);
 
     fireEvent.dblClick(screen.getByText("Root Task"));
@@ -1037,7 +1037,7 @@ describe("GanttChart — inlineEdit", () => {
     expect(screen.queryByText("Should Not Save")).not.toBeInTheDocument();
   });
 
-  it("saves the new name on blur", () => {
+  it("Should save the new name on blur", () => {
     render(<GanttChart tasks={tasks} inlineEdit />);
 
     fireEvent.dblClick(screen.getByText("Root Task"));
@@ -1050,7 +1050,7 @@ describe("GanttChart — inlineEdit", () => {
     expect(screen.getByText("Blur Saved")).toBeInTheDocument();
   });
 
-  it("calls onTasksChange after an inline rename", () => {
+  it("Should call onTasksChange after an inline rename", () => {
     const onTasksChange = vi.fn();
     render(<GanttChart tasks={tasks} inlineEdit onTasksChange={onTasksChange} />);
 
@@ -1066,7 +1066,7 @@ describe("GanttChart — inlineEdit", () => {
 });
 
 describe("GanttChart — status context menu (right-click on bar)", () => {
-  it("shows a status menu after right-clicking a task bar", () => {
+  it("Should show a status menu after right-clicking a task bar", () => {
     render(<GanttChart tasks={tasks} />);
 
     fireEvent.contextMenu(screen.getByTestId("gantt-bar-root"));
@@ -1074,7 +1074,7 @@ describe("GanttChart — status context menu (right-click on bar)", () => {
     expect(screen.getByTestId("gantt-status-menu-done")).toBeInTheDocument();
   });
 
-  it("updates the task status after selecting a menu item", () => {
+  it("Should update the task status after selecting a menu item", () => {
     render(<GanttChart tasks={tasks} />);
 
     fireEvent.contextMenu(screen.getByTestId("gantt-bar-root"));
@@ -1086,7 +1086,7 @@ describe("GanttChart — status context menu (right-click on bar)", () => {
     expect(rootRow.querySelector(".MuiChip-root")).not.toHaveTextContent("In Progress");
   });
 
-  it("calls onStatusChange when a status is selected from the context menu", () => {
+  it("Should call onStatusChange when a status is selected from the context menu", () => {
     const onStatusChange = vi.fn();
     render(<GanttChart tasks={tasks} onStatusChange={onStatusChange} />);
 
@@ -1113,19 +1113,19 @@ const progressTaskList: GanttTask[] = [
 ];
 
 describe("GanttChart — progressDraggable", () => {
-  it("renders a progress handle when progressDraggable=true", () => {
+  it("Should render a progress handle when progressDraggable=true", () => {
     render(<GanttChart tasks={progressTaskList} progressDraggable />);
 
     expect(screen.getByTestId("gantt-progress-handle-work")).toBeInTheDocument();
   });
 
-  it("does not render a progress handle when progressDraggable=false", () => {
+  it("Should not render a progress handle when progressDraggable=false", () => {
     render(<GanttChart tasks={progressTaskList} />);
 
     expect(screen.queryByTestId("gantt-progress-handle-work")).not.toBeInTheDocument();
   });
 
-  it("calls onTasksChange with updated progress after a progress drag", () => {
+  it("Should call onTasksChange with updated progress after a progress drag", () => {
     const onTasksChange = vi.fn();
     render(
       <GanttChart
@@ -1155,11 +1155,11 @@ describe("GanttChart — progressDraggable", () => {
 // ---------------------------------------------------------------------------
 
 describe("computeCriticalPath", () => {
-  it("returns empty set for an empty task list", () => {
+  it("Should return empty set for an empty task list", () => {
     expect(computeCriticalPath([])).toEqual(new Set());
   });
 
-  it("returns only the task with the latest end date when there are no dependencies", () => {
+  it("Should return only the task with the latest end date when there are no dependencies", () => {
     const cpTasks: GanttTask[] = [
       { id: "a", name: "A", status: "planned", startDate: new Date("2025-01-01"), endDate: new Date("2025-01-31") },
       { id: "b", name: "B", status: "planned", startDate: new Date("2025-01-01"), endDate: new Date("2025-03-31") },
@@ -1169,7 +1169,7 @@ describe("computeCriticalPath", () => {
     expect(result.has("a")).toBe(false);
   });
 
-  it("returns the full chain when tasks are sequentially dependent", () => {
+  it("Should return the full chain when tasks are sequentially dependent", () => {
     const cpTasks: GanttTask[] = [
       { id: "a", name: "A", status: "planned", startDate: new Date("2025-01-01"), endDate: new Date("2025-01-31") },
       { id: "b", name: "B", status: "planned", startDate: new Date("2025-02-01"), endDate: new Date("2025-02-28"), dependencies: ["a"] },
@@ -1181,7 +1181,7 @@ describe("computeCriticalPath", () => {
     expect(result.has("c")).toBe(true);
   });
 
-  it("includes all tasks that can reach the project end, even shorter parallel branches", () => {
+  it("Should include all tasks that can reach the project end, even shorter parallel branches", () => {
     // Both "short" and "long" lead to "final" — both are critical by the "reachability" algorithm.
     // Tasks that contribute nothing to the project end would be excluded.
     const cpTasks: GanttTask[] = [
@@ -1198,7 +1198,7 @@ describe("computeCriticalPath", () => {
     expect(result.has("orphan")).toBe(false);
   });
 
-  it("does not loop infinitely on circular dependencies", () => {
+  it("Should not loop infinitely on circular dependencies", () => {
     const cpTasks: GanttTask[] = [
       { id: "a", name: "A", status: "planned", startDate: new Date("2025-01-01"), endDate: new Date("2025-01-31"), dependencies: ["b"] },
       { id: "b", name: "B", status: "planned", startDate: new Date("2025-01-01"), endDate: new Date("2025-02-28"), dependencies: ["a"] },
@@ -1230,19 +1230,19 @@ const depDialogTasks: GanttTask[] = [
 ];
 
 describe("GanttChart — dialog dependencies", () => {
-  it("renders the dependencies field in the add dialog", () => {
+  it("Should render the dependencies field in the add dialog", () => {
     render(<GanttChart tasks={depDialogTasks} enableBuiltinDialogs />);
     fireEvent.click(screen.getByTestId("gantt-add-task-pred"));
     expect(screen.getByTestId("gantt-dialog-field-dependencies")).toBeInTheDocument();
   });
 
-  it("renders the dependencies field in the edit dialog", () => {
+  it("Should render the dependencies field in the edit dialog", () => {
     render(<GanttChart tasks={depDialogTasks} enableBuiltinDialogs />);
     fireEvent.click(screen.getByTestId("gantt-edit-task-main"));
     expect(screen.getByTestId("gantt-dialog-field-dependencies")).toBeInTheDocument();
   });
 
-  it("preserves existing dependencies when saving via edit dialog", () => {
+  it("Should preserve existing dependencies when saving via edit dialog", () => {
     const onTaskUpdated = vi.fn();
     render(<GanttChart tasks={depDialogTasks} enableBuiltinDialogs onTaskUpdated={onTaskUpdated} />);
     fireEvent.click(screen.getByTestId("gantt-edit-task-main"));
@@ -1252,7 +1252,7 @@ describe("GanttChart — dialog dependencies", () => {
     expect(saved.dependencies).toEqual(["pred"]);
   });
 
-  it("does not include dependencies on a newly added task by default", () => {
+  it("Should not include dependencies on a newly added task by default", () => {
     const onTaskCreated = vi.fn();
     render(<GanttChart tasks={depDialogTasks} enableBuiltinDialogs onTaskCreated={onTaskCreated} />);
     fireEvent.click(screen.getByTestId("gantt-add-task-pred"));
@@ -1287,19 +1287,19 @@ const cpChainTasks: GanttTask[] = [
 ];
 
 describe("GanttChart — showCriticalPath", () => {
-  it("renders without crashing when showCriticalPath=true", () => {
+  it("Should render without crashing when showCriticalPath=true", () => {
     render(<GanttChart tasks={cpChainTasks} showCriticalPath />);
     expect(screen.getByTestId("gantt-bar-cp-a")).toBeInTheDocument();
     expect(screen.getByTestId("gantt-bar-cp-b")).toBeInTheDocument();
   });
 
-  it("renders without crashing when showCriticalPath=false (default)", () => {
+  it("Should render without crashing when showCriticalPath=false (default)", () => {
     render(<GanttChart tasks={cpChainTasks} />);
     expect(screen.getByTestId("gantt-bar-cp-a")).toBeInTheDocument();
     expect(screen.getByTestId("gantt-bar-cp-b")).toBeInTheDocument();
   });
 
-  it("renders the component with milestone tasks when showCriticalPath=true", () => {
+  it("Should render the component with milestone tasks when showCriticalPath=true", () => {
     const msTask: GanttTask = {
       id: "ms",
       name: "Milestone",
@@ -1329,11 +1329,11 @@ function buildVirtualTasks(count: number): GanttTask[] {
 }
 
 describe("GanttChart — virtualizeRows", () => {
-  it("renders without crashing with virtualizeRows=true and many tasks", () => {
+  it("Should render without crashing with virtualizeRows=true and many tasks", () => {
     render(<GanttChart tasks={buildVirtualTasks(300)} virtualizeRows />);
   });
 
-  it("renders fewer DOM rows than total tasks when virtualizeRows=true (jsdom has clientHeight=0 so only overscan rows are in DOM)", () => {
+  it("Should render fewer DOM rows than total tasks when virtualizeRows=true (jsdom has clientHeight=0 so only overscan rows are in DOM)", () => {
     const totalTasks = 50;
     render(<GanttChart tasks={buildVirtualTasks(totalTasks)} virtualizeRows />);
     // Overscan=5 → at most 10 rows rendered (5 top + 5 bottom) — far fewer than 50.
@@ -1341,14 +1341,14 @@ describe("GanttChart — virtualizeRows", () => {
     expect(rows.length).toBeLessThan(totalTasks);
   });
 
-  it("renders all rows normally when virtualizeRows=false (default)", () => {
+  it("Should render all rows normally when virtualizeRows=false (default)", () => {
     const totalTasks = 20;
     render(<GanttChart tasks={buildVirtualTasks(totalTasks)} />);
     const rows = document.querySelectorAll(".gantt-task-row");
     expect(rows.length).toBe(totalTasks);
   });
 
-  it("renders the timeline scroll container when virtualizeRows=true", () => {
+  it("Should render the timeline scroll container when virtualizeRows=true", () => {
     // In jsdom the virtualizer may render 0 timeline rows (no layout),
     // so we just verify the scroll container is present and the component doesn't crash.
     render(<GanttChart tasks={buildVirtualTasks(50)} virtualizeRows />);
@@ -1361,24 +1361,24 @@ describe("GanttChart — virtualizeRows", () => {
 // ---------------------------------------------------------------------------
 
 describe("GanttChart — columnActions header", () => {
-  it("shows 'Aktionen' label in the panel header when actions column is visible", () => {
+  it("Should show 'Aktionen' label in the panel header when actions column is visible", () => {
     render(<GanttChart tasks={tasks} enableBuiltinDialogs />);
     expect(screen.getByText("Aktionen")).toBeInTheDocument();
   });
 
-  it("shows custom columnActions label from translations", () => {
+  it("Should show custom columnActions label from translations", () => {
     render(<GanttChart tasks={tasks} enableBuiltinDialogs translations={{ columnActions: "Actions" }} />);
     expect(screen.getByText("Actions")).toBeInTheDocument();
   });
 
-  it("does not show actions header when no action callbacks are present", () => {
+  it("Should not show actions header when no action callbacks are present", () => {
     render(<GanttChart tasks={tasks} enableBuiltinDialogs={false} />);
     expect(screen.queryByText("Aktionen")).not.toBeInTheDocument();
   });
 });
 
 describe("GanttChart — statusColors prop", () => {
-  it("renders without crashing when custom statusColors are provided", () => {
+  it("Should render without crashing when custom statusColors are provided", () => {
     render(
       <GanttChart
         tasks={tasks}
@@ -1388,7 +1388,7 @@ describe("GanttChart — statusColors prop", () => {
     expect(screen.getByTestId("gantt-bar-root")).toBeInTheDocument();
   });
 
-  it("renders without crashing with partial statusColors (only one status overridden)", () => {
+  it("Should render without crashing with partial statusColors (only one status overridden)", () => {
     render(<GanttChart tasks={tasks} statusColors={{ done: "#ff0000" }} />);
     expect(screen.getByTestId("gantt-bar-root")).toBeInTheDocument();
   });
@@ -1399,7 +1399,7 @@ describe("GanttChart — statusColors prop", () => {
 // ---------------------------------------------------------------------------
 
 describe("GanttChart — ganttTheme prop", () => {
-  it("renders without crashing with a full ganttTheme", () => {
+  it("Should render without crashing with a full ganttTheme", () => {
     render(
       <GanttChart
         tasks={tasks}
@@ -1416,7 +1416,7 @@ describe("GanttChart — ganttTheme prop", () => {
     expect(screen.getByTestId("gantt-bar-root")).toBeInTheDocument();
   });
 
-  it("ganttTheme.statusColors overrides the top-level statusColors prop", () => {
+  it("Should show that ganttTheme.statusColors overrides the top-level statusColors prop", () => {
     // Both props set "planned" — ganttTheme wins. Component must not crash.
     render(
       <GanttChart
@@ -1428,7 +1428,7 @@ describe("GanttChart — ganttTheme prop", () => {
     expect(screen.getByTestId("gantt-bar-root")).toBeInTheDocument();
   });
 
-  it("renders criticalPathColor without crashing when showCriticalPath=true", () => {
+  it("Should render criticalPathColor without crashing when showCriticalPath=true", () => {
     render(
       <GanttChart
         tasks={tasks}
@@ -1439,20 +1439,20 @@ describe("GanttChart — ganttTheme prop", () => {
     expect(screen.getByTestId("gantt-bar-root")).toBeInTheDocument();
   });
 
-  it("renders partial ganttTheme (only barBorderRadius) without crashing", () => {
+  it("Should render partial ganttTheme (only barBorderRadius) without crashing", () => {
     render(<GanttChart tasks={tasks} ganttTheme={{ barBorderRadius: 0 }} />);
     expect(screen.getByTestId("gantt-bar-root")).toBeInTheDocument();
   });
 });
 
 describe("GanttChart — GanttTask.color", () => {
-  it("renders without crashing when a task has a custom color", () => {
+  it("Should render without crashing when a task has a custom color", () => {
     const coloredTasks = tasks.map((t) => (t.id === "root" ? { ...t, color: "#e11d48" } : t));
     render(<GanttChart tasks={coloredTasks} />);
     expect(screen.getByTestId("gantt-bar-root")).toBeInTheDocument();
   });
 
-  it("renders without crashing when only some tasks have a custom color", () => {
+  it("Should render without crashing when only some tasks have a custom color", () => {
     const mixed = [
       { ...tasks[0], color: "#e11d48" },
       tasks[1],

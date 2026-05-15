@@ -26,13 +26,13 @@ const meta: Meta<typeof PasswordStrengthMeter> = {
     helperText: { control: "text" },
     inputSize: { control: "radio", options: ["small", "medium"] },
     passwordMinLength: { control: "number" },
-    // Controlled via render in the Controlled story — not directly editable.
+    // Wird über render in der Controlled-Story gesteuert — nicht direkt editierbar.
     value: { control: false },
-    // Form-integration props — use dedicated stories or pass via render.
+    // Form-Integration-Props — über dedizierte Stories oder per render übergeben.
     name: { control: false },
     inputRef: { control: false },
     autoComplete: { control: false },
-    // Complex objects — use dedicated stories instead.
+    // Komplexe Objekte — stattdessen dedizierte Stories verwenden.
     translation: { control: false },
     meterColors: { control: false },
     checkColors: { control: false },

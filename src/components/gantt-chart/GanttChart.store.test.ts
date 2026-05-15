@@ -275,29 +275,29 @@ const depTasks: GanttTask[] = [
 ];
 
 describe("createGanttChartStore — cascadeDependencies", () => {
-  it("does not cascade when cascadeDependencies=false", () => {
+  it("Should not cascade when cascadeDependencies=false", () => {
     const store = createGanttChartStore(depTasks, "months", false, undefined, false);
     const moved = { ...depTasks[0], endDate: new Date("2025-02-14") };
     store.getState().updateTask(moved);
 
     const succ = store.getState().tasks.find((t) => t.id === "succ")!;
-    // Successor should stay unchanged.
+    // Nachfolger soll unverändert bleiben.
     expect(succ.startDate.toISOString().slice(0, 10)).toBe("2025-02-01");
   });
 
-  it("shifts direct successor when predecessor end date moves forward", () => {
+  it("Should shift direct successor when predecessor end date moves forward", () => {
     const store = createGanttChartStore(depTasks, "months", false, undefined, true);
-    // pred ends Jan 31 → Feb 14: +14 days
+    // Vorgänger endet 31. Jan. → 14. Feb.: +14 Tage
     const moved = { ...depTasks[0], endDate: new Date("2025-02-14") };
     store.getState().updateTask(moved);
 
     const succ = store.getState().tasks.find((t) => t.id === "succ")!;
-    // succ was Feb 01 – Feb 28, should shift +14 days → Feb 15 – Mar 14
+    // Nachfolger war 01. Feb. – 28. Feb., soll +14 Tage verschoben werden → 15. Feb. – 14. März
     expect(succ.startDate.toISOString().slice(0, 10)).toBe("2025-02-15");
     expect(succ.endDate.toISOString().slice(0, 10)).toBe("2025-03-14");
   });
 
-  it("cascades recursively through a chain of successors", () => {
+  it("Should cascade recursively through a chain of successors", () => {
     const store = createGanttChartStore(depTasks, "months", false, undefined, true);
     const moved = { ...depTasks[0], endDate: new Date("2025-02-14") }; // +14 days
     store.getState().updateTask(moved);
@@ -308,7 +308,7 @@ describe("createGanttChartStore — cascadeDependencies", () => {
     expect(succ2.endDate.toISOString().slice(0, 10)).toBe("2025-04-14");
   });
 
-  it("shifts successor backward when predecessor end date moves earlier", () => {
+  it("Should shift successor backward when predecessor end date moves earlier", () => {
     const store = createGanttChartStore(depTasks, "months", false, undefined, true);
     const moved = { ...depTasks[0], endDate: new Date("2025-01-17") }; // −14 days
     store.getState().updateTask(moved);
