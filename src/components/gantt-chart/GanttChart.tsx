@@ -5,7 +5,7 @@ import {
   createGanttChartStore,
   type GanttChartStore,
 } from "./GanttChart.store";
-import type { GanttChartProps, GanttToolbarConfig, GanttTranslations } from "./GanttChart.types";
+import type { GanttChartProps, GanttStatusColors, GanttToolbarConfig, GanttTranslations } from "./GanttChart.types";
 import { DEFAULT_GANTT_TRANSLATIONS } from "./GanttChart.types";
 import { getDisplayRange, getTimelineRange } from "./util/gantt-chart.util";
 import type { GanttTimeScale } from "./GanttChart.types";
@@ -46,6 +46,16 @@ const GanttTranslationsContext = createContext<GanttTranslations>(DEFAULT_GANTT_
 
 export function useGanttTranslations(): GanttTranslations {
   return useContext(GanttTranslationsContext);
+}
+
+// ---------------------------------------------------------------------------
+// Status-Colors-Kontext
+// ---------------------------------------------------------------------------
+
+const GanttStatusColorsContext = createContext<GanttStatusColors>({});
+
+export function useGanttStatusColors(): GanttStatusColors {
+  return useContext(GanttStatusColorsContext);
 }
 
 // ---------------------------------------------------------------------------
@@ -277,6 +287,7 @@ export function GanttChart({
   showCriticalPath = false,
   virtualizeRows = false,
   cascadeDependencies = false,
+  statusColors,
   onTaskClick,
   onMilestoneClick,
   onAddTask,
@@ -312,8 +323,11 @@ export function GanttChart({
     }, cascadeDependencies);
   });
 
+  const resolvedStatusColors = useMemo(() => statusColors ?? {}, [statusColors]);
+
   return (
     <GanttTranslationsContext.Provider value={mergedTranslations}>
+      <GanttStatusColorsContext.Provider value={resolvedStatusColors}>
       <GanttChartStoreContext.Provider value={store}>
         <GanttChartInner
           tasks={tasks}
@@ -346,6 +360,7 @@ export function GanttChart({
           maxPanelWidth={maxPanelWidth}
         />
       </GanttChartStoreContext.Provider>
+      </GanttStatusColorsContext.Provider>
     </GanttTranslationsContext.Provider>
   );
 }

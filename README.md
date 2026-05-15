@@ -325,6 +325,7 @@ function App() {
 | `defaultRangeStart` | `Date` | auto | Overrides the auto-computed start of the visible range. |
 | `defaultRangeEnd` | `Date` | auto | Overrides the auto-computed end of the visible range. |
 | `translations` | `Partial<GanttTranslations>` | German | Override display strings for i18n (see [Translations](#translations)). |
+| `statusColors` | `GanttStatusColors` | MUI palette | Override bar/chip/dot colors per status (see [Colors & Theming](#colors--theming)). |
 
 **Toolbar**
 
@@ -431,6 +432,11 @@ type GanttTranslations = {
   // Panel headers
   columnName: string;             // Default: "Name"
   columnStatus: string;           // Default: "Status"
+  columnActions: string;          // Default: "Aktionen"
+  // Icon tooltips (action column)
+  addTaskTooltip: string;         // Default: "Aufgabe hinzufügen"
+  editTaskTooltip: string;        // Default: "Aufgabe bearbeiten"
+  deleteTaskTooltip: string;      // Default: "Aufgabe löschen"
   // Status chip labels
   statusPlanned: string;          // Default: "Geplant"
   statusInProgress: string;       // Default: "In Arbeit"
@@ -573,6 +579,12 @@ All three components support full i18n without any external library. Pass only t
     dialogFieldParent: 'Parent Task',
     dialogFieldParentNone: '— None —',
     dialogDeleteConfirm: 'Delete task "{name}"?',
+    dialogFieldDependencies: 'Predecessors',
+    dialogFieldDependenciesNone: '— None —',
+    columnActions: 'Actions',
+    addTaskTooltip: 'Add task',
+    editTaskTooltip: 'Edit task',
+    deleteTaskTooltip: 'Delete task',
   }}
 />
 ```
@@ -613,6 +625,23 @@ All three components support full i18n without any external library. Pass only t
 ### Colors & Theming
 
 All components use MUI's theme system wherever possible (`color="text.secondary"`, `borderColor: "divider"`, etc.) and automatically adapt to light and dark mode. Custom colors can be passed via props where supported:
+
+**GanttChart — custom status colors:**
+
+```tsx
+import type { GanttStatusColors } from 'mui-ts-library';
+
+const statusColors: GanttStatusColors = {
+  planned:     '#7c3aed',   // purple
+  'in-progress': '#0ea5e9', // sky blue
+  done:        '#16a34a',   // green
+  blocked:     '#dc2626',   // red
+};
+
+<GanttChart tasks={tasks} statusColors={statusColors} />
+```
+
+All four fields are optional — omit any status to keep its MUI palette default.
 
 ```tsx
 <PasswordStrengthMeter

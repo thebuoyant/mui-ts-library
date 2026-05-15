@@ -1355,3 +1355,41 @@ describe("GanttChart — virtualizeRows", () => {
     expect(screen.getByTestId("gantt-timeline-scroll")).toBeInTheDocument();
   });
 });
+
+// ---------------------------------------------------------------------------
+// Phase 17 — columnActions header + statusColors + icon Tooltips
+// ---------------------------------------------------------------------------
+
+describe("GanttChart — columnActions header", () => {
+  it("shows 'Aktionen' label in the panel header when actions column is visible", () => {
+    render(<GanttChart tasks={tasks} enableBuiltinDialogs />);
+    expect(screen.getByText("Aktionen")).toBeInTheDocument();
+  });
+
+  it("shows custom columnActions label from translations", () => {
+    render(<GanttChart tasks={tasks} enableBuiltinDialogs translations={{ columnActions: "Actions" }} />);
+    expect(screen.getByText("Actions")).toBeInTheDocument();
+  });
+
+  it("does not show actions header when no action callbacks are present", () => {
+    render(<GanttChart tasks={tasks} enableBuiltinDialogs={false} />);
+    expect(screen.queryByText("Aktionen")).not.toBeInTheDocument();
+  });
+});
+
+describe("GanttChart — statusColors prop", () => {
+  it("renders without crashing when custom statusColors are provided", () => {
+    render(
+      <GanttChart
+        tasks={tasks}
+        statusColors={{ planned: "#7c3aed", "in-progress": "#0ea5e9", done: "#16a34a", blocked: "#dc2626" }}
+      />,
+    );
+    expect(screen.getByTestId("gantt-bar-root")).toBeInTheDocument();
+  });
+
+  it("renders without crashing with partial statusColors (only one status overridden)", () => {
+    render(<GanttChart tasks={tasks} statusColors={{ done: "#ff0000" }} />);
+    expect(screen.getByTestId("gantt-bar-root")).toBeInTheDocument();
+  });
+});

@@ -40,6 +40,10 @@ const EN_TRANSLATIONS: GanttTranslations = {
   expandAllTooltip: "Expand all",
   collapseAllTooltip: "Collapse all",
   resetViewTooltip: "Reset view",
+  columnActions: "Actions",
+  addTaskTooltip: "Add task",
+  editTaskTooltip: "Edit task",
+  deleteTaskTooltip: "Delete task",
 };
 
 const sampleTasks: GanttTask[] = [
@@ -229,6 +233,7 @@ const meta: Meta<typeof GanttChart> = {
     progressDraggable: { control: "boolean" },
     showCriticalPath: { control: "boolean" },
     virtualizeRows: { control: "boolean" },
+    statusColors: { control: false },
     toolbarConfig: { control: false },
     onTaskMoved: { control: false },
     onTaskResized: { control: false },
@@ -614,6 +619,27 @@ function generateLargeTasks(): GanttTask[] {
 }
 
 const largeTasks = generateLargeTasks();
+
+export const CustomStatusColors: Story = {
+  args: {
+    tasks: sampleTasks,
+    timeScale: "months",
+    initialExpandAll: true,
+    height: 500,
+    enableBuiltinDialogs: true,
+    statusColors: {
+      planned: "#7c3aed",
+      "in-progress": "#0ea5e9",
+      done: "#16a34a",
+      blocked: "#dc2626",
+    },
+  },
+  render: (args) => (
+    <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
+      <GanttChart {...args} />
+    </Box>
+  ),
+};
 
 export const LargeDataset: Story = {
   args: {

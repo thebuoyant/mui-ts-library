@@ -28,7 +28,7 @@ React 19, TypeScript 5.9, MUI v7, Zustand v5, Vite 8, Vitest 4, Storybook 10
 
 ---
 
-## Aktueller Stand: Phasen 1–13 + Expand/Collapse All + Phase 12 + Cascade Dependencies + Toolbar-Konfiguration abgeschlossen ✅ (188 Tests grün, README aktuell)
+## Aktueller Stand: Phasen 1–17 abgeschlossen ✅ (221 Tests grün, README aktuell)
 
 ### Alle vorhandenen Dateien
 
@@ -48,7 +48,7 @@ React 19, TypeScript 5.9, MUI v7, Zustand v5, Vite 8, Vitest 4, Storybook 10
 | `GanttTimelineHeader.tsx`       | Header mit optionalem zwei-Ebenen-Modus (`groups`) für Tages-Skala                  |
 | `GanttTimeline.tsx`             | Rechtes Panel: Balken + Progress-Overlay, Meilensteine, Gitterlinien, SVG (Pfeile + Today-Linie) |
 | `GanttToolbar.tsx`              | Toolbar: Skala-Switcher + Von/Bis-Date-Inputs + Reset-Button + Heute-Button + Expand/Collapse-All-Button |
-| `GanttChart.stories.tsx`        | 13 Stories mit argTypes und meta args                                                |
+| `GanttChart.stories.tsx`        | 16 Stories mit argTypes und meta args                                                |
 
 ### GanttTimeScale — implementierter Stand
 
@@ -259,7 +259,7 @@ onTasksChange?.(rawStore.getState().tasks); // synchron — Zustand-set ist sync
 
 ---
 
-## Storybook — 14 Stories
+## Storybook — 16 Stories
 
 | Story               | Besonderheit                                                        |
 | ------------------- | ------------------------------------------------------------------- |
@@ -277,6 +277,8 @@ onTasksChange?.(rawStore.getState().tasks); // synchron — Zustand-set ist sync
 | WithBuiltinDialogs  | `enableBuiltinDialogs: true`, alle Dialog-Callbacks verdrahtet      |
 | ZoomAndToday        | `zoomable: true`, built-in dialogs, height: 500                     |
 | DragAndResize       | `draggable: true`, `resizable: true`, `initialExpandAll: true`, `cascadeDependencies: true` |
+| CustomStatusColors  | `statusColors` mit Violett/Blau/Grün/Rot, `initialExpandAll: true`                         |
+| LargeDataset        | 360 Tasks, `virtualizeRows: true`, `initialExpandAll: true`                                 |
 
 ---
 
@@ -334,7 +336,7 @@ export function useRawGanttChartStore(): GanttChartStore
 ```
 Bitte lies zuerst die claude-gantt-kickoff.md im Root des Projekts.
 Dann besprechen wir die nächste geplante Phase.
-188 Tests müssen nach den Änderungen grün bleiben.
+221 Tests müssen nach den Änderungen grün bleiben.
 ```
 
 ---
@@ -472,8 +474,6 @@ toolbarConfig?: GanttToolbarConfig;  // nur abweichende Keys angeben
 - `resolvedToolbarConfig = { ...DEFAULT_TOOLBAR_CONFIG, ...toolbarConfig }` via `useMemo`
 - Wird als `config: Required<GanttToolbarConfig>` an `GanttToolbar` übergeben
 
-## Geplante Phasen (noch nicht implementiert)
-
 ---
 
 ### Phase 13 ✅ abgeschlossen (172 Tests)
@@ -537,32 +537,96 @@ Wird von `GanttTimeline` (ersetzt lokales `useMemo`) und `GanttChartInner` (`scr
 
 ---
 
-### Phase 15 — Abhängigkeiten im Dialog + kritischer Pfad
+### Phase 15 ✅ abgeschlossen (212 Tests)
 
-**Abhängigkeiten im Edit-Dialog verwalten**
-- Neues Multiselect-Feld "Vorgänger" im `GanttTaskDialog`
-- DFS-geordnete Liste wie beim Parent-Dropdown, aber MultiSelect
-- Zirkuläre Abhängigkeiten ausschließen (eigene ID + Nachkommen ausblenden)
+**Abhängigkeiten im Dialog + kritischer Pfad**
 
-**Kritischer Pfad hervorheben**
-- Neue Prop `showCriticalPath?: boolean`
-- Berechnung: längste Kette von Abhängigkeiten bis zum letzten Task
-- Balken auf dem kritischen Pfad erhalten einen farbigen Rand (`error.main` o. ä.)
+**Neues Multiselect-Feld "Vorgänger" im `GanttTaskDialog`**
+- DFS-geordnete Liste, identisch zum Parent-Dropdown
+- Eigene ID + alle Nachkommen ausgeblendet (keine Zyklen möglich)
+- Neue Translations: `dialogFieldDependencies`, `dialogFieldDependenciesNone`
+
+**Neue Util-Funktion**
+```ts
+// util/gantt-chart.util.ts
+export function computeCriticalPath(tasks: GanttTask[]): Set<string>
+```
+DFS mit Memoisation + `inStack`-Guard für Zyklen. Gibt alle Task-IDs zurück, die über Abhängigkeiten den Projekt-Endpunkt erreichen können.
+
+**Neue Prop**
+```ts
+showCriticalPath?: boolean;  // Default: false
+```
+Balken auf dem kritischen Pfad: `boxShadow: inset 0 0 0 2.5px error.main`
+Meilensteine: `boxShadow: 0 0 0 2.5px error.main`
 
 ---
 
-### Phase 16 — Virtualisierung für große Datensätze
+### Phase 16 ✅ abgeschlossen (216 Tests)
 
-Ab ca. 200+ Tasks wird das DOM schwer. Lösung: nur sichtbare Zeilen rendern.
+**Virtualisierung für große Datensätze**
 
-- Virtuelle Liste in `GanttTaskPanel` + `GanttTimeline` mit identischem `overscan`
-- Beide müssen synchron scrollen (Vertical-Scroll-Sync bereits vorhanden)
-- Implementierung via `@tanstack/react-virtual` (passt gut zu React 19 + kein eigenes ScrollContainer-Pattern nötig)
-- Neue Prop `virtualizeRows?: boolean` (Default: false — opt-in um bestehende Stories nicht zu brechen)
+**Neue Prop**
+```ts
+virtualizeRows?: boolean;  // Default: false
+```
+
+**Implementierung**
+- `@tanstack/react-virtual` v3 in `GanttTaskPanel` + `GanttTimeline`
+- `useVirtualizer({ count, getScrollElement, estimateSize: () => ROW_HEIGHT, overscan: 5 })`
+- Virtual Rows: `position: absolute` + `transform: translateY(vRow.start)` in `position: relative`-Container mit `height: getTotalSize()`
+- Inline-Style überschreibt MUI `sx` (CSS-Spezifität)
+- jsdom-Limitation: Timeline-Virtualizer rendert 0 Items (kein Layout) → Panel-Test via `.gantt-task-row`-DOM-Klasse
+
+**Neue Story**
+- `LargeDataset` — 360 Tasks (4×4×5×4 hierarchisch generiert), `virtualizeRows: true`
 
 ---
 
-### Phase 17 — Export
+### Phase 17 ✅ abgeschlossen (221 Tests)
+
+**„Aktionen"-Spalten-Header + konfigurierbare Status-Farben + vollständige Translations**
+
+**Neuer Spalten-Header**
+- "Aktionen"-Label über der Icon-Buttons-Spalte im `GanttTaskPanel`-Header
+- `Typography variant="caption"` mit `{t.columnActions}`, zentriert in `ACTIONS_COL_WIDTH`
+
+**Icon-Button-Tooltips**
+- Edit/Add/Delete-Icons in `GanttTaskRow` in MUI `<Tooltip>` gewrapped
+- Texte über Translations konfigurierbar: `editTaskTooltip`, `addTaskTooltip`, `deleteTaskTooltip`
+
+**Neue Translations-Keys**
+```ts
+columnActions: string;      // Default: "Aktionen"
+addTaskTooltip: string;     // Default: "Aufgabe hinzufügen"
+editTaskTooltip: string;    // Default: "Aufgabe bearbeiten"
+deleteTaskTooltip: string;  // Default: "Aufgabe löschen"
+```
+
+**Neuer Typ + Prop**
+```ts
+export type GanttStatusColors = Partial<Record<GanttTaskStatus, string>>;
+
+statusColors?: GanttStatusColors;
+```
+
+**Implementierung via Context**
+```ts
+// GanttChart.tsx
+const GanttStatusColorsContext = createContext<GanttStatusColors>({});
+export function useGanttStatusColors(): GanttStatusColors
+```
+- `GanttTaskPanel`: Dot-Farbe + Chip-Border/Color (`statusColors[status] ?? STATUS_DOT_COLOR[status]`)
+- `GanttTimeline`: Bar bgcolor (`statusColors[status] ?? BAR_COLOR[status] ?? "grey.300"`)
+
+**Neue Story**
+- `CustomStatusColors` — Violett/Blau/Grün/Rot per `statusColors`-Prop
+
+---
+
+## Geplante Phasen (noch nicht implementiert)
+
+### Phase 18 — Export
 
 **PNG/SVG-Export**
 - Neuer Export-Button in der Toolbar (optional, Prop `showExport?: boolean`)
@@ -641,15 +705,9 @@ Ab ca. 200+ Tasks wird das DOM schwer. Lösung: nur sichtbare Zeilen rendern.
 
 - Toolbar-Button "Import" → Textarea-Dialog, erwartet CSV mit Spalten `id,name,start,end,parentId,status`
 - Parsed und ruft `setTasks` auf — optionales `onImport` Callback
-- Passend zu Phase 17 (Export): vollständiger Round-Trip
+- Passend zu Phase 18 (Export): vollständiger Round-Trip
 
-### Idee K — Virtualisierung für große Datensätze
-
-- Ab ca. 200+ Tasks wird das DOM schwer
-- Virtuelle Liste in `GanttTaskPanel` + `GanttTimeline` mit identischem `overscan`
-- Implementierung via `@tanstack/react-virtual`
-- Neue Prop `virtualizeRows?: boolean` (Default: false — opt-in)
-- Beide Panels müssen synchron scrollen (Vertical-Scroll-Sync bereits vorhanden)
+### Idee K — Virtualisierung für große Datensätze ✅ als Phase 16 implementiert
 
 ### Idee L — Timeline-Annotationen / Marker
 

@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { type RefObject, type UIEventHandler } from "react";
-import { Box, Chip, IconButton, Menu, MenuItem, TextField, Typography } from "@mui/material";
+import { Box, Chip, IconButton, Menu, MenuItem, TextField, Tooltip, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import { useGanttChartStore, useGanttTranslations, useRawGanttChartStore } from "./GanttChart";
+import { useGanttChartStore, useGanttStatusColors, useGanttTranslations, useRawGanttChartStore } from "./GanttChart";
 import type { GanttTask, GanttTaskNode, GanttTaskStatus, GanttTranslations } from "./GanttChart.types";
 import { getVisibleTasks } from "./util/gantt-chart.util";
 import { ROW_HEIGHT, HEADER_HEIGHT, ACTIONS_COL_WIDTH, STATUS_COL_WIDTH } from "./GanttChart.constants";
@@ -74,6 +74,7 @@ function GanttTaskRow({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [editingName, setEditingName] = useState<string | null>(null);
   const t = useGanttTranslations();
+  const statusColors = useGanttStatusColors();
 
   const commitRename = () => {
     if (editingName !== null && editingName.trim()) {
@@ -133,7 +134,7 @@ function GanttTaskRow({
             borderRadius: task.isMilestone ? 0 : "50%",
             transform: task.isMilestone ? "rotate(45deg)" : undefined,
             flexShrink: 0,
-            bgcolor: STATUS_DOT_COLOR[task.status] ?? "grey.400",
+            bgcolor: statusColors[task.status] ?? STATUS_DOT_COLOR[task.status] ?? "grey.400",
           }}
         />
 
@@ -179,40 +180,46 @@ function GanttTaskRow({
           }}
         >
           {onEditTask && (
-            <IconButton
-              size="small"
-              data-testid={`gantt-edit-task-${task.id}`}
-              onClick={(e) => {
-                e.stopPropagation();
-                onEditTask(task);
-              }}
-            >
-              <EditIcon fontSize="inherit" />
-            </IconButton>
+            <Tooltip title={t.editTaskTooltip}>
+              <IconButton
+                size="small"
+                data-testid={`gantt-edit-task-${task.id}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEditTask(task);
+                }}
+              >
+                <EditIcon fontSize="inherit" />
+              </IconButton>
+            </Tooltip>
           )}
           {onAddTask && (
-            <IconButton
-              size="small"
-              data-testid={`gantt-add-task-${task.id}`}
-              onClick={(e) => {
-                e.stopPropagation();
-                onAddTask(task);
-              }}
-            >
-              <AddIcon fontSize="inherit" />
-            </IconButton>
+            <Tooltip title={t.addTaskTooltip}>
+              <IconButton
+                size="small"
+                data-testid={`gantt-add-task-${task.id}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddTask(task);
+                }}
+              >
+                <AddIcon fontSize="inherit" />
+              </IconButton>
+            </Tooltip>
           )}
           {onDeleteTask && (
-            <IconButton
-              size="small"
-              data-testid={`gantt-delete-task-${task.id}`}
-              onClick={(e) => {
-                e.stopPropagation();
-                onDeleteTask(task);
-              }}
-            >
-              <DeleteIcon fontSize="inherit" />
-            </IconButton>
+            <Tooltip title={t.deleteTaskTooltip}>
+              <IconButton
+                size="small"
+                data-testid={`gantt-delete-task-${task.id}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDeleteTask(task);
+                }}
+              >
+                <DeleteIcon fontSize="inherit" />
+              </IconButton>
+            </Tooltip>
           )}
         </Box>
       )}
@@ -231,11 +238,15 @@ function GanttTaskRow({
           label={getStatusLabel(task.status, t)}
           size="small"
           variant="outlined"
-          color={STATUS_CHIP_COLOR[task.status] ?? "default"}
+          color={statusColors[task.status] ? "default" : STATUS_CHIP_COLOR[task.status] ?? "default"}
           sx={{
             height: 20,
             fontSize: 10,
             cursor: onStatusChange ? "pointer" : "default",
+            ...(statusColors[task.status] && {
+              borderColor: statusColors[task.status],
+              color: statusColors[task.status],
+            }),
           }}
           onClick={
             onStatusChange
@@ -432,9 +443,13 @@ export function GanttTaskPanel({
               {t.columnName}
             </Typography>
           </Box>
-          {/* Aktions-Spalten-Platzhalter — sorgt für korrekte Ausrichtung mit den Zeilen */}
+          {/* Aktions-Spalten-Header */}
           {hasActionsColumn && (
-            <Box sx={{ width: ACTIONS_COL_WIDTH, flexShrink: 0 }} />
+            <Box sx={{ width: ACTIONS_COL_WIDTH, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Typography variant="caption" color="text.secondary">
+                {t.columnActions}
+              </Typography>
+            </Box>
           )}
           {/* Status-Spalte */}
           <Box

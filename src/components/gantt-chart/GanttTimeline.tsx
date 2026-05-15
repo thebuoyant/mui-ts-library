@@ -2,7 +2,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { type RefObject, type UIEventHandler } from "react";
 import { Box, Menu, MenuItem, useTheme } from "@mui/material";
-import { useGanttChartStore, useGanttTranslations, useRawGanttChartStore } from "./GanttChart";
+import { useGanttChartStore, useGanttStatusColors, useGanttTranslations, useRawGanttChartStore } from "./GanttChart";
 import type { GanttTask, GanttTaskStatus } from "./GanttChart.types";
 import type { GanttTaskNode } from "./GanttChart.types";
 import {
@@ -172,6 +172,7 @@ export function GanttTimeline({
   const updateTask = useGanttChartStore((s) => s.updateTask);
   const rawStore = useRawGanttChartStore();
   const t = useGanttTranslations();
+  const statusColors = useGanttStatusColors();
 
   // Jede Instanz braucht eine eigene Marker-ID damit mehrere GanttCharts auf einer Seite
   // nicht dieselbe SVG-defs-Referenz teilen.
@@ -607,7 +608,7 @@ export function GanttTimeline({
                           height: BAR_HEIGHT,
                           top: "50%",
                           transform: "translateY(-50%)",
-                          bgcolor: BAR_COLOR[task.status] ?? "grey.300",
+                          bgcolor: statusColors[task.status] ?? BAR_COLOR[task.status] ?? "grey.300",
                           borderRadius: 1,
                           overflow: "hidden",
                           opacity: isDragging ? 0.75 : 1,

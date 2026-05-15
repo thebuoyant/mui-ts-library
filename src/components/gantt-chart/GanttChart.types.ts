@@ -69,6 +69,12 @@ export type GanttTranslations = {
   // Dialoge — Vorgänger-Multiselect
   dialogFieldDependencies: string;
   dialogFieldDependenciesNone: string;
+  // Task-Panel — Aktions-Spalten-Header
+  columnActions: string;
+  // Task-Panel — Zeilen-Icon-Tooltips
+  addTaskTooltip: string;
+  editTaskTooltip: string;
+  deleteTaskTooltip: string;
   // Toolbar — Heute-Button + Expand/Collapse + Reset
   scrollToTodayTooltip: string;
   expandAllTooltip: string;
@@ -113,7 +119,14 @@ export const DEFAULT_GANTT_TRANSLATIONS: GanttTranslations = {
   expandAllTooltip: "Alle aufklappen",
   collapseAllTooltip: "Alle zuklappen",
   resetViewTooltip: "Ansicht zurücksetzen",
+  columnActions: "Aktionen",
+  addTaskTooltip: "Aufgabe hinzufügen",
+  editTaskTooltip: "Aufgabe bearbeiten",
+  deleteTaskTooltip: "Aufgabe löschen",
 };
+
+// Überschreibt die Standard-Balkenfarben je Status — CSS-Farbwerte oder MUI-Theme-Keys.
+export type GanttStatusColors = Partial<Record<GanttTaskStatus, string>>;
 
 // Feingranulare Konfiguration der Toolbar-Elemente — alle Felder optional (Default: true/sichtbar).
 export type GanttToolbarConfig = {
@@ -168,6 +181,8 @@ export type GanttChartProps = {
   progressDraggable?: boolean;
   // Wenn true, werden nur sichtbare Zeilen gerendert (für 200+ Tasks empfohlen). Default: false.
   virtualizeRows?: boolean;
+  // Überschreibt die Standard-Balkenfarben je Status — beliebige CSS-Farbwerte.
+  statusColors?: GanttStatusColors;
   onTaskClick?: (task: GanttTask) => void;
   onMilestoneClick?: (task: GanttTask) => void;
   onAddTask?: (parentTask?: GanttTask) => void;
