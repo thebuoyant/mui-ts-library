@@ -5,7 +5,7 @@ import {
   createGanttChartStore,
   type GanttChartStore,
 } from "./GanttChart.store";
-import type { GanttChartProps, GanttStatusColors, GanttToolbarConfig, GanttTranslations } from "./GanttChart.types";
+import type { GanttChartProps, GanttTheme, GanttToolbarConfig, GanttTranslations } from "./GanttChart.types";
 import { DEFAULT_GANTT_TRANSLATIONS } from "./GanttChart.types";
 import { getDisplayRange, getTimelineRange } from "./util/gantt-chart.util";
 import type { GanttTimeScale } from "./GanttChart.types";
@@ -49,13 +49,13 @@ export function useGanttTranslations(): GanttTranslations {
 }
 
 // ---------------------------------------------------------------------------
-// Status-Colors-Kontext
+// Theme-Kontext — fasst alle visuellen Konfigurationsoptionen zusammen.
 // ---------------------------------------------------------------------------
 
-const GanttStatusColorsContext = createContext<GanttStatusColors>({});
+const GanttThemeContext = createContext<GanttTheme>({});
 
-export function useGanttStatusColors(): GanttStatusColors {
-  return useContext(GanttStatusColorsContext);
+export function useGanttTheme(): GanttTheme {
+  return useContext(GanttThemeContext);
 }
 
 // ---------------------------------------------------------------------------
@@ -288,6 +288,7 @@ export function GanttChart({
   virtualizeRows = false,
   cascadeDependencies = false,
   statusColors,
+  ganttTheme,
   onTaskClick,
   onMilestoneClick,
   onAddTask,
@@ -323,11 +324,15 @@ export function GanttChart({
     }, cascadeDependencies);
   });
 
-  const resolvedStatusColors = useMemo(() => statusColors ?? {}, [statusColors]);
+  // statusColors (Phase 17, backwards compat) wird von ganttTheme.statusColors überschrieben.
+  const resolvedTheme = useMemo<GanttTheme>(() => ({
+    ...ganttTheme,
+    statusColors: { ...statusColors, ...ganttTheme?.statusColors },
+  }), [statusColors, ganttTheme]);
 
   return (
     <GanttTranslationsContext.Provider value={mergedTranslations}>
-      <GanttStatusColorsContext.Provider value={resolvedStatusColors}>
+      <GanttThemeContext.Provider value={resolvedTheme}>
       <GanttChartStoreContext.Provider value={store}>
         <GanttChartInner
           tasks={tasks}
@@ -360,7 +365,7 @@ export function GanttChart({
           maxPanelWidth={maxPanelWidth}
         />
       </GanttChartStoreContext.Provider>
-      </GanttStatusColorsContext.Provider>
+      </GanttThemeContext.Provider>
     </GanttTranslationsContext.Provider>
   );
 }

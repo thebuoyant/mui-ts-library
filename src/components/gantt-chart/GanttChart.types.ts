@@ -17,6 +17,8 @@ export type GanttTask = {
   isMilestone?: boolean;
   // Fortschritt in Prozent (0–100) — wird als halbopaker Overlay-Balken gerendert.
   progress?: number;
+  // Überschreibt die Status-Farbe für diesen einzelnen Task (höchste Priorität, CSS-Farbwert).
+  color?: string;
 };
 
 // Interner Knoten für den aufgebauten Task-Baum — nicht Teil der öffentlichen API.
@@ -128,6 +130,23 @@ export const DEFAULT_GANTT_TRANSLATIONS: GanttTranslations = {
 // Überschreibt die Standard-Balkenfarben je Status — CSS-Farbwerte oder MUI-Theme-Keys.
 export type GanttStatusColors = Partial<Record<GanttTaskStatus, string>>;
 
+// Gebündeltes Theming-Objekt — fasst alle visuellen Konfigurationsoptionen zusammen.
+// Einzelne Keys überschreiben die MUI-Palette-Defaults; nicht gesetzte Keys behalten das Standard-Aussehen.
+export type GanttTheme = {
+  // Per-Status-Balkenfarben (CSS-Farbwerte).
+  statusColors?: GanttStatusColors;
+  // Farbe des kritischen-Pfad-Indikators (Default: error.main).
+  criticalPathColor?: string;
+  // Farbe der Meilenstein-Raute (Default: warning.main).
+  milestoneColor?: string;
+  // Farbe der Heute-Linie (Default: primary.main).
+  todayLineColor?: string;
+  // Hintergrundfarbe der Wochenend-Spalten (Default: action.hover).
+  weekendColor?: string;
+  // Eckenradius der Aufgaben-Balken in Pixeln (Default: 4).
+  barBorderRadius?: number;
+};
+
 // Feingranulare Konfiguration der Toolbar-Elemente — alle Felder optional (Default: true/sichtbar).
 export type GanttToolbarConfig = {
   showScaleDays?: boolean;
@@ -182,7 +201,10 @@ export type GanttChartProps = {
   // Wenn true, werden nur sichtbare Zeilen gerendert (für 200+ Tasks empfohlen). Default: false.
   virtualizeRows?: boolean;
   // Überschreibt die Standard-Balkenfarben je Status — beliebige CSS-Farbwerte.
+  // @deprecated — bitte `ganttTheme.statusColors` verwenden.
   statusColors?: GanttStatusColors;
+  // Gebündeltes Theming-Objekt — überschreibt alle visuellen Defaults auf einmal.
+  ganttTheme?: GanttTheme;
   onTaskClick?: (task: GanttTask) => void;
   onMilestoneClick?: (task: GanttTask) => void;
   onAddTask?: (parentTask?: GanttTask) => void;

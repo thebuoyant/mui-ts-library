@@ -5,7 +5,7 @@ import { Box, Chip, IconButton, Menu, MenuItem, TextField, Tooltip, Typography }
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import { useGanttChartStore, useGanttStatusColors, useGanttTranslations, useRawGanttChartStore } from "./GanttChart";
+import { useGanttChartStore, useGanttTheme, useGanttTranslations, useRawGanttChartStore } from "./GanttChart";
 import type { GanttTask, GanttTaskNode, GanttTaskStatus, GanttTranslations } from "./GanttChart.types";
 import { getVisibleTasks } from "./util/gantt-chart.util";
 import { ROW_HEIGHT, HEADER_HEIGHT, ACTIONS_COL_WIDTH, STATUS_COL_WIDTH } from "./GanttChart.constants";
@@ -74,7 +74,8 @@ function GanttTaskRow({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [editingName, setEditingName] = useState<string | null>(null);
   const t = useGanttTranslations();
-  const statusColors = useGanttStatusColors();
+  const ganttTheme = useGanttTheme();
+  const { statusColors } = ganttTheme;
 
   const commitRename = () => {
     if (editingName !== null && editingName.trim()) {
@@ -134,7 +135,7 @@ function GanttTaskRow({
             borderRadius: task.isMilestone ? 0 : "50%",
             transform: task.isMilestone ? "rotate(45deg)" : undefined,
             flexShrink: 0,
-            bgcolor: statusColors[task.status] ?? STATUS_DOT_COLOR[task.status] ?? "grey.400",
+            bgcolor: task.color ?? statusColors?.[task.status] ?? STATUS_DOT_COLOR[task.status] ?? "grey.400",
           }}
         />
 
@@ -238,14 +239,14 @@ function GanttTaskRow({
           label={getStatusLabel(task.status, t)}
           size="small"
           variant="outlined"
-          color={statusColors[task.status] ? "default" : STATUS_CHIP_COLOR[task.status] ?? "default"}
+          color={(task.color ?? statusColors?.[task.status]) ? "default" : STATUS_CHIP_COLOR[task.status] ?? "default"}
           sx={{
             height: 20,
             fontSize: 10,
             cursor: onStatusChange ? "pointer" : "default",
-            ...(statusColors[task.status] && {
-              borderColor: statusColors[task.status],
-              color: statusColors[task.status],
+            ...((task.color ?? statusColors?.[task.status]) && {
+              borderColor: task.color ?? statusColors?.[task.status],
+              color: task.color ?? statusColors?.[task.status],
             }),
           }}
           onClick={

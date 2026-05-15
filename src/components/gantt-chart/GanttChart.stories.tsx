@@ -234,6 +234,7 @@ const meta: Meta<typeof GanttChart> = {
     showCriticalPath: { control: "boolean" },
     virtualizeRows: { control: "boolean" },
     statusColors: { control: false },
+    ganttTheme: { control: false },
     toolbarConfig: { control: false },
     onTaskMoved: { control: false },
     onTaskResized: { control: false },
@@ -620,19 +621,46 @@ function generateLargeTasks(): GanttTask[] {
 
 const largeTasks = generateLargeTasks();
 
-export const CustomStatusColors: Story = {
+export const CustomGanttTheme: Story = {
   args: {
     tasks: sampleTasks,
     timeScale: "months",
     initialExpandAll: true,
     height: 500,
     enableBuiltinDialogs: true,
-    statusColors: {
-      planned: "#7c3aed",
-      "in-progress": "#0ea5e9",
-      done: "#16a34a",
-      blocked: "#dc2626",
+    showCriticalPath: true,
+    ganttTheme: {
+      statusColors: {
+        planned: "#7c3aed",
+        "in-progress": "#0ea5e9",
+        done: "#16a34a",
+        blocked: "#dc2626",
+      },
+      criticalPathColor: "#ff6b35",
+      milestoneColor: "#7c3aed",
+      todayLineColor: "#ff6b35",
+      weekendColor: "rgba(124, 58, 237, 0.06)",
+      barBorderRadius: 8,
     },
+  },
+  render: (args) => (
+    <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
+      <GanttChart {...args} />
+    </Box>
+  ),
+};
+
+const coloredTasks: typeof sampleTasks = sampleTasks.map((t, i) => ({
+  ...t,
+  color: i % 5 === 0 ? "#e11d48" : i % 5 === 1 ? "#0891b2" : i % 5 === 2 ? "#16a34a" : i % 5 === 3 ? "#d97706" : undefined,
+}));
+
+export const PerTaskColor: Story = {
+  args: {
+    tasks: coloredTasks,
+    timeScale: "months",
+    initialExpandAll: true,
+    height: 500,
   },
   render: (args) => (
     <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>

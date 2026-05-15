@@ -28,7 +28,7 @@ React 19, TypeScript 5.9, MUI v7, Zustand v5, Vite 8, Vitest 4, Storybook 10
 
 ---
 
-## Aktueller Stand: Phasen 1–17 abgeschlossen ✅ (221 Tests grün, README aktuell)
+## Aktueller Stand: Phasen 1–18 abgeschlossen ✅ (227 Tests grün, README aktuell)
 
 ### Alle vorhandenen Dateien
 
@@ -336,7 +336,7 @@ export function useRawGanttChartStore(): GanttChartStore
 ```
 Bitte lies zuerst die claude-gantt-kickoff.md im Root des Projekts.
 Dann besprechen wir die nächste geplante Phase.
-221 Tests müssen nach den Änderungen grün bleiben.
+227 Tests müssen nach den Änderungen grün bleiben.
 ```
 
 ---
@@ -626,7 +626,54 @@ export function useGanttStatusColors(): GanttStatusColors
 
 ## Geplante Phasen (noch nicht implementiert)
 
-### Phase 18 — Export
+### Phase 18 ✅ abgeschlossen (227 Tests)
+
+**`ganttTheme` + `GanttTask.color` — gebündeltes Theming**
+
+**Neuer Typ**
+```ts
+export type GanttTheme = {
+  statusColors?: GanttStatusColors;   // per-Status Balkenfarben
+  criticalPathColor?: string;         // Default: error.main
+  milestoneColor?: string;            // Default: warning.main
+  todayLineColor?: string;            // Default: primary.main
+  weekendColor?: string;              // Default: action.hover
+  barBorderRadius?: number;           // px, Default: 4
+};
+```
+
+**Neue Prop**
+```ts
+ganttTheme?: GanttTheme;
+```
+
+**Prioritäten-Kette für Balken/Dot/Chip-Farbe:**
+`task.color` → `ganttTheme.statusColors[status]` → `statusColors[status]` (backwards compat, deprecated) → MUI-Palette-Default
+
+**Implementierung via `GanttThemeContext`**
+```ts
+// GanttChart.tsx
+const GanttThemeContext = createContext<GanttTheme>({});
+export function useGanttTheme(): GanttTheme
+```
+Intern werden `statusColors`-Prop und `ganttTheme.statusColors` gemergt (`ganttTheme` hat Vorrang):
+```ts
+const resolvedTheme = { ...ganttTheme, statusColors: { ...statusColors, ...ganttTheme?.statusColors } };
+```
+
+**`GanttTask.color?: string`** — überschreibt die Status-Farbe für genau diesen Task (höchste Priorität); wirkt auf Balken, Status-Dot und Chip.
+
+**Neue Stories**
+- `CustomGanttTheme` — zeigt alle `ganttTheme`-Felder inkl. kritischem Pfad und `barBorderRadius: 8`
+- `PerTaskColor` — jeder 5. Task hat eine individuelle `color`-Property
+
+**Renames**
+- `useGanttStatusColors()` → `useGanttTheme()` in allen Consumers (`GanttTaskPanel`, `GanttTimeline`)
+- `GanttStatusColorsContext` → `GanttThemeContext` in `GanttChart.tsx`
+
+---
+
+### Phase 19 — Export
 
 **PNG/SVG-Export**
 - Neuer Export-Button in der Toolbar (optional, Prop `showExport?: boolean`)
@@ -705,7 +752,7 @@ export function useGanttStatusColors(): GanttStatusColors
 
 - Toolbar-Button "Import" → Textarea-Dialog, erwartet CSV mit Spalten `id,name,start,end,parentId,status`
 - Parsed und ruft `setTasks` auf — optionales `onImport` Callback
-- Passend zu Phase 18 (Export): vollständiger Round-Trip
+- Passend zu Phase 19 (Export): vollständiger Round-Trip
 
 ### Idee K — Virtualisierung für große Datensätze ✅ als Phase 16 implementiert
 

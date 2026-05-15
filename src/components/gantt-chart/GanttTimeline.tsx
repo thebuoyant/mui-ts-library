@@ -2,7 +2,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { type RefObject, type UIEventHandler } from "react";
 import { Box, Menu, MenuItem, useTheme } from "@mui/material";
-import { useGanttChartStore, useGanttStatusColors, useGanttTranslations, useRawGanttChartStore } from "./GanttChart";
+import { useGanttChartStore, useGanttTheme, useGanttTranslations, useRawGanttChartStore } from "./GanttChart";
 import type { GanttTask, GanttTaskStatus } from "./GanttChart.types";
 import type { GanttTaskNode } from "./GanttChart.types";
 import {
@@ -172,7 +172,8 @@ export function GanttTimeline({
   const updateTask = useGanttChartStore((s) => s.updateTask);
   const rawStore = useRawGanttChartStore();
   const t = useGanttTranslations();
-  const statusColors = useGanttStatusColors();
+  const ganttTheme = useGanttTheme();
+  const { statusColors, criticalPathColor, milestoneColor, todayLineColor, weekendColor, barBorderRadius } = ganttTheme;
 
   // Jede Instanz braucht eine eigene Marker-ID damit mehrere GanttCharts auf einer Seite
   // nicht dieselbe SVG-defs-Referenz teilen.
@@ -479,7 +480,7 @@ export function GanttTimeline({
                   width: COLUMN_WIDTH_DAY,
                   top: 0,
                   height: "100%",
-                  bgcolor: "action.hover",
+                  bgcolor: weekendColor ?? "action.hover",
                 }}
               />
             ))}
@@ -539,11 +540,11 @@ export function GanttTimeline({
                         top: "50%",
                         width: 12,
                         height: 12,
-                        bgcolor: "warning.main",
+                        bgcolor: milestoneColor ?? "warning.main",
                         transform: "translate(-50%, -50%) rotate(45deg)",
                         cursor: onMilestoneClick ? "pointer" : "default",
                         boxShadow: criticalTaskIds.has(task.id)
-                          ? `0 0 0 2.5px ${theme.palette.error.main}`
+                          ? `0 0 0 2.5px ${criticalPathColor ?? theme.palette.error.main}`
                           : undefined,
                         "&:hover": onMilestoneClick ? { opacity: 0.8 } : undefined,
                       }}
@@ -608,12 +609,12 @@ export function GanttTimeline({
                           height: BAR_HEIGHT,
                           top: "50%",
                           transform: "translateY(-50%)",
-                          bgcolor: statusColors[task.status] ?? BAR_COLOR[task.status] ?? "grey.300",
-                          borderRadius: 1,
+                          bgcolor: task.color ?? statusColors?.[task.status] ?? BAR_COLOR[task.status] ?? "grey.300",
+                          borderRadius: barBorderRadius !== undefined ? `${barBorderRadius}px` : 1,
                           overflow: "hidden",
                           opacity: isDragging ? 0.75 : 1,
                           boxShadow: criticalTaskIds.has(task.id)
-                            ? `inset 0 0 0 2.5px ${theme.palette.error.main}`
+                            ? `inset 0 0 0 2.5px ${criticalPathColor ?? theme.palette.error.main}`
                             : undefined,
                           cursor: isDragging
                             ? "grabbing"
@@ -796,7 +797,7 @@ export function GanttTimeline({
                 y1={0}
                 x2={todayX}
                 y2={visibleTasks.length * ROW_HEIGHT}
-                stroke={theme.palette.primary.main}
+                stroke={todayLineColor ?? theme.palette.primary.main}
                 strokeWidth={1.5}
                 strokeDasharray="4 2"
               />

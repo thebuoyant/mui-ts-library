@@ -325,7 +325,8 @@ function App() {
 | `defaultRangeStart` | `Date` | auto | Overrides the auto-computed start of the visible range. |
 | `defaultRangeEnd` | `Date` | auto | Overrides the auto-computed end of the visible range. |
 | `translations` | `Partial<GanttTranslations>` | German | Override display strings for i18n (see [Translations](#translations)). |
-| `statusColors` | `GanttStatusColors` | MUI palette | Override bar/chip/dot colors per status (see [Colors & Theming](#colors--theming)). |
+| `statusColors` | `GanttStatusColors` | MUI palette | Override bar/chip/dot colors per status. Deprecated — use `ganttTheme.statusColors`. |
+| `ganttTheme` | `GanttTheme` | MUI palette | Bundle all visual overrides in one object (see [Colors & Theming](#colors--theming)). |
 
 **Toolbar**
 
@@ -626,22 +627,43 @@ All three components support full i18n without any external library. Pass only t
 
 All components use MUI's theme system wherever possible (`color="text.secondary"`, `borderColor: "divider"`, etc.) and automatically adapt to light and dark mode. Custom colors can be passed via props where supported:
 
-**GanttChart — custom status colors:**
+**GanttChart — `ganttTheme` (recommended):**
 
 ```tsx
-import type { GanttStatusColors } from 'mui-ts-library';
+import type { GanttTheme } from 'mui-ts-library';
 
-const statusColors: GanttStatusColors = {
-  planned:     '#7c3aed',   // purple
-  'in-progress': '#0ea5e9', // sky blue
-  done:        '#16a34a',   // green
-  blocked:     '#dc2626',   // red
+const ganttTheme: GanttTheme = {
+  statusColors: {
+    planned:       '#7c3aed',   // purple
+    'in-progress': '#0ea5e9',   // sky blue
+    done:          '#16a34a',   // green
+    blocked:       '#dc2626',   // red
+  },
+  criticalPathColor: '#ff6b35',                  // default: error.main
+  milestoneColor:    '#7c3aed',                  // default: warning.main
+  todayLineColor:    '#ff6b35',                  // default: primary.main
+  weekendColor:      'rgba(124, 58, 237, 0.06)', // default: action.hover
+  barBorderRadius:   8,                          // px, default: 4
 };
 
-<GanttChart tasks={tasks} statusColors={statusColors} />
+<GanttChart tasks={tasks} ganttTheme={ganttTheme} />
 ```
 
-All four fields are optional — omit any status to keep its MUI palette default.
+All fields are optional — omit any key to keep its MUI palette default.
+
+**GanttTask — per-task color override:**
+
+```tsx
+const tasks: GanttTask[] = [
+  { id: 'a', name: 'Team Red',  ..., color: '#e11d48' },
+  { id: 'b', name: 'Team Blue', ..., color: '#0891b2' },
+  { id: 'c', name: 'Team Green',...                   }, // uses status color
+];
+
+<GanttChart tasks={tasks} />
+```
+
+`task.color` has the highest priority: it overrides `ganttTheme.statusColors` and the MUI palette default for that individual task bar, dot, and chip.
 
 ```tsx
 <PasswordStrengthMeter

@@ -1393,3 +1393,73 @@ describe("GanttChart — statusColors prop", () => {
     expect(screen.getByTestId("gantt-bar-root")).toBeInTheDocument();
   });
 });
+
+// ---------------------------------------------------------------------------
+// Phase 18 — ganttTheme + GanttTask.color
+// ---------------------------------------------------------------------------
+
+describe("GanttChart — ganttTheme prop", () => {
+  it("renders without crashing with a full ganttTheme", () => {
+    render(
+      <GanttChart
+        tasks={tasks}
+        ganttTheme={{
+          statusColors: { planned: "#7c3aed", "in-progress": "#0ea5e9", done: "#16a34a", blocked: "#dc2626" },
+          criticalPathColor: "#ff6b35",
+          milestoneColor: "#7c3aed",
+          todayLineColor: "#ff6b35",
+          weekendColor: "rgba(124,58,237,0.06)",
+          barBorderRadius: 8,
+        }}
+      />,
+    );
+    expect(screen.getByTestId("gantt-bar-root")).toBeInTheDocument();
+  });
+
+  it("ganttTheme.statusColors overrides the top-level statusColors prop", () => {
+    // Both props set "planned" — ganttTheme wins. Component must not crash.
+    render(
+      <GanttChart
+        tasks={tasks}
+        statusColors={{ planned: "#aaaaaa" }}
+        ganttTheme={{ statusColors: { planned: "#7c3aed" } }}
+      />,
+    );
+    expect(screen.getByTestId("gantt-bar-root")).toBeInTheDocument();
+  });
+
+  it("renders criticalPathColor without crashing when showCriticalPath=true", () => {
+    render(
+      <GanttChart
+        tasks={tasks}
+        showCriticalPath
+        ganttTheme={{ criticalPathColor: "#ff6b35" }}
+      />,
+    );
+    expect(screen.getByTestId("gantt-bar-root")).toBeInTheDocument();
+  });
+
+  it("renders partial ganttTheme (only barBorderRadius) without crashing", () => {
+    render(<GanttChart tasks={tasks} ganttTheme={{ barBorderRadius: 0 }} />);
+    expect(screen.getByTestId("gantt-bar-root")).toBeInTheDocument();
+  });
+});
+
+describe("GanttChart — GanttTask.color", () => {
+  it("renders without crashing when a task has a custom color", () => {
+    const coloredTasks = tasks.map((t) => (t.id === "root" ? { ...t, color: "#e11d48" } : t));
+    render(<GanttChart tasks={coloredTasks} />);
+    expect(screen.getByTestId("gantt-bar-root")).toBeInTheDocument();
+  });
+
+  it("renders without crashing when only some tasks have a custom color", () => {
+    const mixed = [
+      { ...tasks[0], color: "#e11d48" },
+      tasks[1],
+      tasks[2],
+    ];
+    render(<GanttChart tasks={mixed} />);
+    expect(screen.getByTestId("gantt-task-row-root")).toBeInTheDocument();
+    expect(screen.getByTestId("gantt-task-row-child")).toBeInTheDocument();
+  });
+});
