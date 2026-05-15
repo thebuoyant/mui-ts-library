@@ -7,6 +7,7 @@ import type { GanttTaskNode } from "./GanttChart.types";
 import {
   addDays,
   calculateTaskPosition,
+  computeCriticalPath,
   getDaysInRange,
   getDisplayRange,
   getISOWeekNumber,
@@ -138,6 +139,7 @@ type GanttTimelineProps = {
   draggable?: boolean;
   resizable?: boolean;
   progressDraggable?: boolean;
+  showCriticalPath?: boolean;
   onTaskMoved?: (task: GanttTask, newStart: Date, newEnd: Date) => void;
   onTaskResized?: (task: GanttTask, newEnd: Date) => void;
   onTasksChange?: (tasks: GanttTask[]) => void;
@@ -152,6 +154,7 @@ export function GanttTimeline({
   draggable = false,
   resizable = false,
   progressDraggable = false,
+  showCriticalPath = false,
   onTaskMoved,
   onTaskResized,
   onTasksChange,
@@ -159,6 +162,7 @@ export function GanttTimeline({
 }: GanttTimelineProps) {
   const theme = useTheme();
   const taskTree = useGanttChartStore((s) => s.taskTree);
+  const allTasks = useGanttChartStore((s) => s.tasks);
   const expandedIds = useGanttChartStore((s) => s.expandedIds);
   const timelineRange = useGanttChartStore((s) => s.timelineRange);
   const timeScale = useGanttChartStore((s) => s.timeScale);
@@ -239,6 +243,11 @@ export function GanttTimeline({
   const dependencyLines = useMemo(
     () => computeDependencyLines(visibleTasks, displayRange, totalWidth),
     [visibleTasks, displayRange, totalWidth],
+  );
+
+  const criticalTaskIds = useMemo(
+    () => showCriticalPath ? computeCriticalPath(allTasks) : new Set<string>(),
+    [showCriticalPath, allTasks],
   );
 
   // Positionen der Wochenend-Spalten für das Hintergrund-Highlight (nur Tages-Skala).
@@ -519,6 +528,9 @@ export function GanttTimeline({
                       bgcolor: "warning.main",
                       transform: "translate(-50%, -50%) rotate(45deg)",
                       cursor: onMilestoneClick ? "pointer" : "default",
+                      boxShadow: criticalTaskIds.has(task.id)
+                        ? `0 0 0 2.5px ${theme.palette.error.main}`
+                        : undefined,
                       "&:hover": onMilestoneClick ? { opacity: 0.8 } : undefined,
                     }}
                     onClick={() => onMilestoneClick?.(task)}
@@ -590,6 +602,9 @@ export function GanttTimeline({
                         borderRadius: 1,
                         overflow: "hidden",
                         opacity: isDragging ? 0.75 : 1,
+                        boxShadow: criticalTaskIds.has(task.id)
+                          ? `inset 0 0 0 2.5px ${theme.palette.error.main}`
+                          : undefined,
                         cursor: isDragging
                           ? "grabbing"
                           : draggable

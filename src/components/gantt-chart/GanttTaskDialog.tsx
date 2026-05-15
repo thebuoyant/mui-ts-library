@@ -26,6 +26,7 @@ type TaskFormState = {
   status: GanttTaskStatus;
   isMilestone: boolean;
   parentId: string;
+  dependencies: string[];
 };
 
 function toDateString(date: Date): string {
@@ -98,6 +99,7 @@ export function GanttTaskDialog({
   }, [mode, initialTask, flattenedTasks]);
 
   const parentOptions = flattenedTasks.filter((n) => !excludedIds.has(n.id));
+  const dependencyOptions = parentOptions; // gleiche Ausschlussmenge wie Elternelement
 
   const defaultDate = toDateString(
     clampDate(new Date(), timelineRange.start, timelineRange.end),
@@ -110,6 +112,7 @@ export function GanttTaskDialog({
     status: "planned",
     isMilestone: false,
     parentId: "",
+    dependencies: [],
   });
 
   useEffect(() => {
@@ -123,6 +126,7 @@ export function GanttTaskDialog({
         status: initialTask.status,
         isMilestone: initialTask.isMilestone ?? false,
         parentId: initialTask.parentId ?? "",
+        dependencies: initialTask.dependencies ?? [],
       });
     } else {
       setForm({
@@ -132,6 +136,7 @@ export function GanttTaskDialog({
         status: "planned",
         isMilestone: false,
         parentId: defaultParentId ?? "",
+        dependencies: [],
       });
     }
   }, [open, mode, initialTask, defaultParentId, timelineRange]);
@@ -176,8 +181,7 @@ export function GanttTaskDialog({
       status: form.status,
       isMilestone: form.isMilestone || undefined,
       parentId: form.parentId || undefined,
-      // Abhängigkeiten werden beim Bearbeiten aus initialTask übernommen, beim Hinzufügen leer.
-      dependencies: mode === "edit" ? initialTask?.dependencies : undefined,
+      dependencies: form.dependencies.length > 0 ? form.dependencies : undefined,
     });
   };
 
@@ -271,6 +275,56 @@ export function GanttTaskDialog({
           >
             <MenuItem value="">{t.dialogFieldParentNone}</MenuItem>
             {parentOptions.map((task) => (
+              <MenuItem key={task.id} value={task.id} sx={{ minWidth: 0 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    pl: task.depth * 2,
+                    gap: 0.75,
+                    minWidth: 0,
+                    width: "100%",
+                    overflow: "hidden",
+                  }}
+                >
+                  {task.depth > 0 && (
+                    <Typography
+                      component="span"
+                      variant="caption"
+                      sx={{ color: "text.disabled", lineHeight: 1, flexShrink: 0 }}
+                    >
+                      {"└"}
+                    </Typography>
+                  )}
+                  <OverflowTooltip label={task.name} />
+                </Box>
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl size="small" fullWidth>
+          <InputLabel>{t.dialogFieldDependencies}</InputLabel>
+          <Select
+            multiple
+            value={form.dependencies}
+            label={t.dialogFieldDependencies}
+            onChange={(e) => {
+              const val = e.target.value;
+              setForm((prev) => ({
+                ...prev,
+                dependencies: typeof val === "string" ? val.split(",") : val,
+              }));
+            }}
+            inputProps={{ "data-testid": "gantt-dialog-field-dependencies" }}
+            renderValue={(selected) => {
+              if (selected.length === 0) return t.dialogFieldDependenciesNone;
+              return selected
+                .map((id) => flattenedTasks.find((n) => n.id === id)?.name ?? id)
+                .join(", ");
+            }}
+            MenuProps={{ PaperProps: { sx: { maxHeight: 280 } } }}
+          >
+            {dependencyOptions.map((task) => (
               <MenuItem key={task.id} value={task.id} sx={{ minWidth: 0 }}>
                 <Box
                   sx={{

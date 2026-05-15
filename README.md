@@ -340,6 +340,9 @@ function App() {
 | `draggable` | `boolean` | `false` | Allow task bars to be moved horizontally by dragging. |
 | `resizable` | `boolean` | `false` | Allow the end date to be changed by dragging the right edge of a bar. |
 | `zoomable` | `boolean` | `false` | Enable Ctrl + scroll wheel to cycle through time scales. |
+| `inlineEdit` | `boolean` | `false` | Double-click on a task name in the left panel to edit it inline. |
+| `progressDraggable` | `boolean` | `false` | Show a drag handle inside task bars to set `progress` (0–100) directly. |
+| `showCriticalPath` | `boolean` | `false` | Highlight bars on the critical path (longest dependency chain) with a red inset border. |
 | `cascadeDependencies` | `boolean` | `false` | When a task's dates change, automatically shift all Finish-to-Start successors by the same delta. |
 | `enableBuiltinDialogs` | `boolean` | `true` | When `true`, Add/Edit/Delete icons open MUI dialogs. When `false`, the `onAddTask` / `onEditTask` / `onDeleteTask` callbacks are invoked directly. |
 
@@ -452,6 +455,9 @@ type GanttTranslations = {
   dialogFieldParentNone: string;
   // Delete confirmation template — {name} is replaced by the task name
   dialogDeleteConfirm: string;
+  // Dialog — predecessor multi-select
+  dialogFieldDependencies: string;
+  dialogFieldDependenciesNone: string;
 };
 ```
 

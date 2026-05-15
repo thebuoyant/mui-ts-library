@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { GanttChart } from "./GanttChart";
 import type { GanttTask } from "./GanttChart.types";
+import { computeCriticalPath } from "./util/gantt-chart.util";
 
 const tasks: GanttTask[] = [
   {
@@ -1146,5 +1147,169 @@ describe("GanttChart — progressDraggable", () => {
     expect(onTasksChange).toHaveBeenCalledTimes(1);
     const updated = onTasksChange.mock.calls[0][0] as GanttTask[];
     expect(updated[0].progress).toBeDefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Phase 15 — computeCriticalPath util
+// ---------------------------------------------------------------------------
+
+describe("computeCriticalPath", () => {
+  it("returns empty set for an empty task list", () => {
+    expect(computeCriticalPath([])).toEqual(new Set());
+  });
+
+  it("returns only the task with the latest end date when there are no dependencies", () => {
+    const cpTasks: GanttTask[] = [
+      { id: "a", name: "A", status: "planned", startDate: new Date("2025-01-01"), endDate: new Date("2025-01-31") },
+      { id: "b", name: "B", status: "planned", startDate: new Date("2025-01-01"), endDate: new Date("2025-03-31") },
+    ];
+    const result = computeCriticalPath(cpTasks);
+    expect(result.has("b")).toBe(true);
+    expect(result.has("a")).toBe(false);
+  });
+
+  it("returns the full chain when tasks are sequentially dependent", () => {
+    const cpTasks: GanttTask[] = [
+      { id: "a", name: "A", status: "planned", startDate: new Date("2025-01-01"), endDate: new Date("2025-01-31") },
+      { id: "b", name: "B", status: "planned", startDate: new Date("2025-02-01"), endDate: new Date("2025-02-28"), dependencies: ["a"] },
+      { id: "c", name: "C", status: "planned", startDate: new Date("2025-03-01"), endDate: new Date("2025-03-31"), dependencies: ["b"] },
+    ];
+    const result = computeCriticalPath(cpTasks);
+    expect(result.has("a")).toBe(true);
+    expect(result.has("b")).toBe(true);
+    expect(result.has("c")).toBe(true);
+  });
+
+  it("includes all tasks that can reach the project end, even shorter parallel branches", () => {
+    // Both "short" and "long" lead to "final" — both are critical by the "reachability" algorithm.
+    // Tasks that contribute nothing to the project end would be excluded.
+    const cpTasks: GanttTask[] = [
+      { id: "short", name: "Short", status: "planned", startDate: new Date("2025-01-01"), endDate: new Date("2025-01-31") },
+      { id: "long", name: "Long",  status: "planned", startDate: new Date("2025-01-01"), endDate: new Date("2025-02-28") },
+      { id: "final", name: "Final", status: "planned", startDate: new Date("2025-03-01"), endDate: new Date("2025-03-31"), dependencies: ["short", "long"] },
+      { id: "orphan", name: "Orphan", status: "planned", startDate: new Date("2025-01-01"), endDate: new Date("2025-01-15") },
+    ];
+    const result = computeCriticalPath(cpTasks);
+    expect(result.has("short")).toBe(true);
+    expect(result.has("long")).toBe(true);
+    expect(result.has("final")).toBe(true);
+    // "orphan" ends on 2025-01-15, well before the project end — not critical.
+    expect(result.has("orphan")).toBe(false);
+  });
+
+  it("does not loop infinitely on circular dependencies", () => {
+    const cpTasks: GanttTask[] = [
+      { id: "a", name: "A", status: "planned", startDate: new Date("2025-01-01"), endDate: new Date("2025-01-31"), dependencies: ["b"] },
+      { id: "b", name: "B", status: "planned", startDate: new Date("2025-01-01"), endDate: new Date("2025-02-28"), dependencies: ["a"] },
+    ];
+    expect(() => computeCriticalPath(cpTasks)).not.toThrow();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Phase 15 — dialog dependencies field
+// ---------------------------------------------------------------------------
+
+const depDialogTasks: GanttTask[] = [
+  {
+    id: "pred",
+    name: "Predecessor",
+    status: "done",
+    startDate: new Date("2025-01-01"),
+    endDate: new Date("2025-01-31"),
+  },
+  {
+    id: "main",
+    name: "Main Task",
+    status: "in-progress",
+    startDate: new Date("2025-02-01"),
+    endDate: new Date("2025-03-31"),
+    dependencies: ["pred"],
+  },
+];
+
+describe("GanttChart — dialog dependencies", () => {
+  it("renders the dependencies field in the add dialog", () => {
+    render(<GanttChart tasks={depDialogTasks} enableBuiltinDialogs />);
+    fireEvent.click(screen.getByTestId("gantt-add-task-pred"));
+    expect(screen.getByTestId("gantt-dialog-field-dependencies")).toBeInTheDocument();
+  });
+
+  it("renders the dependencies field in the edit dialog", () => {
+    render(<GanttChart tasks={depDialogTasks} enableBuiltinDialogs />);
+    fireEvent.click(screen.getByTestId("gantt-edit-task-main"));
+    expect(screen.getByTestId("gantt-dialog-field-dependencies")).toBeInTheDocument();
+  });
+
+  it("preserves existing dependencies when saving via edit dialog", () => {
+    const onTaskUpdated = vi.fn();
+    render(<GanttChart tasks={depDialogTasks} enableBuiltinDialogs onTaskUpdated={onTaskUpdated} />);
+    fireEvent.click(screen.getByTestId("gantt-edit-task-main"));
+    fireEvent.click(screen.getByTestId("gantt-dialog-save"));
+    expect(onTaskUpdated).toHaveBeenCalledOnce();
+    const saved = onTaskUpdated.mock.calls[0][0] as GanttTask;
+    expect(saved.dependencies).toEqual(["pred"]);
+  });
+
+  it("does not include dependencies on a newly added task by default", () => {
+    const onTaskCreated = vi.fn();
+    render(<GanttChart tasks={depDialogTasks} enableBuiltinDialogs onTaskCreated={onTaskCreated} />);
+    fireEvent.click(screen.getByTestId("gantt-add-task-pred"));
+    fireEvent.change(screen.getByTestId("gantt-dialog-field-name"), { target: { value: "New Task" } });
+    fireEvent.click(screen.getByTestId("gantt-dialog-save"));
+    expect(onTaskCreated).toHaveBeenCalledOnce();
+    const created = onTaskCreated.mock.calls[0][0] as GanttTask;
+    expect(created.dependencies).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Phase 15 — showCriticalPath
+// ---------------------------------------------------------------------------
+
+const cpChainTasks: GanttTask[] = [
+  {
+    id: "cp-a",
+    name: "CP Task A",
+    status: "planned",
+    startDate: new Date("2025-01-01"),
+    endDate: new Date("2025-01-31"),
+  },
+  {
+    id: "cp-b",
+    name: "CP Task B",
+    status: "planned",
+    startDate: new Date("2025-02-01"),
+    endDate: new Date("2025-03-31"),
+    dependencies: ["cp-a"],
+  },
+];
+
+describe("GanttChart — showCriticalPath", () => {
+  it("renders without crashing when showCriticalPath=true", () => {
+    render(<GanttChart tasks={cpChainTasks} showCriticalPath />);
+    expect(screen.getByTestId("gantt-bar-cp-a")).toBeInTheDocument();
+    expect(screen.getByTestId("gantt-bar-cp-b")).toBeInTheDocument();
+  });
+
+  it("renders without crashing when showCriticalPath=false (default)", () => {
+    render(<GanttChart tasks={cpChainTasks} />);
+    expect(screen.getByTestId("gantt-bar-cp-a")).toBeInTheDocument();
+    expect(screen.getByTestId("gantt-bar-cp-b")).toBeInTheDocument();
+  });
+
+  it("renders the component with milestone tasks when showCriticalPath=true", () => {
+    const msTask: GanttTask = {
+      id: "ms",
+      name: "Milestone",
+      status: "planned",
+      startDate: new Date("2025-04-01"),
+      endDate: new Date("2025-04-01"),
+      isMilestone: true,
+      dependencies: ["cp-b"],
+    };
+    render(<GanttChart tasks={[...cpChainTasks, msTask]} showCriticalPath />);
+    expect(screen.getByTestId("gantt-milestone-ms")).toBeInTheDocument();
   });
 });

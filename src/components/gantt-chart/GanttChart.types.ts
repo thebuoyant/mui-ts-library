@@ -66,6 +66,9 @@ export type GanttTranslations = {
   dialogFieldParentNone: string;
   // Dialoge — Bestätigungstext ({name} wird durch den Task-Namen ersetzt)
   dialogDeleteConfirm: string;
+  // Dialoge — Vorgänger-Multiselect
+  dialogFieldDependencies: string;
+  dialogFieldDependenciesNone: string;
   // Toolbar — Heute-Button + Expand/Collapse + Reset
   scrollToTodayTooltip: string;
   expandAllTooltip: string;
@@ -104,6 +107,8 @@ export const DEFAULT_GANTT_TRANSLATIONS: GanttTranslations = {
   dialogFieldParent: "Übergeordnete Aufgabe",
   dialogFieldParentNone: "— Keine —",
   dialogDeleteConfirm: "Soll die Aufgabe \"{name}\" wirklich gelöscht werden?",
+  dialogFieldDependencies: "Vorgänger",
+  dialogFieldDependenciesNone: "— Keine —",
   scrollToTodayTooltip: "Zum heutigen Tag",
   expandAllTooltip: "Alle aufklappen",
   collapseAllTooltip: "Alle zuklappen",
@@ -155,6 +160,8 @@ export type GanttChartProps = {
   resizable?: boolean;
   // Wenn true, werden beim Verschieben/Resizen alle Finish-to-Start-Nachfolger automatisch mitverschoben.
   cascadeDependencies?: boolean;
+  // Hebt den kritischen Pfad (längste Abhängigkeitskette) farbig hervor (Default: false).
+  showCriticalPath?: boolean;
   // Doppelklick auf Task-Namen startet Inline-Editierung (Default: false).
   inlineEdit?: boolean;
   // Fortschritt per Drag am Progress-Handle direkt im Balken setzen (Default: false).

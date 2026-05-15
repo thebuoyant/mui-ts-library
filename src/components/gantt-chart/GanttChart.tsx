@@ -101,6 +101,7 @@ function GanttChartInner({
   resizable = false,
   inlineEdit = false,
   progressDraggable = false,
+  showCriticalPath = false,
   onTaskMoved,
   onTaskResized,
 }: GanttChartInnerProps) {
@@ -240,6 +241,7 @@ function GanttChartInner({
           draggable={draggable}
           resizable={resizable}
           progressDraggable={progressDraggable}
+          showCriticalPath={showCriticalPath}
           onTaskMoved={onTaskMoved}
           onTaskResized={onTaskResized}
           onTasksChange={onTasksChange}
@@ -269,6 +271,7 @@ export function GanttChart({
   resizable = false,
   inlineEdit = false,
   progressDraggable = false,
+  showCriticalPath = false,
   cascadeDependencies = false,
   onTaskClick,
   onMilestoneClick,
@@ -319,6 +322,7 @@ export function GanttChart({
           resizable={resizable}
           inlineEdit={inlineEdit}
           progressDraggable={progressDraggable}
+          showCriticalPath={showCriticalPath}
           onTaskClick={onTaskClick}
           onMilestoneClick={onMilestoneClick}
           onAddTask={onAddTask}

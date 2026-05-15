@@ -337,3 +337,58 @@ export function getQuartersInRange(range: TimelineRange): QuarterLabel[] {
 
   return result;
 }
+
+// ---------------------------------------------------------------------------
+// Kritischer Pfad (Critical Path Method)
+// ---------------------------------------------------------------------------
+
+/**
+ * Berechnet den kritischen Pfad: alle Tasks, von denen aus über Finish-to-Start-Abhängigkeiten
+ * das globale Projektende erreichbar ist.
+ *
+ * Algorithmus: Für jeden Task wird per DFS (mit Memoization) das späteste Enddatum berechnet,
+ * das über seine Nachfolger-Kette erreichbar ist. Tasks, deren Wert dem globalen Maximum
+ * entspricht, bilden den kritischen Pfad.
+ *
+ * Zirkuläre Abhängigkeiten werden durch einen `inStack`-Guard abgefangen.
+ */
+export function computeCriticalPath(tasks: GanttTask[]): Set<string> {
+  if (tasks.length === 0) return new Set();
+
+  // Nachfolger-Map aufbauen: Vorgänger-ID → Liste der Nachfolger-IDs.
+  const successorMap = new Map<string, string[]>();
+  for (const task of tasks) {
+    for (const predId of (task.dependencies ?? [])) {
+      if (!successorMap.has(predId)) successorMap.set(predId, []);
+      successorMap.get(predId)!.push(task.id);
+    }
+  }
+
+  const taskMap = new Map(tasks.map((t) => [t.id, t]));
+  const memo = new Map<string, number>();
+  const inStack = new Set<string>();
+
+  function latestReachable(taskId: string): number {
+    if (memo.has(taskId)) return memo.get(taskId)!;
+    // Zyklus-Guard: Task bereits auf dem aktuellen DFS-Stack → eigenes endDate zurückgeben.
+    if (inStack.has(taskId)) return taskMap.get(taskId)?.endDate.getTime() ?? 0;
+    inStack.add(taskId);
+    const task = taskMap.get(taskId);
+    let result = task?.endDate.getTime() ?? 0;
+    for (const succId of (successorMap.get(taskId) ?? [])) {
+      result = Math.max(result, latestReachable(succId));
+    }
+    inStack.delete(taskId);
+    memo.set(taskId, result);
+    return result;
+  }
+
+  for (const t of tasks) latestReachable(t.id);
+
+  const projectEnd = Math.max(...memo.values());
+  const critical = new Set<string>();
+  for (const t of tasks) {
+    if (latestReachable(t.id) === projectEnd) critical.add(t.id);
+  }
+  return critical;
+}
