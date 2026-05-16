@@ -87,6 +87,33 @@ Jeder Tag wird als `TagSelectionItem`-Objekt übergeben. Das gesamte Array (ausg
 
 > **Hinweis zu Farb-Priorität:** Wenn `foregroundColor` oder `backgroundColor` gesetzt sind, wird `color` komplett ignoriert. Die beiden Systeme schließen sich gegenseitig aus.
 
+**TypeScript-Typen:**
+
+```ts
+import type { ReactElement } from 'react';
+
+type TagColor =
+  | "default"
+  | "primary"
+  | "secondary"
+  | "error"
+  | "info"
+  | "success"
+  | "warning";
+
+type TagSelectionItem = {
+  id:               string;
+  label:            string;
+  selected?:        boolean;
+  disabled?:        boolean;
+  color?:           TagColor;
+  foregroundColor?: string;
+  backgroundColor?: string;
+  startIcon?:       ReactElement;
+  deleteIcon?:      ReactElement;
+};
+```
+
 ---
 
 ### Komponenten-Props: `TagSelectionProps`
@@ -137,7 +164,24 @@ Jeder Tag wird als `TagSelectionItem`-Objekt übergeben. Das gesamte Array (ausg
 
 ## Texte & Übersetzungen {#texte--übersetzungen}
 
-Alle angezeigten Texte können über die `translation`-Prop überschrieben werden. Es müssen nur die Keys angegeben werden, die vom Standard abweichen.
+Alle angezeigten Texte können über die `translation`-Prop überschrieben werden. Es müssen nur die Keys angegeben werden, die vom Standard abweichen. Die englischen Standardwerte können direkt importiert werden:
+
+```ts
+import { DEFAULT_TAG_SELECTION_TRANSLATION } from 'mui-ts-library';
+import type { TagSelectionTranslation } from 'mui-ts-library';
+
+// Vollständiger TypeScript-Typ:
+type TagSelectionTranslation = {
+  selectedTagsLabel:   string;
+  autoCompleteLabel:   string;
+  noSelectedTagsText:  string;
+  noAvailableTagsText: string;
+  placeholder:         string;
+  loadingText:         string;
+  createTagLabel:      string;  // {query} wird durch den eingetippten Text ersetzt
+  maxTagsReachedText:  string;
+};
+```
 
 | Key | Standard-Wert | Beschreibung |
 |---|---|---|

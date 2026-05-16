@@ -112,6 +112,30 @@ Diese Props machen die Komponente vollständig kompatibel mit gängigen Formular
 | `failure` | `string` | `"#cc0000"` | Farbe des Warnsymbols (Anforderung nicht erfüllt) |
 | `success` | `string` | `"#43a047"` | Farbe des Häkchens (Anforderung erfüllt) |
 
+**TypeScript-Typen und Standardwerte:**
+
+```ts
+import {
+  DEFAULT_METER_COLORS,
+  DEFAULT_CHECK_COLORS,
+} from 'mui-ts-library';
+import type { MeterColors, CheckColors } from 'mui-ts-library';
+
+type MeterColors = {
+  weak:     string;
+  ok:       string;
+  good:     string;
+  veryGood: string;
+};
+
+type CheckColors = {
+  failure: string;
+  success: string;
+};
+```
+
+> **Hinweis:** `meterColors` akzeptiert `Partial<MeterColors>` — es müssen nur abweichende Keys angegeben werden. `checkColors` hingegen ist kein Partial: wenn das Objekt übergeben wird, müssen beide Felder (`failure` und `success`) gesetzt sein.
+
 ---
 
 ### Übersetzung
@@ -119,6 +143,27 @@ Diese Props machen die Komponente vollständig kompatibel mit gängigen Formular
 | Prop | Typ | Standard | Beschreibung |
 |---|---|---|---|
 | `translation` | `Partial<PasswordStrengthMeterTranslation>` | Englische Defaults | Texte für alle angezeigten Beschriftungen und Aria-Labels. Nur abweichende Keys angeben — nicht gesetzte Keys fallen auf die englischen Standardwerte zurück. |
+
+Die englischen Standardwerte können direkt importiert werden:
+
+```ts
+import { DEFAULT_PASSWORD_TRANSLATIONS } from 'mui-ts-library';
+import type { PasswordStrengthMeterTranslation } from 'mui-ts-library';
+
+// Vollständiger TypeScript-Typ:
+type PasswordStrengthMeterTranslation = {
+  label:                string;
+  summaryHeaderLabel:   string;
+  summaryMinChars:      string;  // {n} wird durch passwordMinLength ersetzt
+  summaryCapitalLetter: string;
+  summaryLowerCaseLetter: string;
+  summaryNumber:        string;
+  summarySpecialChar:   string;
+  showPasswordLabel:    string;
+  hidePasswordLabel:    string;
+  meterAriaLabel:       string;
+};
+```
 
 ---
 
@@ -144,6 +189,24 @@ Das `result`-Objekt liefert alle Informationen über das aktuelle Passwort und k
 | `hasUpper` | `boolean` | Enthält mindestens einen Großbuchstaben. |
 | `hasDigit` | `boolean` | Enthält mindestens eine Ziffer. |
 | `hasSymbol` | `boolean` | Enthält mindestens ein Sonderzeichen (alles außer Buchstaben und Ziffern). |
+
+**TypeScript-Typen:**
+
+```ts
+type StrengthScore = 0 | 1 | 2 | 3 | 4;
+type MeterStatus   = "weak" | "ok" | "good" | "very good";
+
+type StrengthResult = {
+  score:      StrengthScore;
+  percent:    number;       // 0 | 25 | 50 | 75 | 100
+  meterStatus: MeterStatus;
+  length:     number;
+  hasLower:   boolean;
+  hasUpper:   boolean;
+  hasDigit:   boolean;
+  hasSymbol:  boolean;
+};
+```
 
 ---
 

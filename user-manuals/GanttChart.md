@@ -106,6 +106,26 @@ Jede Aufgabe wird als `GanttTask`-Objekt übergeben. Die `tasks`-Prop erwartet e
 | `progress` | `number` | Nein | Fortschritt in Prozent (0–100). Wird als halbopaker Overlay-Balken über den Task-Balken gerendert. Interaktiv wenn `progressDraggable={true}`. |
 | `color` | `string` | Nein | Überschreibt die statusbasierte Balkenfarbe für diesen einzelnen Task (höchste Priorität). Beliebiger CSS-Farbwert (z. B. `"#e91e63"` oder `"rgb(0,150,136)"`). |
 
+**TypeScript-Typen:**
+
+```ts
+type GanttTaskStatus = "planned" | "in-progress" | "done" | "blocked";
+type GanttTimeScale  = "days" | "weeks" | "months" | "quarters";
+
+type GanttTask = {
+  id:            string;
+  name:          string;
+  status:        GanttTaskStatus;
+  startDate:     Date;
+  endDate:       Date;
+  parentId?:     string;
+  dependencies?: string[];
+  isMilestone?:  boolean;
+  progress?:     number;
+  color?:        string;
+};
+```
+
 ---
 
 ### Komponenten-Props: `GanttChartProps`
@@ -188,6 +208,22 @@ Erlaubt die selektive Ausblendung einzelner Toolbar-Elemente. Alle Felder sind o
 | `showRangeReset` | `boolean` | `true` | Zurücksetzen-Button (erscheint nur wenn Bereich manuell angepasst wurde) |
 | `showResetView` | `boolean` | `true` | Ansicht zurücksetzen (Skala + Bereich auf Standardwerte) |
 
+**TypeScript-Typ:**
+
+```ts
+type GanttToolbarConfig = {
+  showScaleDays?:         boolean;
+  showScaleWeeks?:        boolean;
+  showScaleMonths?:       boolean;
+  showScaleQuarters?:     boolean;
+  showExpandCollapseAll?: boolean;
+  showScrollToToday?:     boolean;
+  showDateRange?:         boolean;
+  showRangeReset?:        boolean;
+  showResetView?:         boolean;
+};
+```
+
 **Beispiel — nur Skalenbuttons anzeigen:**
 
 ```tsx
@@ -218,7 +254,22 @@ Alle Felder sind optional. Nicht gesetzte Keys verwenden die MUI-Palette-Default
 | `weekendColor` | `string` | `action.hover` | Hintergrundfarbe der Wochenend-Spalten (nur sichtbar in der Tages-Skala). |
 | `barBorderRadius` | `number` | `4` | Eckenradius der Task-Balken in Pixeln. `0` = eckige Balken. |
 
-**`GanttStatusColors`:** Partielles Objekt `Record<GanttTaskStatus, string>`. Es müssen nicht alle vier Status gesetzt werden.
+**TypeScript-Typen:**
+
+```ts
+type GanttStatusColors = Partial<Record<GanttTaskStatus, string>>;
+
+type GanttTheme = {
+  statusColors?:      GanttStatusColors;
+  criticalPathColor?: string;
+  milestoneColor?:    string;
+  todayLineColor?:    string;
+  weekendColor?:      string;
+  barBorderRadius?:   number;
+};
+```
+
+**Beispiel:**
 
 ```tsx
 const ganttTheme: GanttTheme = {
@@ -263,6 +314,56 @@ const ganttTheme: GanttTheme = {
 Alle angezeigten Texte können über die `translations`-Prop überschrieben werden. Es müssen nur die Keys angegeben werden, die vom Standard abweichen.
 
 > **Wichtig:** Die Standardwerte der Komponente sind eine Mischung aus Deutsch (Toolbar-Labels) und Englisch (Status-Labels). Für eine vollständig einheitliche Sprache sollten **alle** Keys gesetzt werden.
+
+Die vorausgefüllten deutschen Standardwerte können direkt importiert werden:
+
+```ts
+import { DEFAULT_GANTT_TRANSLATIONS } from 'mui-ts-library';
+import type { GanttTranslations } from 'mui-ts-library';
+
+// Vollständiger TypeScript-Typ:
+type GanttTranslations = {
+  scaleDays: string;
+  scaleWeeks: string;
+  scaleMonths: string;
+  scaleQuarters: string;
+  rangeFrom: string;
+  rangeTo: string;
+  rangeResetTooltip: string;
+  scrollToTodayTooltip: string;
+  expandAllTooltip: string;
+  collapseAllTooltip: string;
+  resetViewTooltip: string;
+  weekColumnPrefix: string;
+  dateLocale: string;
+  columnName: string;
+  columnStatus: string;
+  columnActions: string;
+  addTaskTooltip: string;
+  editTaskTooltip: string;
+  deleteTaskTooltip: string;
+  statusPlanned: string;
+  statusInProgress: string;
+  statusDone: string;
+  statusBlocked: string;
+  dialogAddTitle: string;
+  dialogEditTitle: string;
+  dialogDeleteTitle: string;
+  dialogSave: string;
+  dialogCancel: string;
+  dialogDelete: string;
+  dialogFieldName: string;
+  dialogFieldStartDate: string;
+  dialogFieldEndDate: string;
+  dialogFieldStatus: string;
+  dialogFieldMilestone: string;
+  dialogFieldParent: string;
+  dialogFieldParentNone: string;
+  dialogDeleteConfirm: string;  // {name} wird durch den Task-Namen ersetzt
+  dialogFieldDependencies: string;
+  dialogFieldDependenciesNone: string;
+};
+```
 
 | Key | Standard-Wert | Beschreibung |
 |---|---|---|
