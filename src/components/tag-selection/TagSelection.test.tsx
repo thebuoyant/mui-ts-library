@@ -203,6 +203,55 @@ describe("TagSelection", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("Should disable the autocomplete input when disabled is true", () => {
+    render(<TagSelection tags={tags} disabled={true} />);
+
+    expect(screen.getByLabelText("Search and add tags")).toBeDisabled();
+  });
+
+  it("Should disable chips when the component is disabled", () => {
+    render(<TagSelection tags={tags} disabled={true} />);
+
+    const chip = screen.getByText("React").closest(".MuiChip-root");
+    expect(chip).toHaveClass("Mui-disabled");
+  });
+
+  it("Should show loading text when the autocomplete is open, loading is true and no options are available yet", async () => {
+    const user = userEvent.setup();
+
+    // MUI zeigt loadingText nur wenn options leer ist — typisches Async-Lade-Pattern.
+    render(<TagSelection tags={[]} loading={true} />);
+
+    await user.click(screen.getByLabelText("Search and add tags"));
+
+    expect(await screen.findByText("Loading...")).toBeInTheDocument();
+  });
+
+  it("Should disable the autocomplete and show helper text when maxTags is reached", () => {
+    render(<TagSelection tags={tags} maxTags={1} />);
+
+    expect(screen.getByLabelText("Search and add tags")).toBeDisabled();
+    expect(
+      screen.getByText("Maximum number of tags reached."),
+    ).toBeInTheDocument();
+  });
+
+  it("Should call onTagCreate with the typed value when a new tag is created", async () => {
+    const user = userEvent.setup();
+    const handleTagCreate = vi.fn();
+
+    render(
+      <TagSelection tags={tags} allowCreate={true} onTagCreate={handleTagCreate} />,
+    );
+
+    const input = screen.getByLabelText("Search and add tags");
+    await user.type(input, "Vue");
+
+    await user.click(await screen.findByText("Create 'Vue'"));
+
+    expect(handleTagCreate).toHaveBeenCalledWith("Vue");
+  });
+
   it("Should support custom translations and icon visibility flags", async () => {
     const user = userEvent.setup();
 

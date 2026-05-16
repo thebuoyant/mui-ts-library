@@ -8,6 +8,7 @@ type TagSelectionChipProps = {
   showStartIcon?: boolean;
   showDeleteIcon?: boolean;
   chipSize: "small" | "medium";
+  disabled?: boolean;
 };
 
 export function TagSelectionChip({
@@ -17,6 +18,7 @@ export function TagSelectionChip({
   showStartIcon = true,
   showDeleteIcon = true,
   chipSize = "medium",
+  disabled = false,
 }: TagSelectionChipProps) {
   const shouldShowStartIcon = showStartIcon && Boolean(tag.startIcon);
 
@@ -38,8 +40,8 @@ export function TagSelectionChip({
       deleteIcon={shouldShowCustomDeleteIcon ? tag.deleteIcon : undefined}
       onDelete={showDeleteIcon && onDelete ? () => onDelete(tag) : undefined}
       onClick={onClick ? () => onClick(tag) : undefined}
-      clickable={Boolean(onClick) && !tag.disabled}
-      disabled={tag.disabled}
+      clickable={Boolean(onClick) && !tag.disabled && !disabled}
+      disabled={disabled || tag.disabled}
       variant={tag.selected ? "filled" : "outlined"}
       color={!hasCustomColors ? (tag.color ?? "default") : undefined}
       sx={{
@@ -49,7 +51,7 @@ export function TagSelectionChip({
           // backgroundColor auch als Rahmenfarbe nutzen – ohne Angabe übernimmt MUI den Theme-Wert.
           borderColor: tag.backgroundColor ?? undefined,
         }),
-        cursor: onClick && !tag.disabled ? "pointer" : "default",
+        cursor: onClick && !tag.disabled && !disabled ? "pointer" : "default",
       }}
     />
   );

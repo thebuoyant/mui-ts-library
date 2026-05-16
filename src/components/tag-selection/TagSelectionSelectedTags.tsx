@@ -13,6 +13,7 @@ type TagSelectionSelectedTagsProps = {
   showDeleteIcon?: boolean;
   showSelectedTagsLabel: boolean;
   chipSize: "small" | "medium";
+  disabled?: boolean;
 };
 
 export function TagSelectionSelectedTags({
@@ -23,6 +24,7 @@ export function TagSelectionSelectedTags({
   showDeleteIcon = true,
   showSelectedTagsLabel,
   chipSize = "medium",
+  disabled = false,
 }: TagSelectionSelectedTagsProps) {
   return (
     <Box sx={{ mb: 2 }}>
@@ -45,6 +47,7 @@ export function TagSelectionSelectedTags({
               showStartIcon={showStartIcon}
               showDeleteIcon={showDeleteIcon}
               chipSize={chipSize}
+              disabled={disabled}
             />
           ))}
         </Stack>

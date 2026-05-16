@@ -276,6 +276,46 @@ const tags: TagSelectionItem[] = [
 ];
 ```
 
+**With loading state (async tag fetching):**
+
+```tsx
+const [tags, setTags] = useState<TagSelectionItem[]>([]);
+const [loading, setLoading] = useState(true);
+
+useEffect(() => {
+  fetchTags().then((result) => {
+    setTags(result);
+    setLoading(false);
+  });
+}, []);
+
+<TagSelection tags={tags} loading={loading} />
+```
+
+**With tag limit:**
+
+```tsx
+// Nur maximal 3 Tags auswählbar — Autocomplete sperrt sich danach automatisch.
+<TagSelection tags={tags} maxTags={3} />
+```
+
+**With creatable tags:**
+
+```tsx
+const [tags, setTags] = useState<TagSelectionItem[]>(initialTags);
+
+<TagSelection
+  tags={tags}
+  allowCreate={true}
+  onTagCreate={(label) => {
+    setTags((prev) => [
+      ...prev,
+      { id: label.toLowerCase().replace(/\s+/g, '-'), label },
+    ]);
+  }}
+/>
+```
+
 ---
 
 ### PasswordStrengthMeter
@@ -508,11 +548,16 @@ type GanttTranslations = {
 | `showDeleteIcon` | `boolean` | `true` | Globally toggle delete icons on all chips. |
 | `inputSize` | `"small" \| "medium"` | `"medium"` | Size of the autocomplete input. |
 | `chipSize` | `"small" \| "medium"` | `"medium"` | Size of all chips. |
+| `disabled` | `boolean` | `false` | Disables the entire component — input and all chips become non-interactive. |
+| `loading` | `boolean` | `false` | Shows a loading indicator in the dropdown — use while fetching tags from an API. |
+| `maxTags` | `number` | — | Maximum number of selectable tags. The autocomplete is disabled once the limit is reached. |
+| `allowCreate` | `boolean` | `false` | Enables free-text creation of new tags. A "Create '{query}'" option appears when no match is found. |
 | `translation` | `Partial<TagSelectionTranslation>` | English defaults | Override any display text (see [Translations](#translations)). Only pass keys you want to change. |
 | `onTagSelect` | `(tag, selectedTags, allTags) => void` | — | Called when a tag is selected. |
 | `onTagDelete` | `(tag, selectedTags, allTags) => void` | — | Called when a tag is removed. |
 | `onTagsChange` | `(selectedTags, allTags) => void` | — | Called after every selection change. |
 | `onSearchChange` | `(searchValue: string) => void` | — | Called when the search input changes. |
+| `onTagCreate` | `(label: string) => void` | — | Called when the user creates a new tag via `allowCreate`. Add the new tag to `tags` to make it appear. |
 
 ### TagSelectionItem
 
@@ -640,6 +685,9 @@ All three components support full i18n without any external library. Pass only t
     noSelectedTagsText:  'Keine Tags ausgewählt.',
     noAvailableTagsText: 'Keine Tags verfügbar.',
     placeholder:         'Suchen...',
+    loadingText:         'Wird geladen...',
+    createTagLabel:      "'{query}' erstellen",
+    maxTagsReachedText:  'Maximale Anzahl an Tags erreicht.',
   }}
 />
 ```

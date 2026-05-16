@@ -42,11 +42,16 @@ function TagSelectionInner({
   showDeleteIcon = true,
   inputSize = "medium",
   chipSize = "medium",
+  disabled = false,
+  loading = false,
+  maxTags,
+  allowCreate = false,
   translation,
   onTagSelect,
   onTagDelete,
   onTagsChange,
   onSearchChange,
+  onTagCreate,
 }: TagSelectionInnerProps) {
   const storeTags = useTagSelectionStore((state) => state.tags);
   const searchValue = useTagSelectionStore((state) => state.searchValue);
@@ -68,6 +73,8 @@ function TagSelectionInner({
     () => storeTags.filter((tag) => !tag.selected && !tag.disabled),
     [storeTags],
   );
+
+  const isMaxReached = maxTags !== undefined && selectedTags.length >= maxTags;
 
   const emitTagsChange = (nextTags: TagSelectionItem[]) => {
     if (onTagsChange) {
@@ -133,6 +140,12 @@ function TagSelectionInner({
     }
   };
 
+  const handleTagCreate = (label: string) => {
+    if (onTagCreate) {
+      onTagCreate(label);
+    }
+  };
+
   return (
     <Box sx={{ width: "100%" }}>
       <Stack>
@@ -145,6 +158,7 @@ function TagSelectionInner({
             showDeleteIcon={showDeleteIcon}
             showSelectedTagsLabel={showSelectedTagsLabel}
             chipSize={chipSize}
+            disabled={disabled}
           />
         )}
 
@@ -155,9 +169,14 @@ function TagSelectionInner({
             translation={translation}
             onSearchChange={handleSearchChange}
             onTagSelect={handleTagSelect}
+            onTagCreate={handleTagCreate}
             showStartIcon={showStartIcon}
             inputSize={inputSize}
             chipSize={chipSize}
+            disabled={disabled}
+            loading={loading}
+            isMaxReached={isMaxReached}
+            allowCreate={allowCreate}
           />
         )}
       </Stack>
@@ -175,10 +194,15 @@ export function TagSelection({
   translation,
   inputSize = "medium",
   chipSize = "medium",
+  disabled = false,
+  loading = false,
+  maxTags,
+  allowCreate = false,
   onTagSelect,
   onTagDelete,
   onTagsChange,
   onSearchChange,
+  onTagCreate,
 }: TagSelectionProps) {
   const t: TagSelectionTranslation = { ...DEFAULT_TAG_SELECTION_TRANSLATION, ...translation };
   const [store] = useState(() => createTagSelectionStore(tags));
@@ -193,12 +217,17 @@ export function TagSelection({
         showStartIcon={showStartIcon}
         showDeleteIcon={showDeleteIcon}
         translation={t}
+        inputSize={inputSize}
+        chipSize={chipSize}
+        disabled={disabled}
+        loading={loading}
+        maxTags={maxTags}
+        allowCreate={allowCreate}
         onTagSelect={onTagSelect}
         onTagDelete={onTagDelete}
         onTagsChange={onTagsChange}
         onSearchChange={onSearchChange}
-        inputSize={inputSize}
-        chipSize={chipSize}
+        onTagCreate={onTagCreate}
       />
     </TagSelectionStoreContext.Provider>
   );

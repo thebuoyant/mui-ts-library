@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { fn } from "storybook/test";
 import { Box } from "@mui/material";
+import { useState } from "react";
 import CodeIcon from "@mui/icons-material/Code";
 import JavascriptIcon from "@mui/icons-material/Javascript";
 import CssIcon from "@mui/icons-material/Css";
@@ -100,10 +101,14 @@ const meta: Meta<typeof TagSelection> = {
     showDeleteIcon: true,
     inputSize: "medium",
     chipSize: "medium",
+    disabled: false,
+    loading: false,
+    allowCreate: false,
     onTagSelect: fn(),
     onTagDelete: fn(),
     onTagsChange: fn(),
     onSearchChange: fn(),
+    onTagCreate: fn(),
   },
   argTypes: {
     showSelectedTags: { control: "boolean" },
@@ -111,8 +116,12 @@ const meta: Meta<typeof TagSelection> = {
     showAutoComplete: { control: "boolean" },
     showStartIcon: { control: "boolean" },
     showDeleteIcon: { control: "boolean" },
+    disabled: { control: "boolean" },
+    loading: { control: "boolean" },
+    allowCreate: { control: "boolean" },
     inputSize: { control: "radio", options: ["small", "medium"] },
     chipSize: { control: "radio", options: ["small", "medium"] },
+    maxTags: { control: "number" },
     // Komplexe Objekte — stattdessen dedizierte Stories verwenden.
     tags: { control: false },
     translation: { control: false },
@@ -120,6 +129,7 @@ const meta: Meta<typeof TagSelection> = {
     onTagDelete: { control: false },
     onTagsChange: { control: false },
     onSearchChange: { control: false },
+    onTagCreate: { control: false },
   },
 };
 
@@ -250,4 +260,67 @@ export const CustomColors: Story = {
       <TagSelection {...args} />
     </Box>
   ),
+};
+
+export const Disabled: Story = {
+  args: {
+    disabled: true,
+  },
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <TagSelection {...args} />
+    </Box>
+  ),
+};
+
+export const Loading: Story = {
+  args: {
+    // Leere Tags simulieren den Zustand während ein API-Call läuft.
+    tags: [],
+    loading: true,
+  },
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <TagSelection {...args} />
+    </Box>
+  ),
+};
+
+export const MaxTags: Story = {
+  args: {
+    maxTags: 2,
+  },
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <TagSelection {...args} />
+    </Box>
+  ),
+};
+
+// Zeigt den Create-Modus: neue Tags können durch freie Texteingabe erstellt werden.
+// onTagCreate gibt den Label-Text zurück — der aufrufende Code ist dafür zuständig,
+// den neuen Tag in die tags-Liste einzufügen (hier per lokalem State demonstriert).
+export const Creatable: Story = {
+  args: {
+    allowCreate: true,
+  },
+  render: (args) => {
+    const [localTags, setLocalTags] = useState(sampleTags);
+
+    return (
+      <Box sx={{ maxWidth: 420 }}>
+        <TagSelection
+          {...args}
+          tags={localTags}
+          onTagCreate={(label) => {
+            args.onTagCreate?.(label);
+            setLocalTags((prev) => [
+              ...prev,
+              { id: label.toLowerCase().replace(/\s+/g, "-"), label },
+            ]);
+          }}
+        />
+      </Box>
+    );
+  },
 };
