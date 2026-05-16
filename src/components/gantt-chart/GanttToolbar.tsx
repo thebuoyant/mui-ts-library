@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Box, IconButton, TextField, ToggleButton, ToggleButtonGroup, Tooltip } from "@mui/material";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import RestoreIcon from "@mui/icons-material/Restore";
@@ -45,7 +46,8 @@ export function GanttToolbar({ onScrollToToday, config }: GanttToolbarProps) {
   const allExpanded = tasks.length > 0 && tasks.every((t) => expandedIds.has(t.id));
   const isViewChanged = timeScale !== defaultTimeScale || isRangeCustomized || isExpandedCustomized;
 
-  const now = Date.now();
+  // eslint-disable-next-line react-hooks/purity
+  const now = useMemo(() => Date.now(), []);
   const isTodayInRange =
     now >= timelineRange.start.getTime() && now <= timelineRange.end.getTime();
 

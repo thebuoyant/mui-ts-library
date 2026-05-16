@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { fn } from "storybook/test";
 import { Box } from "@mui/material";
-import { useState } from "react";
+import { useState, type ComponentProps } from "react";
 import CodeIcon from "@mui/icons-material/Code";
 import JavascriptIcon from "@mui/icons-material/Javascript";
 import CssIcon from "@mui/icons-material/Css";
@@ -297,6 +297,26 @@ export const MaxTags: Story = {
   ),
 };
 
+function CreatableStory(args: ComponentProps<typeof TagSelection>) {
+  const [localTags, setLocalTags] = useState(sampleTags);
+
+  return (
+    <Box sx={{ maxWidth: 420 }}>
+      <TagSelection
+        {...args}
+        tags={localTags}
+        onTagCreate={(label) => {
+          args.onTagCreate?.(label);
+          setLocalTags((prev) => [
+            ...prev,
+            { id: label.toLowerCase().replace(/\s+/g, "-"), label },
+          ]);
+        }}
+      />
+    </Box>
+  );
+}
+
 // Zeigt den Create-Modus: neue Tags können durch freie Texteingabe erstellt werden.
 // onTagCreate gibt den Label-Text zurück — der aufrufende Code ist dafür zuständig,
 // den neuen Tag in die tags-Liste einzufügen (hier per lokalem State demonstriert).
@@ -304,23 +324,5 @@ export const Creatable: Story = {
   args: {
     allowCreate: true,
   },
-  render: (args) => {
-    const [localTags, setLocalTags] = useState(sampleTags);
-
-    return (
-      <Box sx={{ maxWidth: 420 }}>
-        <TagSelection
-          {...args}
-          tags={localTags}
-          onTagCreate={(label) => {
-            args.onTagCreate?.(label);
-            setLocalTags((prev) => [
-              ...prev,
-              { id: label.toLowerCase().replace(/\s+/g, "-"), label },
-            ]);
-          }}
-        />
-      </Box>
-    );
-  },
+  render: (args) => <CreatableStory {...args} />,
 };

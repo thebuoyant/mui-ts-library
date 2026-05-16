@@ -119,6 +119,7 @@ export function GanttTaskDialog({
     if (!open) return;
     const clamped = toDateString(clampDate(new Date(), timelineRange.start, timelineRange.end));
     if (mode === "edit" && initialTask) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setForm({
         name: initialTask.name,
         startDate: toDateString(initialTask.startDate),

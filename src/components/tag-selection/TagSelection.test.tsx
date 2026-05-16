@@ -171,7 +171,6 @@ describe("TagSelection", () => {
   });
 
   it("Should reflect an external tags update in the rendered output", async () => {
-    const user = userEvent.setup();
     const initialTags: TagSelectionItem[] = [
       { id: "vue", label: "Vue", selected: true, deleteIcon: <CloseIcon /> },
     ];

@@ -20,6 +20,7 @@ import { LEFT_PANEL_WIDTH, DIVIDER_WIDTH } from "./GanttChart.constants";
 
 const GanttChartStoreContext = createContext<GanttChartStore | null>(null);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useGanttChartStore<T>(
   selector: (state: ReturnType<GanttChartStore["getState"]>) => T,
 ) {
@@ -32,6 +33,7 @@ export function useGanttChartStore<T>(
   return useStore(store, selector);
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useRawGanttChartStore(): GanttChartStore {
   const store = useContext(GanttChartStoreContext);
   if (!store) throw new Error("GanttChartStoreContext is missing.");
@@ -44,6 +46,7 @@ export function useRawGanttChartStore(): GanttChartStore {
 
 const GanttTranslationsContext = createContext<GanttTranslations>(DEFAULT_GANTT_TRANSLATIONS);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useGanttTranslations(): GanttTranslations {
   return useContext(GanttTranslationsContext);
 }
@@ -54,6 +57,7 @@ export function useGanttTranslations(): GanttTranslations {
 
 const GanttThemeContext = createContext<GanttTheme>({});
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useGanttTheme(): GanttTheme {
   return useContext(GanttThemeContext);
 }
@@ -119,7 +123,6 @@ function GanttChartInner({
   const resolvedHeight = resolveSize(height, 400);
   const resolvedToolbarConfig = useMemo(
     () => ({ ...DEFAULT_TOOLBAR_CONFIG, ...toolbarConfig }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [toolbarConfig],
   );
   const resolvedWidth = resolveSize(width, "100%");
@@ -308,7 +311,6 @@ export function GanttChart({
 }: GanttChartProps) {
   const mergedTranslations = useMemo(
     () => ({ ...DEFAULT_GANTT_TRANSLATIONS, ...translations }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [translations],
   );
 

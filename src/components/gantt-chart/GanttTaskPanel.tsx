@@ -339,6 +339,7 @@ export function GanttTaskPanel({
     [taskTree, expandedIds],
   );
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const rowVirtualizer = useVirtualizer({
     count: visibleTasks.length,
     getScrollElement: () => scrollRef.current,

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { fn } from "storybook/test";
 import { Box, TextField, Typography } from "@mui/material";
-import { useState } from "react";
+import { useState, type ComponentProps } from "react";
 import { PasswordStrengthMeter } from "./PasswordStrengthMeter";
 
 const meta: Meta<typeof PasswordStrengthMeter> = {
@@ -161,33 +161,35 @@ export const WithError: Story = {
   ),
 };
 
+function ControlledStory(args: ComponentProps<typeof PasswordStrengthMeter>) {
+  const [password, setPassword] = useState("");
+
+  return (
+    <Box sx={{ maxWidth: 420, display: "flex", flexDirection: "column", gap: 2 }}>
+      <TextField
+        label="External password field"
+        size="small"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        helperText="This field drives the PasswordStrengthMeter from outside."
+      />
+      <PasswordStrengthMeter
+        {...args}
+        value={password}
+        showPasswordAdornment={false}
+        onPasswordChange={(_, result) => {
+          args.onPasswordChange?.(_, result);
+        }}
+      />
+      <Typography variant="caption" color="text.secondary">
+        Current value: "{password}"
+      </Typography>
+    </Box>
+  );
+}
+
 // Zeigt den kontrollierten Modus: Das Passwort wird von außen verwaltet,
 // z. B. wenn die Komponente in ein bestehendes Formular eingebettet wird.
 export const Controlled: Story = {
-  render: (args) => {
-    const [password, setPassword] = useState("");
-
-    return (
-      <Box sx={{ maxWidth: 420, display: "flex", flexDirection: "column", gap: 2 }}>
-        <TextField
-          label="External password field"
-          size="small"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          helperText="This field drives the PasswordStrengthMeter from outside."
-        />
-        <PasswordStrengthMeter
-          {...args}
-          value={password}
-          showPasswordAdornment={false}
-          onPasswordChange={(_, result) => {
-            args.onPasswordChange?.(_, result);
-          }}
-        />
-        <Typography variant="caption" color="text.secondary">
-          Current value: "{password}"
-        </Typography>
-      </Box>
-    );
-  },
+  render: (args) => <ControlledStory {...args} />,
 };

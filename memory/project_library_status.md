@@ -5,7 +5,7 @@ metadata:
   type: project
 ---
 
-Stand: 2026-05-16. 237 Tests grün (10 Test-Dateien).
+Stand: 2026-05-16. 237 Tests grün (10 Test-Dateien). ESLint: 0 Errors, 0 Warnings.
 
 **Why:** Vollständige Referenz für Einstieg in neue Sessions ohne erneutes Lesen aller Dateien.
 
@@ -64,7 +64,7 @@ Kein Kickoff-Dokument vorhanden (anders als GanttChart und PSM).
 
 ## Dokumentation
 
-- `README.md` im Root — vollständige API-Referenz für alle drei Komponenten
+- `README.md` im Root — Schnellstart + Links zu Manualen (vollständig auf Deutsch)
 - `user-manuals/GanttChart.md` — detailliertes Benutzerhandbuch (Deutsch, Confluence-ready)
 - `user-manuals/TagSelection.md` — detailliertes Benutzerhandbuch (Deutsch, Confluence-ready)
 - `user-manuals/PasswordStrengthMeter.md` — detailliertes Benutzerhandbuch (Deutsch, Confluence-ready)
