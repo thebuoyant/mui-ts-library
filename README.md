@@ -508,7 +508,7 @@ type GanttTranslations = {
 | `showDeleteIcon` | `boolean` | `true` | Globally toggle delete icons on all chips. |
 | `inputSize` | `"small" \| "medium"` | `"medium"` | Size of the autocomplete input. |
 | `chipSize` | `"small" \| "medium"` | `"medium"` | Size of all chips. |
-| `translation` | `TagSelectionTranslation` | English defaults | All display texts (see [Translations](#translations)). |
+| `translation` | `Partial<TagSelectionTranslation>` | English defaults | Override any display text (see [Translations](#translations)). Only pass keys you want to change. |
 | `onTagSelect` | `(tag, selectedTags, allTags) => void` | — | Called when a tag is selected. |
 | `onTagDelete` | `(tag, selectedTags, allTags) => void` | — | Called when a tag is removed. |
 | `onTagsChange` | `(selectedTags, allTags) => void` | — | Called after every selection change. |

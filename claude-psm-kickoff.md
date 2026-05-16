@@ -16,9 +16,10 @@ Wir arbeiten an **`mui-ts-library`** — einer eigenen React-Komponentenbiblioth
 | **Styling** | MUI `sx`-Prop, MUI-Theme-Farben wo möglich |
 | **Typen** | Alle öffentlichen Typen in `PasswordStrengthMeter.types.ts` |
 | **Defaults** | Exportierte `DEFAULT_*`-Konstanten statt inline-Objekte in der Funktionssignatur |
-| **Tests** | Vitest + @testing-library/react — Tests beschreiben Verhalten, nie Implementierung |
+| **Tests** | Vitest + @testing-library/react — Tests starten immer mit `it("Should ...)`, beschreiben Verhalten, nie Implementierung |
 | **Stories** | Storybook mit `@storybook/react-vite`, meta `args` + `argTypes` für Controls-Panel |
 | **Exports** | Alles aus `src/index.ts` re-exportieren — kein Import aus internen Pfaden nötig |
+| **Kommentare** | Ausschließlich auf Deutsch |
 
 ### Tech-Stack
 
@@ -28,67 +29,74 @@ React 19, TypeScript 5.9, MUI v7, Vite 8, Vitest 4, Storybook 10
 
 ---
 
-## Ist-Zustand (Analyse)
+## Aktueller Stand: Phasen 1–4 abgeschlossen ✅ (232 Tests grün, README aktuell)
 
-Die Komponente funktioniert grundsätzlich gut — Scoring-Algorithmus, Controlled Mode und Accessibility-Basics sind solide. Für eine professionelle Library fehlen aber noch folgende Dinge:
-
-| Bereich | Problem |
-|---|---|
-| **Types** | `StrengthResult`, `StrengthScore`, `MeterStatus` leben in der util-Datei, nicht in `*.types.ts` |
-| **Exports** | Types werden aus `PasswordStrengthMeter.tsx` re-exportiert statt aus `index.ts` |
-| **Defaults** | Keine `DEFAULT_*`-Konstanten — Defaults sind inline in der Funktionssignatur vergraben |
-| **Partial props** | `translation` und `meterColors` verlangen das volle Objekt — kein `Partial<>` |
-| **Translations unvollständig** | `"Show password"` / `"Hide password"` / `"Password strength"` sind hardcoded auf Englisch |
-| **Storybook** | Keine `argTypes` / meta `args` → kein Controls-Panel; nur 2 Stories |
-| **Fragile Tests** | `querySelector(".meter-result")` und MUI-interne `data-testid`s statt eigener testids |
-| **Form-Integration** | Kein `name`, `disabled`, `error`, `helperText`, `inputRef` → nicht React-Hook-Form-kompatibel |
-
----
-
-## Alle vorhandenen Dateien
+### Alle vorhandenen Dateien
 
 | Datei | Inhalt |
 |---|---|
-| `PasswordStrengthMeter.types.ts` | `CheckColors`, `MeterColors`, `PasswordStrengthMeterTranslation`, `PasswordStrengthMeterProps` |
+| `PasswordStrengthMeter.types.ts` | `StrengthScore`, `MeterStatus`, `StrengthResult`, `CheckColors`, `MeterColors`, `PasswordStrengthMeterTranslation`, `PasswordStrengthMeterProps` + alle `DEFAULT_*`-Konstanten |
 | `PasswordStrengthMeter.tsx` | Haupt-Komponente: Input + Adornment + Meter-Balken + Requirement-Summary |
-| `PasswordStrengthMeter.test.tsx` | 12 Komponenten-Tests |
-| `PasswordStrengthMeter.stories.tsx` | 2 Stories (Default, Controlled) — noch ohne argTypes/Controls |
+| `PasswordStrengthMeter.test.tsx` | 17 Komponenten-Tests |
+| `PasswordStrengthMeter.stories.tsx` | 10 Stories mit argTypes und meta args |
 | `util/password-strength.util.ts` | `scorePassword()` — Scoring-Algorithmus mit Bonus/Malus-Regeln |
-| `util/password-strength.util.test.ts` | 9 Util-Tests |
+| `util/password-strength.util.test.ts` | 10 Util-Tests |
 
 ---
 
-## Aktueller Stand der Props-API
+## Vollständige Props-API
 
 ```tsx
 <PasswordStrengthMeter
+  // Kern
   value="..."                    // kontrollierter Modus (optional)
   showPasswordAdornment={true}   // Show/Hide-Button am Input
   showMeter={true}               // Stärke-Balken anzeigen
   showSummary={true}             // Anforderungs-Checkliste anzeigen
   inputSize="medium"             // "small" | "medium"
   passwordMinLength={8}
-  translation={{ label: "Password", ... }}   // Partial noch nicht unterstützt
-  meterColors={{ weak: "#cc0000", ... }}     // Partial noch nicht unterstützt
+  translation={{ label: "Passwort", summaryMinChars: "Mindestens {n} Zeichen", ... }}  // Partial<>
+  meterColors={{ weak: "#cc0000", ... }}     // Partial<>
   checkColors={{ failure: "#cc0000", success: "#43a047" }}
   onPasswordChange={(password, result) => ...}
+
+  // Form-Integration (React Hook Form, Formik, native Forms)
+  name="password"                // natives name-Attribut
+  inputRef={ref}                 // Ref auf das native <input>-Element
+  disabled={false}
+  error={false}
+  helperText="Passwort ist zu schwach."
+  autoComplete="new-password"
 />
 ```
 
-### StrengthResult (aus util — noch nicht in types.ts)
+### PasswordStrengthMeterTranslation (alle Keys)
 
 ```ts
-type StrengthResult = {
-  score: 0 | 1 | 2 | 3 | 4;
-  percent: number;        // score * 25
-  meterStatus: "weak" | "ok" | "good" | "very good";
-  length: number;
-  hasLower: boolean;
-  hasUpper: boolean;
-  hasDigit: boolean;
-  hasSymbol: boolean;
+type PasswordStrengthMeterTranslation = {
+  label: string;                  // Default: "Password"
+  summaryHeaderLabel: string;     // Default: "Requirements for your password"
+  summaryMinChars: string;        // Default: "At least {n} characters"  — {n} wird ersetzt
+  summaryCapitalLetter: string;   // Default: "At least 1 capital letter"
+  summaryLowerCaseLetter: string; // Default: "At least 1 lowercase letter"
+  summaryNumber: string;          // Default: "At least 1 number"
+  summarySpecialChar: string;     // Default: "At least 1 special character"
+  showPasswordLabel: string;      // Default: "Show password"  (aria-label)
+  hidePasswordLabel: string;      // Default: "Hide password"  (aria-label)
+  meterAriaLabel: string;         // Default: "Password strength"  (aria-label)
 };
 ```
+
+### data-testids
+
+| Testid | Element |
+|---|---|
+| `psm-input` | Natives `<input>`-Element |
+| `psm-toggle` | IconButton (Passwort anzeigen/verbergen) |
+| `psm-meter` | Innerer Balken-Div (hat `width` + `backgroundColor`) |
+| `psm-summary` | Äußeres Box-Element der Anforderungsliste |
+| `psm-req-success` | CheckCircle-Icon (Anforderung erfüllt) |
+| `psm-req-failure` | ErrorOutline-Icon (Anforderung nicht erfüllt) |
 
 ### Scoring-Algorithmus (scorePassword)
 
@@ -101,6 +109,21 @@ type StrengthResult = {
 - Bekannte Muster (`1234`, `abcd`, `password`, …) → −2
 - Score wird auf 0–4 geklemmt
 
+### Storybook — 10 Stories
+
+| Story | Besonderheit |
+|---|---|
+| `Default` | Alle meta-Args, Controls-Panel aktiv |
+| `SmallInput` | `inputSize: "small"` |
+| `NoMeter` | `showMeter: false` |
+| `NoSummary` | `showSummary: false` |
+| `NoAdornment` | `showPasswordAdornment: false` |
+| `GermanTranslation` | Vollständige deutsche Übersetzung inkl. Aria-Labels |
+| `CustomColors` | Pink/Orange/Blau/Lila Farbschema |
+| `Disabled` | `disabled: true` |
+| `WithError` | `error: true` + `helperText` |
+| `Controlled` | Passwort von externem TextField gesteuert |
+
 ---
 
 ## So starten wir die nächste Session
@@ -108,52 +131,29 @@ type StrengthResult = {
 ```
 Bitte lies zuerst die claude-psm-kickoff.md im Root des Projekts.
 Dann besprechen wir die nächste geplante Phase.
-227 Tests (gesamt im Projekt) müssen nach den Änderungen grün bleiben.
+232 Tests (gesamt im Projekt) müssen nach den Änderungen grün bleiben.
+Alle Code-Kommentare auf Deutsch. Tests starten immer mit it("Should ...").
 ```
 
 ---
 
-## Geplante Phasen
+## Ideen für weitere Phasen
 
-### PSM Phase 1 — Typen & Exports aufräumen
+### Idee A — Passwort-Generator-Button
 
-**Ziel:** Lib-Consumer können alle Types aus einem einzigen Import-Pfad beziehen; keine Überraschungen bei `Partial<>`.
+- Optionaler Button neben dem Toggle (Prop `showGenerator?: boolean`)
+- Generiert ein zufälliges, starkes Passwort direkt im Input
+- Callback `onPasswordGenerated?: (password: string) => void`
 
-- `StrengthResult`, `StrengthScore`, `MeterStatus` von `util/password-strength.util.ts` nach `PasswordStrengthMeter.types.ts` verschieben (util importiert dann aus types)
-- `DEFAULT_PASSWORD_TRANSLATIONS`, `DEFAULT_METER_COLORS`, `DEFAULT_CHECK_COLORS` als exportierte Konstanten
-- `translation?: Partial<PasswordStrengthMeterTranslation>` — Merge gegen Defaults (statt Komplett-Objekt-Pflicht)
-- `meterColors?: Partial<MeterColors>` analog
-- Re-exports aus `PasswordStrengthMeter.tsx` entfernen — alles läuft über `src/index.ts`
-- Alle bestehenden Tests müssen grün bleiben
+### Idee B — Stärke-Label neben dem Balken
 
-### PSM Phase 2 — Storybook professionalisieren
+- Textuelle Bezeichnung der aktuellen Stärke (`"Schwach"`, `"OK"`, `"Gut"`, `"Sehr gut"`)
+- Prop `showStrengthLabel?: boolean`
+- Über Translation konfigurierbar: `strengthWeak`, `strengthOk`, `strengthGood`, `strengthVeryGood`
 
-**Ziel:** Controls-Panel und volle Story-Coverage wie beim GanttChart.
+### Idee C — Bestätigungsfeld (Confirm Password)
 
-- `meta` mit `args` + `argTypes` (alle bool-Props als `control: "boolean"`, komplexe Objekte `control: false`)
-- `fn()` für `onPasswordChange`
-- Neue Stories: `NoMeter`, `NoSummary`, `NoAdornment`, `GermanTranslation`, `CustomColors`, `SmallInput`
-- Bestehende `Controlled`-Story bleibt, bekommt aber korrektes render-Pattern
-
-### PSM Phase 3 — Translations vervollständigen + stabile Testids
-
-**Ziel:** Vollständige i18n + keine fragilen CSS-Klassen/MUI-internen IDs in Tests.
-
-- Neue Translation-Keys:
-  - `showPasswordLabel: string` → `"Show password"` (aria-label)
-  - `hidePasswordLabel: string` → `"Hide password"` (aria-label)
-  - `meterAriaLabel: string` → `"Password strength"` (aria-label)
-  - `summaryMinChars: string` → Template-String mit `{n}` Platzhalter z. B. `"At least {n} characters"` — ersetzt die unhandliche `summaryMinCharsLeft` / `summaryMinCharsRight`-Aufteilung
-- Neue `data-testid`s: `psm-input`, `psm-meter`, `psm-toggle`, `psm-summary`
-- Tests auf `getByTestId` umstellen (weg von `querySelector(".meter-result")` und MUI-internen testids)
-
-### PSM Phase 4 — Form-Integration
-
-**Ziel:** Drop-in-Ersatz für Standard-MUI-Passwortfelder in React-Hook-Form, Formik, native Forms.
-
-- `name?: string` — für `<form>` submission und `register()`
-- `inputRef?: React.Ref<HTMLInputElement>` — für `ref`-Callbacks
-- `disabled?: boolean` — deaktiviert Input + Adornment
-- `error?: boolean` + `helperText?: string` — Fehleranzeige wie bei MUI `TextField`
-- `autoComplete?: string` — `"new-password"` / `"current-password"` für Browser-Hints
-- Tests für alle neuen Props
+- Zweites Passwort-Feld mit Match-Validierung
+- Prop `showConfirm?: boolean`
+- Eigene Translation-Keys für Label + Fehlermeldung
+- `onConfirmChange?: (matches: boolean) => void`

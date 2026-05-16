@@ -1,4 +1,4 @@
-import { Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import { TagSelectionChip } from "./TagSelectionChip";
 import type {
   TagSelectionItem,
@@ -25,7 +25,7 @@ export function TagSelectionSelectedTags({
   chipSize = "medium",
 }: TagSelectionSelectedTagsProps) {
   return (
-    <div className="tag-selection-section">
+    <Box sx={{ mb: 2 }}>
       {showSelectedTagsLabel && (
         <Typography variant="subtitle2" gutterBottom>
           {translation.selectedTagsLabel}
@@ -36,7 +36,7 @@ export function TagSelectionSelectedTags({
           {translation.noSelectedTagsText}
         </Typography>
       ) : (
-        <Stack direction="row" className="tag-selection-chip-list">
+        <Stack direction="row" flexWrap="wrap" gap={1}>
           {selectedTags.map((tag) => (
             <TagSelectionChip
               key={tag.id}
@@ -49,6 +49,6 @@ export function TagSelectionSelectedTags({
           ))}
         </Stack>
       )}
-    </div>
+    </Box>
   );
 }

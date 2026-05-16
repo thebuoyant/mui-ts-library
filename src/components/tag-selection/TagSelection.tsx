@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { Box, Stack } from "@mui/material";
 import { useStore } from "zustand";
-import "./TagSelection.css";
 import {
   createTagSelectionStore,
   type TagSelectionStore,
@@ -13,15 +12,7 @@ import type {
   TagSelectionProps,
   TagSelectionTranslation,
 } from "./TagSelection.types";
-
-const defaultTranslation: TagSelectionTranslation = {
-  selectedTagsLabel: "Selected tags",
-  autoCompleteLabel: "Search and add tags",
-  detailsLabel: "All tags",
-  noSelectedTagsText: "No tags selected.",
-  noAvailableTagsText: "No tags available.",
-  placeholder: "Type to search...",
-};
+import { DEFAULT_TAG_SELECTION_TRANSLATION } from "./TagSelection.types";
 
 const TagSelectionStoreContext = createContext<TagSelectionStore | null>(null);
 
@@ -37,12 +28,8 @@ function useTagSelectionStore<T>(
   return useStore(store, selector);
 }
 
-// onDetailsToggle wird erst in einer zukünftigen Version implementiert.
 // translation ist hier nicht optional, da der äußere Wrapper den Default bereits auflöst.
-type TagSelectionInnerProps = Omit<
-  TagSelectionProps,
-  "translation" | "onDetailsToggle"
-> & {
+type TagSelectionInnerProps = Omit<TagSelectionProps, "translation"> & {
   translation: TagSelectionTranslation;
 };
 
@@ -147,7 +134,7 @@ function TagSelectionInner({
   };
 
   return (
-    <Box className="tag-selection-root">
+    <Box sx={{ width: "100%" }}>
       <Stack>
         {showSelectedTags && (
           <TagSelectionSelectedTags
@@ -185,15 +172,15 @@ export function TagSelection({
   showAutoComplete = true,
   showStartIcon = true,
   showDeleteIcon = true,
-  translation = defaultTranslation,
+  translation,
   inputSize = "medium",
   chipSize = "medium",
   onTagSelect,
   onTagDelete,
   onTagsChange,
   onSearchChange,
-  onDetailsToggle,
 }: TagSelectionProps) {
+  const t: TagSelectionTranslation = { ...DEFAULT_TAG_SELECTION_TRANSLATION, ...translation };
   const [store] = useState(() => createTagSelectionStore(tags));
 
   return (
@@ -205,7 +192,7 @@ export function TagSelection({
         showAutoComplete={showAutoComplete}
         showStartIcon={showStartIcon}
         showDeleteIcon={showDeleteIcon}
-        translation={translation}
+        translation={t}
         onTagSelect={onTagSelect}
         onTagDelete={onTagDelete}
         onTagsChange={onTagsChange}

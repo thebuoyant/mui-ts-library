@@ -215,7 +215,6 @@ describe("TagSelection", () => {
         translation={{
           selectedTagsLabel: "Ausgewählte Tags",
           autoCompleteLabel: "Tags suchen",
-          detailsLabel: "Alle Tags",
           noSelectedTagsText: "Keine Tags ausgewählt.",
           noAvailableTagsText: "Keine Tags verfügbar.",
           placeholder: "Suchen...",

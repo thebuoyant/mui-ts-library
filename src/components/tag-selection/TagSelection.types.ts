@@ -30,11 +30,17 @@ export type TagSelectionItem = {
 export type TagSelectionTranslation = {
   selectedTagsLabel: string;
   autoCompleteLabel: string;
-  // Reserviert für das noch nicht implementierte "Alle Tags"-Panel.
-  detailsLabel: string;
   noSelectedTagsText: string;
   noAvailableTagsText: string;
   placeholder: string;
+};
+
+export const DEFAULT_TAG_SELECTION_TRANSLATION: TagSelectionTranslation = {
+  selectedTagsLabel: "Selected tags",
+  autoCompleteLabel: "Search and add tags",
+  noSelectedTagsText: "No tags selected.",
+  noAvailableTagsText: "No tags available.",
+  placeholder: "Type to search...",
 };
 
 export type TagSelectionProps = {
@@ -44,7 +50,8 @@ export type TagSelectionProps = {
   showAutoComplete?: boolean;
   showStartIcon?: boolean;
   showDeleteIcon?: boolean;
-  translation?: TagSelectionTranslation;
+  // Nur abweichende Keys angeben — Rest fällt auf DEFAULT_TAG_SELECTION_TRANSLATION zurück.
+  translation?: Partial<TagSelectionTranslation>;
   inputSize?: "small" | "medium";
   chipSize?: "small" | "medium";
   onTagSelect?: (
@@ -62,6 +69,4 @@ export type TagSelectionProps = {
     allTags: TagSelectionItem[],
   ) => void;
   onSearchChange?: (searchValue: string) => void;
-  // Reserviert für das noch nicht implementierte "Alle Tags"-Panel.
-  onDetailsToggle?: (expanded: boolean) => void;
 };

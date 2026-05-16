@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
 import { Box } from "@mui/material";
 import CodeIcon from "@mui/icons-material/Code";
 import JavascriptIcon from "@mui/icons-material/Javascript";
@@ -90,6 +91,36 @@ const sampleTags: TagSelectionItem[] = [
 const meta: Meta<typeof TagSelection> = {
   title: "Components/TagSelection",
   component: TagSelection,
+  args: {
+    tags: sampleTags,
+    showSelectedTags: true,
+    showSelectedTagsLabel: true,
+    showAutoComplete: true,
+    showStartIcon: true,
+    showDeleteIcon: true,
+    inputSize: "medium",
+    chipSize: "medium",
+    onTagSelect: fn(),
+    onTagDelete: fn(),
+    onTagsChange: fn(),
+    onSearchChange: fn(),
+  },
+  argTypes: {
+    showSelectedTags: { control: "boolean" },
+    showSelectedTagsLabel: { control: "boolean" },
+    showAutoComplete: { control: "boolean" },
+    showStartIcon: { control: "boolean" },
+    showDeleteIcon: { control: "boolean" },
+    inputSize: { control: "radio", options: ["small", "medium"] },
+    chipSize: { control: "radio", options: ["small", "medium"] },
+    // Komplexe Objekte — stattdessen dedizierte Stories verwenden.
+    tags: { control: false },
+    translation: { control: false },
+    onTagSelect: { control: false },
+    onTagDelete: { control: false },
+    onTagsChange: { control: false },
+    onSearchChange: { control: false },
+  },
 };
 
 export default meta;
@@ -97,41 +128,126 @@ export default meta;
 type Story = StoryObj<typeof TagSelection>;
 
 export const Default: Story = {
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <TagSelection {...args} />
+    </Box>
+  ),
+};
+
+export const SmallInput: Story = {
   args: {
-    tags: sampleTags,
     inputSize: "small",
     chipSize: "small",
-    showSelectedTags: true,
-    showSelectedTagsLabel: true,
-    showAutoComplete: true,
-    showStartIcon: true,
-    showDeleteIcon: true,
+  },
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <TagSelection {...args} />
+    </Box>
+  ),
+};
+
+export const NoSelectedTags: Story = {
+  args: {
+    showSelectedTags: false,
+  },
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <TagSelection {...args} />
+    </Box>
+  ),
+};
+
+export const NoAutoComplete: Story = {
+  args: {
+    showAutoComplete: false,
+  },
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <TagSelection {...args} />
+    </Box>
+  ),
+};
+
+export const NoStartIcons: Story = {
+  args: {
+    showStartIcon: false,
+  },
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <TagSelection {...args} />
+    </Box>
+  ),
+};
+
+export const NoDeleteIcons: Story = {
+  args: {
+    showDeleteIcon: false,
+  },
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <TagSelection {...args} />
+    </Box>
+  ),
+};
+
+export const GermanTranslation: Story = {
+  args: {
     translation: {
-      selectedTagsLabel: "Selected tags",
-      autoCompleteLabel: "Search and add tags",
-      detailsLabel: "All tags",
-      noSelectedTagsText: "No tags selected.",
-      noAvailableTagsText: "No tags available.",
-      placeholder: "Type to search...",
+      selectedTagsLabel: "Ausgewählte Tags",
+      autoCompleteLabel: "Tags suchen und hinzufügen",
+      noSelectedTagsText: "Keine Tags ausgewählt.",
+      noAvailableTagsText: "Keine Tags verfügbar.",
+      placeholder: "Suchen...",
     },
   },
   render: (args) => (
     <Box sx={{ maxWidth: 420 }}>
-      <TagSelection
-        {...args}
-        onTagSelect={(tag, selectedTags, allTags) => {
-          console.log("onTagSelect", tag, selectedTags, allTags);
-        }}
-        onTagDelete={(tag, selectedTags, allTags) => {
-          console.log("onTagDelete", tag, selectedTags, allTags);
-        }}
-        onTagsChange={(selectedTags, allTags) => {
-          console.log("onTagsChange", selectedTags, allTags);
-        }}
-        onSearchChange={(searchValue) => {
-          console.log("onSearchChange", searchValue);
-        }}
-      />
+      <TagSelection {...args} />
+    </Box>
+  ),
+};
+
+const customColorTags: TagSelectionItem[] = [
+  {
+    id: "brand-primary",
+    label: "Branding Primär",
+    selected: true,
+    foregroundColor: "#ffffff",
+    backgroundColor: "#6200ea",
+    deleteIcon: <CloseIcon />,
+  },
+  {
+    id: "brand-secondary",
+    label: "Branding Sekundär",
+    selected: true,
+    foregroundColor: "#ffffff",
+    backgroundColor: "#00897b",
+    deleteIcon: <CloseIcon />,
+  },
+  {
+    id: "highlight",
+    label: "Highlight",
+    foregroundColor: "#1a1a1a",
+    backgroundColor: "#ffea00",
+    deleteIcon: <CloseIcon />,
+  },
+  {
+    id: "accent",
+    label: "Akzent",
+    foregroundColor: "#ffffff",
+    backgroundColor: "#e64a19",
+    deleteIcon: <CloseIcon />,
+  },
+];
+
+export const CustomColors: Story = {
+  args: {
+    tags: customColorTags,
+  },
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <TagSelection {...args} />
     </Box>
   ),
 };

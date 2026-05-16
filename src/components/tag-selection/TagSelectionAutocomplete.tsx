@@ -1,4 +1,4 @@
-import { Autocomplete, Chip, TextField } from "@mui/material";
+import { Autocomplete, Box, Chip, TextField } from "@mui/material";
 import type { SyntheticEvent } from "react";
 import type {
   TagSelectionItem,
@@ -27,7 +27,7 @@ export function TagSelectionAutocomplete({
   chipSize = "medium",
 }: TagSelectionAutocompleteProps) {
   return (
-    <div className="tag-selection-section">
+    <Box sx={{ mb: 2 }}>
       <Autocomplete<TagSelectionItem, false, false, false>
         options={availableTags}
         // value=null hält die Auswahl immer leer: nach einem Klick auf eine Option
@@ -95,6 +95,6 @@ export function TagSelectionAutocomplete({
         isOptionEqualToValue={(option, value) => option.id === value.id}
         noOptionsText={translation.noAvailableTagsText}
       />
-    </div>
+    </Box>
   );
 }

@@ -12,7 +12,6 @@ import type {
 const translation: TagSelectionTranslation = {
   selectedTagsLabel: "Selected tags",
   autoCompleteLabel: "Search and add tags",
-  detailsLabel: "All tags",
   noSelectedTagsText: "No tags selected.",
   noAvailableTagsText: "No tags available.",
   placeholder: "Type to search...",
