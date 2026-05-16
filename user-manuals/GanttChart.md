@@ -300,7 +300,7 @@ const ganttTheme: GanttTheme = {
 | `onEditTask` | `(task: GanttTask) => void` | Klick auf das „Bearbeiten"-Icon. Wird nur ausgelöst wenn `enableBuiltinDialogs={false}`. |
 | `onDeleteTask` | `(task: GanttTask) => void` | Klick auf das „Löschen"-Icon. Wird nur ausgelöst wenn `enableBuiltinDialogs={false}`. |
 | `onStatusChange` | `(task: GanttTask, status: GanttTaskStatus) => void` | Auswahl eines neuen Status im Rechtsklick-Kontextmenü des Balkens. |
-| `onTaskMoved` | `(task: GanttTask, newStart: Date, newEnd: Date) => void` | Task wurde per Drag horizontal verschoben (`draggable={true}`). Enthält den verschobenen Task mit den **neuen** Daten. |
+| `onTaskMoved` | `(task: GanttTask, newStart: Date, newEnd: Date) => void` | Task wurde per Drag horizontal verschoben (`draggable={true}`). `task` enthält die ursprünglichen Metadaten (id, name, status etc.) mit den **alten** Datumsangaben. Die neuen Daten befinden sich ausschließlich in `newStart` und `newEnd`. |
 | `onTaskResized` | `(task: GanttTask, newEnd: Date) => void` | Task-Balken wurde am rechten Rand per Drag verlängert/verkürzt (`resizable={true}`). |
 | `onTasksChange` | `(tasks: GanttTask[]) => void` | Wird nach **jeder** CRUD-Aktion mit der vollständigen, aktuellen Task-Liste aufgerufen. Zentraler Callback für datengetriebene Architekturen (z. B. Redux, Zustand, React Query). |
 | `onTaskCreated` | `(task: GanttTask) => void` | Neuer Task wurde über den eingebauten Dialog angelegt (`enableBuiltinDialogs={true}`). |
