@@ -11,6 +11,8 @@ Der `PasswordStrengthMeter` ist eine Passwort-Eingabe-Komponente auf Basis von R
 - Onboarding-Flows mit Sicherheitshinweisen
 - Admin-Bereiche mit strengen Passwortrichtlinien
 
+![PasswordStrengthMeter – Komponentenvorschau](PasswordStrengthMeter.png)
+
 ---
 
 ## Technische Voraussetzungen

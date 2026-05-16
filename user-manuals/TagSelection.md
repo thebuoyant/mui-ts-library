@@ -11,6 +11,8 @@ Die `TagSelection`-Komponente ist ein flexibles Multi-Tag-Auswahlfeld auf Basis 
 - Filterauswahl in Suchmasken und Dashboard-Filtern
 - Tag-basiertes Labeling in Content-Management-Systemen
 
+![TagSelection – Komponentenvorschau](TagSelection.png)
+
 ---
 
 ## Technische Voraussetzungen

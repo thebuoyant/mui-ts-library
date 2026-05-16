@@ -11,6 +11,8 @@ Der `GanttChart` ist eine vollständig interaktive Projektplanungs-Komponente au
 - Visualisierung von Meilensteinen in agilen Projekten
 - Dashboards mit zeitlicher Übersicht über laufende Aufgaben
 
+![GanttChart – Komponentenvorschau](GanttChart.png)
+
 ---
 
 ## Technische Voraussetzungen
