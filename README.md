@@ -28,7 +28,7 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 | `GanttChart` | Vollständige Projekt-Timeline mit hierarchischen Aufgaben, Meilensteinen, Abhängigkeitspfeilen, Drag & Drop, kaskadierenden Abhängigkeiten, Fortschritts-Tracking, Zoom, Split-Pane, integrierten CRUD-Dialogen und konfigurierbarer Toolbar |
 | `TagSelection` | Multi-Tag-Auswahlfeld mit Such-Autocomplete, Chip-Anzeige und vollständiger Callback-API |
 | `PasswordStrengthMeter` | Passwort-Eingabefeld mit Live-Stärkebewertung, animiertem Meter und Anforderungscheckliste |
-| `RichTextEditor` | WYSIWYG-Editor auf Basis TipTap v3 mit MUI-Toolbar, Link-Dialog, Zeichenzähler, Zeichenbegrenzung, Readonly/Disabled-Modus und vollständiger Form-Integration |
+| `RichTextEditor` | WYSIWYG-Editor auf Basis TipTap v3 mit MUI-Toolbar, Textfarbe, Hervorhebung, Link-Dialog, automatischer Markdown-Konvertierung beim Einfügen, Zeichenzähler, Zeichenbegrenzung, konfigurierbarer Höhe/Breite, Readonly/Disabled-Modus und vollständiger Form-Integration |
 
 ---
 
@@ -411,6 +411,25 @@ const [content, setContent] = useState('<p>Initialinhalt</p>');
   helperText="Pflichtfeld."
 />
 ```
+
+**Höhe und Breite:**
+
+```tsx
+{/* Feste Höhe — Inhalt scrollt vertikal */}
+<RichTextEditor height={400} />
+
+{/* Editor füllt den umgebenden Flex-Container */}
+<Box sx={{ height: 500, display: "flex", flexDirection: "column" }}>
+  <RichTextEditor height="auto" />
+</Box>
+
+{/* Feste Breite */}
+<RichTextEditor height={300} width={600} />
+```
+
+**Markdown einfügen:**
+
+Beim Einfügen (`Ctrl+V`) von Markdown-Text aus `.md`-Dateien oder Markdown-Editoren wird die Syntax automatisch in Rich-Text umgewandelt — `**fett**` wird zu Fettschrift, `## Heading` zu einer Überschrift usw.
 
 **Mit React Hook Form:**
 

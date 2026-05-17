@@ -12,6 +12,8 @@ Der `RichTextEditor` ist ein vollständiger WYSIWYG-Texteditor auf Basis von [Ti
 - Kommentarfelder mit Formatierungsmöglichkeiten
 - Formularfelder die mehr als `<TextField multiline>` benötigen
 
+![RichTextEditor – Komponentenvorschau](RichTextEditor.png)
+
 ---
 
 ## Technische Voraussetzungen
@@ -25,6 +27,10 @@ Der `RichTextEditor` ist ein vollständiger WYSIWYG-Texteditor auf Basis von [Ti
 | `@tiptap/starter-kit` | 3.x |
 | `@tiptap/extension-placeholder` | 3.x |
 | `@tiptap/extension-character-count` | 3.x |
+| `@tiptap/extension-text-style` | 3.x |
+| `@tiptap/extension-color` | 3.x |
+| `@tiptap/extension-highlight` | 3.x |
+| `tiptap-markdown` | 0.9.x |
 
 ---
 
@@ -110,6 +116,8 @@ type RichTextEditorToolbarConfig = {
   showCodeBlock?:      boolean;
   showLink?:           boolean;
   showHorizontalRule?: boolean;
+  showTextColor?:      boolean;
+  showHighlight?:      boolean;
   showUndoRedo?:       boolean;
   showClearFormat?:    boolean;
 };
@@ -259,6 +267,36 @@ import { DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG } from 'mui-ts-library';
 ```
 
 Der Zähler färbt sich rot wenn das Limit erreicht ist.
+
+---
+
+## Höhe und Breite
+
+Die Gesamtgröße des Editors (Toolbar + Inhaltsbereich) wird über `height` und `width` gesteuert. Numerische Werte werden automatisch in `px` umgewandelt; CSS-Strings wie `"50vh"` oder `"100%"` werden direkt übergeben.
+
+```tsx
+{/* Standard: 200px hoch, 100% breit */}
+<RichTextEditor />
+
+{/* Feste Höhe — Inhalt scrollt vertikal wenn er überläuft */}
+<RichTextEditor height={400} />
+
+{/* CSS-String direkt möglich */}
+<RichTextEditor height="50vh" />
+
+{/* "auto" — Editor füllt den umgebenden Flex-Container */}
+<Box sx={{ height: 500, display: "flex", flexDirection: "column" }}>
+  <RichTextEditor height="auto" />
+</Box>
+
+{/* Feste Breite */}
+<RichTextEditor width={600} />
+
+{/* Kombiniert */}
+<RichTextEditor height={300} width="80%" />
+```
+
+**Hinweis zu `height="auto"`:** Der umgebende Container muss `display: flex` und `flex-direction: column` haben, damit sich der Editor daran orientieren kann.
 
 ---
 
@@ -414,3 +452,6 @@ Der Editor-Rahmen erscheint in `error.main` (MUI-Fehlerfarbe), der `helperText` 
 | **TipTap v3** | StarterKit enthält bereits `Link` und `Underline` — keine separaten Imports |
 | **`shouldRerenderOnTransaction: true`** | Notwendig in TipTap v3 damit Toolbar-Buttons ihren aktiven Zustand reflektieren |
 | **`onMouseDown` preventDefault** | Jeder Toolbar-Button verhindert damit das Blur des Editors beim Klicken |
+| **`height` auf `Paper`** | Die Gesamthöhe (Toolbar + Inhalt) sitzt auf dem `Paper`-Wrapper; der Inhaltsbereich füllt den Rest über `flex: 1` |
+| **`normalizeSize()`** | Konvertiert numerische Strings (`"300"`) zu Zahlen, damit MUI `px` anhängt — ermöglicht Storybook-Text-Controls |
+| **`tiptap-markdown`** | Freies Community-Paket (`transformPastedText: true`) — kein TipTap-Pro erforderlich |
