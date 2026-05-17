@@ -105,8 +105,10 @@ export type RichTextEditorProps = {
   onChange?:     (value: string) => void;
   placeholder?:  string;
   outputFormat?: RichTextEditorOutputFormat;
-  minHeight?:    number | string;
-  maxHeight?:    number | string;
+  /** Gesamthöhe des Editors (Toolbar + Inhalt). Zahlen → px. "auto" → füllt den umgebenden Flex-Container. */
+  height?: number | string;
+  /** Breite des Editors. Zahlen → px. "auto" oder leer → 100% des Elternelements. */
+  width?:  number | string;
   showCharacterCount?: boolean;
   maxCharacters?:      number;
   toolbarConfig?: RichTextEditorToolbarConfig;

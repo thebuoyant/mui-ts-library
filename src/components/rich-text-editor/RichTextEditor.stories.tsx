@@ -1,6 +1,7 @@
 import { type ComponentProps, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { fn } from "storybook/test";
+import { Box } from "@mui/material";
 import { RichTextEditor } from "./RichTextEditor";
 
 const meta: Meta<typeof RichTextEditor> = {
@@ -9,8 +10,10 @@ const meta: Meta<typeof RichTextEditor> = {
   argTypes: {
     placeholder:        { control: "text" },
     outputFormat:       { control: "radio", options: ["html", "json"] },
-    minHeight:          { control: "number" },
-    maxHeight:          { control: "text" },  // Zahlen ("300"), Pixel-Strings ("300px"), Prozent ("50%") oder "auto"
+    // Zahlen ("300"), Pixel-Strings ("300px"), Prozent ("50vh") oder "auto" (füllt Container)
+    height:             { control: "text" },
+    // Zahlen ("600"), Pixel-Strings ("600px"), Prozent ("50%") — leer = 100%
+    width:              { control: "text" },
     showCharacterCount: { control: "boolean" },
     maxCharacters:      { control: "number" },
     disabled:           { control: "boolean" },
@@ -33,8 +36,8 @@ const meta: Meta<typeof RichTextEditor> = {
     onFocus:            fn(),
     placeholder:        "Hier tippen …",
     outputFormat:       "html",
-    minHeight:          120,
-    maxHeight:          "",
+    height:             "",
+    width:              "",
     showCharacterCount: false,
     maxCharacters:      0,
     disabled:           false,
@@ -84,10 +87,34 @@ export const WithInitialValue: Story = {
   },
 };
 
-export const WithMaxHeight: Story = {
+// Demonstriert feste Höhe: Inhalt überläuft → vertikale Scrollbar erscheint
+export const WithFixedHeight: Story = {
   args: {
-    value:     LONG_HTML,
-    maxHeight: "200",
+    value:  LONG_HTML,
+    height: "200",
+  },
+};
+
+// Demonstriert "auto": Editor füllt den umgebenden Container (hier 400px)
+export const WithAutoHeight: Story = {
+  decorators: [
+    (Story) => (
+      <Box sx={{ height: 400, display: "flex", flexDirection: "column", border: "2px dashed", borderColor: "divider", p: 1 }}>
+        <Story />
+      </Box>
+    ),
+  ],
+  args: {
+    value:  SAMPLE_HTML,
+    height: "auto",
+  },
+};
+
+// Demonstriert feste Breite — Editor nimmt nicht die volle Container-Breite ein
+export const WithCustomWidth: Story = {
+  args: {
+    value: SAMPLE_HTML,
+    width: "500",
   },
 };
 
@@ -170,15 +197,27 @@ export const WithError: Story = {
 
 export const WithTextColor: Story = {
   args: {
-    value:       "<p>Markiere diesen Text und wähle eine <strong>Farbe</strong> aus der Toolbar.</p>",
-    placeholder: "Text markieren, dann Textfarbe wählen …",
+    value: [
+      '<p>Textfarben können pro Zeichen vergeben werden:',
+      ' <span style="color:#ff0000">Rot</span>,',
+      ' <span style="color:#1e90ff">Blau</span>,',
+      ' <span style="color:#008000">Grün</span>,',
+      ' <span style="color:#ff8c00">Orange</span>.</p>',
+      '<p>Text markieren → A-Button in der Toolbar → Farbe wählen.</p>',
+    ].join(""),
   },
 };
 
 export const WithHighlight: Story = {
   args: {
-    value:       "<p>Markiere diesen Text und wähle eine <strong>Hintergrundfarbe</strong> aus der Toolbar.</p>",
-    placeholder: "Text markieren, dann Hervorhebungsfarbe wählen …",
+    value: [
+      "<p>Hervorhebungen funktionieren wie ein Textmarker:",
+      ' <mark style="background-color:#ffff00">Gelb</mark>,',
+      ' <mark style="background-color:#90ee90">Grün</mark>,',
+      ' <mark style="background-color:#87ceeb">Blau</mark>,',
+      ' <mark style="background-color:#ff69b4">Pink</mark>.</p>',
+      "<p>Text markieren → Pinsel-Button in der Toolbar → Farbe wählen.</p>",
+    ].join(""),
   },
 };
 

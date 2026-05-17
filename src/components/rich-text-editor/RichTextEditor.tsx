@@ -16,13 +16,20 @@ import { RichTextEditorContent } from "./RichTextEditorContent";
 import { RichTextEditorToolbar } from "./RichTextEditorToolbar";
 import { RichTextEditorFooter } from "./RichTextEditorFooter";
 
+// Numerische Strings ("300") → Zahl, damit MUI "px" anhängt; alles andere unverändert
+function normalizeSize(val: number | string | undefined): number | string | undefined {
+  if (val === "" || val === undefined) return undefined;
+  if (typeof val === "string" && val !== "auto" && !isNaN(Number(val))) return Number(val);
+  return val;
+}
+
 export function RichTextEditor({
   value,
   onChange,
   placeholder,
   outputFormat = "html",
-  minHeight,
-  maxHeight,
+  height,
+  width,
   showCharacterCount = false,
   maxCharacters,
   toolbarConfig,
@@ -37,6 +44,12 @@ export function RichTextEditor({
 }: RichTextEditorProps) {
   const t = { ...DEFAULT_RICH_TEXT_EDITOR_TRANSLATION, ...translation };
   const tc = { ...DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG, ...toolbarConfig };
+
+  const normH      = normalizeSize(height);
+  const normW      = normalizeSize(width);
+  const isAutoH    = normH === "auto";
+  // undefined → 200px Standardhöhe
+  const effectiveH = isAutoH ? undefined : (normH ?? 200);
 
   const editor = useEditor({
     // TipTap v3 rendert ohne dieses Flag nicht bei jedem Transaction neu → Toolbar-State wäre veraltet
@@ -94,16 +107,24 @@ export function RichTextEditor({
     showCharacterCount || (maxCharacters !== undefined && maxCharacters > 0) || !!helperText;
 
   return (
-    <Box>
+    <Box
+      sx={{
+        width: normW ?? "100%",
+        ...(isAutoH ? { display: "flex", flexDirection: "column", flex: 1 } : {}),
+      }}
+    >
       <Paper
         variant="outlined"
         sx={{
+          display:       "flex",
+          flexDirection: "column",
+          overflow:      "hidden",
+          ...(isAutoH ? { flex: 1 } : { height: effectiveH }),
           borderColor: error ? "error.main" : undefined,
           "&:focus-within": {
             borderColor: error ? "error.main" : "primary.main",
             borderWidth: 2,
           },
-          overflow: "hidden",
         }}
       >
         {!readonly && (
@@ -122,8 +143,6 @@ export function RichTextEditor({
           error={error}
           disabled={disabled}
           readonly={readonly}
-          minHeight={minHeight}
-          maxHeight={maxHeight}
         />
       </Paper>
       {showFooter && (

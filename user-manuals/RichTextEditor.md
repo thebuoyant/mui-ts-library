@@ -69,8 +69,8 @@ function App() {
 | `onChange` | `(value: string) => void` | — | Wird bei jeder Inhaltsänderung aufgerufen |
 | `placeholder` | `string` | — | Platzhaltertext wenn der Editor leer ist |
 | `outputFormat` | `RichTextEditorOutputFormat` | `"html"` | Ausgabeformat für `onChange` — `"html"` oder `"json"` |
-| `minHeight` | `number \| string` | `120` | Mindesthöhe des Editorbereichs |
-| `maxHeight` | `number \| string` | — | Maximale Höhe (überschüssiger Inhalt scrollt) |
+| `height` | `number \| string` | `200` | Gesamthöhe des Editors (Toolbar + Inhalt). Zahlen → px. `"auto"` → füllt den umgebenden Flex-Container. Überschüssiger Inhalt scrollt vertikal. |
+| `width` | `number \| string` | `"100%"` | Breite des Editors. Zahlen → px. Leer oder nicht gesetzt → 100% des Elternelements. |
 | `showCharacterCount` | `boolean` | `false` | Zeigt Zeichenzähler unten rechts |
 | `maxCharacters` | `number` | — | Maximale Zeichenanzahl — Eingabe wird bei Erreichen blockiert |
 | `toolbarConfig` | `RichTextEditorToolbarConfig` | alle `true` | Einzelne Toolbar-Buttons ein-/ausblenden |
