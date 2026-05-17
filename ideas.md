@@ -41,7 +41,7 @@ Bell-Icon mit Dropdown, Read/Unread-Status, Zeitstempel und optionaler Gruppieru
 ### JSON Tree Viewer
 Collapsible Key/Value-Baum mit Syntax-Coloring und Copy-Button. Unverzichtbar in DevTools, API-Explorern und Debug-Ansichten.
 
-### Rich Text Editor
+### Rich Text Editor ✅ Implementiert
 WYSIWYG-Block auf Basis TipTap oder Quill, vollständig mit MUI-Theme gestylt (Toolbar, Buttons, Farben). Für CMS, E-Mail-Templates und Kommentarfelder.
 
 ### Inline Date-Range-Picker

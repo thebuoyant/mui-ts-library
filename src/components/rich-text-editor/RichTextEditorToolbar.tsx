@@ -1,0 +1,307 @@
+import { useState } from "react";
+import { type Editor } from "@tiptap/react";
+import {
+  Box,
+  Divider,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
+import FormatBoldIcon from "@mui/icons-material/FormatBold";
+import FormatItalicIcon from "@mui/icons-material/FormatItalic";
+import FormatUnderlinedIcon from "@mui/icons-material/FormatUnderlined";
+import StrikethroughSIcon from "@mui/icons-material/StrikethroughS";
+import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
+import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
+import CodeIcon from "@mui/icons-material/Code";
+import InsertLinkIcon from "@mui/icons-material/InsertLink";
+import HorizontalRuleIcon from "@mui/icons-material/HorizontalRule";
+import UndoIcon from "@mui/icons-material/Undo";
+import RedoIcon from "@mui/icons-material/Redo";
+import FormatClearIcon from "@mui/icons-material/FormatClear";
+import {
+  type RichTextEditorTranslation,
+  type RichTextEditorToolbarConfig,
+} from "./RichTextEditor.types";
+import { RichTextEditorLinkDialog } from "./RichTextEditorLinkDialog";
+
+type RichTextEditorToolbarProps = {
+  editor:        Editor | null;
+  toolbarConfig: Required<RichTextEditorToolbarConfig>;
+  translation:   RichTextEditorTranslation;
+  disabled?:     boolean;
+};
+
+type ToolbarButtonProps = {
+  label:     string;
+  icon:      React.ReactNode;
+  onClick:   () => void;
+  active?:   boolean;
+  disabled?: boolean;
+};
+
+function ToolbarButton({ label, icon, onClick, active, disabled }: ToolbarButtonProps) {
+  return (
+    <Tooltip title={label} arrow>
+      <span>
+        <IconButton
+          size="small"
+          // Verhindert dass der Editor seinen Fokus verliert wenn ein Toolbar-Button gedrückt wird
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={onClick}
+          disabled={disabled}
+          color={active ? "primary" : "default"}
+          sx={{ borderRadius: 1 }}
+          aria-label={label}
+          aria-pressed={active}
+        >
+          {icon}
+        </IconButton>
+      </span>
+    </Tooltip>
+  );
+}
+
+function H1Icon() {
+  return <Box component="span" sx={{ fontWeight: "bold", fontSize: "0.875rem", lineHeight: 1 }}>H1</Box>;
+}
+function H2Icon() {
+  return <Box component="span" sx={{ fontWeight: "bold", fontSize: "0.875rem", lineHeight: 1 }}>H2</Box>;
+}
+function H3Icon() {
+  return <Box component="span" sx={{ fontWeight: "bold", fontSize: "0.875rem", lineHeight: 1 }}>H3</Box>;
+}
+
+export function RichTextEditorToolbar({
+  editor,
+  toolbarConfig: tc,
+  translation: t,
+  disabled,
+}: RichTextEditorToolbarProps) {
+  const [linkDialogOpen, setLinkDialogOpen] = useState(false);
+
+  const isDisabled = disabled || !editor;
+
+  const hasTextGroup =
+    tc.showBold || tc.showItalic || tc.showUnderline || tc.showStrike;
+  const hasHeadingGroup =
+    tc.showHeading1 || tc.showHeading2 || tc.showHeading3;
+  const hasListGroup =
+    tc.showBulletList || tc.showOrderedList;
+  const hasBlockGroup =
+    tc.showBlockquote || tc.showCodeBlock || tc.showLink || tc.showHorizontalRule;
+  const hasHistoryGroup =
+    tc.showUndoRedo || tc.showClearFormat;
+
+  const groups = [hasTextGroup, hasHeadingGroup, hasListGroup, hasBlockGroup, hasHistoryGroup];
+  const activeGroupCount = groups.filter(Boolean).length;
+
+  function divider(afterGroup: boolean, groupIndex: number) {
+    if (!afterGroup) return null;
+    const nextActiveIndex = groups.slice(groupIndex + 1).findIndex(Boolean);
+    if (nextActiveIndex === -1) return null;
+    return <Divider orientation="vertical" flexItem key={`div-${groupIndex}`} sx={{ mx: 0.5 }} />;
+  }
+
+  return (
+    <>
+      <Box
+        sx={{
+          display:    "flex",
+          flexWrap:   "wrap",
+          alignItems: "center",
+          gap:        0.25,
+          px:         1,
+          py:         0.5,
+        }}
+        role="toolbar"
+        aria-label="Text formatting"
+      >
+        {hasTextGroup && (
+          <Box sx={{ display: "flex", gap: 0.25 }}>
+            {tc.showBold && (
+              <ToolbarButton
+                label={t.bold}
+                icon={<FormatBoldIcon fontSize="small" />}
+                onClick={() => editor?.chain().focus().toggleBold().run()}
+                active={editor?.isActive("bold")}
+                disabled={isDisabled}
+              />
+            )}
+            {tc.showItalic && (
+              <ToolbarButton
+                label={t.italic}
+                icon={<FormatItalicIcon fontSize="small" />}
+                onClick={() => editor?.chain().focus().toggleItalic().run()}
+                active={editor?.isActive("italic")}
+                disabled={isDisabled}
+              />
+            )}
+            {tc.showUnderline && (
+              <ToolbarButton
+                label={t.underline}
+                icon={<FormatUnderlinedIcon fontSize="small" />}
+                onClick={() => editor?.chain().focus().toggleUnderline().run()}
+                active={editor?.isActive("underline")}
+                disabled={isDisabled}
+              />
+            )}
+            {tc.showStrike && (
+              <ToolbarButton
+                label={t.strike}
+                icon={<StrikethroughSIcon fontSize="small" />}
+                onClick={() => editor?.chain().focus().toggleStrike().run()}
+                active={editor?.isActive("strike")}
+                disabled={isDisabled}
+              />
+            )}
+          </Box>
+        )}
+
+        {divider(hasTextGroup, 0)}
+
+        {hasHeadingGroup && (
+          <Box sx={{ display: "flex", gap: 0.25 }}>
+            {tc.showHeading1 && (
+              <ToolbarButton
+                label={t.heading1}
+                icon={<H1Icon />}
+                onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
+                active={editor?.isActive("heading", { level: 1 })}
+                disabled={isDisabled}
+              />
+            )}
+            {tc.showHeading2 && (
+              <ToolbarButton
+                label={t.heading2}
+                icon={<H2Icon />}
+                onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
+                active={editor?.isActive("heading", { level: 2 })}
+                disabled={isDisabled}
+              />
+            )}
+            {tc.showHeading3 && (
+              <ToolbarButton
+                label={t.heading3}
+                icon={<H3Icon />}
+                onClick={() => editor?.chain().focus().toggleHeading({ level: 3 }).run()}
+                active={editor?.isActive("heading", { level: 3 })}
+                disabled={isDisabled}
+              />
+            )}
+          </Box>
+        )}
+
+        {divider(hasHeadingGroup, 1)}
+
+        {hasListGroup && (
+          <Box sx={{ display: "flex", gap: 0.25 }}>
+            {tc.showBulletList && (
+              <ToolbarButton
+                label={t.bulletList}
+                icon={<FormatListBulletedIcon fontSize="small" />}
+                onClick={() => editor?.chain().focus().toggleBulletList().run()}
+                active={editor?.isActive("bulletList")}
+                disabled={isDisabled}
+              />
+            )}
+            {tc.showOrderedList && (
+              <ToolbarButton
+                label={t.orderedList}
+                icon={<FormatListNumberedIcon fontSize="small" />}
+                onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+                active={editor?.isActive("orderedList")}
+                disabled={isDisabled}
+              />
+            )}
+          </Box>
+        )}
+
+        {divider(hasListGroup, 2)}
+
+        {hasBlockGroup && (
+          <Box sx={{ display: "flex", gap: 0.25 }}>
+            {tc.showBlockquote && (
+              <ToolbarButton
+                label={t.blockquote}
+                icon={<FormatQuoteIcon fontSize="small" />}
+                onClick={() => editor?.chain().focus().toggleBlockquote().run()}
+                active={editor?.isActive("blockquote")}
+                disabled={isDisabled}
+              />
+            )}
+            {tc.showCodeBlock && (
+              <ToolbarButton
+                label={t.codeBlock}
+                icon={<CodeIcon fontSize="small" />}
+                onClick={() => editor?.chain().focus().toggleCodeBlock().run()}
+                active={editor?.isActive("codeBlock")}
+                disabled={isDisabled}
+              />
+            )}
+            {tc.showLink && (
+              <ToolbarButton
+                label={t.link}
+                icon={<InsertLinkIcon fontSize="small" />}
+                onClick={() => setLinkDialogOpen(true)}
+                active={editor?.isActive("link")}
+                disabled={isDisabled}
+              />
+            )}
+            {tc.showHorizontalRule && (
+              <ToolbarButton
+                label={t.horizontalRule}
+                icon={<HorizontalRuleIcon fontSize="small" />}
+                onClick={() => editor?.chain().focus().setHorizontalRule().run()}
+                disabled={isDisabled}
+              />
+            )}
+          </Box>
+        )}
+
+        {divider(hasBlockGroup, 3)}
+
+        {hasHistoryGroup && (
+          <Box sx={{ display: "flex", gap: 0.25 }}>
+            {tc.showUndoRedo && (
+              <>
+                <ToolbarButton
+                  label={t.undo}
+                  icon={<UndoIcon fontSize="small" />}
+                  onClick={() => editor?.chain().focus().undo().run()}
+                  disabled={isDisabled || !editor?.can().undo()}
+                />
+                <ToolbarButton
+                  label={t.redo}
+                  icon={<RedoIcon fontSize="small" />}
+                  onClick={() => editor?.chain().focus().redo().run()}
+                  disabled={isDisabled || !editor?.can().redo()}
+                />
+              </>
+            )}
+            {tc.showClearFormat && (
+              <ToolbarButton
+                label={t.clearFormat}
+                icon={<FormatClearIcon fontSize="small" />}
+                onClick={() => editor?.chain().focus().clearNodes().unsetAllMarks().run()}
+                disabled={isDisabled}
+              />
+            )}
+          </Box>
+        )}
+
+        {/* Verhindert Layout-Shift wenn activeGroupCount 0 ist */}
+        {activeGroupCount === 0 && <Box sx={{ height: 32 }} />}
+      </Box>
+
+      {tc.showLink && editor && (
+        <RichTextEditorLinkDialog
+          open={linkDialogOpen}
+          onClose={() => setLinkDialogOpen(false)}
+          editor={editor}
+          translation={t}
+        />
+      )}
+    </>
+  );
+}

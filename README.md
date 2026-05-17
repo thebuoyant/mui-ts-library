@@ -13,6 +13,7 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
   - [GanttChart](#gantchart)
   - [TagSelection](#tagselection)
   - [PasswordStrengthMeter](#passwordstrengthmeter)
+  - [RichTextEditor](#richtexteditor)
 - [Dokumentation](#dokumentation)
 - [Entwicklung](#entwicklung)
 - [Veröffentlichung auf npm](#veröffentlichung-auf-npm)
@@ -27,6 +28,7 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 | `GanttChart` | Vollständige Projekt-Timeline mit hierarchischen Aufgaben, Meilensteinen, Abhängigkeitspfeilen, Drag & Drop, kaskadierenden Abhängigkeiten, Fortschritts-Tracking, Zoom, Split-Pane, integrierten CRUD-Dialogen und konfigurierbarer Toolbar |
 | `TagSelection` | Multi-Tag-Auswahlfeld mit Such-Autocomplete, Chip-Anzeige und vollständiger Callback-API |
 | `PasswordStrengthMeter` | Passwort-Eingabefeld mit Live-Stärkebewertung, animiertem Meter und Anforderungscheckliste |
+| `RichTextEditor` | WYSIWYG-Editor auf Basis TipTap v3 mit MUI-Toolbar, Link-Dialog, Zeichenzähler, Zeichenbegrenzung, Readonly/Disabled-Modus und vollständiger Form-Integration |
 
 ---
 
@@ -361,6 +363,77 @@ function SignUpForm() {
 
 ---
 
+### RichTextEditor
+
+```tsx
+import { RichTextEditor } from 'mui-ts-library';
+
+function App() {
+  return (
+    <RichTextEditor
+      placeholder="Hier tippen …"
+      showCharacterCount
+      onChange={(html) => console.log(html)}
+      onBlur={() => console.log('blur')}
+    />
+  );
+}
+```
+
+**Kontrollierter Modus:**
+
+```tsx
+const [content, setContent] = useState('<p>Initialinhalt</p>');
+
+<RichTextEditor value={content} onChange={setContent} />
+```
+
+**Minimale Toolbar (nur Bold, Italic, Underline):**
+
+```tsx
+<RichTextEditor
+  toolbarConfig={{
+    showBold: true, showItalic: true, showUnderline: true,
+    showStrike: false, showHeading1: false, showHeading2: false,
+    showHeading3: false, showBulletList: false, showOrderedList: false,
+    showBlockquote: false, showCodeBlock: false, showLink: false,
+    showHorizontalRule: false, showUndoRedo: false, showClearFormat: false,
+  }}
+/>
+```
+
+**Mit Zeichenbegrenzung und Fehlerzustand:**
+
+```tsx
+<RichTextEditor
+  maxCharacters={500}
+  error={true}
+  helperText="Pflichtfeld."
+/>
+```
+
+**Mit React Hook Form:**
+
+```tsx
+import { Controller } from 'react-hook-form';
+
+<Controller
+  name="description"
+  control={control}
+  render={({ field, fieldState }) => (
+    <RichTextEditor
+      value={field.value}
+      onChange={field.onChange}
+      onBlur={field.onBlur}
+      error={!!fieldState.error}
+      helperText={fieldState.error?.message}
+    />
+  )}
+/>
+```
+
+---
+
 ## Dokumentation
 
 Ausführliche Prop-Referenzen, Verwendungsbeispiele und i18n-Anleitungen für jede Komponente befinden sich im Ordner [`user-manuals/`](user-manuals/):
@@ -370,6 +443,7 @@ Ausführliche Prop-Referenzen, Verwendungsbeispiele und i18n-Anleitungen für je
 | `GanttChart` | [user-manuals/GanttChart.md](user-manuals/GanttChart.md) |
 | `TagSelection` | [user-manuals/TagSelection.md](user-manuals/TagSelection.md) |
 | `PasswordStrengthMeter` | [user-manuals/PasswordStrengthMeter.md](user-manuals/PasswordStrengthMeter.md) |
+| `RichTextEditor` | [user-manuals/RichTextEditor.md](user-manuals/RichTextEditor.md) |
 
 ---
 
