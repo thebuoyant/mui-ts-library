@@ -50,7 +50,7 @@ export function RichTextEditor({
       Color,
       Highlight.configure({ multicolor: true }),
       Placeholder.configure({ placeholder: placeholder ?? "" }),
-      ...(maxCharacters !== undefined
+      ...(maxCharacters !== undefined && maxCharacters > 0
         ? [CharacterCount.configure({ limit: maxCharacters })]
         : showCharacterCount
           ? [CharacterCount]
@@ -91,7 +91,7 @@ export function RichTextEditor({
   const charCount = editor?.storage.characterCount?.characters?.() ?? 0;
 
   const showFooter =
-    showCharacterCount || maxCharacters !== undefined || !!helperText;
+    showCharacterCount || (maxCharacters !== undefined && maxCharacters > 0) || !!helperText;
 
   return (
     <Box>
@@ -130,9 +130,9 @@ export function RichTextEditor({
         <RichTextEditorFooter
           helperText={helperText}
           error={error}
-          showCharacterCount={showCharacterCount || maxCharacters !== undefined}
+          showCharacterCount={showCharacterCount || (maxCharacters !== undefined && maxCharacters > 0)}
           charCount={charCount}
-          maxCharacters={maxCharacters}
+          maxCharacters={maxCharacters && maxCharacters > 0 ? maxCharacters : undefined}
           translation={t}
         />
       )}

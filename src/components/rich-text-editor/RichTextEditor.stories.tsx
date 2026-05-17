@@ -7,15 +7,41 @@ const meta: Meta<typeof RichTextEditor> = {
   title: "Components/RichTextEditor",
   component: RichTextEditor,
   argTypes: {
+    placeholder:        { control: "text" },
+    outputFormat:       { control: "radio", options: ["html", "json"] },
+    minHeight:          { control: "number" },
+    maxHeight:          { control: "text" },  // Zahlen ("300"), Pixel-Strings ("300px"), Prozent ("50%") oder "auto"
+    showCharacterCount: { control: "boolean" },
+    maxCharacters:      { control: "number" },
     disabled:           { control: "boolean" },
     readonly:           { control: "boolean" },
-    showCharacterCount: { control: "boolean" },
-    outputFormat:       { control: "radio", options: ["html", "json"] },
+    error:              { control: "boolean" },
+    helperText:         { control: "text" },
+    name:               { control: "text" },
+    // Kontrollierter Modus — über dedizierte Controlled-Story verwenden
+    value:       { control: false },
+    // Komplexe Objekte — stattdessen dedizierte Stories verwenden
+    toolbarConfig: { control: false },
+    translation:   { control: false },
+    onChange:      { control: false },
+    onBlur:        { control: false },
+    onFocus:       { control: false },
   },
   args: {
-    onChange: fn(),
-    onBlur:   fn(),
-    onFocus:  fn(),
+    onChange:           fn(),
+    onBlur:             fn(),
+    onFocus:            fn(),
+    placeholder:        "Hier tippen …",
+    outputFormat:       "html",
+    minHeight:          120,
+    maxHeight:          "",
+    showCharacterCount: false,
+    maxCharacters:      0,
+    disabled:           false,
+    readonly:           false,
+    error:              false,
+    helperText:         "",
+    name:               "",
   },
 };
 
@@ -32,6 +58,20 @@ const SAMPLE_HTML = `
 <blockquote>Ein Zitat als Blockquote.</blockquote>
 `;
 
+const LONG_HTML = `
+<h2>Langer Inhalt — Scrollbar-Demo</h2>
+<p>Zeile 1: Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+<p>Zeile 2: Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+<p>Zeile 3: Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+<p>Zeile 4: Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.</p>
+<p>Zeile 5: Excepteur sint occaecat cupidatat non proident, sunt in culpa.</p>
+<p>Zeile 6: Qui officia deserunt mollit anim id est laborum.</p>
+<p>Zeile 7: Curabitur pretium tincidunt lacus. Nulla gravida orci a odio.</p>
+<p>Zeile 8: Nullam varius, turpis molestie dictum semper, diam lectus porttitor purus.</p>
+<p>Zeile 9: Proin a arcu quis massa pretium venenatis eu vel nisi.</p>
+<p>Zeile 10: Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere.</p>
+`;
+
 export const Default: Story = {
   args: {
     placeholder: "Hier tippen …",
@@ -41,6 +81,13 @@ export const Default: Story = {
 export const WithInitialValue: Story = {
   args: {
     value: SAMPLE_HTML,
+  },
+};
+
+export const WithMaxHeight: Story = {
+  args: {
+    value:     LONG_HTML,
+    maxHeight: "200",
   },
 };
 
