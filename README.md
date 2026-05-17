@@ -52,13 +52,13 @@ zustand >= 5
 
 ```bash
 # npm
-npm install mui-ts-library
+npm install @tschlend/mui-ts-library
 
 # yarn
-yarn add mui-ts-library
+yarn add @tschlend/mui-ts-library
 
 # pnpm
-pnpm add mui-ts-library
+pnpm add @tschlend/mui-ts-library
 ```
 
 > **Hinweis:** Alle Peer Dependencies müssen installiert sein. Falls MUI noch nicht eingerichtet ist, folge dem [MUI-Installationsguide](https://mui.com/material-ui/getting-started/installation/).
@@ -92,8 +92,8 @@ Eine vollständige Projekt-Timeline-Komponente auf Basis von MUI. Wichtigste Fea
 - **Vollständige i18n** — jeden UI-Text über die `translations`-Prop überschreiben (deutsche Standardwerte)
 
 ```tsx
-import { GanttChart } from 'mui-ts-library';
-import type { GanttTask } from 'mui-ts-library';
+import { GanttChart } from '@tschlend/mui-ts-library';
+import type { GanttTask } from '@tschlend/mui-ts-library';
 
 const tasks: GanttTask[] = [
   {
@@ -171,7 +171,7 @@ function App() {
 **Mit benutzerdefinierter Toolbar-Konfiguration:**
 
 ```tsx
-import type { GanttToolbarConfig } from 'mui-ts-library';
+import type { GanttToolbarConfig } from '@tschlend/mui-ts-library';
 
 const toolbarConfig: GanttToolbarConfig = {
   showScaleDays: false,       // Schaltfläche "Tage" ausblenden
@@ -188,7 +188,7 @@ const toolbarConfig: GanttToolbarConfig = {
 **Mit benutzerdefiniertem Datumsbereich und englischen Übersetzungen:**
 
 ```tsx
-import type { GanttTranslations } from 'mui-ts-library';
+import type { GanttTranslations } from '@tschlend/mui-ts-library';
 
 const EN: Partial<GanttTranslations> = {
   scaleDays: 'Days',
@@ -228,8 +228,8 @@ const EN: Partial<GanttTranslations> = {
 ### TagSelection
 
 ```tsx
-import { TagSelection } from 'mui-ts-library';
-import type { TagSelectionItem } from 'mui-ts-library';
+import { TagSelection } from '@tschlend/mui-ts-library';
+import type { TagSelectionItem } from '@tschlend/mui-ts-library';
 
 const tags: TagSelectionItem[] = [
   { id: 'react',      label: 'React',      selected: true  },
@@ -313,8 +313,8 @@ const [tags, setTags] = useState<TagSelectionItem[]>(initialTags);
 ### PasswordStrengthMeter
 
 ```tsx
-import { PasswordStrengthMeter } from 'mui-ts-library';
-import type { StrengthResult } from 'mui-ts-library';
+import { PasswordStrengthMeter } from '@tschlend/mui-ts-library';
+import type { StrengthResult } from '@tschlend/mui-ts-library';
 
 function App() {
   return (
@@ -341,7 +341,7 @@ function App() {
 
 ```tsx
 import { useForm } from 'react-hook-form';
-import { PasswordStrengthMeter } from 'mui-ts-library';
+import { PasswordStrengthMeter } from '@tschlend/mui-ts-library';
 
 function SignUpForm() {
   const { register, handleSubmit, formState: { errors } } = useForm<{ password: string }>();
@@ -366,7 +366,7 @@ function SignUpForm() {
 ### RichTextEditor
 
 ```tsx
-import { RichTextEditor } from 'mui-ts-library';
+import { RichTextEditor } from '@tschlend/mui-ts-library';
 
 function App() {
   return (

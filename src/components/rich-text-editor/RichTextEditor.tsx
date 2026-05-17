@@ -94,7 +94,7 @@ export function RichTextEditor({
         ? JSON.stringify(editor.getJSON())
         : editor.getHTML();
     if (current !== value) {
-      editor.commands.setContent(value, false);
+      editor.commands.setContent(value, { emitUpdate: false });
     }
   }, [editor, value, outputFormat]);
 

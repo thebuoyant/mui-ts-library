@@ -29,13 +29,13 @@ Die `TagSelection`-Komponente ist ein flexibles Multi-Tag-Auswahlfeld auf Basis 
 ## Import
 
 ```tsx
-import { TagSelection } from 'mui-ts-library';
+import { TagSelection } from '@tschlend/mui-ts-library';
 import type {
   TagSelectionItem,
   TagSelectionProps,
   TagSelectionTranslation,
   TagColor,
-} from 'mui-ts-library';
+} from '@tschlend/mui-ts-library';
 ```
 
 ---
@@ -43,8 +43,8 @@ import type {
 ## Schnellstart
 
 ```tsx
-import { TagSelection } from 'mui-ts-library';
-import type { TagSelectionItem } from 'mui-ts-library';
+import { TagSelection } from '@tschlend/mui-ts-library';
+import type { TagSelectionItem } from '@tschlend/mui-ts-library';
 import { useState } from 'react';
 
 const initialTags: TagSelectionItem[] = [
@@ -169,8 +169,8 @@ type TagSelectionItem = {
 Alle angezeigten Texte können über die `translation`-Prop überschrieben werden. Es müssen nur die Keys angegeben werden, die vom Standard abweichen. Die englischen Standardwerte können direkt importiert werden:
 
 ```ts
-import { DEFAULT_TAG_SELECTION_TRANSLATION } from 'mui-ts-library';
-import type { TagSelectionTranslation } from 'mui-ts-library';
+import { DEFAULT_TAG_SELECTION_TRANSLATION } from '@tschlend/mui-ts-library';
+import type { TagSelectionTranslation } from '@tschlend/mui-ts-library';
 
 // Vollständiger TypeScript-Typ:
 type TagSelectionTranslation = {

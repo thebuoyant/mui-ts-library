@@ -6,6 +6,8 @@ import { resolve } from "node:path";
 
 export default defineConfig({
   plugins: [react()],
+  // Public-Assets nicht in den Library-Build kopieren
+  publicDir: false,
   build: {
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
@@ -18,6 +20,7 @@ export default defineConfig({
         "react",
         "react-dom",
         "@mui/material",
+        "@mui/icons-material",
         "@emotion/react",
         "@emotion/styled",
       ],
