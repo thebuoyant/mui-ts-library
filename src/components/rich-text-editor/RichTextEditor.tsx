@@ -6,6 +6,7 @@ import { Color } from "@tiptap/extension-color";
 import { Highlight } from "@tiptap/extension-highlight";
 import { Placeholder } from "@tiptap/extension-placeholder";
 import { CharacterCount } from "@tiptap/extension-character-count";
+import { Markdown } from "tiptap-markdown";
 import { Box, Divider, Paper } from "@mui/material";
 import {
   type RichTextEditorProps,
@@ -62,6 +63,8 @@ export function RichTextEditor({
       TextStyle,
       Color,
       Highlight.configure({ multicolor: true }),
+      // Eingefügter Markdown-Text wird automatisch in Rich-Text umgewandelt
+      Markdown.configure({ transformPastedText: true, transformCopiedText: false }),
       Placeholder.configure({ placeholder: placeholder ?? "" }),
       ...(maxCharacters !== undefined && maxCharacters > 0
         ? [CharacterCount.configure({ limit: maxCharacters })]

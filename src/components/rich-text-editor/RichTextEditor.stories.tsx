@@ -195,6 +195,24 @@ export const WithError: Story = {
   },
 };
 
+// Zeigt das Ergebnis von gepastem Markdown — dieser Inhalt entstand aus reinem Markdown-Text.
+// Eigenen Markdown-Text (aus .md-Datei, README etc.) einfach in den Editor einfügen.
+export const MarkdownPaste: Story = {
+  args: {
+    placeholder: "Markdown hier einfügen — z.B. **fett**, # Überschrift, - Liste …",
+    value: [
+      "<h2>Ergebnis aus gepastem Markdown</h2>",
+      "<p>Der folgende Inhalt entstand durch Einfügen von <strong>rohem Markdown-Text</strong>. Eigene <code>.md</code>-Inhalte einfach in den Editor einfügen — sie werden automatisch konvertiert.</p>",
+      "<h3>Formatierungen</h3>",
+      "<p>Text kann <strong>fett</strong>, <em>kursiv</em> oder <s>durchgestrichen</s> sein.</p>",
+      "<h3>Listen</h3>",
+      "<ul><li>Aufzählungspunkt A</li><li>Aufzählungspunkt B</li><li>Aufzählungspunkt C</li></ul>",
+      "<blockquote><p>Ein Blockzitat aus dem Markdown.</p></blockquote>",
+      "<p>Inline-<code>Code</code> und <a href='https://example.com'>Links</a> werden ebenfalls erkannt.</p>",
+    ].join(""),
+  },
+};
+
 export const WithTextColor: Story = {
   args: {
     value: [

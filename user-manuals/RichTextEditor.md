@@ -262,6 +262,23 @@ Der Zähler färbt sich rot wenn das Limit erreicht ist.
 
 ---
 
+## Markdown einfügen (Paste)
+
+Der Editor konvertiert eingefügten Markdown-Text automatisch in Rich-Text. Kopierter Inhalt aus `.md`-Dateien, GitHub READMEs oder Markdown-Editoren wird korrekt formatiert:
+
+| Markdown-Syntax | Ergebnis |
+|---|---|
+| `## Überschrift` | H2-Heading |
+| `**fett**` / `*kursiv*` | Fett / Kursiv |
+| `- Punkt` / `1. Punkt` | Bullet-List / Numbered-List |
+| `> Zitat` | Blockquote |
+| `` `code` `` | Inline-Code |
+| `[Text](url)` | Klickbarer Link |
+
+**Hinweis:** Diese Konvertierung greift nur bei Inhalten aus der Zwischenablage (Plain-Text-Clipboard). Inhalte, die aus gerenderten Quellen (z.B. GitHub-Webansicht) kopiert werden, bringen bereits HTML mit und werden über den normalen HTML-Pfad eingefügt.
+
+---
+
 ## Readonly und Disabled
 
 ```tsx
