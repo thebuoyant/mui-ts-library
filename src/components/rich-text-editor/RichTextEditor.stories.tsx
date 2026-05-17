@@ -121,6 +121,20 @@ export const WithError: Story = {
   },
 };
 
+export const WithTextColor: Story = {
+  args: {
+    value:       "<p>Markiere diesen Text und wähle eine <strong>Farbe</strong> aus der Toolbar.</p>",
+    placeholder: "Text markieren, dann Textfarbe wählen …",
+  },
+};
+
+export const WithHighlight: Story = {
+  args: {
+    value:       "<p>Markiere diesen Text und wähle eine <strong>Hintergrundfarbe</strong> aus der Toolbar.</p>",
+    placeholder: "Text markieren, dann Hervorhebungsfarbe wählen …",
+  },
+};
+
 export const GermanTranslation: Story = {
   args: {
     placeholder: "Hier tippen …",
@@ -139,6 +153,10 @@ export const GermanTranslation: Story = {
       codeBlock:        "Code-Block",
       link:             "Link einfügen",
       horizontalRule:   "Trennlinie",
+      textColor:        "Textfarbe",
+      removeTextColor:  "Textfarbe entfernen",
+      highlight:        "Hervorheben",
+      removeHighlight:  "Hervorhebung entfernen",
       undo:             "Rückgängig",
       redo:             "Wiederholen",
       clearFormat:      "Formatierung löschen",

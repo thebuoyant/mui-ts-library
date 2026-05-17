@@ -87,4 +87,24 @@ describe("RichTextEditorToolbar", () => {
     const boldButton = screen.getByRole("button", { name: "Bold" });
     expect(boldButton).toHaveAttribute("aria-pressed", "false");
   });
+
+  it("Should render text color and highlight buttons by default", () => {
+    render(<TestWrapper />);
+    expect(screen.getByRole("button", { name: "Text color" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Highlight" })).toBeInTheDocument();
+  });
+
+  it("Should hide text color and highlight buttons when disabled via toolbarConfig", () => {
+    render(
+      <TestWrapper
+        toolbarConfig={{
+          ...DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG,
+          showTextColor: false,
+          showHighlight: false,
+        }}
+      />,
+    );
+    expect(screen.queryByRole("button", { name: "Text color" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Highlight" })).not.toBeInTheDocument();
+  });
 });

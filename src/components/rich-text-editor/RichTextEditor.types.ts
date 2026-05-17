@@ -14,6 +14,8 @@ export type RichTextEditorToolbarConfig = {
   showCodeBlock?:      boolean;
   showLink?:           boolean;
   showHorizontalRule?: boolean;
+  showTextColor?:      boolean;
+  showHighlight?:      boolean;
   showUndoRedo?:       boolean;
   showClearFormat?:    boolean;
 };
@@ -32,6 +34,8 @@ export const DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG: Required<RichTextEditorToo
   showCodeBlock:      true,
   showLink:           true,
   showHorizontalRule: true,
+  showTextColor:      true,
+  showHighlight:      true,
   showUndoRedo:       true,
   showClearFormat:    true,
 };
@@ -50,6 +54,10 @@ export type RichTextEditorTranslation = {
   codeBlock:        string;
   link:             string;
   horizontalRule:   string;
+  textColor:        string;
+  removeTextColor:  string;
+  highlight:        string;
+  removeHighlight:  string;
   undo:             string;
   redo:             string;
   clearFormat:      string;
@@ -76,6 +84,10 @@ export const DEFAULT_RICH_TEXT_EDITOR_TRANSLATION: RichTextEditorTranslation = {
   codeBlock:        "Code block",
   link:             "Insert link",
   horizontalRule:   "Horizontal rule",
+  textColor:        "Text color",
+  removeTextColor:  "Remove text color",
+  highlight:        "Highlight",
+  removeHighlight:  "Remove highlight",
   undo:             "Undo",
   redo:             "Redo",
   clearFormat:      "Clear formatting",

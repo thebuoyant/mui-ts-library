@@ -139,6 +139,10 @@ type RichTextEditorTranslation = {
   codeBlock:        string;
   link:             string;
   horizontalRule:   string;
+  textColor:        string;
+  removeTextColor:  string;
+  highlight:        string;
+  removeHighlight:  string;
   undo:             string;
   redo:             string;
   clearFormat:      string;
@@ -194,6 +198,26 @@ const [content, setContent] = useState('<p>Initialinhalt</p>');
 ```
 
 Der Editor synchronisiert `value` → `editor.setContent()` automatisch, wenn sich der externe Wert ändert — ohne den Cursor zu verstellen.
+
+---
+
+## Textfarbe und Hervorhebung
+
+Text markieren und über die Toolbar-Buttons **Textfarbe** (A-Icon) oder **Hervorheben** (Pinsel-Icon) eine Farbe aus der Palette wählen:
+
+```tsx
+<RichTextEditor placeholder="Markiere Text, dann wähle eine Farbe …" />
+```
+
+Beide Buttons zeigen eine farbige Indikatorlinie unter dem Icon — die zuletzt verwendete oder am Cursor aktive Farbe. Über den Regenbogen-Swatch in der Palette ist ein freier Farbwähler (nativer Browser-Picker) verfügbar. Der Papierkorb-Button entfernt die Farbe wieder.
+
+Über `toolbarConfig` lassen sich beide Buttons einzeln ausblenden:
+
+```tsx
+<RichTextEditor
+  toolbarConfig={{ showTextColor: false, showHighlight: false }}
+/>
+```
 
 ---
 
@@ -316,6 +340,10 @@ const DE_TRANSLATION = {
   codeBlock:        "Code-Block",
   link:             "Link einfügen",
   horizontalRule:   "Trennlinie",
+  textColor:        "Textfarbe",
+  removeTextColor:  "Textfarbe entfernen",
+  highlight:        "Hervorheben",
+  removeHighlight:  "Hervorhebung entfernen",
   undo:             "Rückgängig",
   redo:             "Wiederholen",
   clearFormat:      "Formatierung löschen",

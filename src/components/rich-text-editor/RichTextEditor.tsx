@@ -1,6 +1,9 @@
 import { useEffect } from "react";
 import { useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
+import { TextStyle } from "@tiptap/extension-text-style";
+import { Color } from "@tiptap/extension-color";
+import { Highlight } from "@tiptap/extension-highlight";
 import { Placeholder } from "@tiptap/extension-placeholder";
 import { CharacterCount } from "@tiptap/extension-character-count";
 import { Box, Divider, Paper } from "@mui/material";
@@ -43,6 +46,9 @@ export function RichTextEditor({
       StarterKit.configure({
         link: { openOnClick: false },
       }),
+      TextStyle,
+      Color,
+      Highlight.configure({ multicolor: true }),
       Placeholder.configure({ placeholder: placeholder ?? "" }),
       ...(maxCharacters !== undefined
         ? [CharacterCount.configure({ limit: maxCharacters })]

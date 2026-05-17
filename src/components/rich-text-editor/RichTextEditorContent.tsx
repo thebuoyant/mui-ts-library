@@ -64,6 +64,8 @@ export function RichTextEditorContent({
             "& code": { bgcolor: "transparent", px: 0 },
           },
           "& a": { color: "primary.main", cursor: "pointer" },
+          // TipTap-Highlight rendert als <mark style="background-color: ...">
+          "& mark": { borderRadius: 0.5, px: 0.25 },
           "& hr": { borderColor: "divider", my: 2 },
         },
       }}

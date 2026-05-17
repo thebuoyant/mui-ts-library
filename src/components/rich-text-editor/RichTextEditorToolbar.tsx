@@ -16,6 +16,8 @@ import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import CodeIcon from "@mui/icons-material/Code";
 import InsertLinkIcon from "@mui/icons-material/InsertLink";
 import HorizontalRuleIcon from "@mui/icons-material/HorizontalRule";
+import FormatColorTextIcon from "@mui/icons-material/FormatColorText";
+import BorderColorIcon from "@mui/icons-material/BorderColor";
 import UndoIcon from "@mui/icons-material/Undo";
 import RedoIcon from "@mui/icons-material/Redo";
 import FormatClearIcon from "@mui/icons-material/FormatClear";
@@ -24,6 +26,7 @@ import {
   type RichTextEditorToolbarConfig,
 } from "./RichTextEditor.types";
 import { RichTextEditorLinkDialog } from "./RichTextEditorLinkDialog";
+import { RichTextEditorColorPicker } from "./RichTextEditorColorPicker";
 
 type RichTextEditorToolbarProps = {
   editor:        Editor | null;
@@ -62,6 +65,44 @@ function ToolbarButton({ label, icon, onClick, active, disabled }: ToolbarButton
   );
 }
 
+// Farb-Button mit farbiger Indikatorlinie unter dem Icon
+type ColorButtonProps = {
+  label:       string;
+  icon:        React.ReactNode;
+  activeColor: string | null | undefined;
+  disabled?:   boolean;
+  onClick:     (e: React.MouseEvent<HTMLButtonElement>) => void;
+};
+
+function ColorButton({ label, icon, activeColor, disabled, onClick }: ColorButtonProps) {
+  return (
+    <Tooltip title={label} arrow>
+      <span>
+        <IconButton
+          size="small"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={onClick}
+          disabled={disabled}
+          sx={{ borderRadius: 1, flexDirection: "column", gap: 0, pb: 0.25 }}
+          aria-label={label}
+        >
+          <Box sx={{ display: "flex", alignItems: "center" }}>{icon}</Box>
+          {/* Farbige Indikatorlinie zeigt die aktuell aktive Farbe */}
+          <Box
+            sx={{
+              width:        "80%",
+              height:       3,
+              bgcolor:      activeColor ?? "text.primary",
+              borderRadius: 0.5,
+              mt:           "1px",
+            }}
+          />
+        </IconButton>
+      </span>
+    </Tooltip>
+  );
+}
+
 function H1Icon() {
   return <Box component="span" sx={{ fontWeight: "bold", fontSize: "0.875rem", lineHeight: 1 }}>H1</Box>;
 }
@@ -78,9 +119,14 @@ export function RichTextEditorToolbar({
   translation: t,
   disabled,
 }: RichTextEditorToolbarProps) {
-  const [linkDialogOpen, setLinkDialogOpen] = useState(false);
+  const [linkDialogOpen, setLinkDialogOpen]           = useState(false);
+  const [colorPickerAnchor, setColorPickerAnchor]     = useState<HTMLElement | null>(null);
+  const [highlightPickerAnchor, setHighlightPickerAnchor] = useState<HTMLElement | null>(null);
 
   const isDisabled = disabled || !editor;
+
+  const activeTextColor  = editor?.getAttributes("textStyle")?.color as string | undefined;
+  const activeHighlight  = editor?.getAttributes("highlight")?.color as string | undefined;
 
   const hasTextGroup =
     tc.showBold || tc.showItalic || tc.showUnderline || tc.showStrike;
@@ -90,10 +136,12 @@ export function RichTextEditorToolbar({
     tc.showBulletList || tc.showOrderedList;
   const hasBlockGroup =
     tc.showBlockquote || tc.showCodeBlock || tc.showLink || tc.showHorizontalRule;
+  const hasColorGroup =
+    tc.showTextColor || tc.showHighlight;
   const hasHistoryGroup =
     tc.showUndoRedo || tc.showClearFormat;
 
-  const groups = [hasTextGroup, hasHeadingGroup, hasListGroup, hasBlockGroup, hasHistoryGroup];
+  const groups = [hasTextGroup, hasHeadingGroup, hasListGroup, hasBlockGroup, hasColorGroup, hasHistoryGroup];
   const activeGroupCount = groups.filter(Boolean).length;
 
   function divider(afterGroup: boolean, groupIndex: number) {
@@ -261,6 +309,31 @@ export function RichTextEditorToolbar({
 
         {divider(hasBlockGroup, 3)}
 
+        {hasColorGroup && (
+          <Box sx={{ display: "flex", gap: 0.25 }}>
+            {tc.showTextColor && (
+              <ColorButton
+                label={t.textColor}
+                icon={<FormatColorTextIcon fontSize="small" />}
+                activeColor={activeTextColor}
+                disabled={isDisabled}
+                onClick={(e) => setColorPickerAnchor(e.currentTarget)}
+              />
+            )}
+            {tc.showHighlight && (
+              <ColorButton
+                label={t.highlight}
+                icon={<BorderColorIcon fontSize="small" />}
+                activeColor={activeHighlight}
+                disabled={isDisabled}
+                onClick={(e) => setHighlightPickerAnchor(e.currentTarget)}
+              />
+            )}
+          </Box>
+        )}
+
+        {divider(hasColorGroup, 4)}
+
         {hasHistoryGroup && (
           <Box sx={{ display: "flex", gap: 0.25 }}>
             {tc.showUndoRedo && (
@@ -300,6 +373,32 @@ export function RichTextEditorToolbar({
           onClose={() => setLinkDialogOpen(false)}
           editor={editor}
           translation={t}
+        />
+      )}
+
+      {tc.showTextColor && (
+        <RichTextEditorColorPicker
+          anchorEl={colorPickerAnchor}
+          open={Boolean(colorPickerAnchor)}
+          onClose={() => setColorPickerAnchor(null)}
+          mode="textColor"
+          activeColor={activeTextColor}
+          onSelectColor={(color) => editor?.chain().focus().setColor(color).run()}
+          onRemoveColor={() => editor?.chain().focus().unsetColor().run()}
+          removeLabel={t.removeTextColor}
+        />
+      )}
+
+      {tc.showHighlight && (
+        <RichTextEditorColorPicker
+          anchorEl={highlightPickerAnchor}
+          open={Boolean(highlightPickerAnchor)}
+          onClose={() => setHighlightPickerAnchor(null)}
+          mode="highlight"
+          activeColor={activeHighlight}
+          onSelectColor={(color) => editor?.chain().focus().setHighlight({ color }).run()}
+          onRemoveColor={() => editor?.chain().focus().unsetHighlight().run()}
+          removeLabel={t.removeHighlight}
         />
       )}
     </>
