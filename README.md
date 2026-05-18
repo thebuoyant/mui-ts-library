@@ -43,7 +43,6 @@ react-dom >= 19
 @emotion/react >= 11
 @emotion/styled >= 11
 @mui/icons-material >= 7
-zustand >= 5
 ```
 
 ---
@@ -518,61 +517,35 @@ Coverage-Berichte werden in `./coverage/` generiert. `coverage/index.html` im Br
 
 ## Veröffentlichung auf npm
 
-### 1. package.json vorbereiten
+### Deploy-Script
 
-Vor der ersten Veröffentlichung `package.json` anpassen:
+Alle Schritte sind in einem einzigen Befehl zusammengefasst:
 
-```json
-{
-  "name": "@your-org/mui-ts-library",
-  "version": "1.0.0",
-  "private": false,
-  "description": "Typsichere React-Komponentenbibliothek auf Basis von MUI",
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
-    }
-  },
-  "files": ["dist"],
-  "sideEffects": false,
-  "license": "MIT"
-}
+```bash
+npm run npm-deploy
 ```
 
-### 2. Versionierung (SemVer)
+Das Script läuft automatisch durch:
+
+1. **User-Check** — prüft ob npm-User `tsdev` eingeloggt ist; falls nicht, Abbruch mit Hinweis auf `npm login`
+2. **Git-Check** — prüft ob keine uncommitteten Änderungen vorhanden sind
+3. **Versionsauswahl** — interaktiv: `patch` / `minor` / `major` oder keine Änderung
+4. **Tests → Build → Publish** — läuft automatisch via `prepublishOnly`
+5. **Git-Push** — Commit und Tag werden nach `main` gepusht
+
+> npm fragt am Ende automatisch nach dem 2FA-Code aus der Authenticator-App.
+
+### Versionierung (SemVer)
 
 | Änderungstyp | Stufe | Beispiel |
 |---|---|---|
-| Bugfix, nicht brechende Verbesserung | **Patch** | `1.0.0` → `1.0.1` |
-| Neues Feature, abwärtskompatibel | **Minor** | `1.0.0` → `1.1.0` |
-| Brechende API-Änderung | **Major** | `1.0.0` → `2.0.0` |
+| Bugfix, nicht brechende Verbesserung | **patch** | `0.1.0` → `0.1.1` |
+| Neues Feature, abwärtskompatibel | **minor** | `0.1.0` → `0.2.0` |
+| Brechende API-Änderung | **major** | `0.1.0` → `1.0.0` |
 
-```bash
-npm version patch   # oder minor / major
-```
+### Automatisierung mit GitHub Actions (optional)
 
-### 3. Bauen & Veröffentlichen
-
-```bash
-# Vor jeder Veröffentlichung bauen
-npm run build
-
-# Prüfen was hochgeladen wird (ohne tatsächliche Veröffentlichung)
-npm pack --dry-run
-
-# Veröffentlichen
-npm login
-npm publish --access public
-```
-
-### 4. Automatisierung mit GitHub Actions
-
-`.github/workflows/publish.yml` erstellen:
+Ein npm Automation-Token unter **GitHub → Settings → Secrets → Actions** als `NPM_TOKEN` hinterlegen, dann `.github/workflows/publish.yml` anlegen:
 
 ```yaml
 name: Publish to npm
@@ -605,12 +578,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 ```
 
-Das npm-Automatisierungstoken als `NPM_TOKEN` unter **GitHub → Settings → Secrets → Actions** hinterlegen, danach eine Veröffentlichung auslösen:
-
-```bash
-npm version minor
-git push origin main --tags
-```
+Release auslösen: `npm version minor && git push origin main --tags`
 
 ---
 
