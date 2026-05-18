@@ -12,6 +12,9 @@ const translation: TagSelectionTranslation = {
   noSelectedTagsText: "No tags selected.",
   noAvailableTagsText: "No tags available.",
   placeholder: "Type to search...",
+  loadingText: "Loading...",
+  createTagLabel: "Create '{query}'",
+  maxTagsReachedText: "Maximum number of tags reached.",
 };
 
 describe("TagSelectionSelectedTags", () => {

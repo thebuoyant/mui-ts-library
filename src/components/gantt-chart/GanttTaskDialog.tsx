@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type InputHTMLAttributes } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Box,
   Button,
@@ -212,7 +212,7 @@ export function GanttTaskDialog({
           fullWidth
           size="small"
           autoFocus
-          inputProps={{ "data-testid": "gantt-dialog-field-name" }}
+          slotProps={{ htmlInput: { "data-testid": "gantt-dialog-field-name" } }}
         />
         <TextField
           label={t.dialogFieldStartDate}
@@ -222,8 +222,7 @@ export function GanttTaskDialog({
           required
           fullWidth
           size="small"
-          slotProps={{ inputLabel: { shrink: true } }}
-          inputProps={{ "data-testid": "gantt-dialog-field-start" }}
+          slotProps={{ inputLabel: { shrink: true }, htmlInput: { "data-testid": "gantt-dialog-field-start" } }}
         />
         <TextField
           label={t.dialogFieldEndDate}
@@ -234,8 +233,7 @@ export function GanttTaskDialog({
           fullWidth
           size="small"
           disabled={form.isMilestone}
-          slotProps={{ inputLabel: { shrink: true } }}
-          inputProps={{ "data-testid": "gantt-dialog-field-end", min: form.startDate }}
+          slotProps={{ inputLabel: { shrink: true }, htmlInput: { "data-testid": "gantt-dialog-field-end", min: form.startDate } }}
         />
         <FormControl size="small" fullWidth>
           <InputLabel>{t.dialogFieldStatus}</InputLabel>
@@ -260,7 +258,7 @@ export function GanttTaskDialog({
               checked={form.isMilestone}
               onChange={(e) => handleMilestoneChange(e.target.checked)}
               size="small"
-              inputProps={{ "data-testid": "gantt-dialog-field-milestone" } as InputHTMLAttributes<HTMLInputElement>}
+              data-testid="gantt-dialog-field-milestone"
             />
           }
           label={t.dialogFieldMilestone}
@@ -272,7 +270,7 @@ export function GanttTaskDialog({
             label={t.dialogFieldParent}
             onChange={(e) => setForm((prev) => ({ ...prev, parentId: e.target.value }))}
             inputProps={{ "data-testid": "gantt-dialog-field-parent" }}
-            MenuProps={{ PaperProps: { sx: { maxHeight: 280 } } }}
+            MenuProps={{ slotProps: { paper: { sx: { maxHeight: 280 } } } }}
           >
             <MenuItem value="">{t.dialogFieldParentNone}</MenuItem>
             {parentOptions.map((task) => (
@@ -323,7 +321,7 @@ export function GanttTaskDialog({
                 .map((id) => flattenedTasks.find((n) => n.id === id)?.name ?? id)
                 .join(", ");
             }}
-            MenuProps={{ PaperProps: { sx: { maxHeight: 280 } } }}
+            MenuProps={{ slotProps: { paper: { sx: { maxHeight: 280 } } } }}
           >
             {dependencyOptions.map((task) => (
               <MenuItem key={task.id} value={task.id} sx={{ minWidth: 0 }}>

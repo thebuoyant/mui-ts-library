@@ -11,8 +11,8 @@ import {
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutlined";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutlined";
 import { useId, useMemo, useState } from "react";
 import { scorePassword } from "./util/password-strength.util";
 import type {
@@ -40,7 +40,7 @@ function RequirementItem({
   checkColors,
 }: RequirementItemProps) {
   return (
-    <Stack direction="row" alignItems="center" spacing={0.5} mb={0.25}>
+    <Stack direction="row" sx={{ alignItems: "center", mb: 0.25 }} spacing={0.5}>
       <Typography variant="caption">{label}</Typography>
       {fulfilled ? (
         <CheckCircleOutlineIcon

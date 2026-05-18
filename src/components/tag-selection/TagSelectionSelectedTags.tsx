@@ -38,7 +38,7 @@ export function TagSelectionSelectedTags({
           {translation.noSelectedTagsText}
         </Typography>
       ) : (
-        <Stack direction="row" flexWrap="wrap" gap={1}>
+        <Stack direction="row" sx={{ flexWrap: "wrap", gap: 1 }}>
           {selectedTags.map((tag) => (
             <TagSelectionChip
               key={tag.id}

@@ -154,9 +154,8 @@ export function GanttToolbar({ onScrollToToday, config }: GanttToolbarProps) {
               label={t.rangeFrom}
               value={toDateInputValue(timelineRange.start)}
               onChange={handleStartChange}
-              slotProps={{ inputLabel: { shrink: true } }}
+              slotProps={{ inputLabel: { shrink: true }, htmlInput: { "data-testid": "gantt-range-start" } }}
               sx={{ width: 148 }}
-              inputProps={{ "data-testid": "gantt-range-start" }}
             />
             <TextField
               type="date"
@@ -164,9 +163,8 @@ export function GanttToolbar({ onScrollToToday, config }: GanttToolbarProps) {
               label={t.rangeTo}
               value={toDateInputValue(timelineRange.end)}
               onChange={handleEndChange}
-              slotProps={{ inputLabel: { shrink: true } }}
+              slotProps={{ inputLabel: { shrink: true }, htmlInput: { "data-testid": "gantt-range-end" } }}
               sx={{ width: 148 }}
-              inputProps={{ "data-testid": "gantt-range-end" }}
             />
           </>
         )}

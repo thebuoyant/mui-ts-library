@@ -153,7 +153,7 @@ function GanttTaskRow({
             }}
             onClick={(e) => e.stopPropagation()}
             sx={{ flex: 1, minWidth: 0 }}
-            inputProps={{ "data-testid": `gantt-inline-edit-${task.id}` }}
+            slotProps={{ htmlInput: { "data-testid": `gantt-inline-edit-${task.id}` } }}
           />
         ) : (
           <Typography
