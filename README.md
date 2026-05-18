@@ -1,6 +1,6 @@
 # mui-ts-library
 
-Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **MUI (Material UI v7)**. Die Komponenten sind als eigenständige Ergänzungen zu MUI konzipiert — sie folgen MUI's Design-Sprache, unterstützen Theming von Haus aus und werden mit vollständigen TypeScript-Typen, Storybook-Stories und Unit-Tests ausgeliefert.
+Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **MUI (Material UI v9)**. Die Komponenten sind als eigenständige Ergänzungen zu MUI konzipiert — sie folgen MUI's Design-Sprache, unterstützen Theming von Haus aus und werden mit vollständigen TypeScript-Typen, Storybook-Stories und Unit-Tests ausgeliefert.
 
 ---
 
@@ -39,10 +39,10 @@ Die folgenden Pakete werden als **Peer Dependencies** behandelt und müssen im Z
 ```
 react >= 19
 react-dom >= 19
-@mui/material >= 7
+@mui/material >= 9
 @emotion/react >= 11
 @emotion/styled >= 11
-@mui/icons-material >= 7
+@mui/icons-material >= 9
 ```
 
 ---
