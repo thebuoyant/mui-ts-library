@@ -34,7 +34,9 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "vite build && tsc -p tsconfig.build.json",
+    "clean": "rm -rf dist",
+    "build": "npm run clean && vite build && tsc -p tsconfig.build.json",
+    "prepublishOnly": "npm run test:run && npm run build",
     "lint": "eslint .",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
