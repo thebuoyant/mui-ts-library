@@ -28,7 +28,7 @@ Der `PasswordStrengthMeter` ist eine Passwort-Eingabe-Komponente auf Basis von R
 ## Import
 
 ```tsx
-import { PasswordStrengthMeter } from '@tschlend/mui-ts-library';
+import { PasswordStrengthMeter } from '@tsdev/mui-ts-library';
 import type {
   PasswordStrengthMeterProps,
   PasswordStrengthMeterTranslation,
@@ -37,7 +37,7 @@ import type {
   MeterStatus,
   MeterColors,
   CheckColors,
-} from '@tschlend/mui-ts-library';
+} from '@tsdev/mui-ts-library';
 ```
 
 ---
@@ -45,7 +45,7 @@ import type {
 ## Schnellstart
 
 ```tsx
-import { PasswordStrengthMeter } from '@tschlend/mui-ts-library';
+import { PasswordStrengthMeter } from '@tsdev/mui-ts-library';
 
 function App() {
   return (
@@ -120,8 +120,8 @@ Diese Props machen die Komponente vollständig kompatibel mit gängigen Formular
 import {
   DEFAULT_METER_COLORS,
   DEFAULT_CHECK_COLORS,
-} from '@tschlend/mui-ts-library';
-import type { MeterColors, CheckColors } from '@tschlend/mui-ts-library';
+} from '@tsdev/mui-ts-library';
+import type { MeterColors, CheckColors } from '@tsdev/mui-ts-library';
 
 type MeterColors = {
   weak:     string;
@@ -149,8 +149,8 @@ type CheckColors = {
 Die englischen Standardwerte können direkt importiert werden:
 
 ```ts
-import { DEFAULT_PASSWORD_TRANSLATIONS } from '@tschlend/mui-ts-library';
-import type { PasswordStrengthMeterTranslation } from '@tschlend/mui-ts-library';
+import { DEFAULT_PASSWORD_TRANSLATIONS } from '@tsdev/mui-ts-library';
+import type { PasswordStrengthMeterTranslation } from '@tsdev/mui-ts-library';
 
 // Vollständiger TypeScript-Typ:
 type PasswordStrengthMeterTranslation = {

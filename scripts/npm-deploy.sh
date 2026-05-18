@@ -14,7 +14,7 @@ fail() { echo -e "${RED}  FAIL${NC}  $1"; exit 1; }
 info() { echo -e "${BLUE}  --${NC}  $1"; }
 
 echo ""
-echo -e "${BOLD}  npm Deploy — @tschlend/mui-ts-library${NC}"
+echo -e "${BOLD}  npm Deploy — @tsdev/mui-ts-library${NC}"
 echo "  ─────────────────────────────────────────"
 echo ""
 
@@ -87,5 +87,5 @@ git push origin main --tags
 
 echo ""
 echo -e "${GREEN}  Fertig!${NC}  Version $NEW_VERSION ist live:"
-echo "           https://www.npmjs.com/package/@tschlend/mui-ts-library"
+echo "           https://www.npmjs.com/package/@tsdev/mui-ts-library"
 echo ""

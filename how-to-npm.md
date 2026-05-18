@@ -19,7 +19,7 @@ Die npm-Website: **https://www.npmjs.com**
 1. Gehe auf **https://www.npmjs.com**
 2. Klicke oben rechts auf **Sign Up**
 3. Wähle einen **Username** — dieser wird dein Scope-Prefix.
-   Dieses Projekt nutzt `@tschlend`, d.h. der Username lautet `tschlend`.
+   Dieses Projekt nutzt `@tsdev`, d.h. der Username lautet `tsdev`.
 4. Gib deine E-Mail-Adresse und ein sicheres Passwort ein
 5. Bestätige die E-Mail-Adresse (npm schickt dir eine Bestätigungsmail)
 
@@ -117,7 +117,7 @@ Das zeigt dir genau welche Dateien im Paket landen würden — **ohne** etwas ho
 npm publish --access public
 ```
 
-`--access public` ist bei Scoped Packages (`@tschlend/...`) notwendig, weil diese standardmäßig als privat (kostenpflichtig) behandelt werden. Der Flag setzt das Paket auf öffentlich (kostenlos).
+`--access public` ist bei Scoped Packages (`@tsdev/...`) notwendig, weil diese standardmäßig als privat (kostenpflichtig) behandelt werden. Der Flag setzt das Paket auf öffentlich (kostenlos).
 
 npm fragt dich nach deinem 2FA-Code aus der Authenticator-App.
 
@@ -125,20 +125,20 @@ Nach ein paar Sekunden siehst du:
 
 ```
 npm notice Publishing to https://registry.npmjs.org/ with tag latest
-+ @tschlend/mui-ts-library@1.0.0
++ @tsdev/mui-ts-library@1.0.0
 ```
 
 Das Paket ist jetzt live unter:
-**https://www.npmjs.com/package/@tschlend/mui-ts-library**
+**https://www.npmjs.com/package/@tsdev/mui-ts-library**
 
 ### 4.2 Installation im Zielprojekt testen
 
 ```bash
-npm install @tschlend/mui-ts-library
+npm install @tsdev/mui-ts-library
 ```
 
 ```tsx
-import { RichTextEditor, GanttChart } from '@tschlend/mui-ts-library';
+import { RichTextEditor, GanttChart } from '@tsdev/mui-ts-library';
 ```
 
 ---
