@@ -30,7 +30,7 @@ const meta: Meta<typeof TagSelection> = {
     chipSize: "medium",
     disabled: false,
     loading: false,
-    allowCreate: false,
+    allowCreate: true,
     onTagSelect: fn(),
     onTagDelete: fn(),
     onTagsChange: fn(),
