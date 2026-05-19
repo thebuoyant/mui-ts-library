@@ -1,4 +1,3 @@
-import LabelIcon from "@mui/icons-material/Label";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
@@ -21,25 +20,19 @@ const translation: TagSelectionTranslation = {
 };
 
 const availableTags: TagSelectionItem[] = [
-  {
-    id: "react",
-    label: "React",
-    startIcon: <LabelIcon data-testid="react-icon" />,
-  },
-  { id: "vitest", label: "Vitest" },
+  { id: "react",  label: "React",  color: "primary" },
+  { id: "vitest", label: "Vitest", color: "success" },
 ];
 
 type TestWrapperProps = {
   onSearchChange?: (value: string) => void;
   onTagSelect?: (tag: TagSelectionItem) => void;
-  showStartIcon?: boolean;
   availableTags?: TagSelectionItem[];
 };
 
 function TestWrapper({
   onSearchChange = vi.fn(),
   onTagSelect = vi.fn(),
-  showStartIcon = true,
   availableTags = [],
 }: TestWrapperProps) {
   const [searchValue, setSearchValue] = useState("");
@@ -54,11 +47,9 @@ function TestWrapper({
         onSearchChange(value);
       }}
       onTagSelect={(tag) => {
-        // Simuliert das Leeren des searchValue durch den Store nach einer Auswahl.
         setSearchValue("");
         onTagSelect(tag);
       }}
-      showStartIcon={showStartIcon}
       inputSize="medium"
       chipSize="medium"
     />
@@ -103,7 +94,6 @@ describe("TagSelectionAutocomplete", () => {
 
     const listbox = await screen.findByRole("listbox");
     expect(within(listbox).getByText("React")).toBeInTheDocument();
-    expect(screen.getByTestId("react-icon")).toBeInTheDocument();
 
     await user.click(within(listbox).getByText("React"));
 
@@ -127,14 +117,13 @@ describe("TagSelectionAutocomplete", () => {
     expect(input).toHaveValue("");
   });
 
-  it("Should show the no-options text and hide the start icon when configured", async () => {
+  it("Should show the no-options text when no tags are available", async () => {
     const user = userEvent.setup();
 
-    render(<TestWrapper availableTags={[]} showStartIcon={false} />);
+    render(<TestWrapper availableTags={[]} />);
 
     await user.click(screen.getByLabelText("Search and add tags"));
 
     expect(await screen.findByText("No tags available.")).toBeInTheDocument();
-    expect(screen.queryByTestId("react-icon")).not.toBeInTheDocument();
   });
 });

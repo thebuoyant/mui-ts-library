@@ -9,8 +9,6 @@ type TagSelectionSelectedTagsProps = {
   selectedTags: TagSelectionItem[];
   translation: TagSelectionTranslation;
   onTagDelete: (tag: TagSelectionItem) => void;
-  showStartIcon?: boolean;
-  showDeleteIcon?: boolean;
   showSelectedTagsLabel: boolean;
   chipSize: "small" | "medium";
   disabled?: boolean;
@@ -20,8 +18,6 @@ export function TagSelectionSelectedTags({
   selectedTags,
   translation,
   onTagDelete,
-  showStartIcon = true,
-  showDeleteIcon = true,
   showSelectedTagsLabel,
   chipSize = "medium",
   disabled = false,
@@ -44,8 +40,6 @@ export function TagSelectionSelectedTags({
               key={tag.id}
               tag={tag}
               onDelete={onTagDelete}
-              showStartIcon={showStartIcon}
-              showDeleteIcon={showDeleteIcon}
               chipSize={chipSize}
               disabled={disabled}
             />

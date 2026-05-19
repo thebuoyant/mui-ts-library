@@ -1,5 +1,3 @@
-import CloseIcon from "@mui/icons-material/Close";
-import LabelIcon from "@mui/icons-material/Label";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
@@ -39,15 +37,7 @@ describe("TagSelectionSelectedTags", () => {
 
     render(
       <TagSelectionSelectedTags
-        selectedTags={[
-          {
-            id: "react",
-            label: "React",
-            selected: true,
-            startIcon: <LabelIcon data-testid="selected-start-icon" />,
-            deleteIcon: <CloseIcon />,
-          },
-        ]}
+        selectedTags={[{ id: "react", label: "React", selected: true }]}
         translation={translation}
         onTagDelete={handleDelete}
         showSelectedTagsLabel={false}
@@ -57,9 +47,8 @@ describe("TagSelectionSelectedTags", () => {
 
     expect(screen.queryByText("Selected tags")).not.toBeInTheDocument();
     expect(screen.getByText("React")).toBeInTheDocument();
-    expect(screen.getByTestId("selected-start-icon")).toBeInTheDocument();
 
-    await user.click(screen.getByTestId("CloseIcon"));
+    await user.click(screen.getByTestId("CancelIcon"));
 
     expect(handleDelete).toHaveBeenCalledWith(
       expect.objectContaining({ id: "react" }),

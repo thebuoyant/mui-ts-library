@@ -38,8 +38,6 @@ function TagSelectionInner({
   showSelectedTags = true,
   showSelectedTagsLabel = true,
   showAutoComplete = true,
-  showStartIcon = true,
-  showDeleteIcon = true,
   inputSize = "medium",
   chipSize = "medium",
   disabled = false,
@@ -154,8 +152,6 @@ function TagSelectionInner({
             selectedTags={selectedTags}
             translation={translation}
             onTagDelete={handleTagDelete}
-            showStartIcon={showStartIcon}
-            showDeleteIcon={showDeleteIcon}
             showSelectedTagsLabel={showSelectedTagsLabel}
             chipSize={chipSize}
             disabled={disabled}
@@ -170,7 +166,6 @@ function TagSelectionInner({
             onSearchChange={handleSearchChange}
             onTagSelect={handleTagSelect}
             onTagCreate={handleTagCreate}
-            showStartIcon={showStartIcon}
             inputSize={inputSize}
             chipSize={chipSize}
             disabled={disabled}
@@ -189,8 +184,6 @@ export function TagSelection({
   showSelectedTags = true,
   showSelectedTagsLabel = true,
   showAutoComplete = true,
-  showStartIcon = true,
-  showDeleteIcon = true,
   translation,
   inputSize = "medium",
   chipSize = "medium",
@@ -214,8 +207,6 @@ export function TagSelection({
         showSelectedTags={showSelectedTags}
         showSelectedTagsLabel={showSelectedTagsLabel}
         showAutoComplete={showAutoComplete}
-        showStartIcon={showStartIcon}
-        showDeleteIcon={showDeleteIcon}
         translation={t}
         inputSize={inputSize}
         chipSize={chipSize}

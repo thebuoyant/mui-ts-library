@@ -1,5 +1,3 @@
-import CloseIcon from "@mui/icons-material/Close";
-import LabelIcon from "@mui/icons-material/Label";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
@@ -11,8 +9,6 @@ const baseTag = {
   selected: true,
   foregroundColor: "rgb(10, 20, 30)",
   backgroundColor: "rgb(200, 210, 220)",
-  startIcon: <LabelIcon data-testid="start-icon" />,
-  deleteIcon: <CloseIcon data-testid="delete-icon" />,
 };
 
 describe("TagSelectionChip", () => {
@@ -27,7 +23,6 @@ describe("TagSelectionChip", () => {
       backgroundColor: "rgb(200, 210, 220)",
       borderColor: "rgb(200, 210, 220)",
     });
-    expect(screen.getByTestId("start-icon")).toBeInTheDocument();
   });
 
   it("Should render an outlined chip for non-selected tags", () => {
@@ -72,7 +67,6 @@ describe("TagSelectionChip", () => {
 
     const chip = screen.getByText("TypeScript").closest(".MuiChip-root");
 
-    // Wenn custom backgroundColor gesetzt ist, darf kein colorPrimary verwendet werden.
     expect(chip).not.toHaveClass("MuiChip-colorPrimary");
     expect(chip).toHaveStyle({ backgroundColor: "rgb(200, 210, 220)" });
   });
@@ -92,7 +86,7 @@ describe("TagSelectionChip", () => {
     );
 
     await user.click(screen.getByRole("button", { name: "React" }));
-    await user.click(screen.getByTestId("delete-icon"));
+    await user.click(screen.getByTestId("CancelIcon"));
 
     expect(handleClick).toHaveBeenCalledWith(
       expect.objectContaining({ id: "react" }),
@@ -102,7 +96,7 @@ describe("TagSelectionChip", () => {
     );
   });
 
-  it("Should show the MUI default delete icon when onDelete is set but no custom deleteIcon exists", async () => {
+  it("Should show the MUI default delete icon when onDelete is set", async () => {
     const user = userEvent.setup();
     const handleDelete = vi.fn();
 
@@ -120,21 +114,6 @@ describe("TagSelectionChip", () => {
     expect(handleDelete).toHaveBeenCalledWith(
       expect.objectContaining({ id: "vue" }),
     );
-  });
-
-  it("Should hide optional icons when they are disabled via props", () => {
-    render(
-      <TagSelectionChip
-        tag={baseTag}
-        chipSize="medium"
-        showStartIcon={false}
-        showDeleteIcon={false}
-        onDelete={vi.fn()}
-      />,
-    );
-
-    expect(screen.queryByTestId("start-icon")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("delete-icon")).not.toBeInTheDocument();
   });
 
   it("Should render disabled chips as not clickable", () => {

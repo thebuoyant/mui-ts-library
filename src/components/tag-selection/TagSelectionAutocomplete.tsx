@@ -19,7 +19,6 @@ type TagSelectionAutocompleteProps = {
   onSearchChange: (value: string) => void;
   onTagSelect: (tag: TagSelectionItem) => void;
   onTagCreate?: (label: string) => void;
-  showStartIcon?: boolean;
   disabled?: boolean;
   loading?: boolean;
   isMaxReached?: boolean;
@@ -33,7 +32,6 @@ export function TagSelectionAutocomplete({
   onSearchChange,
   onTagSelect,
   onTagCreate,
-  showStartIcon = true,
   inputSize = "medium",
   chipSize = "medium",
   disabled = false,
@@ -136,9 +134,6 @@ export function TagSelectionAutocomplete({
               <Chip
                 size={chipSize}
                 label={option.label}
-                icon={
-                  showStartIcon ? (option.startIcon ?? undefined) : undefined
-                }
                 color={!hasCustomColors ? (option.color ?? "default") : undefined}
                 sx={
                   hasCustomColors

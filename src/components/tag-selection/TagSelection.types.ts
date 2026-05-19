@@ -1,5 +1,3 @@
-import type { ReactElement } from "react";
-
 // Entspricht den Farbnamen, die MUI Chip nativ unterstützt.
 // Farben kommen aus dem aktiven Theme und funktionieren automatisch im Dark-Mode.
 export type TagColor =
@@ -23,8 +21,6 @@ export type TagSelectionItem = {
   // Wenn gesetzt, überschreibt dies den color-Prop.
   foregroundColor?: string;
   backgroundColor?: string;
-  startIcon?: ReactElement;
-  deleteIcon?: ReactElement;
 };
 
 export type TagSelectionTranslation = {
@@ -55,8 +51,6 @@ export type TagSelectionProps = {
   showSelectedTags?: boolean;
   showSelectedTagsLabel?: boolean;
   showAutoComplete?: boolean;
-  showStartIcon?: boolean;
-  showDeleteIcon?: boolean;
   // Nur abweichende Keys angeben — Rest fällt auf DEFAULT_TAG_SELECTION_TRANSLATION zurück.
   translation?: Partial<TagSelectionTranslation>;
   inputSize?: "small" | "medium";

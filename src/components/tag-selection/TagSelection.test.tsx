@@ -1,5 +1,3 @@
-import CloseIcon from "@mui/icons-material/Close";
-import LabelIcon from "@mui/icons-material/Label";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
@@ -7,25 +5,9 @@ import { TagSelection } from "./TagSelection";
 import type { TagSelectionItem } from "./TagSelection.types";
 
 const tags: TagSelectionItem[] = [
-  {
-    id: "react",
-    label: "React",
-    selected: true,
-    startIcon: <LabelIcon data-testid="react-selected-icon" />,
-    deleteIcon: <CloseIcon />,
-  },
-  {
-    id: "typescript",
-    label: "TypeScript",
-    startIcon: <LabelIcon data-testid="typescript-icon" />,
-    deleteIcon: <CloseIcon />,
-  },
-  {
-    id: "disabled",
-    label: "Disabled",
-    disabled: true,
-    deleteIcon: <CloseIcon />,
-  },
+  { id: "react",      label: "React",      selected: true, color: "primary" },
+  { id: "typescript", label: "TypeScript",                 color: "info" },
+  { id: "disabled",   label: "Disabled",   disabled: true },
 ];
 
 describe("TagSelection", () => {
@@ -129,7 +111,7 @@ describe("TagSelection", () => {
       />,
     );
 
-    await user.click(screen.getByTestId("CloseIcon"));
+    await user.click(screen.getByTestId("CancelIcon"));
 
     expect(handleTagDelete).toHaveBeenCalledTimes(1);
     expect(handleTagsChange).toHaveBeenCalledTimes(1);
@@ -138,15 +120,9 @@ describe("TagSelection", () => {
       handleTagDelete.mock.calls[0];
 
     expect(deletedTag).toEqual(
-      expect.objectContaining({
-        id: "react",
-        label: "React",
-        selected: false,
-      }),
+      expect.objectContaining({ id: "react", label: "React", selected: false }),
     );
-
     expect(selectedTagsAfterDelete).toEqual([]);
-
     expect(updatedTagsAfterDelete).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ id: "react", selected: false }),
@@ -172,11 +148,11 @@ describe("TagSelection", () => {
 
   it("Should reflect an external tags update in the rendered output", async () => {
     const initialTags: TagSelectionItem[] = [
-      { id: "vue", label: "Vue", selected: true, deleteIcon: <CloseIcon /> },
+      { id: "vue", label: "Vue", selected: true },
     ];
     const updatedTags: TagSelectionItem[] = [
       ...initialTags,
-      { id: "svelte", label: "Svelte", selected: true, deleteIcon: <CloseIcon /> },
+      { id: "svelte", label: "Svelte", selected: true },
     ];
 
     const { rerender } = render(<TagSelection tags={initialTags} />);
@@ -197,9 +173,7 @@ describe("TagSelection", () => {
     );
 
     expect(screen.queryByText("Selected tags")).not.toBeInTheDocument();
-    expect(
-      screen.queryByLabelText("Search and add tags"),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Search and add tags")).not.toBeInTheDocument();
   });
 
   it("Should disable the autocomplete input when disabled is true", () => {
@@ -215,10 +189,9 @@ describe("TagSelection", () => {
     expect(chip).toHaveClass("Mui-disabled");
   });
 
-  it("Should show loading text when the autocomplete is open, loading is true and no options are available yet", async () => {
+  it("Should show loading text when the autocomplete is open and loading", async () => {
     const user = userEvent.setup();
 
-    // MUI zeigt loadingText nur wenn options leer ist — typisches Async-Lade-Pattern.
     render(<TagSelection tags={[]} loading={true} />);
 
     await user.click(screen.getByLabelText("Search and add tags"));
@@ -230,9 +203,7 @@ describe("TagSelection", () => {
     render(<TagSelection tags={tags} maxTags={1} />);
 
     expect(screen.getByLabelText("Search and add tags")).toBeDisabled();
-    expect(
-      screen.getByText("Maximum number of tags reached."),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Maximum number of tags reached.")).toBeInTheDocument();
   });
 
   it("Should call onTagCreate with the typed value when a new tag is created", async () => {
@@ -251,31 +222,26 @@ describe("TagSelection", () => {
     expect(handleTagCreate).toHaveBeenCalledWith("Vue");
   });
 
-  it("Should support custom translations and icon visibility flags", async () => {
+  it("Should support custom translations", async () => {
     const user = userEvent.setup();
 
     render(
       <TagSelection
-        tags={tags}
-        showStartIcon={false}
-        showDeleteIcon={false}
+        tags={[]}
         showSelectedTagsLabel={false}
         translation={{
-          selectedTagsLabel: "Ausgewählte Tags",
           autoCompleteLabel: "Tags suchen",
-          noSelectedTagsText: "Keine Tags ausgewählt.",
           noAvailableTagsText: "Keine Tags verfügbar.",
           placeholder: "Suchen...",
         }}
       />,
     );
 
-    expect(screen.queryByText("Ausgewählte Tags")).not.toBeInTheDocument();
+    expect(screen.queryByText("Selected tags")).not.toBeInTheDocument();
     expect(screen.getByLabelText("Tags suchen")).toBeInTheDocument();
-    expect(screen.queryByTestId("react-selected-icon")).not.toBeInTheDocument();
 
     await user.click(screen.getByLabelText("Tags suchen"));
 
-    expect(screen.queryByTestId("typescript-icon")).not.toBeInTheDocument();
+    expect(await screen.findByText("Keine Tags verfügbar.")).toBeInTheDocument();
   });
 });
