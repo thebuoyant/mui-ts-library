@@ -1,14 +1,16 @@
-import { Autocomplete, Box, Chip, TextField, createFilterOptions } from "@mui/material";
-import type { SyntheticEvent } from "react";
+import { Autocomplete, Box, Chip, IconButton, Stack, TextField } from "@mui/material";
+import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
+import { useState, type SyntheticEvent } from "react";
 import type {
+  TagColor,
   TagSelectionItem,
   TagSelectionTranslation,
 } from "./TagSelection.types";
 
-const filter = createFilterOptions<TagSelectionItem>();
-
-// Internes Sentinel-ID um "Neu erstellen"-Optionen von echten Tags zu unterscheiden.
-const CREATE_SENTINEL_ID = "__create__";
+const TAG_COLORS: TagColor[] = [
+  "default", "primary", "secondary", "error", "info", "success", "warning",
+];
 
 type TagSelectionAutocompleteProps = {
   inputSize: "medium" | "small";
@@ -18,7 +20,7 @@ type TagSelectionAutocompleteProps = {
   translation: TagSelectionTranslation;
   onSearchChange: (value: string) => void;
   onTagSelect: (tag: TagSelectionItem) => void;
-  onTagCreate?: (label: string) => void;
+  onTagCreate?: (label: string, color: TagColor) => void;
   disabled?: boolean;
   loading?: boolean;
   isMaxReached?: boolean;
@@ -39,15 +41,29 @@ export function TagSelectionAutocomplete({
   isMaxReached = false,
   allowCreate = false,
 }: TagSelectionAutocompleteProps) {
+  const [selectedColor, setSelectedColor] = useState<TagColor>("default");
+
   const isDisabled = disabled || isMaxReached;
+
+  const hasExactMatch = availableTags.some(
+    (tag) => tag.label.toLowerCase() === searchValue.trim().toLowerCase(),
+  );
+  const isCreateMode = allowCreate && searchValue.trim() !== "" && !hasExactMatch;
+
+  const handleConfirmCreate = () => {
+    onTagCreate?.(searchValue.trim(), selectedColor);
+    setSelectedColor("default");
+  };
+
+  const handleCancelCreate = () => {
+    onSearchChange("");
+    setSelectedColor("default");
+  };
 
   return (
     <Box sx={{ mb: 2 }}>
       <Autocomplete<TagSelectionItem, false, false, false>
         options={availableTags}
-        // value=null hält die Auswahl immer leer: nach einem Klick auf eine Option
-        // soll kein "ausgewählter Wert" im Feld stehen, sondern das Feld über
-        // searchValue="" (aus dem Store) automatisch geleert werden.
         value={null}
         size={inputSize}
         disabled={isDisabled}
@@ -59,39 +75,9 @@ export function TagSelectionAutocomplete({
         }}
         onChange={(_: SyntheticEvent, value: TagSelectionItem | null) => {
           if (value) {
-            if (value.id === CREATE_SENTINEL_ID && onTagCreate) {
-              onTagCreate(searchValue.trim());
-            } else {
-              onTagSelect(value);
-            }
+            onTagSelect(value);
           }
         }}
-        filterOptions={
-          allowCreate
-            ? (options, params) => {
-                const filtered = filter(options, params);
-                const { inputValue } = params;
-
-                if (inputValue.trim() !== "") {
-                  const exactMatch = options.some(
-                    (opt) =>
-                      opt.label.toLowerCase() === inputValue.trim().toLowerCase(),
-                  );
-                  if (!exactMatch) {
-                    filtered.push({
-                      id: CREATE_SENTINEL_ID,
-                      label: translation.createTagLabel.replace(
-                        "{query}",
-                        inputValue.trim(),
-                      ),
-                    });
-                  }
-                }
-
-                return filtered;
-              }
-            : undefined
-        }
         slotProps={{
           listbox: {
             sx: {
@@ -113,24 +99,10 @@ export function TagSelectionAutocomplete({
           />
         )}
         renderOption={(props, option) => {
-          if (option.id === CREATE_SENTINEL_ID) {
-            return (
-              <li {...props} key={CREATE_SENTINEL_ID} style={{ width: "100%" }}>
-                {option.label}
-              </li>
-            );
-          }
-
-          const hasCustomColors = Boolean(
-            option.foregroundColor || option.backgroundColor,
-          );
+          const hasCustomColors = Boolean(option.foregroundColor || option.backgroundColor);
 
           return (
-            <li
-              {...props}
-              key={option.id}
-              style={{ width: "auto", padding: 0, margin: 0 }}
-            >
+            <li key={option.id} {...props} style={{ width: "auto", padding: 0, margin: 0 }}>
               <Chip
                 size={chipSize}
                 label={option.label}
@@ -151,6 +123,35 @@ export function TagSelectionAutocomplete({
         noOptionsText={translation.noAvailableTagsText}
         loadingText={translation.loadingText}
       />
+
+      {isCreateMode && (
+        <Stack direction="row" sx={{ mt: 0.5, flexWrap: "wrap", gap: 0.5, alignItems: "center" }}>
+          <IconButton
+            size="small"
+            color="success"
+            onMouseDown={(e) => { e.preventDefault(); handleConfirmCreate(); }}
+          >
+            <CheckIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            size="small"
+            onMouseDown={(e) => { e.preventDefault(); handleCancelCreate(); }}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+          {TAG_COLORS.map((c) => (
+            <Chip
+              key={c}
+              size="small"
+              color={c}
+              label={c}
+              variant={selectedColor === c ? "filled" : "outlined"}
+              onClick={() => setSelectedColor(c)}
+              clickable
+            />
+          ))}
+        </Stack>
+      )}
     </Box>
   );
 }

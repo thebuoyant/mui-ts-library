@@ -30,8 +30,6 @@ export type TagSelectionTranslation = {
   noAvailableTagsText: string;
   placeholder: string;
   loadingText: string;
-  // {query} wird zur Laufzeit durch den getippten Text ersetzt, z. B. "Create 'Vue'".
-  createTagLabel: string;
   maxTagsReachedText: string;
 };
 
@@ -42,7 +40,6 @@ export const DEFAULT_TAG_SELECTION_TRANSLATION: TagSelectionTranslation = {
   noAvailableTagsText: "No tags available.",
   placeholder: "Type to search...",
   loadingText: "Loading...",
-  createTagLabel: "Create '{query}'",
   maxTagsReachedText: "Maximum number of tags reached.",
 };
 
@@ -76,5 +73,5 @@ export type TagSelectionProps = {
     allTags: TagSelectionItem[],
   ) => void;
   onSearchChange?: (searchValue: string) => void;
-  onTagCreate?: (label: string) => void;
+  onTagCreate?: (label: string, color: TagColor) => void;
 };

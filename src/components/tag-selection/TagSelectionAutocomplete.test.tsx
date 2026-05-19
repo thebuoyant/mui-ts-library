@@ -4,6 +4,7 @@ import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { TagSelectionAutocomplete } from "./TagSelectionAutocomplete";
 import type {
+  TagColor,
   TagSelectionItem,
   TagSelectionTranslation,
 } from "./TagSelection.types";
@@ -15,7 +16,6 @@ const translation: TagSelectionTranslation = {
   noAvailableTagsText: "No tags available.",
   placeholder: "Type to search...",
   loadingText: "Loading...",
-  createTagLabel: "Create '{query}'",
   maxTagsReachedText: "Maximum number of tags reached.",
 };
 
@@ -27,13 +27,17 @@ const availableTags: TagSelectionItem[] = [
 type TestWrapperProps = {
   onSearchChange?: (value: string) => void;
   onTagSelect?: (tag: TagSelectionItem) => void;
+  onTagCreate?: (label: string, color: TagColor) => void;
   availableTags?: TagSelectionItem[];
+  allowCreate?: boolean;
 };
 
 function TestWrapper({
   onSearchChange = vi.fn(),
   onTagSelect = vi.fn(),
+  onTagCreate,
   availableTags = [],
+  allowCreate = false,
 }: TestWrapperProps) {
   const [searchValue, setSearchValue] = useState("");
 
@@ -50,6 +54,8 @@ function TestWrapper({
         setSearchValue("");
         onTagSelect(tag);
       }}
+      onTagCreate={onTagCreate}
+      allowCreate={allowCreate}
       inputSize="medium"
       chipSize="medium"
     />
@@ -125,5 +131,28 @@ describe("TagSelectionAutocomplete", () => {
     await user.click(screen.getByLabelText("Search and add tags"));
 
     expect(await screen.findByText("No tags available.")).toBeInTheDocument();
+  });
+
+  it("Should show color chips when typing a value with no exact match and allowCreate is true", async () => {
+    const user = userEvent.setup();
+
+    render(<TestWrapper availableTags={availableTags} allowCreate />);
+
+    await user.type(screen.getByLabelText("Search and add tags"), "Vue");
+
+    expect(await screen.findByText("default")).toBeInTheDocument();
+    expect(screen.getByText("primary")).toBeInTheDocument();
+  });
+
+  it("Should call onTagCreate with label and selected color when checkmark is clicked", async () => {
+    const user = userEvent.setup();
+    const handleCreate = vi.fn();
+
+    render(<TestWrapper availableTags={availableTags} allowCreate onTagCreate={handleCreate} />);
+
+    await user.type(screen.getByLabelText("Search and add tags"), "Vue");
+    await user.click(await screen.findByTestId("CheckIcon"));
+
+    expect(handleCreate).toHaveBeenCalledWith("Vue", "default");
   });
 });

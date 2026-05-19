@@ -182,11 +182,11 @@ function CreatableStory(args: ComponentProps<typeof TagSelection>) {
       <TagSelection
         {...args}
         tags={localTags}
-        onTagCreate={(label) => {
-          args.onTagCreate?.(label);
+        onTagCreate={(label, color) => {
+          args.onTagCreate?.(label, color);
           setLocalTags((prev) => [
             ...prev,
-            { id: label.toLowerCase().replace(/\s+/g, "-"), label },
+            { id: label.toLowerCase().replace(/\s+/g, "-"), label, color },
           ]);
         }}
       />

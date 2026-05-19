@@ -206,7 +206,7 @@ describe("TagSelection", () => {
     expect(screen.getByText("Maximum number of tags reached.")).toBeInTheDocument();
   });
 
-  it("Should call onTagCreate with the typed value when a new tag is created", async () => {
+  it("Should call onTagCreate with label and color when checkmark is clicked", async () => {
     const user = userEvent.setup();
     const handleTagCreate = vi.fn();
 
@@ -217,9 +217,24 @@ describe("TagSelection", () => {
     const input = screen.getByLabelText("Search and add tags");
     await user.type(input, "Vue");
 
-    await user.click(await screen.findByText("Create 'Vue'"));
+    await user.click(await screen.findByTestId("CheckIcon"));
 
-    expect(handleTagCreate).toHaveBeenCalledWith("Vue");
+    expect(handleTagCreate).toHaveBeenCalledWith("Vue", "default");
+  });
+
+  it("Should clear the input when the cancel button is clicked in create mode", async () => {
+    const user = userEvent.setup();
+
+    render(<TagSelection tags={tags} allowCreate={true} />);
+
+    const input = screen.getByLabelText("Search and add tags");
+    await user.type(input, "Vue");
+
+    await screen.findByTestId("CheckIcon");
+
+    await user.click(await screen.findByTestId("CloseIcon"));
+
+    expect(input).toHaveValue("");
   });
 
   it("Should support custom translations", async () => {

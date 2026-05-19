@@ -8,6 +8,7 @@ import {
 import { TagSelectionAutocomplete } from "./TagSelectionAutocomplete";
 import { TagSelectionSelectedTags } from "./TagSelectionSelectedTags";
 import type {
+  TagColor,
   TagSelectionItem,
   TagSelectionProps,
   TagSelectionTranslation,
@@ -138,9 +139,9 @@ function TagSelectionInner({
     }
   };
 
-  const handleTagCreate = (label: string) => {
+  const handleTagCreate = (label: string, color: TagColor) => {
     if (onTagCreate) {
-      onTagCreate(label);
+      onTagCreate(label, color);
     }
   };
 
