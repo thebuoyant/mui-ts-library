@@ -45,10 +45,11 @@ export function TagSelectionAutocomplete({
 
   const isDisabled = disabled || isMaxReached;
 
-  const hasExactMatch = availableTags.some(
-    (tag) => tag.label.toLowerCase() === searchValue.trim().toLowerCase(),
+  // isCreateMode only activates when there are no matching options at all.
+  const filteredOptions = availableTags.filter((tag) =>
+    tag.label.toLowerCase().includes(searchValue.trim().toLowerCase()),
   );
-  const isCreateMode = allowCreate && searchValue.trim() !== "" && !hasExactMatch;
+  const isCreateMode = allowCreate && searchValue.trim() !== "" && filteredOptions.length === 0;
 
   const handleConfirmCreate = () => {
     onTagCreate?.(searchValue.trim(), selectedColor);
@@ -96,6 +97,36 @@ export function TagSelectionAutocomplete({
             helperText={
               isMaxReached && !disabled ? translation.maxTagsReachedText : undefined
             }
+            slotProps={{
+              ...params.slotProps,
+              input: {
+                ...params.slotProps?.input,
+                endAdornment: (
+                  <>
+                    {isCreateMode && (
+                      <>
+                        <IconButton
+                          size="small"
+                          sx={{ color: "success.main" }}
+                          onMouseDown={(e) => { e.preventDefault(); }}
+                          onClick={handleConfirmCreate}
+                        >
+                          <CheckIcon fontSize="small" />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          onMouseDown={(e) => { e.preventDefault(); }}
+                          onClick={handleCancelCreate}
+                        >
+                          <CloseIcon fontSize="small" />
+                        </IconButton>
+                      </>
+                    )}
+                    {params.slotProps?.input?.endAdornment}
+                  </>
+                ),
+              },
+            }}
           />
         )}
         renderOption={(props, option) => {
@@ -126,19 +157,6 @@ export function TagSelectionAutocomplete({
 
       {isCreateMode && (
         <Stack direction="row" sx={{ mt: 0.5, flexWrap: "wrap", gap: 0.5, alignItems: "center" }}>
-          <IconButton
-            size="small"
-            color="success"
-            onMouseDown={(e) => { e.preventDefault(); handleConfirmCreate(); }}
-          >
-            <CheckIcon fontSize="small" />
-          </IconButton>
-          <IconButton
-            size="small"
-            onMouseDown={(e) => { e.preventDefault(); handleCancelCreate(); }}
-          >
-            <CloseIcon fontSize="small" />
-          </IconButton>
           {TAG_COLORS.map((c) => (
             <Chip
               key={c}
