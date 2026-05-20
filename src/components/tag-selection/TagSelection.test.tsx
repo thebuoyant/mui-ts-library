@@ -251,6 +251,23 @@ describe("TagSelection", () => {
     expect(input).toHaveValue("");
   });
 
+  it("Should render selected tags in ascending alphabetical order", () => {
+    const unsortedTags: TagSelectionItem[] = [
+      { id: "vue",        label: "Vue",        selected: true },
+      { id: "angular",    label: "Angular",    selected: true },
+      { id: "react",      label: "React",      selected: true },
+      { id: "typescript", label: "TypeScript", selected: true },
+    ];
+
+    render(<TagSelection tags={unsortedTags} />);
+
+    const chipLabels = screen
+      .getAllByTestId("CancelIcon")
+      .map((icon) => icon.closest(".MuiChip-root")?.querySelector(".MuiChip-label")?.textContent);
+
+    expect(chipLabels).toEqual(["Angular", "React", "TypeScript", "Vue"]);
+  });
+
   it("Should support custom translations", async () => {
     const user = userEvent.setup();
 

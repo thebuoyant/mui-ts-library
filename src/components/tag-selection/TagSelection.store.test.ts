@@ -15,20 +15,17 @@ describe("createTagSelectionStore", () => {
     expect(store.getState()).toMatchObject({
       tags: initialTags,
       searchValue: "",
-      detailsExpanded: false,
     });
   });
 
-  it("Should update tags, search value and details state", () => {
+  it("Should update tags and search value", () => {
     const store = createTagSelectionStore(initialTags);
 
     store.getState().setTags([{ id: "9", label: "Vitest" }]);
     store.getState().setSearchValue("vit");
-    store.getState().setDetailsExpanded(true);
 
     expect(store.getState().tags).toEqual([{ id: "9", label: "Vitest" }]);
     expect(store.getState().searchValue).toBe("vit");
-    expect(store.getState().detailsExpanded).toBe(true);
   });
 
   it("Should select a non-disabled tag and clear the current search", () => {

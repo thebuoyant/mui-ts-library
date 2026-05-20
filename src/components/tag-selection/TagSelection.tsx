@@ -68,7 +68,10 @@ function TagSelectionInner({
   }, [tags, setTags]);
 
   const selectedTags = useMemo(
-    () => storeTags.filter((tag) => tag.selected),
+    () =>
+      storeTags
+        .filter((tag) => tag.selected)
+        .sort((a, b) => a.label.localeCompare(b.label)),
     [storeTags],
   );
 

@@ -31,8 +31,8 @@ const meta: Meta<typeof TagSelection> = {
     disabled: false,
     loading: false,
     allowCreate: true,
-    maxTags: 5,
-    maxVisibleChips: 5,
+    maxTags: 10,
+    maxVisibleChips: 10,
     listboxMaxHeight: 300,
     popoverPlacement: "bottom",
     onTagSelect: fn(),
@@ -80,7 +80,6 @@ export const Default: Story = {
 export const SmallInput: Story = {
   args: {
     inputSize: "small",
-    chipSize: "small",
   },
   render: (args) => (
     <Box sx={{ maxWidth: 420 }}>
@@ -119,6 +118,8 @@ export const GermanTranslation: Story = {
       noSelectedTagsText: "Keine Tags ausgewählt.",
       noAvailableTagsText: "Keine Tags verfügbar.",
       placeholder: "Suchen...",
+      loadingText: "Laden...",
+      maxTagsReachedText: "Maximale Anzahl an Tags erreicht.",
     },
   },
   render: (args) => (
@@ -157,9 +158,10 @@ export const Disabled: Story = {
   ),
 };
 
+// Simuliert den Zustand während ein API-Call läuft: keine Tags vorhanden,
+// Autocomplete zeigt einen Lade-Spinner wenn das Dropdown geöffnet wird.
 export const Loading: Story = {
   args: {
-    // Leere Tags simulieren den Zustand während ein API-Call läuft.
     tags: [],
     loading: true,
   },
@@ -201,24 +203,20 @@ function CreatableStory(args: ComponentProps<typeof TagSelection>) {
   );
 }
 
-// Zeigt den Create-Modus: neue Tags können durch freie Texteingabe erstellt werden.
-// onTagCreate gibt den Label-Text zurück — der aufrufende Code ist dafür zuständig,
-// den neuen Tag in die tags-Liste einzufügen (hier per lokalem State demonstriert).
+// Neue Tags können durch freie Texteingabe erstellt werden. onTagCreate gibt
+// Label und Farbe zurück — der aufrufende Code fügt den Tag in seine tags-Liste
+// ein (hier per lokalem State demonstriert). Der neue Tag muss selected: true haben.
 export const Creatable: Story = {
-  args: {
-    allowCreate: true,
-  },
   render: (args) => <CreatableStory {...args} />,
 };
 
-// Zeigt den Overflow-Modus: maxVisibleChips begrenzt die sichtbaren Chips.
-// Überzählige Chips werden hinter einem "+N"-Chip versteckt, der einen Popover öffnet.
-// Chips im Popover sind löschbar. popoverPlacement steuert die Öffnungsrichtung.
+// maxVisibleChips begrenzt die sichtbaren Chips. Überzählige Chips werden hinter
+// einem "+N"-Chip versteckt, der einen Popover öffnet. popoverPlacement steuert
+// die Öffnungsrichtung.
 export const OverflowChips: Story = {
   args: {
     maxVisibleChips: 3,
     popoverPlacement: "bottom",
-    listboxMaxHeight: 200,
     tags: sampleTags.map((t) => ({ ...t, selected: true })),
   },
   render: (args) => (

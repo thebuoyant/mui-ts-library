@@ -4,12 +4,9 @@ import type { TagSelectionItem } from "./TagSelection.types";
 export type TagSelectionStoreState = {
   tags: TagSelectionItem[];
   searchValue: string;
-  // Für zukünftiges "Alle Tags"-Panel – noch nicht über die UI zugänglich.
-  detailsExpanded: boolean;
 
   setTags: (tags: TagSelectionItem[]) => void;
   setSearchValue: (searchValue: string) => void;
-  setDetailsExpanded: (expanded: boolean) => void;
   selectTag: (tagId: string) => void;
   deleteTag: (tagId: string) => void;
   addTag: (tag: TagSelectionItem) => void;
@@ -21,7 +18,6 @@ export function createTagSelectionStore(initialTags: TagSelectionItem[]) {
   return createStore<TagSelectionStoreState>((set) => ({
     tags: initialTags,
     searchValue: "",
-    detailsExpanded: false,
 
     setTags: (tags) => {
       set({ tags });
@@ -29,10 +25,6 @@ export function createTagSelectionStore(initialTags: TagSelectionItem[]) {
 
     setSearchValue: (searchValue) => {
       set({ searchValue });
-    },
-
-    setDetailsExpanded: (detailsExpanded) => {
-      set({ detailsExpanded });
     },
 
     selectTag: (tagId) => {
