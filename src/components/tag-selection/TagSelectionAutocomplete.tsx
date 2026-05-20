@@ -1,7 +1,7 @@
 import { Autocomplete, Box, Chip, IconButton, Stack, TextField } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
-import { useEffect, useState, type SyntheticEvent } from "react";
+import { useState, type SyntheticEvent } from "react";
 import type {
   TagColor,
   TagSelectionItem,
@@ -54,9 +54,7 @@ export function TagSelectionAutocomplete({
   );
   const isCreateMode = allowCreate && searchValue.trim() !== "" && filteredOptions.length === 0;
 
-  useEffect(() => {
-    if (isCreateMode) setPopupOpen(false);
-  }, [isCreateMode]);
+  const effectivePopupOpen = popupOpen && !isCreateMode;
 
   const handleConfirmCreate = () => {
     onTagCreate?.(searchValue.trim(), selectedColor);
@@ -73,7 +71,7 @@ export function TagSelectionAutocomplete({
       <Autocomplete<TagSelectionItem, false, false, false>
         options={availableTags}
         value={null}
-        open={popupOpen}
+        open={effectivePopupOpen}
         onOpen={() => { if (!isCreateMode) setPopupOpen(true); }}
         onClose={() => setPopupOpen(false)}
         size={inputSize}

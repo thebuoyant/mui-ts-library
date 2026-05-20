@@ -1,5 +1,5 @@
 import { Box, Chip, Popover, Stack, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { TagSelectionChip } from "./TagSelectionChip";
 import type {
   TagSelectionItem,
@@ -37,11 +37,7 @@ export function TagSelectionSelectedTags({
   const overflowTags =
     maxVisibleChips !== undefined ? selectedTags.slice(maxVisibleChips) : [];
 
-  useEffect(() => {
-    if (overflowTags.length === 0) {
-      setPopoverAnchor(null);
-    }
-  }, [overflowTags.length]);
+  const isPopoverOpen = Boolean(popoverAnchor) && overflowTags.length > 0;
 
   const anchorOrigin =
     popoverPlacement === "top"
@@ -86,7 +82,7 @@ export function TagSelectionSelectedTags({
                 onClick={(e) => setPopoverAnchor(e.currentTarget)}
               />
               <Popover
-                open={Boolean(popoverAnchor)}
+                open={isPopoverOpen}
                 anchorEl={popoverAnchor}
                 onClose={() => setPopoverAnchor(null)}
                 anchorOrigin={anchorOrigin}
