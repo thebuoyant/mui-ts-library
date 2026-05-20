@@ -1,7 +1,7 @@
 import { Autocomplete, Box, Chip, IconButton, Stack, TextField } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
-import { useState, type SyntheticEvent } from "react";
+import { useEffect, useState, type SyntheticEvent } from "react";
 import type {
   TagColor,
   TagSelectionItem,
@@ -44,6 +44,7 @@ export function TagSelectionAutocomplete({
   listboxMaxHeight,
 }: TagSelectionAutocompleteProps) {
   const [selectedColor, setSelectedColor] = useState<TagColor>("default");
+  const [popupOpen, setPopupOpen] = useState(false);
 
   const isDisabled = disabled || isMaxReached;
 
@@ -52,6 +53,10 @@ export function TagSelectionAutocomplete({
     tag.label.toLowerCase().includes(searchValue.trim().toLowerCase()),
   );
   const isCreateMode = allowCreate && searchValue.trim() !== "" && filteredOptions.length === 0;
+
+  useEffect(() => {
+    if (isCreateMode) setPopupOpen(false);
+  }, [isCreateMode]);
 
   const handleConfirmCreate = () => {
     onTagCreate?.(searchValue.trim(), selectedColor);
@@ -68,7 +73,9 @@ export function TagSelectionAutocomplete({
       <Autocomplete<TagSelectionItem, false, false, false>
         options={availableTags}
         value={null}
-        open={isCreateMode ? false : undefined}
+        open={popupOpen}
+        onOpen={() => { if (!isCreateMode) setPopupOpen(true); }}
+        onClose={() => setPopupOpen(false)}
         size={inputSize}
         disabled={isDisabled}
         loading={loading}

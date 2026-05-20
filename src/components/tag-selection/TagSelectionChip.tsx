@@ -33,6 +33,10 @@ export function TagSelectionChip({
           color: tag.foregroundColor ?? "inherit",
           backgroundColor: tag.backgroundColor ?? "transparent",
           borderColor: tag.backgroundColor ?? undefined,
+          "& .MuiChip-deleteIcon": {
+            color: tag.foregroundColor ? `${tag.foregroundColor}99` : "inherit",
+            "&:hover": { color: tag.foregroundColor ?? "inherit" },
+          },
         }),
         cursor: onClick && !tag.disabled && !disabled ? "pointer" : "default",
       }}
