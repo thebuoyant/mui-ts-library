@@ -59,4 +59,16 @@ describe("createTagSelectionStore", () => {
       false,
     );
   });
+
+  it("Should add a new tag as selected and clear the search value", () => {
+    const store = createTagSelectionStore(initialTags);
+
+    store.getState().setSearchValue("Vue");
+    store.getState().addTag({ id: "vue", label: "Vue" });
+
+    const added = store.getState().tags.find((tag) => tag.id === "vue");
+    expect(added).toBeDefined();
+    expect(added?.selected).toBe(true);
+    expect(store.getState().searchValue).toBe("");
+  });
 });

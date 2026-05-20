@@ -146,7 +146,7 @@ describe("TagSelectionSelectedTags", () => {
     await user.click(screen.getByText("+1"));
 
     // Popover rendert in einem Portal — nach dem vue-Label suchen und dort klicken
-    const popoverVue = screen.getByText("Vue").closest(".MuiChip-root")!;
+    const popoverVue = screen.getByText("Vue").closest(".MuiChip-root") as HTMLElement;
     await user.click(within(popoverVue).getByTestId("CancelIcon"));
 
     expect(handleDelete).toHaveBeenCalledWith(

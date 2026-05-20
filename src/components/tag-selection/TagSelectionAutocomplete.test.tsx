@@ -155,4 +155,22 @@ describe("TagSelectionAutocomplete", () => {
 
     expect(handleCreate).toHaveBeenCalledWith("Vue", "default");
   });
+
+  it("Should disable the input and show helper text when isMaxReached is true", () => {
+    render(
+      <TagSelectionAutocomplete
+        availableTags={availableTags}
+        searchValue=""
+        translation={translation}
+        onSearchChange={vi.fn()}
+        onTagSelect={vi.fn()}
+        inputSize="medium"
+        chipSize="medium"
+        isMaxReached={true}
+      />,
+    );
+
+    expect(screen.getByLabelText("Search and add tags")).toBeDisabled();
+    expect(screen.getByText("Maximum number of tags reached.")).toBeInTheDocument();
+  });
 });

@@ -143,11 +143,11 @@ export function TagSelectionAutocomplete({
             }}
           />
         )}
-        renderOption={(props, option) => {
+        renderOption={({ key, ...props }, option) => {
           const hasCustomColors = Boolean(option.foregroundColor || option.backgroundColor);
 
           return (
-            <li key={option.id} {...props} style={{ width: "auto", padding: 0, margin: 0 }}>
+            <li key={key} {...props} style={{ width: "auto", padding: 0, margin: 0 }}>
               <Chip
                 size={chipSize}
                 label={option.label}
