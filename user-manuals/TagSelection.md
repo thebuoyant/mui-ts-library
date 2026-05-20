@@ -123,7 +123,7 @@ type TagSelectionItem = {
 | `showSelectedTagsLabel` | `boolean` | `true` | Zeigt das Label-Heading über dem Chip-Bereich an (Standard: „Selected tags"). Kann versteckt werden wenn der Kontext selbsterklärend ist. |
 | `showAutoComplete` | `boolean` | `true` | Zeigt das Such-Eingabefeld an. Wenn `false`, kann der Nutzer keine neuen Tags auswählen — der Chip-Bereich bleibt sichtbar (reine Anzeige). |
 | `inputSize` | `"small" \| "medium"` | `"medium"` | Größe der Autocomplete-Eingabe gemäß MUI-Standard. Beeinflusst Schriftgröße, Innenabstand und Höhe des Eingabefelds. |
-| `chipSize` | `"small" \| "medium"` | `"medium"` | Größe aller Chips — sowohl im Auswahl-Bereich als auch in der Dropdown-Liste. Sollte zur `inputSize` passen (`"small"` + `"small"` oder `"medium"` + `"medium"`). |
+| `chipSize` | `"small" \| "medium"` | `"small"` | Größe aller Chips — sowohl im Auswahl-Bereich als auch in der Dropdown-Liste. Sollte zur `inputSize` passen (`"small"` + `"small"` oder `"medium"` + `"medium"`). |
 
 #### Zustand & Verhalten
 
@@ -133,6 +133,9 @@ type TagSelectionItem = {
 | `loading` | `boolean` | `false` | Zeigt einen Ladezustand im Autocomplete-Dropdown an. Gedacht für asynchrones Laden von Tags aus einer API. Die Ladeanimation erscheint wenn das Dropdown geöffnet ist und das `tags`-Array noch leer ist. |
 | `maxTags` | `number` | — | Maximale Anzahl gleichzeitig auswählbarer Tags. Wenn das Limit erreicht ist, wird das Autocomplete-Eingabefeld automatisch deaktiviert und ein Hinweistext erscheint. Das Entfernen eines ausgewählten Tags entsperrt das Feld wieder. |
 | `allowCreate` | `boolean` | `false` | Aktiviert den freien Texteingabe-Modus. Wenn der Nutzer einen Text eintippt, der keinem bestehenden Tag entspricht (auch keine Teilübereinstimmung), wechselt das Eingabefeld in den Create-Mode: Im Input erscheinen ein CheckIcon (bestätigen) und ein CloseIcon (abbrechen), darunter werden 7 Theme-Farb-Chips zur Farbauswahl angezeigt. Der neue Tag wird intern sofort als selektiert markiert. `onTagCreate` informiert den Aufrufer über den erstellten Tag. |
+| `maxVisibleChips` | `number` | — | Maximale Anzahl sichtbarer Chips im Auswahl-Bereich. Überzählige Chips werden hinter einem `+N`-Chip verborgen. Ein Klick auf `+N` öffnet einen Popover mit den versteckten Chips — diese können dort auch gelöscht werden. Ohne diesen Prop werden alle Chips angezeigt. |
+| `popoverPlacement` | `"top" \| "bottom"` | `"bottom"` | Öffnungsrichtung des Overflow-Popovers (relativ zum `+N`-Chip). Nur relevant wenn `maxVisibleChips` gesetzt ist. |
+| `listboxMaxHeight` | `number` | — | Maximale Höhe der Autocomplete-Dropdown-Liste in Pixeln. Sobald die Liste höher wäre, erscheint eine vertikale Scrollbar. Ohne diesen Prop gilt MUI's interner Standard. |
 
 #### Übersetzung
 
@@ -335,6 +338,22 @@ onTagCreate={(label) => {
 }}
 ```
 
+### Overflow-Chips begrenzen
+
+Wenn die Komponente in einem platzbegrenzten Bereich eingesetzt wird, verhindert `maxVisibleChips` dass der Chip-Bereich unbegrenzt wächst. Überzählige Chips werden hinter einem `+N`-Chip verborgen und in einem Popover angezeigt:
+
+```tsx
+<TagSelection
+  tags={tags}
+  maxVisibleChips={3}
+  popoverPlacement="bottom"
+  listboxMaxHeight={250}
+  onTagsChange={(_, allTags) => setTags(allTags)}
+/>
+```
+
+Der Popover öffnet sich beim Klick auf `+N` und schließt sich automatisch, sobald alle Overflow-Chips gelöscht wurden.
+
 ### Branding-Farben (Custom Colors)
 
 ```tsx
@@ -401,3 +420,5 @@ const [submitting, setSubmitting] = useState(false);
 | **`loading` ohne Optionen** | Der `loadingText` ist nur sichtbar wenn das Autocomplete geöffnet ist **und** das `tags`-Array keine verfügbaren (nicht-ausgewählten, nicht-deaktivierten) Tags enthält. Mit verfügbaren Tags zeigt MUI Autocomplete diese und nicht den Ladetext. |
 | **`color` vs. Custom Colors** | `color` und `foregroundColor`/`backgroundColor` schließen sich gegenseitig aus. Wenn Custom Colors gesetzt sind, wird `color` vollständig ignoriert — auch für den Dark-Mode-Kontrast. |
 | **`maxTags` und Deaktivierung** | Wenn `maxTags` erreicht ist, werden bestehende Chips **nicht** deaktiviert — der Nutzer kann Tags entfernen um wieder Platz zu schaffen. Nur das Hinzufügen neuer Tags wird gesperrt. |
+| **Sortierung der ausgewählten Tags** | Ausgewählte Tags werden im Chip-Bereich immer **alphabetisch aufsteigend** sortiert angezeigt — unabhängig von der Reihenfolge im `tags`-Array oder der Reihenfolge in der sie ausgewählt wurden. |
+| **Overflow-Popover und `disabled`** | Im `disabled`-Zustand werden Chips im Overflow-Popover ohne Lösch-Icon angezeigt. Der `+N`-Chip selbst bleibt klickbar (nur Ansicht, kein Löschen möglich). |

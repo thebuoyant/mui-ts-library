@@ -26,7 +26,7 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 | Komponente | Beschreibung |
 |---|---|
 | `GanttChart` | Vollständige Projekt-Timeline mit hierarchischen Aufgaben, Meilensteinen, Abhängigkeitspfeilen, Drag & Drop, kaskadierenden Abhängigkeiten, Fortschritts-Tracking, Zoom, Split-Pane, integrierten CRUD-Dialogen und konfigurierbarer Toolbar |
-| `TagSelection` | Multi-Tag-Auswahlfeld mit Such-Autocomplete, Chip-Anzeige und vollständiger Callback-API |
+| `TagSelection` | Multi-Tag-Auswahlfeld mit Such-Autocomplete, alphabetisch sortierter Chip-Anzeige, Overflow-Begrenzung (`maxVisibleChips`), freier Tag-Erstellung (`allowCreate`), MUI-Theme- und Custom-Farben, Tag-Limit und vollständiger Callback-API |
 | `PasswordStrengthMeter` | Passwort-Eingabefeld mit Live-Stärkebewertung, animiertem Meter und Anforderungscheckliste |
 | `RichTextEditor` | WYSIWYG-Editor auf Basis TipTap v3 mit MUI-Toolbar, Textfarbe, Hervorhebung, Link-Dialog, automatischer Markdown-Konvertierung beim Einfügen, Zeichenzähler, Zeichenbegrenzung, konfigurierbarer Höhe/Breite, Readonly/Disabled-Modus und vollständiger Form-Integration |
 
@@ -76,18 +76,23 @@ Eine vollständige Projekt-Timeline-Komponente auf Basis von MUI. Wichtigste Fea
 
 - **Hierarchische Aufgaben** über `parentId` — unbegrenzte Verschachtelungstiefe, Ein-/Ausklappen pro Knoten oder global
 - **Meilensteine** als Rauten (`isMilestone: true`)
-- **Fortschrittsbalken** — halbdurchsichtiger Overlay für 0–100 % Fertigstellung
+- **Fortschrittsbalken** — halbdurchsichtiger Overlay für 0–100 % Fertigstellung (`progress`)
+- **Fortschritt per Drag** — Fortschritts-Handle direkt im Balken verschiebbar (`progressDraggable`)
 - **Abhängigkeitspfeile** — Z-förmige SVG-Pfeile für Finish-to-Start-Beziehungen
 - **Kaskadierende Abhängigkeiten** — Nachfolger-Aufgaben werden beim Verschieben eines Vorgängers automatisch mitgeschoben
 - **4 Zeitskalen** — Tage, Wochen, Monate, Quartale mit sofortigem Wechsel
 - **Zoom** — Strg + Mausrad wechselt zwischen Skalen (`zoomable`)
 - **Drag & Drop** — Balken horizontal verschieben (`draggable`) oder Enddatum per Ziehen anpassen (`resizable`)
+- **Inline-Editierung** — Doppelklick auf einen Task-Namen startet die direkte Bearbeitung im Panel (`inlineEdit`)
 - **Heute-Linie** — gestrichelte vertikale Markierung am aktuellen Tag; Schaltfläche „Heute anzeigen"
 - **Wochenend-Hervorhebung** — schattierte Spalten auf der Tages-Skala
 - **Split-Pane** — Trennlinie ziehen um den Aufgaben-Panel zu vergrößern/verkleinern (begrenzt durch `minPanelWidth` / `maxPanelWidth`)
 - **Integrierte CRUD-Dialoge** — Hinzufügen / Bearbeiten / Löschen mit Validierung und Eltern-Aufgaben-Auswahl
 - **Konfigurierbare Toolbar** — jedes Toolbar-Element einzeln ein-/ausblendbar über `toolbarConfig`
 - **Ansicht zurücksetzen** — Skala, Datumsbereich und Auf-/Zugeklappt-Zustand mit einem Klick wiederherstellen
+- **Row-Virtualisierung** — nur sichtbare Zeilen rendern; für 200+ Tasks empfohlen (`virtualizeRows`)
+- **Individuelle Task-Farbe** — `color` auf `GanttTask` überschreibt die Status-Farbe für einzelne Tasks
+- **Theming** — Balkenfarben, Meilenstein-Farbe, Heute-Linie, Wochenend-Farbe, Eckenradius über `ganttTheme` konfigurierbar
 - **Vollständige i18n** — jeden UI-Text über die `translations`-Prop überschreiben (deutsche Standardwerte)
 
 ```tsx
@@ -167,6 +172,37 @@ function App() {
 />
 ```
 
+**Mit Inline-Editierung, Fortschritt-Drag und Virtualisierung:**
+
+```tsx
+<GanttChart
+  tasks={tasks}
+  inlineEdit
+  progressDraggable
+  virtualizeRows
+  onTasksChange={(all) => console.log('Alle Aufgaben:', all)}
+/>
+```
+
+**Mit individuellem Theming:**
+
+```tsx
+import type { GanttTheme } from '@tsdev/mui-ts-library';
+
+const theme: GanttTheme = {
+  statusColors: {
+    planned:     '#90caf9',
+    'in-progress': '#ffe082',
+    done:        '#a5d6a7',
+    blocked:     '#ef9a9a',
+  },
+  barBorderRadius: 8,
+  todayLineColor: '#e91e63',
+};
+
+<GanttChart tasks={tasks} ganttTheme={theme} />
+```
+
 **Mit benutzerdefinierter Toolbar-Konfiguration:**
 
 ```tsx
@@ -190,25 +226,21 @@ const toolbarConfig: GanttToolbarConfig = {
 import type { GanttTranslations } from '@tsdev/mui-ts-library';
 
 const EN: Partial<GanttTranslations> = {
-  scaleDays: 'Days',
-  scaleWeeks: 'Weeks',
-  scaleMonths: 'Months',
-  scaleQuarters: 'Quarters',
-  rangeFrom: 'From',
-  rangeTo: 'To',
-  rangeResetTooltip: 'Reset range',
-  scrollToTodayTooltip: 'Scroll to today',
-  expandAllTooltip: 'Expand all',
-  collapseAllTooltip: 'Collapse all',
-  resetViewTooltip: 'Reset view',
-  weekColumnPrefix: 'W',
-  dateLocale: 'en-US',
-  dialogAddTitle: 'Add Task',
-  dialogEditTitle: 'Edit Task',
-  statusPlanned: 'Planned',
-  statusInProgress: 'In Progress',
-  statusDone: 'Done',
-  statusBlocked: 'Blocked',
+  scaleDays: 'Days', scaleWeeks: 'Weeks', scaleMonths: 'Months', scaleQuarters: 'Quarters',
+  rangeFrom: 'From', rangeTo: 'To', rangeResetTooltip: 'Reset range',
+  scrollToTodayTooltip: 'Scroll to today', expandAllTooltip: 'Expand all',
+  collapseAllTooltip: 'Collapse all', resetViewTooltip: 'Reset view',
+  weekColumnPrefix: 'W', dateLocale: 'en-US',
+  columnName: 'Name', columnStatus: 'Status', columnActions: 'Actions',
+  addTaskTooltip: 'Add task', editTaskTooltip: 'Edit task', deleteTaskTooltip: 'Delete task',
+  dialogAddTitle: 'Add Task', dialogEditTitle: 'Edit Task', dialogDeleteTitle: 'Delete Task',
+  dialogSave: 'Save', dialogCancel: 'Cancel', dialogDelete: 'Delete',
+  dialogFieldName: 'Name', dialogFieldStartDate: 'Start date', dialogFieldEndDate: 'End date',
+  dialogFieldStatus: 'Status', dialogFieldMilestone: 'Is milestone',
+  dialogFieldParent: 'Parent task', dialogFieldParentNone: '— None —',
+  dialogDeleteConfirm: 'Delete task "{name}"?',
+  dialogFieldDependencies: 'Predecessors', dialogFieldDependenciesNone: '— None —',
+  statusPlanned: 'Planned', statusInProgress: 'In Progress', statusDone: 'Done', statusBlocked: 'Blocked',
 };
 
 <GanttChart
@@ -288,6 +320,18 @@ useEffect(() => {
 <TagSelection tags={tags} maxTags={3} />
 ```
 
+**Mit Overflow-Begrenzung:**
+
+```tsx
+{/* Zeigt maximal 3 Chips — weitere werden hinter einem "+N"-Chip verborgen */}
+<TagSelection
+  tags={tags}
+  maxVisibleChips={3}
+  popoverPlacement="bottom"
+  listboxMaxHeight={250}
+/>
+```
+
 **Mit erstellbaren Tags:**
 
 Wenn `allowCreate={true}` gesetzt ist, erscheinen im Input ein CheckIcon (bestätigen) und ein
@@ -364,6 +408,39 @@ function App() {
 <PasswordStrengthMeter
   showMeter={false}
   showSummary={false}
+  inputSize="small"
+/>
+```
+
+**Mit deutschen Texten und eigenen Meter-Farben:**
+
+```tsx
+import type { PasswordStrengthMeterTranslation, MeterColors } from '@tsdev/mui-ts-library';
+
+const DE: Partial<PasswordStrengthMeterTranslation> = {
+  label: 'Passwort',
+  summaryHeaderLabel: 'Anforderungen',
+  summaryMinChars: 'Mindestens {n} Zeichen',
+  summaryCapitalLetter: 'Mindestens 1 Großbuchstabe',
+  summaryLowerCaseLetter: 'Mindestens 1 Kleinbuchstabe',
+  summaryNumber: 'Mindestens 1 Zahl',
+  summarySpecialChar: 'Mindestens 1 Sonderzeichen',
+  showPasswordLabel: 'Passwort anzeigen',
+  hidePasswordLabel: 'Passwort verbergen',
+};
+
+const colors: Partial<MeterColors> = {
+  weak: '#d32f2f',
+  ok: '#f57c00',
+  good: '#388e3c',
+  veryGood: '#1b5e20',
+};
+
+<PasswordStrengthMeter
+  passwordMinLength={10}
+  translation={DE}
+  meterColors={colors}
+  onPasswordChange={(password, result) => console.log(result.score)}
 />
 ```
 
@@ -455,6 +532,31 @@ const [content, setContent] = useState('<p>Initialinhalt</p>');
 
 {/* Feste Breite */}
 <RichTextEditor height={300} width={600} />
+```
+
+**JSON-Output statt HTML:**
+
+```tsx
+{/* Gibt den Inhalt als TipTap-JSON-Dokument zurück statt als HTML-String */}
+<RichTextEditor outputFormat="json" onChange={(json) => console.log(json)} />
+```
+
+**Mit deutschen Toolbar-Texten:**
+
+```tsx
+import type { RichTextEditorTranslation } from '@tsdev/mui-ts-library';
+
+const DE: Partial<RichTextEditorTranslation> = {
+  bold: 'Fett', italic: 'Kursiv', underline: 'Unterstrichen',
+  heading1: 'Überschrift 1', heading2: 'Überschrift 2', heading3: 'Überschrift 3',
+  bulletList: 'Aufzählung', orderedList: 'Nummerierte Liste',
+  link: 'Link einfügen', linkDialogTitle: 'Link einfügen',
+  linkDialogUrlLabel: 'URL', linkDialogSave: 'Speichern',
+  linkDialogCancel: 'Abbrechen', linkDialogRemove: 'Link entfernen',
+  undo: 'Rückgängig', redo: 'Wiederholen', clearFormat: 'Formatierung entfernen',
+};
+
+<RichTextEditor translation={DE} />
 ```
 
 **Markdown einfügen:**
