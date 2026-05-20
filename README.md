@@ -248,22 +248,20 @@ function App() {
 }
 ```
 
-**Mit benutzerdefinierten Icons und Farben:**
+**Mit benutzerdefinierten Farben:**
+
+Jeder Tag unterstützt entweder eine MUI-Theme-Farbe (`color`) oder vollständig eigene Farben
+(`backgroundColor` + `foregroundColor`). Beide Varianten können gemischt werden:
 
 ```tsx
-import StarIcon from '@mui/icons-material/Star';
-import CloseIcon from '@mui/icons-material/Close';
-
 const tags: TagSelectionItem[] = [
-  {
-    id: 'featured',
-    label: 'Featured',
-    selected: true,
-    startIcon: <StarIcon style={{ color: '#fff' }} />,
-    deleteIcon: <CloseIcon style={{ color: '#ccc' }} />,
-    foregroundColor: '#ffffff',
-    backgroundColor: '#1976d2',
-  },
+  // MUI-Theme-Farbe
+  { id: 'react',    label: 'React',    selected: true, color: 'primary'  },
+  { id: 'success',  label: 'Done',     selected: true, color: 'success'  },
+
+  // Eigene Hex-Farben — foregroundColor sollte zur backgroundColor kontrastieren
+  { id: 'brand',    label: 'Branding', selected: true, foregroundColor: '#ffffff', backgroundColor: '#6200ea' },
+  { id: 'warning',  label: 'Achtung',  selected: true, foregroundColor: '#1a1a1a', backgroundColor: '#ffea00' },
 ];
 ```
 
@@ -292,19 +290,52 @@ useEffect(() => {
 
 **Mit erstellbaren Tags:**
 
+Wenn `allowCreate={true}` gesetzt ist, erscheinen im Input ein CheckIcon (bestätigen) und ein
+CloseIcon (abbrechen), sobald der Suchbegriff keinem bestehenden Tag entspricht. Darunter
+werden 7 Theme-Farb-Chips zur Farbauswahl angezeigt.
+
+Der neue Tag wird intern **sofort als selektiert** markiert. `onTagCreate` wird aufgerufen
+damit der externe State synchronisiert werden kann — dabei `selected: true` setzen, damit
+der Tag beim nächsten Re-Render nicht aus der Auswahl fällt:
+
 ```tsx
 const [tags, setTags] = useState<TagSelectionItem[]>(initialTags);
 
 <TagSelection
   tags={tags}
   allowCreate={true}
-  onTagCreate={(label) => {
+  onTagCreate={(label, color) => {
     setTags((prev) => [
       ...prev,
-      { id: label.toLowerCase().replace(/\s+/g, '-'), label },
+      {
+        id: label.toLowerCase().replace(/\s+/g, '-'),
+        label,
+        color,         // vom User im Farb-Picker gewählt
+        selected: true // wichtig: sonst verschwindet der Tag beim nächsten Re-Render
+      },
     ]);
   }}
 />
+```
+
+Wer eigene Hex-Farben vergeben möchte, kann `backgroundColor` und `foregroundColor` direkt
+im `onTagCreate`-Handler setzen — die Komponente selbst gibt nur den gewählten `color`-Wert
+(MUI-Theme-Farbe) zurück:
+
+```tsx
+onTagCreate={(label, color) => {
+  const myBackgroundColor = computeColorForLabel(label); // eigene Logik
+  setTags((prev) => [
+    ...prev,
+    {
+      id: label.toLowerCase().replace(/\s+/g, '-'),
+      label,
+      selected: true,
+      foregroundColor: '#ffffff',
+      backgroundColor: myBackgroundColor,
+    },
+  ]);
+}}
 ```
 
 ---
