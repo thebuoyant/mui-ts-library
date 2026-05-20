@@ -186,7 +186,7 @@ function CreatableStory(args: ComponentProps<typeof TagSelection>) {
           args.onTagCreate?.(label, color);
           setLocalTags((prev) => [
             ...prev,
-            { id: label.toLowerCase().replace(/\s+/g, "-"), label, color },
+            { id: label.toLowerCase().replace(/\s+/g, "-"), label, color, selected: true },
           ]);
         }}
       />

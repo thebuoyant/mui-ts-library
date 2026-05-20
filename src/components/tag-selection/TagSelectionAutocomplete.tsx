@@ -66,6 +66,7 @@ export function TagSelectionAutocomplete({
       <Autocomplete<TagSelectionItem, false, false, false>
         options={availableTags}
         value={null}
+        open={isCreateMode ? false : undefined}
         size={inputSize}
         disabled={isDisabled}
         loading={loading}

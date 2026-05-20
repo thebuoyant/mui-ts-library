@@ -58,6 +58,7 @@ function TagSelectionInner({
   const setSearchValue = useTagSelectionStore((state) => state.setSearchValue);
   const selectTag = useTagSelectionStore((state) => state.selectTag);
   const deleteTag = useTagSelectionStore((state) => state.deleteTag);
+  const addTag = useTagSelectionStore((state) => state.addTag);
 
   useEffect(() => {
     setTags(tags);
@@ -140,6 +141,24 @@ function TagSelectionInner({
   };
 
   const handleTagCreate = (label: string, color: TagColor) => {
+    const newTag: TagSelectionItem = {
+      id: label.toLowerCase().replace(/\s+/g, "-"),
+      label,
+      color,
+      selected: true,
+    };
+
+    addTag(newTag);
+
+    const nextTags = [...storeTags, newTag];
+    const nextSelectedTags = nextTags.filter((t) => t.selected);
+
+    if (onTagSelect) {
+      onTagSelect(newTag, nextSelectedTags, nextTags);
+    }
+
+    emitTagsChange(nextTags);
+
     if (onTagCreate) {
       onTagCreate(label, color);
     }

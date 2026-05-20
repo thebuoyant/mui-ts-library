@@ -222,6 +222,20 @@ describe("TagSelection", () => {
     expect(handleTagCreate).toHaveBeenCalledWith("Vue", "default");
   });
 
+  it("Should auto-select the newly created tag and clear the input", async () => {
+    const user = userEvent.setup();
+
+    render(<TagSelection tags={tags} allowCreate={true} />);
+
+    const input = screen.getByLabelText("Search and add tags");
+    await user.type(input, "Vue");
+
+    await user.click(await screen.findByTestId("CheckIcon"));
+
+    expect(input).toHaveValue("");
+    expect(screen.getByText("Vue")).toBeInTheDocument();
+  });
+
   it("Should clear the input when the cancel button is clicked in create mode", async () => {
     const user = userEvent.setup();
 
