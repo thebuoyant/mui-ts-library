@@ -194,12 +194,71 @@ aber das würde bedeuten, dass `TagSelectionAutocomplete` mehr Verantwortung üb
 
 ---
 
-## Empfohlene Reihenfolge für die nächste Session
+## Erledigte Punkte (Session 3)
 
-1. **Nach Confirm: Input leeren** — `onSearchChange("")` am Ende von `handleConfirmCreate`
-2. **Entscheiden:** Soll die Komponente nach Create automatisch selektieren (intern `onTagSelect` aufrufen), oder bleibt das Aufgabe des Aufrufers? → Empfehlung: intern selektieren, weil es das häufigste erwartete Verhalten ist
-3. **Popup im Create-Mode schließen** — `open={isCreateMode ? false : undefined}`, damit "No tags available." nicht gleichzeitig mit den Icons erscheint
-4. **Icons visuell verfeinern** — Tooltip + ggf. InputAdornment-Wrapper für bessere Abstände
-5. **Creatable-Story fixen** — `selected: true` beim neu erstellten Tag setzen
-6. **Storybook visuell testen** — alle Stories + alle Controls durchklicken
-7. **Entscheiden:** Custom-Colors via Colorpicker — ja oder nein?
+- ✅ `addTag`-Action im Store: fügt Tag als `selected: true` hinzu + leert `searchValue` atomar
+- ✅ `handleTagCreate` in TagSelection.tsx: Auto-Select + `onTagSelect`/`onTagsChange` werden gefeuert
+- ✅ Popup im Create-Mode geschlossen (`open={isCreateMode ? false : undefined}`)
+- ✅ Creatable-Story: `selected: true` beim neu erstellten Tag
+- ✅ Neuer Test: "Should auto-select the newly created tag and clear the input"
+- ✅ 263 Tests grün
+
+---
+
+## Offenes Thema: Farb-Auswahl für neue Tags (nächste Session)
+
+### Problem
+Aktuell kann man beim Erstellen nur eine MUI-Theme-Farbe (`TagColor`) wählen.
+Der User möchte aber auch `backgroundColor` + passende `foregroundColor` setzen können,
+damit der Tag gut erkennbar ist.
+
+### Empfohlener Ansatz: Theme-Farben + optionale Custom-Color mit Auto-Kontrast
+
+**Stufe 1 — Theme-Farben (bereits implementiert)**
+Die 7 MUI-Chip-Farben (default, primary, secondary, error, info, success, warning) sind immer
+erreichbar und haben bereits getesteten Kontrast. Für schnelle Auswahl ideal.
+
+**Stufe 2 — Custom Background mit Auto-Kontrast-Foreground**
+Zusätzlich ein `<input type="color">` (oder ein `TextField` mit Hex-Eingabe) für eine
+Hintergrundfarbe. Die Textfarbe wird automatisch berechnet:
+
+```ts
+// W3C relative luminance → entweder Weiß oder Schwarz als Textfarbe
+function getContrastColor(hex: string): "#ffffff" | "#000000" {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  return luminance > 0.5 ? "#000000" : "#ffffff";
+}
+```
+
+**Live-Vorschau-Chip** zeigt sofort wie der Tag aussehen wird:
+```tsx
+<Chip
+  label={searchValue}
+  sx={{ backgroundColor: customColor, color: getContrastColor(customColor) }}
+/>
+```
+
+**UX-Flow:**
+1. User tippt neuen Tag-Namen → Create-Mode aktiviert
+2. Farb-Bereich erscheint unterhalb:
+   - Zeile 1: Theme-Farb-Chips (schnelle Wahl)
+   - Zeile 2: `<input type="color">` + Live-Vorschau-Chip (custom Wahl)
+3. Entweder Theme-Farbe ODER Custom-Color ist aktiv (mutual exclusive)
+4. CheckIcon bestätigt → `onTagCreate(label, color, backgroundColor?, foregroundColor?)`
+
+**Auswirkung auf `onTagCreate`-Signatur:**
+Aktuell: `(label: string, color: TagColor) => void`
+Neu: entweder bleibt die Signatur und wir nutzen `color: "custom"` als Marker,
+oder wir erweitern auf `(label: string, colorConfig: TagColorConfig) => void`:
+```ts
+type TagColorConfig =
+  | { type: "theme"; color: TagColor }
+  | { type: "custom"; backgroundColor: string; foregroundColor: string };
+```
+
+**Entscheidung vor Implementierung:** Signatur-Änderung oder nicht?
+→ Empfehlung: neue optionale Props statt Breaking Change:
+`onTagCreate?: (label: string, color: TagColor, backgroundColor?: string, foregroundColor?: string) => void`
