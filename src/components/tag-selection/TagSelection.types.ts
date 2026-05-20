@@ -58,6 +58,13 @@ export type TagSelectionProps = {
   maxTags?: number;
   // Ermöglicht das Erstellen neuer Tags durch freie Texteingabe.
   allowCreate?: boolean;
+  // Maximale Anzahl sichtbarer Chips im Auswahl-Bereich.
+  // Überzählige Chips werden hinter einem "+N"-Chip versteckt, der einen Popover öffnet.
+  maxVisibleChips?: number;
+  // Richtung in der der Overflow-Popover aufgeht. Standard: "bottom".
+  popoverPlacement?: "top" | "bottom";
+  // Maximale Höhe der Autocomplete-Dropdown-Liste in px. Standard: MUI-Default.
+  listboxMaxHeight?: number;
   onTagSelect?: (
     tag: TagSelectionItem,
     selectedTags: TagSelectionItem[],

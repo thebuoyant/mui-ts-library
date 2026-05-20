@@ -25,6 +25,7 @@ type TagSelectionAutocompleteProps = {
   loading?: boolean;
   isMaxReached?: boolean;
   allowCreate?: boolean;
+  listboxMaxHeight?: number;
 };
 
 export function TagSelectionAutocomplete({
@@ -40,6 +41,7 @@ export function TagSelectionAutocomplete({
   loading = false,
   isMaxReached = false,
   allowCreate = false,
+  listboxMaxHeight,
 }: TagSelectionAutocompleteProps) {
   const [selectedColor, setSelectedColor] = useState<TagColor>("default");
 
@@ -87,6 +89,10 @@ export function TagSelectionAutocomplete({
               flexWrap: "wrap",
               gap: 1,
               padding: 1,
+              ...(listboxMaxHeight !== undefined && {
+                maxHeight: listboxMaxHeight,
+                overflowY: "auto",
+              }),
             },
           },
         }}

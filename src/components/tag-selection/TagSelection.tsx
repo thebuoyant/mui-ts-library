@@ -45,6 +45,9 @@ function TagSelectionInner({
   loading = false,
   maxTags,
   allowCreate = false,
+  maxVisibleChips,
+  popoverPlacement = "bottom",
+  listboxMaxHeight,
   translation,
   onTagSelect,
   onTagDelete,
@@ -175,6 +178,8 @@ function TagSelectionInner({
             showSelectedTagsLabel={showSelectedTagsLabel}
             chipSize={chipSize}
             disabled={disabled}
+            maxVisibleChips={maxVisibleChips}
+            popoverPlacement={popoverPlacement}
           />
         )}
 
@@ -192,6 +197,7 @@ function TagSelectionInner({
             loading={loading}
             isMaxReached={isMaxReached}
             allowCreate={allowCreate}
+            listboxMaxHeight={listboxMaxHeight}
           />
         )}
       </Stack>
@@ -211,6 +217,9 @@ export function TagSelection({
   loading = false,
   maxTags,
   allowCreate = false,
+  maxVisibleChips,
+  popoverPlacement = "bottom",
+  listboxMaxHeight,
   onTagSelect,
   onTagDelete,
   onTagsChange,
@@ -234,6 +243,9 @@ export function TagSelection({
         loading={loading}
         maxTags={maxTags}
         allowCreate={allowCreate}
+        maxVisibleChips={maxVisibleChips}
+        popoverPlacement={popoverPlacement}
+        listboxMaxHeight={listboxMaxHeight}
         onTagSelect={onTagSelect}
         onTagDelete={onTagDelete}
         onTagsChange={onTagsChange}

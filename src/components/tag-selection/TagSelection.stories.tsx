@@ -47,6 +47,9 @@ const meta: Meta<typeof TagSelection> = {
     inputSize: { control: "radio", options: ["small", "medium"] },
     chipSize: { control: "radio", options: ["small", "medium"] },
     maxTags: { control: "number" },
+    maxVisibleChips: { control: "number" },
+    listboxMaxHeight: { control: "number" },
+    popoverPlacement: { control: "radio", options: ["top", "bottom"] },
     // Komplexe Objekte — stattdessen dedizierte Stories verwenden.
     tags: { control: false },
     translation: { control: false },
@@ -202,4 +205,21 @@ export const Creatable: Story = {
     allowCreate: true,
   },
   render: (args) => <CreatableStory {...args} />,
+};
+
+// Zeigt den Overflow-Modus: maxVisibleChips begrenzt die sichtbaren Chips.
+// Überzählige Chips werden hinter einem "+N"-Chip versteckt, der einen Popover öffnet.
+// Chips im Popover sind löschbar. popoverPlacement steuert die Öffnungsrichtung.
+export const OverflowChips: Story = {
+  args: {
+    maxVisibleChips: 3,
+    popoverPlacement: "bottom",
+    listboxMaxHeight: 200,
+    tags: sampleTags.map((t) => ({ ...t, selected: true })),
+  },
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <TagSelection {...args} />
+    </Box>
+  ),
 };
