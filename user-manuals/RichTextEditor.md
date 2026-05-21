@@ -37,14 +37,16 @@ Der `RichTextEditor` ist ein vollständiger WYSIWYG-Texteditor auf Basis von [Ti
 ## Import
 
 ```tsx
-import { RichTextEditor } from '@tsdev/mui-ts-library';
+import {
+  RichTextEditor,
+  DEFAULT_RICH_TEXT_EDITOR_TRANSLATION,
+  DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG,
+} from '@tsdev/mui-ts-library';
 import type {
   RichTextEditorProps,
   RichTextEditorOutputFormat,
   RichTextEditorToolbarConfig,
   RichTextEditorTranslation,
-  DEFAULT_RICH_TEXT_EDITOR_TRANSLATION,
-  DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG,
 } from '@tsdev/mui-ts-library';
 ```
 

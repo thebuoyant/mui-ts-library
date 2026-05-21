@@ -132,7 +132,7 @@ type TagSelectionItem = {
 | `disabled` | `boolean` | `false` | Deaktiviert die gesamte Komponente. Das Autocomplete-Eingabefeld wird gesperrt; ausgewählte Chips werden grau dargestellt und sind nicht löschbar. Nützlich während Formular-Submissions oder in reinen Lese-Ansichten. |
 | `loading` | `boolean` | `false` | Zeigt einen Ladezustand im Autocomplete-Dropdown an. Gedacht für asynchrones Laden von Tags aus einer API. Die Ladeanimation erscheint wenn das Dropdown geöffnet ist und das `tags`-Array noch leer ist. |
 | `maxTags` | `number` | — | Maximale Anzahl gleichzeitig auswählbarer Tags. Wenn das Limit erreicht ist, wird das Autocomplete-Eingabefeld automatisch deaktiviert und ein Hinweistext erscheint. Das Entfernen eines ausgewählten Tags entsperrt das Feld wieder. |
-| `allowCreate` | `boolean` | `false` | Aktiviert den freien Texteingabe-Modus. Wenn der Nutzer einen Text eintippt, der keinem bestehenden Tag entspricht (auch keine Teilübereinstimmung), wechselt das Eingabefeld in den Create-Mode: Im Input erscheinen ein CheckIcon (bestätigen) und ein CloseIcon (abbrechen), darunter werden 7 Theme-Farb-Chips zur Farbauswahl angezeigt. Der neue Tag wird intern sofort als selektiert markiert. `onTagCreate` informiert den Aufrufer über den erstellten Tag. |
+| `allowCreate` | `boolean` | `false` | Aktiviert den freien Texteingabe-Modus. Wenn der Nutzer einen Text eintippt, der keinem bestehenden Tag entspricht (auch keine Teilübereinstimmung), wechselt das Eingabefeld in den Create-Mode: Im Input erscheinen ein CheckIcon (bestätigen) und ein CloseIcon (abbrechen), darunter werden 7 Theme-Farb-Chips zur Farbauswahl angezeigt. Der neue Tag wird intern sofort als selektiert markiert. Bestätigen ist per Klick auf das CheckIcon **oder** per **Enter**-Taste möglich. `onTagCreate` informiert den Aufrufer über den erstellten Tag. |
 | `maxVisibleChips` | `number` | — | Maximale Anzahl sichtbarer Chips im Auswahl-Bereich. Überzählige Chips werden hinter einem `+N`-Chip verborgen. Ein Klick auf `+N` öffnet einen Popover mit den versteckten Chips — diese können dort auch gelöscht werden. Ohne diesen Prop werden alle Chips angezeigt. |
 | `popoverPlacement` | `"top" \| "bottom"` | `"bottom"` | Öffnungsrichtung des Overflow-Popovers (relativ zum `+N`-Chip). Nur relevant wenn `maxVisibleChips` gesetzt ist. |
 | `listboxMaxHeight` | `number` | — | Maximale Höhe der Autocomplete-Dropdown-Liste in Pixeln. Sobald die Liste höher wäre, erscheint eine vertikale Scrollbar. Ohne diesen Prop gilt MUI's interner Standard. |
@@ -153,7 +153,7 @@ type TagSelectionItem = {
 | `onTagDelete` | `(tag: TagSelectionItem, selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | Das Lösch-Icon eines ausgewählten Chips wurde geklickt. `tag` enthält den entfernten Tag mit `selected: false`. `selectedTags` ist die verbleibende Auswahl. `allTags` ist das vollständige Array nach dem Entfernen. |
 | `onTagsChange` | `(selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | Wird nach **jeder** Änderung der Auswahl aufgerufen — sowohl nach Select als auch nach Delete. Zentraler Callback für datengetriebene Architekturen. |
 | `onSearchChange` | `(searchValue: string) => void` | Wird bei jeder Änderung des Suchtexts im Autocomplete-Feld aufgerufen. Nützlich für serverseitige Filterung oder Suche. |
-| `onTagCreate` | `(label: string, color: TagColor) => void` | Wird ausgelöst wenn der Nutzer im Create-Mode das CheckIcon klickt (`allowCreate={true}`). `label` ist der eingetippte Text, `color` die gewählte MUI-Theme-Farbe (Standard: `"default"`). Der neue Tag wird intern bereits als selektiert markiert — `onTagCreate` dient der Synchronisation des externen States. |
+| `onTagCreate` | `(label: string, color: TagColor) => void` | Wird ausgelöst wenn der Nutzer im Create-Mode das CheckIcon klickt **oder Enter drückt** (`allowCreate={true}`). `label` ist der eingetippte Text, `color` die gewählte MUI-Theme-Farbe (Standard: `"default"`). Der neue Tag wird intern bereits als selektiert markiert — `onTagCreate` dient der Synchronisation des externen States. |
 
 > **Wichtig zu `onTagCreate`:** Der neue Tag wird von der Komponente intern sofort mit `selected: true` in den Store eingefügt. `onTagCreate` wird danach ausgelöst damit der Aufrufer seinen externen State (`tags`-Prop) synchronisieren kann. Dabei **muss `selected: true`** gesetzt werden, sonst überschreibt das nächste Re-Render den internen Zustand:
 >
@@ -296,7 +296,8 @@ const handleSearchChange = async (query: string) => {
 
 Wenn `allowCreate={true}` und der Suchbegriff keinem bestehenden Tag entspricht, wechselt
 die Komponente in den Create-Mode: CheckIcon (bestätigen) und CloseIcon (abbrechen) erscheinen
-im Eingabefeld, darunter 7 Theme-Farb-Chips zur Farbauswahl.
+im Eingabefeld, darunter 7 Theme-Farb-Chips zur Farbauswahl. Der Tag kann per Klick auf das
+CheckIcon **oder mit der Enter-Taste** bestätigt werden.
 
 ```tsx
 const [tags, setTags] = useState<TagSelectionItem[]>(initialTags);
@@ -421,4 +422,5 @@ const [submitting, setSubmitting] = useState(false);
 | **`color` vs. Custom Colors** | `color` und `foregroundColor`/`backgroundColor` schließen sich gegenseitig aus. Wenn Custom Colors gesetzt sind, wird `color` vollständig ignoriert — auch für den Dark-Mode-Kontrast. |
 | **`maxTags` und Deaktivierung** | Wenn `maxTags` erreicht ist, werden bestehende Chips **nicht** deaktiviert — der Nutzer kann Tags entfernen um wieder Platz zu schaffen. Nur das Hinzufügen neuer Tags wird gesperrt. |
 | **Sortierung der ausgewählten Tags** | Ausgewählte Tags werden im Chip-Bereich immer **alphabetisch aufsteigend** sortiert angezeigt — unabhängig von der Reihenfolge im `tags`-Array oder der Reihenfolge in der sie ausgewählt wurden. |
+| **Sortierung der verfügbaren Tags** | Die Autocomplete-Dropdown-Liste zeigt verfügbare Tags ebenfalls **alphabetisch aufsteigend** sortiert — unabhängig von der Reihenfolge im `tags`-Array. |
 | **Overflow-Popover und `disabled`** | Im `disabled`-Zustand werden Chips im Overflow-Popover ohne Lösch-Icon angezeigt. Der `+N`-Chip selbst bleibt klickbar (nur Ansicht, kein Löschen möglich). |
