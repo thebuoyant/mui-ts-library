@@ -22,7 +22,7 @@ Der `RichTextEditor` ist ein vollständiger WYSIWYG-Texteditor auf Basis von [Ti
 |---|---|
 | React | 19 |
 | TypeScript | 5.x |
-| Material UI (`@mui/material`) | 7 |
+| Material UI (`@mui/material`) | 9 |
 | `@tiptap/react` | 3.x |
 | `@tiptap/starter-kit` | 3.x |
 | `@tiptap/extension-placeholder` | 3.x |

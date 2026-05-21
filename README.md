@@ -10,7 +10,7 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 - [Voraussetzungen](#voraussetzungen)
 - [Installation](#installation)
 - [Verwendung](#verwendung)
-  - [GanttChart](#gantchart)
+  - [GanttChart](#ganttchart)
   - [TagSelection](#tagselection)
   - [PasswordStrengthMeter](#passwordstrengthmeter)
   - [RichTextEditor](#richtexteditor)
@@ -26,7 +26,7 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 | Komponente | Beschreibung |
 |---|---|
 | `GanttChart` | Vollständige Projekt-Timeline mit hierarchischen Aufgaben, Meilensteinen, Abhängigkeitspfeilen, Drag & Drop, kaskadierenden Abhängigkeiten, Fortschritts-Tracking, Zoom, Split-Pane, integrierten CRUD-Dialogen und konfigurierbarer Toolbar |
-| `TagSelection` | Multi-Tag-Auswahlfeld mit Such-Autocomplete, alphabetisch sortierter Chip-Anzeige, Overflow-Begrenzung (`maxVisibleChips`), freier Tag-Erstellung (`allowCreate`), MUI-Theme- und Custom-Farben, Tag-Limit und vollständiger Callback-API |
+| `TagSelection` | Multi-Tag-Auswahlfeld mit Such-Autocomplete, alphabetisch sortierter Chip-Anzeige und Dropdown-Liste, Overflow-Begrenzung (`maxVisibleChips`), freier Tag-Erstellung (`allowCreate`) per Klick oder Enter, MUI-Theme- und Custom-Farben, Tag-Limit und vollständiger Callback-API |
 | `PasswordStrengthMeter` | Passwort-Eingabefeld mit Live-Stärkebewertung, animiertem Meter und Anforderungscheckliste |
 | `RichTextEditor` | WYSIWYG-Editor auf Basis TipTap v3 mit MUI-Toolbar, Textfarbe, Hervorhebung, Link-Dialog, automatischer Markdown-Konvertierung beim Einfügen, Zeichenzähler, Zeichenbegrenzung, konfigurierbarer Höhe/Breite, Readonly/Disabled-Modus und vollständiger Form-Integration |
 
@@ -336,7 +336,8 @@ useEffect(() => {
 
 Wenn `allowCreate={true}` gesetzt ist, erscheinen im Input ein CheckIcon (bestätigen) und ein
 CloseIcon (abbrechen), sobald der Suchbegriff keinem bestehenden Tag entspricht. Darunter
-werden 7 Theme-Farb-Chips zur Farbauswahl angezeigt.
+werden 7 Theme-Farb-Chips zur Farbauswahl angezeigt. Bestätigen ist per Klick auf das CheckIcon
+**oder mit der Enter-Taste** möglich.
 
 Der neue Tag wird intern **sofort als selektiert** markiert. `onTagCreate` wird aufgerufen
 damit der externe State synchronisiert werden kann — dabei `selected: true` setzen, damit

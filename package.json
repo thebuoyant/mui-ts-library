@@ -2,7 +2,7 @@
   "name": "@tsdev/mui-ts-library",
   "version": "1.0.0",
   "private": false,
-  "description": "Type-safe React component library built on MUI v7 — GanttChart, TagSelection, PasswordStrengthMeter, RichTextEditor",
+  "description": "Type-safe React component library built on MUI v9 — GanttChart, TagSelection, PasswordStrengthMeter, RichTextEditor",
   "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.js",

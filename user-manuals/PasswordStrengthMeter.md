@@ -21,7 +21,7 @@ Der `PasswordStrengthMeter` ist eine Passwort-Eingabe-Komponente auf Basis von R
 |---|---|
 | React | 19 |
 | TypeScript | 5.x |
-| Material UI (`@mui/material`) | 7 |
+| Material UI (`@mui/material`) | 9 |
 
 ---
 

@@ -21,7 +21,7 @@ Die `TagSelection`-Komponente ist ein flexibles Multi-Tag-Auswahlfeld auf Basis 
 |---|---|
 | React | 19 |
 | TypeScript | 5.x |
-| Material UI (`@mui/material`) | 7 |
+| Material UI (`@mui/material`) | 9 |
 | Zustand | 5 |
 
 ---
