@@ -1,5 +1,5 @@
 {
-  "name": "@tsdev/mui-ts-library",
+  "name": "@thebuoyant/mui-ts-library",
   "version": "1.0.0",
   "private": false,
   "description": "Type-safe React component library for MUI v9. Gantt chart with drag & drop, multi-tag selector with autocomplete, WYSIWYG rich text editor (TipTap v3), and password strength meter. Full TypeScript support, dark mode, i18n.",

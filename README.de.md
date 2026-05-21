@@ -66,13 +66,13 @@ react-dom >= 19
 
 ```bash
 # npm
-npm install @tsdev/mui-ts-library
+npm install @thebuoyant/mui-ts-library
 
 # yarn
-yarn add @tsdev/mui-ts-library
+yarn add @thebuoyant/mui-ts-library
 
 # pnpm
-pnpm add @tsdev/mui-ts-library
+pnpm add @thebuoyant/mui-ts-library
 ```
 
 > **Hinweis:** Alle Peer Dependencies müssen installiert sein. Falls MUI noch nicht eingerichtet ist, folge dem [MUI-Installationsguide](https://mui.com/material-ui/getting-started/installation/).
@@ -111,8 +111,8 @@ Eine vollständige Projekt-Timeline-Komponente auf Basis von MUI. Wichtigste Fea
 - **Vollständige i18n** — jeden UI-Text über die `translations`-Prop überschreiben (deutsche Standardwerte)
 
 ```tsx
-import { GanttChart } from '@tsdev/mui-ts-library';
-import type { GanttTask } from '@tsdev/mui-ts-library';
+import { GanttChart } from '@thebuoyant/mui-ts-library';
+import type { GanttTask } from '@thebuoyant/mui-ts-library';
 
 const tasks: GanttTask[] = [
   {
@@ -202,7 +202,7 @@ function App() {
 **Mit individuellem Theming:**
 
 ```tsx
-import type { GanttTheme } from '@tsdev/mui-ts-library';
+import type { GanttTheme } from '@thebuoyant/mui-ts-library';
 
 const theme: GanttTheme = {
   statusColors: {
@@ -221,7 +221,7 @@ const theme: GanttTheme = {
 **Mit benutzerdefinierter Toolbar-Konfiguration:**
 
 ```tsx
-import type { GanttToolbarConfig } from '@tsdev/mui-ts-library';
+import type { GanttToolbarConfig } from '@thebuoyant/mui-ts-library';
 
 const toolbarConfig: GanttToolbarConfig = {
   showScaleDays: false,       // Schaltfläche "Tage" ausblenden
@@ -238,7 +238,7 @@ const toolbarConfig: GanttToolbarConfig = {
 **Mit benutzerdefiniertem Datumsbereich und englischen Übersetzungen:**
 
 ```tsx
-import type { GanttTranslations } from '@tsdev/mui-ts-library';
+import type { GanttTranslations } from '@thebuoyant/mui-ts-library';
 
 const EN: Partial<GanttTranslations> = {
   scaleDays: 'Days', scaleWeeks: 'Weeks', scaleMonths: 'Months', scaleQuarters: 'Quarters',
@@ -274,8 +274,8 @@ const EN: Partial<GanttTranslations> = {
 ### TagSelection
 
 ```tsx
-import { TagSelection } from '@tsdev/mui-ts-library';
-import type { TagSelectionItem } from '@tsdev/mui-ts-library';
+import { TagSelection } from '@thebuoyant/mui-ts-library';
+import type { TagSelectionItem } from '@thebuoyant/mui-ts-library';
 
 const tags: TagSelectionItem[] = [
   { id: 'react',      label: 'React',      selected: true  },
@@ -403,8 +403,8 @@ onTagCreate={(label, color) => {
 ### PasswordStrengthMeter
 
 ```tsx
-import { PasswordStrengthMeter } from '@tsdev/mui-ts-library';
-import type { StrengthResult } from '@tsdev/mui-ts-library';
+import { PasswordStrengthMeter } from '@thebuoyant/mui-ts-library';
+import type { StrengthResult } from '@thebuoyant/mui-ts-library';
 
 function App() {
   return (
@@ -431,7 +431,7 @@ function App() {
 **Mit deutschen Texten und eigenen Meter-Farben:**
 
 ```tsx
-import type { PasswordStrengthMeterTranslation, MeterColors } from '@tsdev/mui-ts-library';
+import type { PasswordStrengthMeterTranslation, MeterColors } from '@thebuoyant/mui-ts-library';
 
 const DE: Partial<PasswordStrengthMeterTranslation> = {
   label: 'Passwort',
@@ -464,7 +464,7 @@ const colors: Partial<MeterColors> = {
 
 ```tsx
 import { useForm } from 'react-hook-form';
-import { PasswordStrengthMeter } from '@tsdev/mui-ts-library';
+import { PasswordStrengthMeter } from '@thebuoyant/mui-ts-library';
 
 function SignUpForm() {
   const { register, handleSubmit, formState: { errors } } = useForm<{ password: string }>();
@@ -489,7 +489,7 @@ function SignUpForm() {
 ### RichTextEditor
 
 ```tsx
-import { RichTextEditor } from '@tsdev/mui-ts-library';
+import { RichTextEditor } from '@thebuoyant/mui-ts-library';
 
 function App() {
   return (
@@ -560,7 +560,7 @@ const [content, setContent] = useState('<p>Initialinhalt</p>');
 **Mit deutschen Toolbar-Texten:**
 
 ```tsx
-import type { RichTextEditorTranslation } from '@tsdev/mui-ts-library';
+import type { RichTextEditorTranslation } from '@thebuoyant/mui-ts-library';
 
 const DE: Partial<RichTextEditorTranslation> = {
   bold: 'Fett', italic: 'Kursiv', underline: 'Unterstrichen',

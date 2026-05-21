@@ -30,7 +30,7 @@ The `PasswordStrengthMeter` is a password input component built on React and Mat
 ## Import
 
 ```tsx
-import { PasswordStrengthMeter } from '@tsdev/mui-ts-library';
+import { PasswordStrengthMeter } from '@thebuoyant/mui-ts-library';
 import type {
   PasswordStrengthMeterProps,
   PasswordStrengthMeterTranslation,
@@ -39,7 +39,7 @@ import type {
   MeterStatus,
   MeterColors,
   CheckColors,
-} from '@tsdev/mui-ts-library';
+} from '@thebuoyant/mui-ts-library';
 ```
 
 ---
@@ -47,7 +47,7 @@ import type {
 ## Quick Start
 
 ```tsx
-import { PasswordStrengthMeter } from '@tsdev/mui-ts-library';
+import { PasswordStrengthMeter } from '@thebuoyant/mui-ts-library';
 
 function App() {
   return (
@@ -122,8 +122,8 @@ These props make the component fully compatible with common form libraries and n
 import {
   DEFAULT_METER_COLORS,
   DEFAULT_CHECK_COLORS,
-} from '@tsdev/mui-ts-library';
-import type { MeterColors, CheckColors } from '@tsdev/mui-ts-library';
+} from '@thebuoyant/mui-ts-library';
+import type { MeterColors, CheckColors } from '@thebuoyant/mui-ts-library';
 
 type MeterColors = {
   weak:     string;
@@ -151,8 +151,8 @@ type CheckColors = {
 The English defaults can be imported directly:
 
 ```ts
-import { DEFAULT_PASSWORD_TRANSLATIONS } from '@tsdev/mui-ts-library';
-import type { PasswordStrengthMeterTranslation } from '@tsdev/mui-ts-library';
+import { DEFAULT_PASSWORD_TRANSLATIONS } from '@thebuoyant/mui-ts-library';
+import type { PasswordStrengthMeterTranslation } from '@thebuoyant/mui-ts-library';
 
 // Full TypeScript type:
 type PasswordStrengthMeterTranslation = {

@@ -31,7 +31,7 @@ The `GanttChart` is a fully interactive project planning component built on Reac
 ## Import
 
 ```tsx
-import { GanttChart } from '@tsdev/mui-ts-library';
+import { GanttChart } from '@thebuoyant/mui-ts-library';
 import type {
   GanttTask,
   GanttTaskStatus,
@@ -40,7 +40,7 @@ import type {
   GanttTranslations,
   GanttToolbarConfig,
   GanttStatusColors,
-} from '@tsdev/mui-ts-library';
+} from '@thebuoyant/mui-ts-library';
 ```
 
 ---
@@ -48,8 +48,8 @@ import type {
 ## Quick Start
 
 ```tsx
-import { GanttChart } from '@tsdev/mui-ts-library';
-import type { GanttTask } from '@tsdev/mui-ts-library';
+import { GanttChart } from '@thebuoyant/mui-ts-library';
+import type { GanttTask } from '@thebuoyant/mui-ts-library';
 
 const tasks: GanttTask[] = [
   {
@@ -322,8 +322,8 @@ All displayed texts can be overridden via the `translations` prop. Only the keys
 The pre-filled German default values can be imported directly:
 
 ```ts
-import { DEFAULT_GANTT_TRANSLATIONS } from '@tsdev/mui-ts-library';
-import type { GanttTranslations } from '@tsdev/mui-ts-library';
+import { DEFAULT_GANTT_TRANSLATIONS } from '@thebuoyant/mui-ts-library';
+import type { GanttTranslations } from '@thebuoyant/mui-ts-library';
 
 // Full TypeScript type:
 type GanttTranslations = {

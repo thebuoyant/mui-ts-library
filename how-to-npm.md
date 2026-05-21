@@ -125,20 +125,20 @@ Nach ein paar Sekunden siehst du:
 
 ```
 npm notice Publishing to https://registry.npmjs.org/ with tag latest
-+ @tsdev/mui-ts-library@1.0.0
++ @thebuoyant/mui-ts-library@1.0.0
 ```
 
 Das Paket ist jetzt live unter:
-**https://www.npmjs.com/package/@tsdev/mui-ts-library**
+**https://www.npmjs.com/package/@thebuoyant/mui-ts-library**
 
 ### 4.2 Installation im Zielprojekt testen
 
 ```bash
-npm install @tsdev/mui-ts-library
+npm install @thebuoyant/mui-ts-library
 ```
 
 ```tsx
-import { RichTextEditor, GanttChart } from '@tsdev/mui-ts-library';
+import { RichTextEditor, GanttChart } from '@thebuoyant/mui-ts-library';
 ```
 
 ---
