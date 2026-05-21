@@ -76,7 +76,10 @@ function TagSelectionInner({
   );
 
   const availableTags = useMemo(
-    () => storeTags.filter((tag) => !tag.selected && !tag.disabled),
+    () =>
+      storeTags
+        .filter((tag) => !tag.selected && !tag.disabled)
+        .sort((a, b) => a.label.localeCompare(b.label)),
     [storeTags],
   );
 

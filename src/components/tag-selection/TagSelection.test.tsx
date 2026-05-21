@@ -88,6 +88,24 @@ describe("TagSelection", () => {
     expect(input).toHaveValue("");
   });
 
+  it("Should render available tags in ascending alphabetical order in the dropdown", async () => {
+    const user = userEvent.setup();
+    const unsortedTags: TagSelectionItem[] = [
+      { id: "vue",     label: "Vue"     },
+      { id: "angular", label: "Angular" },
+      { id: "react",   label: "React"   },
+    ];
+
+    render(<TagSelection tags={unsortedTags} />);
+
+    await user.click(screen.getByLabelText("Search and add tags"));
+    const listbox = await screen.findByRole("listbox");
+    const options = Array.from(listbox.querySelectorAll("[role='option'] .MuiChip-label"))
+      .map((el) => el.textContent);
+
+    expect(options).toEqual(["Angular", "React", "Vue"]);
+  });
+
   it("Should not allow disabled tags to be selected through the available list", async () => {
     const user = userEvent.setup();
 
@@ -231,6 +249,20 @@ describe("TagSelection", () => {
     await user.type(input, "Vue");
 
     await user.click(await screen.findByTestId("CheckIcon"));
+
+    expect(input).toHaveValue("");
+    expect(screen.getByText("Vue")).toBeInTheDocument();
+  });
+
+  it("Should confirm tag creation and clear the input when Enter is pressed in create mode", async () => {
+    const user = userEvent.setup();
+
+    render(<TagSelection tags={tags} allowCreate={true} />);
+
+    const input = screen.getByLabelText("Search and add tags");
+    await user.type(input, "Vue");
+    await screen.findByTestId("CheckIcon");
+    await user.keyboard("{Enter}");
 
     expect(input).toHaveValue("");
     expect(screen.getByText("Vue")).toBeInTheDocument();

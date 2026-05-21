@@ -109,6 +109,12 @@ export function TagSelectionAutocomplete({
             helperText={
               isMaxReached && !disabled ? translation.maxTagsReachedText : undefined
             }
+            onKeyDown={(e) => {
+              if (isCreateMode && e.key === "Enter") {
+                e.preventDefault();
+                handleConfirmCreate();
+              }
+            }}
             slotProps={{
               ...params.slotProps,
               input: {
@@ -172,7 +178,7 @@ export function TagSelectionAutocomplete({
           {TAG_COLORS.map((c) => (
             <Chip
               key={c}
-              size="small"
+              size={chipSize}
               color={c}
               label={c}
               variant={selectedColor === c ? "filled" : "outlined"}
