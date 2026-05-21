@@ -43,13 +43,13 @@ import {
   RichTextEditor,
   DEFAULT_RICH_TEXT_EDITOR_TRANSLATION,
   DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG,
-} from '@thebuoyant/mui-ts-library';
+} from '@thebuoyant-tsdev/mui-ts-library';
 import type {
   RichTextEditorProps,
   RichTextEditorOutputFormat,
   RichTextEditorToolbarConfig,
   RichTextEditorTranslation,
-} from '@thebuoyant/mui-ts-library';
+} from '@thebuoyant-tsdev/mui-ts-library';
 ```
 
 ---
@@ -57,7 +57,7 @@ import type {
 ## Quick Start
 
 ```tsx
-import { RichTextEditor } from '@thebuoyant/mui-ts-library';
+import { RichTextEditor } from '@thebuoyant-tsdev/mui-ts-library';
 
 function App() {
   return (
@@ -130,7 +130,7 @@ type RichTextEditorToolbarConfig = {
 Default configuration (all `true`):
 
 ```tsx
-import { DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG } from '@thebuoyant/mui-ts-library';
+import { DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG } from '@thebuoyant-tsdev/mui-ts-library';
 ```
 
 ### `RichTextEditorTranslation`
@@ -173,7 +173,7 @@ type RichTextEditorTranslation = {
 English defaults:
 
 ```tsx
-import { DEFAULT_RICH_TEXT_EDITOR_TRANSLATION } from '@thebuoyant/mui-ts-library';
+import { DEFAULT_RICH_TEXT_EDITOR_TRANSLATION } from '@thebuoyant-tsdev/mui-ts-library';
 ```
 
 ---
@@ -238,7 +238,7 @@ Both buttons can be individually hidden via `toolbarConfig`:
 Bold, Italic, and Underline only:
 
 ```tsx
-import { DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG } from '@thebuoyant/mui-ts-library';
+import { DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG } from '@thebuoyant-tsdev/mui-ts-library';
 
 <RichTextEditor
   toolbarConfig={{
@@ -339,7 +339,7 @@ The editor automatically converts pasted Markdown text into rich text. Content c
 
 ```tsx
 import { useForm, Controller } from 'react-hook-form';
-import { RichTextEditor } from '@thebuoyant/mui-ts-library';
+import { RichTextEditor } from '@thebuoyant-tsdev/mui-ts-library';
 
 function MyForm() {
   const { control, handleSubmit, formState: { errors } } = useForm<{ description: string }>();
@@ -383,7 +383,7 @@ The value is submitted via a hidden `<input type="hidden" name="content">` in th
 Only specify deviating keys — all others retain their default value:
 
 ```tsx
-import { DEFAULT_RICH_TEXT_EDITOR_TRANSLATION } from '@thebuoyant/mui-ts-library';
+import { DEFAULT_RICH_TEXT_EDITOR_TRANSLATION } from '@thebuoyant-tsdev/mui-ts-library';
 
 const DE_TRANSLATION = {
   bold:             "Fett",

@@ -14,12 +14,12 @@ fail() { echo -e "${RED}  FAIL${NC}  $1"; exit 1; }
 info() { echo -e "${BLUE}  --${NC}  $1"; }
 
 echo ""
-echo -e "${BOLD}  npm Deploy — @thebuoyant/mui-ts-library${NC}"
+echo -e "${BOLD}  npm Deploy — @thebuoyant-tsdev/mui-ts-library${NC}"
 echo "  ─────────────────────────────────────────"
 echo ""
 
 # ── 1. npm User prüfen ────────────────────────────────────────────────────────
-EXPECTED_USER="thebuoyant"
+EXPECTED_USER="thebuoyant-tsdev"
 CURRENT_USER=$(npm whoami 2>/dev/null || echo "")
 
 if [ "$CURRENT_USER" != "$EXPECTED_USER" ]; then
@@ -87,5 +87,5 @@ git push origin main --tags
 
 echo ""
 echo -e "${GREEN}  Fertig!${NC}  Version $NEW_VERSION ist live:"
-echo "           https://www.npmjs.com/package/@thebuoyant/mui-ts-library"
+echo "           https://www.npmjs.com/package/@thebuoyant-tsdev/mui-ts-library"
 echo ""

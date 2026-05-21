@@ -31,13 +31,13 @@ The `TagSelection` component is a flexible multi-tag selector built on React and
 ## Import
 
 ```tsx
-import { TagSelection } from '@thebuoyant/mui-ts-library';
+import { TagSelection } from '@thebuoyant-tsdev/mui-ts-library';
 import type {
   TagSelectionItem,
   TagSelectionProps,
   TagSelectionTranslation,
   TagColor,
-} from '@thebuoyant/mui-ts-library';
+} from '@thebuoyant-tsdev/mui-ts-library';
 ```
 
 ---
@@ -45,8 +45,8 @@ import type {
 ## Quick Start
 
 ```tsx
-import { TagSelection } from '@thebuoyant/mui-ts-library';
-import type { TagSelectionItem } from '@thebuoyant/mui-ts-library';
+import { TagSelection } from '@thebuoyant-tsdev/mui-ts-library';
+import type { TagSelectionItem } from '@thebuoyant-tsdev/mui-ts-library';
 import { useState } from 'react';
 
 const initialTags: TagSelectionItem[] = [
@@ -175,8 +175,8 @@ type TagSelectionItem = {
 All displayed texts can be overridden via the `translation` prop. Only the keys that deviate from the default need to be specified. The English default values can be imported directly:
 
 ```ts
-import { DEFAULT_TAG_SELECTION_TRANSLATION } from '@thebuoyant/mui-ts-library';
-import type { TagSelectionTranslation } from '@thebuoyant/mui-ts-library';
+import { DEFAULT_TAG_SELECTION_TRANSLATION } from '@thebuoyant-tsdev/mui-ts-library';
+import type { TagSelectionTranslation } from '@thebuoyant-tsdev/mui-ts-library';
 
 // Full TypeScript type:
 type TagSelectionTranslation = {

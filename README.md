@@ -66,13 +66,13 @@ react-dom >= 19
 
 ```bash
 # npm
-npm install @thebuoyant/mui-ts-library
+npm install @thebuoyant-tsdev/mui-ts-library
 
 # yarn
-yarn add @thebuoyant/mui-ts-library
+yarn add @thebuoyant-tsdev/mui-ts-library
 
 # pnpm
-pnpm add @thebuoyant/mui-ts-library
+pnpm add @thebuoyant-tsdev/mui-ts-library
 ```
 
 > **Note:** All peer dependencies must be installed. If MUI is not yet set up, follow the [MUI installation guide](https://mui.com/material-ui/getting-started/installation/).
@@ -111,8 +111,8 @@ A full project timeline component built on MUI. Key features:
 - **Full i18n** — override every UI text via the `translations` prop (German defaults)
 
 ```tsx
-import { GanttChart } from '@thebuoyant/mui-ts-library';
-import type { GanttTask } from '@thebuoyant/mui-ts-library';
+import { GanttChart } from '@thebuoyant-tsdev/mui-ts-library';
+import type { GanttTask } from '@thebuoyant-tsdev/mui-ts-library';
 
 const tasks: GanttTask[] = [
   {
@@ -202,7 +202,7 @@ function App() {
 **With custom theming:**
 
 ```tsx
-import type { GanttTheme } from '@thebuoyant/mui-ts-library';
+import type { GanttTheme } from '@thebuoyant-tsdev/mui-ts-library';
 
 const theme: GanttTheme = {
   statusColors: {
@@ -221,7 +221,7 @@ const theme: GanttTheme = {
 **With custom toolbar configuration:**
 
 ```tsx
-import type { GanttToolbarConfig } from '@thebuoyant/mui-ts-library';
+import type { GanttToolbarConfig } from '@thebuoyant-tsdev/mui-ts-library';
 
 const toolbarConfig: GanttToolbarConfig = {
   showScaleDays: false,      // Hide "Days" button
@@ -238,7 +238,7 @@ const toolbarConfig: GanttToolbarConfig = {
 **With custom date range and English translations:**
 
 ```tsx
-import type { GanttTranslations } from '@thebuoyant/mui-ts-library';
+import type { GanttTranslations } from '@thebuoyant-tsdev/mui-ts-library';
 
 const EN: Partial<GanttTranslations> = {
   scaleDays: 'Days', scaleWeeks: 'Weeks', scaleMonths: 'Months', scaleQuarters: 'Quarters',
@@ -274,8 +274,8 @@ const EN: Partial<GanttTranslations> = {
 ### TagSelection
 
 ```tsx
-import { TagSelection } from '@thebuoyant/mui-ts-library';
-import type { TagSelectionItem } from '@thebuoyant/mui-ts-library';
+import { TagSelection } from '@thebuoyant-tsdev/mui-ts-library';
+import type { TagSelectionItem } from '@thebuoyant-tsdev/mui-ts-library';
 
 const tags: TagSelectionItem[] = [
   { id: 'react',      label: 'React',      selected: true  },
@@ -401,8 +401,8 @@ onTagCreate={(label, color) => {
 ### PasswordStrengthMeter
 
 ```tsx
-import { PasswordStrengthMeter } from '@thebuoyant/mui-ts-library';
-import type { StrengthResult } from '@thebuoyant/mui-ts-library';
+import { PasswordStrengthMeter } from '@thebuoyant-tsdev/mui-ts-library';
+import type { StrengthResult } from '@thebuoyant-tsdev/mui-ts-library';
 
 function App() {
   return (
@@ -429,7 +429,7 @@ function App() {
 **With custom translations and meter colors:**
 
 ```tsx
-import type { PasswordStrengthMeterTranslation, MeterColors } from '@thebuoyant/mui-ts-library';
+import type { PasswordStrengthMeterTranslation, MeterColors } from '@thebuoyant-tsdev/mui-ts-library';
 
 const DE: Partial<PasswordStrengthMeterTranslation> = {
   label: 'Passwort',
@@ -462,7 +462,7 @@ const colors: Partial<MeterColors> = {
 
 ```tsx
 import { useForm } from 'react-hook-form';
-import { PasswordStrengthMeter } from '@thebuoyant/mui-ts-library';
+import { PasswordStrengthMeter } from '@thebuoyant-tsdev/mui-ts-library';
 
 function SignUpForm() {
   const { register, handleSubmit, formState: { errors } } = useForm<{ password: string }>();
@@ -487,7 +487,7 @@ function SignUpForm() {
 ### RichTextEditor
 
 ```tsx
-import { RichTextEditor } from '@thebuoyant/mui-ts-library';
+import { RichTextEditor } from '@thebuoyant-tsdev/mui-ts-library';
 
 function App() {
   return (
@@ -558,7 +558,7 @@ const [content, setContent] = useState('<p>Initial content</p>');
 **With custom toolbar translations:**
 
 ```tsx
-import type { RichTextEditorTranslation } from '@thebuoyant/mui-ts-library';
+import type { RichTextEditorTranslation } from '@thebuoyant-tsdev/mui-ts-library';
 
 const DE: Partial<RichTextEditorTranslation> = {
   bold: 'Fett', italic: 'Kursiv', underline: 'Unterstrichen',

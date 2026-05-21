@@ -43,13 +43,13 @@ import {
   RichTextEditor,
   DEFAULT_RICH_TEXT_EDITOR_TRANSLATION,
   DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG,
-} from '@thebuoyant/mui-ts-library';
+} from '@thebuoyant-tsdev/mui-ts-library';
 import type {
   RichTextEditorProps,
   RichTextEditorOutputFormat,
   RichTextEditorToolbarConfig,
   RichTextEditorTranslation,
-} from '@thebuoyant/mui-ts-library';
+} from '@thebuoyant-tsdev/mui-ts-library';
 ```
 
 ---
@@ -57,7 +57,7 @@ import type {
 ## Schnellstart
 
 ```tsx
-import { RichTextEditor } from '@thebuoyant/mui-ts-library';
+import { RichTextEditor } from '@thebuoyant-tsdev/mui-ts-library';
 
 function App() {
   return (
@@ -130,7 +130,7 @@ type RichTextEditorToolbarConfig = {
 Standard-Konfiguration (alle `true`):
 
 ```tsx
-import { DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG } from '@thebuoyant/mui-ts-library';
+import { DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG } from '@thebuoyant-tsdev/mui-ts-library';
 ```
 
 ### `RichTextEditorTranslation`
@@ -173,7 +173,7 @@ type RichTextEditorTranslation = {
 Englische Standardwerte:
 
 ```tsx
-import { DEFAULT_RICH_TEXT_EDITOR_TRANSLATION } from '@thebuoyant/mui-ts-library';
+import { DEFAULT_RICH_TEXT_EDITOR_TRANSLATION } from '@thebuoyant-tsdev/mui-ts-library';
 ```
 
 ---
@@ -238,7 +238,7 @@ Beide Buttons zeigen eine farbige Indikatorlinie unter dem Icon — die zuletzt 
 Nur Bold, Italic und Underline:
 
 ```tsx
-import { DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG } from '@thebuoyant/mui-ts-library';
+import { DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG } from '@thebuoyant-tsdev/mui-ts-library';
 
 <RichTextEditor
   toolbarConfig={{
@@ -339,7 +339,7 @@ Der Editor konvertiert eingefügten Markdown-Text automatisch in Rich-Text. Kopi
 
 ```tsx
 import { useForm, Controller } from 'react-hook-form';
-import { RichTextEditor } from '@thebuoyant/mui-ts-library';
+import { RichTextEditor } from '@thebuoyant-tsdev/mui-ts-library';
 
 function MyForm() {
   const { control, handleSubmit, formState: { errors } } = useForm<{ description: string }>();
@@ -383,7 +383,7 @@ Der Wert wird über ein verstecktes `<input type="hidden" name="content">` im Fo
 Nur abweichende Schlüssel angeben — alle anderen behalten den Standardwert:
 
 ```tsx
-import { DEFAULT_RICH_TEXT_EDITOR_TRANSLATION } from '@thebuoyant/mui-ts-library';
+import { DEFAULT_RICH_TEXT_EDITOR_TRANSLATION } from '@thebuoyant-tsdev/mui-ts-library';
 
 const DE_TRANSLATION = {
   bold:             "Fett",

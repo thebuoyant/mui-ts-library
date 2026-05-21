@@ -30,7 +30,7 @@ Der `PasswordStrengthMeter` ist eine Passwort-Eingabe-Komponente auf Basis von R
 ## Import
 
 ```tsx
-import { PasswordStrengthMeter } from '@thebuoyant/mui-ts-library';
+import { PasswordStrengthMeter } from '@thebuoyant-tsdev/mui-ts-library';
 import type {
   PasswordStrengthMeterProps,
   PasswordStrengthMeterTranslation,
@@ -39,7 +39,7 @@ import type {
   MeterStatus,
   MeterColors,
   CheckColors,
-} from '@thebuoyant/mui-ts-library';
+} from '@thebuoyant-tsdev/mui-ts-library';
 ```
 
 ---
@@ -47,7 +47,7 @@ import type {
 ## Schnellstart
 
 ```tsx
-import { PasswordStrengthMeter } from '@thebuoyant/mui-ts-library';
+import { PasswordStrengthMeter } from '@thebuoyant-tsdev/mui-ts-library';
 
 function App() {
   return (
@@ -122,8 +122,8 @@ Diese Props machen die Komponente vollständig kompatibel mit gängigen Formular
 import {
   DEFAULT_METER_COLORS,
   DEFAULT_CHECK_COLORS,
-} from '@thebuoyant/mui-ts-library';
-import type { MeterColors, CheckColors } from '@thebuoyant/mui-ts-library';
+} from '@thebuoyant-tsdev/mui-ts-library';
+import type { MeterColors, CheckColors } from '@thebuoyant-tsdev/mui-ts-library';
 
 type MeterColors = {
   weak:     string;
@@ -151,8 +151,8 @@ type CheckColors = {
 Die englischen Standardwerte können direkt importiert werden:
 
 ```ts
-import { DEFAULT_PASSWORD_TRANSLATIONS } from '@thebuoyant/mui-ts-library';
-import type { PasswordStrengthMeterTranslation } from '@thebuoyant/mui-ts-library';
+import { DEFAULT_PASSWORD_TRANSLATIONS } from '@thebuoyant-tsdev/mui-ts-library';
+import type { PasswordStrengthMeterTranslation } from '@thebuoyant-tsdev/mui-ts-library';
 
 // Vollständiger TypeScript-Typ:
 type PasswordStrengthMeterTranslation = {

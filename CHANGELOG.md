@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0] — 2026-05-21
 
-Initial public release of `@thebuoyant/mui-ts-library`.
+Initial public release of `@thebuoyant-tsdev/mui-ts-library`.
 
 ### Added
 

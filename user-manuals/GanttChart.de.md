@@ -31,7 +31,7 @@ Der `GanttChart` ist eine vollständig interaktive Projektplanungs-Komponente au
 ## Import
 
 ```tsx
-import { GanttChart } from '@thebuoyant/mui-ts-library';
+import { GanttChart } from '@thebuoyant-tsdev/mui-ts-library';
 import type {
   GanttTask,
   GanttTaskStatus,
@@ -40,7 +40,7 @@ import type {
   GanttTranslations,
   GanttToolbarConfig,
   GanttStatusColors,
-} from '@thebuoyant/mui-ts-library';
+} from '@thebuoyant-tsdev/mui-ts-library';
 ```
 
 ---
@@ -48,8 +48,8 @@ import type {
 ## Schnellstart
 
 ```tsx
-import { GanttChart } from '@thebuoyant/mui-ts-library';
-import type { GanttTask } from '@thebuoyant/mui-ts-library';
+import { GanttChart } from '@thebuoyant-tsdev/mui-ts-library';
+import type { GanttTask } from '@thebuoyant-tsdev/mui-ts-library';
 
 const tasks: GanttTask[] = [
   {
@@ -322,8 +322,8 @@ Alle angezeigten Texte können über die `translations`-Prop überschrieben werd
 Die vorausgefüllten deutschen Standardwerte können direkt importiert werden:
 
 ```ts
-import { DEFAULT_GANTT_TRANSLATIONS } from '@thebuoyant/mui-ts-library';
-import type { GanttTranslations } from '@thebuoyant/mui-ts-library';
+import { DEFAULT_GANTT_TRANSLATIONS } from '@thebuoyant-tsdev/mui-ts-library';
+import type { GanttTranslations } from '@thebuoyant-tsdev/mui-ts-library';
 
 // Vollständiger TypeScript-Typ:
 type GanttTranslations = {
