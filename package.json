@@ -2,7 +2,23 @@
   "name": "@tsdev/mui-ts-library",
   "version": "1.0.0",
   "private": false,
-  "description": "Type-safe React component library built on MUI v9 — GanttChart, TagSelection, PasswordStrengthMeter, RichTextEditor",
+  "description": "Type-safe React component library for MUI v9. Gantt chart with drag & drop, multi-tag selector with autocomplete, WYSIWYG rich text editor (TipTap v3), and password strength meter. Full TypeScript support, dark mode, i18n.",
+  "author": {
+    "name": "Thomas Schlender",
+    "email": "thebuoyant@gmail.com"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/thebuoyant/mui-ts-library#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thebuoyant/mui-ts-library.git"
+  },
+  "bugs": {
+    "url": "https://github.com/thebuoyant/mui-ts-library/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
   "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
@@ -19,28 +35,49 @@
     "README.md"
   ],
   "sideEffects": false,
-  "license": "MIT",
   "keywords": [
     "react",
     "typescript",
     "mui",
     "material-ui",
+    "mui-components",
+    "material-design",
     "component-library",
     "ui-components",
     "react-components",
-    "gantt-chart",
+    "form-components",
+    "dark-mode",
+    "i18n",
+    "accessibility",
+    "a11y",
     "gantt",
+    "gantt-chart",
+    "react-gantt",
+    "react-gantt-chart",
     "project-management",
+    "project-timeline",
+    "task-management",
     "timeline",
     "milestones",
     "drag-and-drop",
+    "drag-drop",
+    "resizable",
+    "virtualization",
     "rich-text-editor",
+    "react-rich-text-editor",
+    "rich-text",
+    "text-editor",
     "wysiwyg",
     "tiptap",
+    "prosemirror",
     "tag-selection",
+    "react-tags",
+    "react-tag-input",
+    "tag-input",
     "autocomplete",
     "multi-select",
-    "password-strength"
+    "password-strength",
+    "password-strength-meter"
   ],
   "scripts": {
     "dev": "vite",
