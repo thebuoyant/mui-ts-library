@@ -9,6 +9,7 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 ## Inhaltsverzeichnis
 
 - [Komponenten](#komponenten)
+- [Dokumentation](#dokumentation)
 - [Voraussetzungen](#voraussetzungen)
 - [Installation](#installation)
 - [Verwendung](#verwendung)
@@ -16,7 +17,6 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
   - [TagSelection](#tagselection)
   - [PasswordStrengthMeter](#passwordstrengthmeter)
   - [RichTextEditor](#richtexteditor)
-- [Dokumentation](#dokumentation)
 - [Entwicklung](#entwicklung)
 - [Veröffentlichung auf npm](#veröffentlichung-auf-npm)
 - [Lizenz](#lizenz)
@@ -31,6 +31,19 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 | `TagSelection` | Multi-Tag-Auswahlfeld mit Such-Autocomplete, alphabetisch sortierter Chip-Anzeige und Dropdown-Liste, Overflow-Begrenzung (`maxVisibleChips`), freier Tag-Erstellung (`allowCreate`) per Klick oder Enter, MUI-Theme- und Custom-Farben, Tag-Limit und vollständiger Callback-API |
 | `PasswordStrengthMeter` | Passwort-Eingabefeld mit Live-Stärkebewertung, animiertem Meter und Anforderungscheckliste |
 | `RichTextEditor` | WYSIWYG-Editor auf Basis TipTap v3 mit MUI-Toolbar, Textfarbe, Hervorhebung, Link-Dialog, automatischer Markdown-Konvertierung beim Einfügen, Zeichenzähler, Zeichenbegrenzung, konfigurierbarer Höhe/Breite, Readonly/Disabled-Modus und vollständiger Form-Integration |
+
+---
+
+## Dokumentation
+
+Ausführliche Prop-Referenzen, Verwendungsbeispiele und i18n-Anleitungen für jede Komponente befinden sich im Ordner [`user-manuals/`](user-manuals/):
+
+| Komponente | Benutzerhandbuch |
+|---|---|
+| `GanttChart` | [user-manuals/GanttChart.md](user-manuals/GanttChart.md) |
+| `TagSelection` | [user-manuals/TagSelection.md](user-manuals/TagSelection.md) |
+| `PasswordStrengthMeter` | [user-manuals/PasswordStrengthMeter.md](user-manuals/PasswordStrengthMeter.md) |
+| `RichTextEditor` | [user-manuals/RichTextEditor.md](user-manuals/RichTextEditor.md) |
 
 ---
 
@@ -585,19 +598,6 @@ import { Controller } from 'react-hook-form';
   )}
 />
 ```
-
----
-
-## Dokumentation
-
-Ausführliche Prop-Referenzen, Verwendungsbeispiele und i18n-Anleitungen für jede Komponente befinden sich im Ordner [`user-manuals/`](user-manuals/):
-
-| Komponente | Benutzerhandbuch |
-|---|---|
-| `GanttChart` | [user-manuals/GanttChart.md](user-manuals/GanttChart.md) |
-| `TagSelection` | [user-manuals/TagSelection.md](user-manuals/TagSelection.md) |
-| `PasswordStrengthMeter` | [user-manuals/PasswordStrengthMeter.md](user-manuals/PasswordStrengthMeter.md) |
-| `RichTextEditor` | [user-manuals/RichTextEditor.md](user-manuals/RichTextEditor.md) |
 
 ---
 

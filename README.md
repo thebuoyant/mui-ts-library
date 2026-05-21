@@ -9,6 +9,7 @@ A type-safe React component library built on **TypeScript** and **MUI (Material 
 ## Table of Contents
 
 - [Components](#components)
+- [Documentation](#documentation)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Usage](#usage)
@@ -16,7 +17,6 @@ A type-safe React component library built on **TypeScript** and **MUI (Material 
   - [TagSelection](#tagselection)
   - [PasswordStrengthMeter](#passwordstrengthmeter)
   - [RichTextEditor](#richtexteditor)
-- [Documentation](#documentation)
 - [Development](#development)
 - [Publishing to npm](#publishing-to-npm)
 - [License](#license)
@@ -31,6 +31,19 @@ A type-safe React component library built on **TypeScript** and **MUI (Material 
 | `TagSelection` | Multi-tag selector with search autocomplete, alphabetically sorted chip display and dropdown list, overflow limit (`maxVisibleChips`), free tag creation (`allowCreate`) via click or Enter, MUI theme and custom colors, tag limit, and a complete callback API |
 | `PasswordStrengthMeter` | Password input with live strength rating, animated meter, and requirements checklist |
 | `RichTextEditor` | WYSIWYG editor based on TipTap v3 with MUI toolbar, text color, highlight, link dialog, automatic Markdown paste conversion, character counter, character limit, configurable height/width, readonly/disabled mode, and full form integration |
+
+---
+
+## Documentation
+
+Full prop references, usage examples, and i18n guides for each component are located in the [`user-manuals/`](user-manuals/) folder:
+
+| Component | User Manual |
+|---|---|
+| `GanttChart` | [user-manuals/GanttChart.md](user-manuals/GanttChart.md) |
+| `TagSelection` | [user-manuals/TagSelection.md](user-manuals/TagSelection.md) |
+| `PasswordStrengthMeter` | [user-manuals/PasswordStrengthMeter.md](user-manuals/PasswordStrengthMeter.md) |
+| `RichTextEditor` | [user-manuals/RichTextEditor.md](user-manuals/RichTextEditor.md) |
 
 ---
 
@@ -584,19 +597,6 @@ import { Controller } from 'react-hook-form';
   )}
 />
 ```
-
----
-
-## Documentation
-
-Full prop references, usage examples, and i18n guides for each component are located in the [`user-manuals/`](user-manuals/) folder:
-
-| Component | User Manual |
-|---|---|
-| `GanttChart` | [user-manuals/GanttChart.md](user-manuals/GanttChart.md) |
-| `TagSelection` | [user-manuals/TagSelection.md](user-manuals/TagSelection.md) |
-| `PasswordStrengthMeter` | [user-manuals/PasswordStrengthMeter.md](user-manuals/PasswordStrengthMeter.md) |
-| `RichTextEditor` | [user-manuals/RichTextEditor.md](user-manuals/RichTextEditor.md) |
 
 ---
 
