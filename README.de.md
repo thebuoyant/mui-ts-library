@@ -1,42 +1,42 @@
 # mui-ts-library
 
-> [Deutsche Version →](README.de.md)
+> [English Version →](README.md)
 
-A type-safe React component library built on **TypeScript** and **MUI (Material UI v9)**. The components are designed as self-contained additions to MUI — they follow MUI's design language, support theming out of the box, and ship with complete TypeScript types, Storybook stories, and unit tests.
+Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **MUI (Material UI v9)**. Die Komponenten sind als eigenständige Ergänzungen zu MUI konzipiert — sie folgen MUI's Design-Sprache, unterstützen Theming von Haus aus und werden mit vollständigen TypeScript-Typen, Storybook-Stories und Unit-Tests ausgeliefert.
 
 ---
 
-## Table of Contents
+## Inhaltsverzeichnis
 
-- [Components](#components)
-- [Prerequisites](#prerequisites)
+- [Komponenten](#komponenten)
+- [Voraussetzungen](#voraussetzungen)
 - [Installation](#installation)
-- [Usage](#usage)
+- [Verwendung](#verwendung)
   - [GanttChart](#ganttchart)
   - [TagSelection](#tagselection)
   - [PasswordStrengthMeter](#passwordstrengthmeter)
   - [RichTextEditor](#richtexteditor)
-- [Documentation](#documentation)
-- [Development](#development)
-- [Publishing to npm](#publishing-to-npm)
-- [License](#license)
+- [Dokumentation](#dokumentation)
+- [Entwicklung](#entwicklung)
+- [Veröffentlichung auf npm](#veröffentlichung-auf-npm)
+- [Lizenz](#lizenz)
 
 ---
 
-## Components
+## Komponenten
 
-| Component | Description |
+| Komponente | Beschreibung |
 |---|---|
-| `GanttChart` | Full project timeline with hierarchical tasks, milestones, dependency arrows, drag & drop, cascading dependencies, progress tracking, zoom, split pane, built-in CRUD dialogs, and a configurable toolbar |
-| `TagSelection` | Multi-tag selector with search autocomplete, alphabetically sorted chip display and dropdown list, overflow limit (`maxVisibleChips`), free tag creation (`allowCreate`) via click or Enter, MUI theme and custom colors, tag limit, and a complete callback API |
-| `PasswordStrengthMeter` | Password input with live strength rating, animated meter, and requirements checklist |
-| `RichTextEditor` | WYSIWYG editor based on TipTap v3 with MUI toolbar, text color, highlight, link dialog, automatic Markdown paste conversion, character counter, character limit, configurable height/width, readonly/disabled mode, and full form integration |
+| `GanttChart` | Vollständige Projekt-Timeline mit hierarchischen Aufgaben, Meilensteinen, Abhängigkeitspfeilen, Drag & Drop, kaskadierenden Abhängigkeiten, Fortschritts-Tracking, Zoom, Split-Pane, integrierten CRUD-Dialogen und konfigurierbarer Toolbar |
+| `TagSelection` | Multi-Tag-Auswahlfeld mit Such-Autocomplete, alphabetisch sortierter Chip-Anzeige und Dropdown-Liste, Overflow-Begrenzung (`maxVisibleChips`), freier Tag-Erstellung (`allowCreate`) per Klick oder Enter, MUI-Theme- und Custom-Farben, Tag-Limit und vollständiger Callback-API |
+| `PasswordStrengthMeter` | Passwort-Eingabefeld mit Live-Stärkebewertung, animiertem Meter und Anforderungscheckliste |
+| `RichTextEditor` | WYSIWYG-Editor auf Basis TipTap v3 mit MUI-Toolbar, Textfarbe, Hervorhebung, Link-Dialog, automatischer Markdown-Konvertierung beim Einfügen, Zeichenzähler, Zeichenbegrenzung, konfigurierbarer Höhe/Breite, Readonly/Disabled-Modus und vollständiger Form-Integration |
 
 ---
 
-## Prerequisites
+## Voraussetzungen
 
-The following packages are treated as **peer dependencies** and must be installed in the target project:
+Die folgenden Pakete werden als **Peer Dependencies** behandelt und müssen im Zielprojekt installiert sein:
 
 ```
 react >= 19
@@ -62,40 +62,40 @@ yarn add @tsdev/mui-ts-library
 pnpm add @tsdev/mui-ts-library
 ```
 
-> **Note:** All peer dependencies must be installed. If MUI is not yet set up, follow the [MUI installation guide](https://mui.com/material-ui/getting-started/installation/).
+> **Hinweis:** Alle Peer Dependencies müssen installiert sein. Falls MUI noch nicht eingerichtet ist, folge dem [MUI-Installationsguide](https://mui.com/material-ui/getting-started/installation/).
 
 ---
 
-## Usage
+## Verwendung
 
-Wrap your app in MUI's `ThemeProvider` as usual. No additional provider is required for this library.
+Die App wie gewohnt in MUI's `ThemeProvider` einbetten. Für diese Bibliothek ist kein zusätzlicher Provider erforderlich.
 
 ---
 
 ### GanttChart
 
-A full project timeline component built on MUI. Key features:
+Eine vollständige Projekt-Timeline-Komponente auf Basis von MUI. Wichtigste Features:
 
-- **Hierarchical tasks** via `parentId` — unlimited nesting depth, expand/collapse per node or globally
-- **Milestones** rendered as diamonds (`isMilestone: true`)
-- **Progress bars** — semi-transparent overlay for 0–100 % completion (`progress`)
-- **Progress drag** — drag the progress handle directly on the bar (`progressDraggable`)
-- **Dependency arrows** — Z-shaped SVG arrows for finish-to-start relationships
-- **Cascading dependencies** — successor tasks are automatically shifted when a predecessor is moved
-- **4 time scales** — Days, Weeks, Months, Quarters with instant switching
-- **Zoom** — Ctrl + mouse wheel cycles through scales (`zoomable`)
-- **Drag & Drop** — move bars horizontally (`draggable`) or resize end dates by dragging (`resizable`)
-- **Inline editing** — double-click a task name to edit it directly in the panel (`inlineEdit`)
-- **Today line** — dashed vertical marker at the current date; "Scroll to today" button
-- **Weekend highlight** — shaded columns on the days scale
-- **Split pane** — drag the divider to resize the task panel (bounded by `minPanelWidth` / `maxPanelWidth`)
-- **Built-in CRUD dialogs** — Add / Edit / Delete with validation and parent task selection
-- **Configurable toolbar** — each toolbar element can be individually shown/hidden via `toolbarConfig`
-- **Reset view** — restore scale, date range, and expand/collapse state with one click
-- **Row virtualization** — render only visible rows; recommended for 200+ tasks (`virtualizeRows`)
-- **Individual task color** — `color` on `GanttTask` overrides the status color for a single task
-- **Theming** — bar colors, milestone color, today line, weekend color, corner radius via `ganttTheme`
-- **Full i18n** — override every UI text via the `translations` prop (German defaults)
+- **Hierarchische Aufgaben** über `parentId` — unbegrenzte Verschachtelungstiefe, Ein-/Ausklappen pro Knoten oder global
+- **Meilensteine** als Rauten (`isMilestone: true`)
+- **Fortschrittsbalken** — halbdurchsichtiger Overlay für 0–100 % Fertigstellung (`progress`)
+- **Fortschritt per Drag** — Fortschritts-Handle direkt im Balken verschiebbar (`progressDraggable`)
+- **Abhängigkeitspfeile** — Z-förmige SVG-Pfeile für Finish-to-Start-Beziehungen
+- **Kaskadierende Abhängigkeiten** — Nachfolger-Aufgaben werden beim Verschieben eines Vorgängers automatisch mitgeschoben
+- **4 Zeitskalen** — Tage, Wochen, Monate, Quartale mit sofortigem Wechsel
+- **Zoom** — Strg + Mausrad wechselt zwischen Skalen (`zoomable`)
+- **Drag & Drop** — Balken horizontal verschieben (`draggable`) oder Enddatum per Ziehen anpassen (`resizable`)
+- **Inline-Editierung** — Doppelklick auf einen Task-Namen startet die direkte Bearbeitung im Panel (`inlineEdit`)
+- **Heute-Linie** — gestrichelte vertikale Markierung am aktuellen Tag; Schaltfläche „Heute anzeigen"
+- **Wochenend-Hervorhebung** — schattierte Spalten auf der Tages-Skala
+- **Split-Pane** — Trennlinie ziehen um den Aufgaben-Panel zu vergrößern/verkleinern (begrenzt durch `minPanelWidth` / `maxPanelWidth`)
+- **Integrierte CRUD-Dialoge** — Hinzufügen / Bearbeiten / Löschen mit Validierung und Eltern-Aufgaben-Auswahl
+- **Konfigurierbare Toolbar** — jedes Toolbar-Element einzeln ein-/ausblendbar über `toolbarConfig`
+- **Ansicht zurücksetzen** — Skala, Datumsbereich und Auf-/Zugeklappt-Zustand mit einem Klick wiederherstellen
+- **Row-Virtualisierung** — nur sichtbare Zeilen rendern; für 200+ Tasks empfohlen (`virtualizeRows`)
+- **Individuelle Task-Farbe** — `color` auf `GanttTask` überschreibt die Status-Farbe für einzelne Tasks
+- **Theming** — Balkenfarben, Meilenstein-Farbe, Heute-Linie, Wochenend-Farbe, Eckenradius über `ganttTheme` konfigurierbar
+- **Vollständige i18n** — jeden UI-Text über die `translations`-Prop überschreiben (deutsche Standardwerte)
 
 ```tsx
 import { GanttChart } from '@tsdev/mui-ts-library';
@@ -104,7 +104,7 @@ import type { GanttTask } from '@tsdev/mui-ts-library';
 const tasks: GanttTask[] = [
   {
     id: 'project',
-    name: 'My Project',
+    name: 'Mein Projekt',
     status: 'in-progress',
     startDate: new Date('2026-03-01'),
     endDate: new Date('2026-06-30'),
@@ -149,18 +149,18 @@ function App() {
       draggable
       resizable
       cascadeDependencies
-      onTaskCreated={(task) => console.log('Created:', task)}
-      onTaskUpdated={(task) => console.log('Updated:', task)}
-      onTaskDeleted={(id) => console.log('Deleted:', id)}
-      onTasksChange={(all) => console.log('All tasks:', all)}
-      onTaskMoved={(task, newStart, newEnd) => console.log('Moved:', task.name, newStart, newEnd)}
-      onTaskResized={(task, newEnd) => console.log('Resized:', task.name, newEnd)}
+      onTaskCreated={(task) => console.log('Erstellt:', task)}
+      onTaskUpdated={(task) => console.log('Aktualisiert:', task)}
+      onTaskDeleted={(id) => console.log('Gelöscht:', id)}
+      onTasksChange={(all) => console.log('Alle Aufgaben:', all)}
+      onTaskMoved={(task, newStart, newEnd) => console.log('Verschoben:', task.name, newStart, newEnd)}
+      onTaskResized={(task, newEnd) => console.log('Größe geändert:', task.name, newEnd)}
     />
   );
 }
 ```
 
-**With external CRUD control (`enableBuiltinDialogs={false}`):**
+**Mit externem CRUD-Control (`enableBuiltinDialogs={false}`):**
 
 ```tsx
 <GanttChart
@@ -169,12 +169,12 @@ function App() {
   onAddTask={(parentTask) => openMyDialog({ parentId: parentTask?.id })}
   onEditTask={(task) => openMyDialog(task)}
   onDeleteTask={(task) => confirmAndDelete(task.id)}
-  onTaskClick={(task) => console.log('Clicked:', task.name)}
-  onMilestoneClick={(task) => console.log('Milestone:', task.name)}
+  onTaskClick={(task) => console.log('Angeklickt:', task.name)}
+  onMilestoneClick={(task) => console.log('Meilenstein:', task.name)}
 />
 ```
 
-**With inline editing, progress drag, and row virtualization:**
+**Mit Inline-Editierung, Fortschritt-Drag und Virtualisierung:**
 
 ```tsx
 <GanttChart
@@ -182,11 +182,11 @@ function App() {
   inlineEdit
   progressDraggable
   virtualizeRows
-  onTasksChange={(all) => console.log('All tasks:', all)}
+  onTasksChange={(all) => console.log('Alle Aufgaben:', all)}
 />
 ```
 
-**With custom theming:**
+**Mit individuellem Theming:**
 
 ```tsx
 import type { GanttTheme } from '@tsdev/mui-ts-library';
@@ -205,15 +205,15 @@ const theme: GanttTheme = {
 <GanttChart tasks={tasks} ganttTheme={theme} />
 ```
 
-**With custom toolbar configuration:**
+**Mit benutzerdefinierter Toolbar-Konfiguration:**
 
 ```tsx
 import type { GanttToolbarConfig } from '@tsdev/mui-ts-library';
 
 const toolbarConfig: GanttToolbarConfig = {
-  showScaleDays: false,      // Hide "Days" button
-  showScaleQuarters: false,  // Hide "Quarters" button
-  showDateRange: false,      // Hide date range picker
+  showScaleDays: false,       // Schaltfläche "Tage" ausblenden
+  showScaleQuarters: false,   // Schaltfläche "Quartale" ausblenden
+  showDateRange: false,       // Von/Bis-Datumsauswahl ausblenden
 };
 
 <GanttChart
@@ -222,7 +222,7 @@ const toolbarConfig: GanttToolbarConfig = {
 />
 ```
 
-**With custom date range and English translations:**
+**Mit benutzerdefiniertem Datumsbereich und englischen Übersetzungen:**
 
 ```tsx
 import type { GanttTranslations } from '@tsdev/mui-ts-library';
@@ -274,32 +274,32 @@ function App() {
   return (
     <TagSelection
       tags={tags}
-      onTagSelect={(tag, selectedTags) => console.log('Selected:', tag.label)}
-      onTagDelete={(tag, selectedTags) => console.log('Removed:', tag.label)}
-      onTagsChange={(selectedTags) => console.log('Selection:', selectedTags)}
+      onTagSelect={(tag, selectedTags) => console.log('Ausgewählt:', tag.label)}
+      onTagDelete={(tag, selectedTags) => console.log('Entfernt:', tag.label)}
+      onTagsChange={(selectedTags) => console.log('Auswahl:', selectedTags)}
     />
   );
 }
 ```
 
-**With custom colors:**
+**Mit benutzerdefinierten Farben:**
 
-Each tag supports either an MUI theme color (`color`) or fully custom colors
-(`backgroundColor` + `foregroundColor`). Both variants can be mixed:
+Jeder Tag unterstützt entweder eine MUI-Theme-Farbe (`color`) oder vollständig eigene Farben
+(`backgroundColor` + `foregroundColor`). Beide Varianten können gemischt werden:
 
 ```tsx
 const tags: TagSelectionItem[] = [
-  // MUI theme color
+  // MUI-Theme-Farbe
   { id: 'react',    label: 'React',    selected: true, color: 'primary'  },
   { id: 'success',  label: 'Done',     selected: true, color: 'success'  },
 
-  // Custom hex colors — foregroundColor should contrast with backgroundColor
+  // Eigene Hex-Farben — foregroundColor sollte zur backgroundColor kontrastieren
   { id: 'brand',    label: 'Branding', selected: true, foregroundColor: '#ffffff', backgroundColor: '#6200ea' },
-  { id: 'warning',  label: 'Caution',  selected: true, foregroundColor: '#1a1a1a', backgroundColor: '#ffea00' },
+  { id: 'warning',  label: 'Achtung',  selected: true, foregroundColor: '#1a1a1a', backgroundColor: '#ffea00' },
 ];
 ```
 
-**With loading state (async tag fetching):**
+**Mit Ladezustand (asynchrones Tag-Laden):**
 
 ```tsx
 const [tags, setTags] = useState<TagSelectionItem[]>([]);
@@ -315,17 +315,17 @@ useEffect(() => {
 <TagSelection tags={tags} loading={loading} />
 ```
 
-**With tag limit:**
+**Mit Tag-Limit:**
 
 ```tsx
-{/* Maximum 3 tags — autocomplete locks automatically once limit is reached */}
+{/* Maximal 3 Tags auswählbar — Autocomplete sperrt sich danach automatisch */}
 <TagSelection tags={tags} maxTags={3} />
 ```
 
-**With overflow limit:**
+**Mit Overflow-Begrenzung:**
 
 ```tsx
-{/* Shows up to 3 chips — additional ones are hidden behind a "+N" chip */}
+{/* Zeigt maximal 3 Chips — weitere werden hinter einem "+N"-Chip verborgen */}
 <TagSelection
   tags={tags}
   maxVisibleChips={3}
@@ -334,15 +334,16 @@ useEffect(() => {
 />
 ```
 
-**With creatable tags:**
+**Mit erstellbaren Tags:**
 
-When `allowCreate={true}` is set, a CheckIcon (confirm) and CloseIcon (cancel) appear in the
-input once the search term does not match any existing tag. Below the input, 7 theme color chips
-are shown for color selection. Confirm by clicking the CheckIcon **or pressing Enter**.
+Wenn `allowCreate={true}` gesetzt ist, erscheinen im Input ein CheckIcon (bestätigen) und ein
+CloseIcon (abbrechen), sobald der Suchbegriff keinem bestehenden Tag entspricht. Darunter
+werden 7 Theme-Farb-Chips zur Farbauswahl angezeigt. Bestätigen ist per Klick auf das CheckIcon
+**oder mit der Enter-Taste** möglich.
 
-The new tag is internally marked as **selected immediately**. `onTagCreate` is called so the
-external state can be synchronized — set `selected: true` to prevent the tag from disappearing
-on the next re-render:
+Der neue Tag wird intern **sofort als selektiert** markiert. `onTagCreate` wird aufgerufen
+damit der externe State synchronisiert werden kann — dabei `selected: true` setzen, damit
+der Tag beim nächsten Re-Render nicht aus der Auswahl fällt:
 
 ```tsx
 const [tags, setTags] = useState<TagSelectionItem[]>(initialTags);
@@ -356,20 +357,21 @@ const [tags, setTags] = useState<TagSelectionItem[]>(initialTags);
       {
         id: label.toLowerCase().replace(/\s+/g, '-'),
         label,
-        color,         // chosen by the user in the color picker
-        selected: true // required: tag disappears on next re-render without this
+        color,         // vom User im Farb-Picker gewählt
+        selected: true // wichtig: sonst verschwindet der Tag beim nächsten Re-Render
       },
     ]);
   }}
 />
 ```
 
-To assign custom hex colors, ignore the `color` argument and set `backgroundColor` and
-`foregroundColor` directly in the `onTagCreate` handler:
+Wer eigene Hex-Farben vergeben möchte, kann `backgroundColor` und `foregroundColor` direkt
+im `onTagCreate`-Handler setzen — die Komponente selbst gibt nur den gewählten `color`-Wert
+(MUI-Theme-Farbe) zurück:
 
 ```tsx
 onTagCreate={(label, color) => {
-  const myBackgroundColor = computeColorForLabel(label); // custom logic
+  const myBackgroundColor = computeColorForLabel(label); // eigene Logik
   setTags((prev) => [
     ...prev,
     {
@@ -396,14 +398,14 @@ function App() {
     <PasswordStrengthMeter
       passwordMinLength={10}
       onPasswordChange={(password, result: StrengthResult) => {
-        console.log(`Score: ${result.score}/4 — ${result.meterStatus}`);
+        console.log(`Punktzahl: ${result.score}/4 — ${result.meterStatus}`);
       }}
     />
   );
 }
 ```
 
-**Minimal variant (input only, no meter or summary):**
+**Minimale Variante (nur Eingabe, ohne Meter und Zusammenfassung):**
 
 ```tsx
 <PasswordStrengthMeter
@@ -413,7 +415,7 @@ function App() {
 />
 ```
 
-**With custom translations and meter colors:**
+**Mit deutschen Texten und eigenen Meter-Farben:**
 
 ```tsx
 import type { PasswordStrengthMeterTranslation, MeterColors } from '@tsdev/mui-ts-library';
@@ -445,7 +447,7 @@ const colors: Partial<MeterColors> = {
 />
 ```
 
-**With React Hook Form:**
+**Mit React Hook Form:**
 
 ```tsx
 import { useForm } from 'react-hook-form';
@@ -453,7 +455,7 @@ import { PasswordStrengthMeter } from '@tsdev/mui-ts-library';
 
 function SignUpForm() {
   const { register, handleSubmit, formState: { errors } } = useForm<{ password: string }>();
-  const { ref, ...rest } = register('password', { required: 'Password is required' });
+  const { ref, ...rest } = register('password', { required: 'Passwort ist erforderlich' });
 
   return (
     <form onSubmit={handleSubmit(console.log)}>
@@ -479,7 +481,7 @@ import { RichTextEditor } from '@tsdev/mui-ts-library';
 function App() {
   return (
     <RichTextEditor
-      placeholder="Start typing…"
+      placeholder="Hier tippen …"
       showCharacterCount
       onChange={(html) => console.log(html)}
       onBlur={() => console.log('blur')}
@@ -488,15 +490,15 @@ function App() {
 }
 ```
 
-**Controlled mode:**
+**Kontrollierter Modus:**
 
 ```tsx
-const [content, setContent] = useState('<p>Initial content</p>');
+const [content, setContent] = useState('<p>Initialinhalt</p>');
 
 <RichTextEditor value={content} onChange={setContent} />
 ```
 
-**Minimal toolbar (Bold, Italic, Underline only):**
+**Minimale Toolbar (nur Bold, Italic, Underline):**
 
 ```tsx
 <RichTextEditor
@@ -510,39 +512,39 @@ const [content, setContent] = useState('<p>Initial content</p>');
 />
 ```
 
-**With character limit and error state:**
+**Mit Zeichenbegrenzung und Fehlerzustand:**
 
 ```tsx
 <RichTextEditor
   maxCharacters={500}
   error={true}
-  helperText="This field is required."
+  helperText="Pflichtfeld."
 />
 ```
 
-**Height and width:**
+**Höhe und Breite:**
 
 ```tsx
-{/* Fixed height — content scrolls vertically */}
+{/* Feste Höhe — Inhalt scrollt vertikal */}
 <RichTextEditor height={400} />
 
-{/* Editor fills the surrounding flex container */}
+{/* Editor füllt den umgebenden Flex-Container */}
 <Box sx={{ height: 500, display: "flex", flexDirection: "column" }}>
   <RichTextEditor height="auto" />
 </Box>
 
-{/* Fixed width */}
+{/* Feste Breite */}
 <RichTextEditor height={300} width={600} />
 ```
 
-**JSON output instead of HTML:**
+**JSON-Output statt HTML:**
 
 ```tsx
-{/* Returns content as a TipTap JSON document instead of an HTML string */}
+{/* Gibt den Inhalt als TipTap-JSON-Dokument zurück statt als HTML-String */}
 <RichTextEditor outputFormat="json" onChange={(json) => console.log(json)} />
 ```
 
-**With custom toolbar translations:**
+**Mit deutschen Toolbar-Texten:**
 
 ```tsx
 import type { RichTextEditorTranslation } from '@tsdev/mui-ts-library';
@@ -560,12 +562,11 @@ const DE: Partial<RichTextEditorTranslation> = {
 <RichTextEditor translation={DE} />
 ```
 
-**Markdown paste:**
+**Markdown einfügen:**
 
-When pasting (`Ctrl+V`) Markdown text from `.md` files or Markdown editors, the syntax is
-automatically converted to rich text — `**bold**` becomes bold, `## Heading` becomes a heading, etc.
+Beim Einfügen (`Ctrl+V`) von Markdown-Text aus `.md`-Dateien oder Markdown-Editoren wird die Syntax automatisch in Rich-Text umgewandelt — `**fett**` wird zu Fettschrift, `## Heading` zu einer Überschrift usw.
 
-**With React Hook Form:**
+**Mit React Hook Form:**
 
 ```tsx
 import { Controller } from 'react-hook-form';
@@ -587,11 +588,11 @@ import { Controller } from 'react-hook-form';
 
 ---
 
-## Documentation
+## Dokumentation
 
-Full prop references, usage examples, and i18n guides for each component are located in the [`user-manuals/`](user-manuals/) folder:
+Ausführliche Prop-Referenzen, Verwendungsbeispiele und i18n-Anleitungen für jede Komponente befinden sich im Ordner [`user-manuals/`](user-manuals/):
 
-| Component | User Manual |
+| Komponente | Benutzerhandbuch |
 |---|---|
 | `GanttChart` | [user-manuals/GanttChart.md](user-manuals/GanttChart.md) |
 | `TagSelection` | [user-manuals/TagSelection.md](user-manuals/TagSelection.md) |
@@ -600,43 +601,43 @@ Full prop references, usage examples, and i18n guides for each component are loc
 
 ---
 
-## Development
+## Entwicklung
 
-### Local Setup
+### Lokales Setup
 
 ```bash
-# 1. Clone the repository
+# 1. Repository klonen
 git clone <repo-url>
 cd mui-ts-library
 
-# 2. Install dependencies
+# 2. Abhängigkeiten installieren
 npm install
 
-# 3. Start the Vite dev server
+# 3. Vite-Entwicklungsserver starten
 npm run dev
 ```
 
 ### Storybook
 
-Every component includes Storybook stories covering all major use cases.
+Jede Komponente enthält Storybook-Stories für alle wesentlichen Anwendungsfälle.
 
 ```bash
-# Start the Storybook dev server (http://localhost:6006)
+# Storybook-Entwicklungsserver starten (http://localhost:6006)
 npm run storybook
 
-# Build a static Storybook for deployment
+# Statisches Storybook für Deployment bauen
 npm run build-storybook
 ```
 
 ### Tests
 
-Tests are written with [Vitest](https://vitest.dev/) and [@testing-library/react](https://testing-library.com/docs/react-testing-library/intro/).
+Tests sind mit [Vitest](https://vitest.dev/) und [@testing-library/react](https://testing-library.com/docs/react-testing-library/intro/) geschrieben.
 
 ```bash
-# Run tests in watch mode
+# Tests im Watch-Modus ausführen
 npm run test
 
-# Run tests once (CI)
+# Tests einmalig ausführen (CI)
 npm run test:run
 ```
 
@@ -646,41 +647,41 @@ npm run test:run
 npm run test:coverage
 ```
 
-Coverage reports are generated in `./coverage/`. Open `coverage/index.html` in a browser for the full report. The coverage configuration includes all component source files (`src/components/**/*.{ts,tsx}`) and excludes stories and pure type files.
+Coverage-Berichte werden in `./coverage/` generiert. `coverage/index.html` im Browser öffnen für den vollständigen Bericht. Die Coverage-Konfiguration schließt alle Komponenten-Quelldateien (`src/components/**/*.{ts,tsx}`) ein und blendet Stories sowie reine Typ-Dateien aus.
 
 ---
 
-## Publishing to npm
+## Veröffentlichung auf npm
 
-### Deploy Script
+### Deploy-Script
 
-All steps are combined into a single command:
+Alle Schritte sind in einem einzigen Befehl zusammengefasst:
 
 ```bash
 npm run npm-deploy
 ```
 
-The script runs automatically through:
+Das Script läuft automatisch durch:
 
-1. **User check** — verifies that npm user `tsdev` is logged in; aborts with a `npm login` prompt if not
-2. **Git check** — verifies there are no uncommitted changes
-3. **Version selection** — interactive: `patch` / `minor` / `major` or no change
-4. **Tests → Build → Publish** — runs automatically via `prepublishOnly`
-5. **Git push** — commit and tag are pushed to `main`
+1. **User-Check** — prüft ob npm-User `tsdev` eingeloggt ist; falls nicht, Abbruch mit Hinweis auf `npm login`
+2. **Git-Check** — prüft ob keine uncommitteten Änderungen vorhanden sind
+3. **Versionsauswahl** — interaktiv: `patch` / `minor` / `major` oder keine Änderung
+4. **Tests → Build → Publish** — läuft automatisch via `prepublishOnly`
+5. **Git-Push** — Commit und Tag werden nach `main` gepusht
 
-> npm will prompt for the 2FA code from your authenticator app at the end.
+> npm fragt am Ende automatisch nach dem 2FA-Code aus der Authenticator-App.
 
-### Versioning (SemVer)
+### Versionierung (SemVer)
 
-| Change type | Level | Example |
+| Änderungstyp | Stufe | Beispiel |
 |---|---|---|
-| Bug fix, non-breaking improvement | **patch** | `0.1.0` → `0.1.1` |
-| New feature, backwards compatible | **minor** | `0.1.0` → `0.2.0` |
-| Breaking API change | **major** | `0.1.0` → `1.0.0` |
+| Bugfix, nicht brechende Verbesserung | **patch** | `0.1.0` → `0.1.1` |
+| Neues Feature, abwärtskompatibel | **minor** | `0.1.0` → `0.2.0` |
+| Brechende API-Änderung | **major** | `0.1.0` → `1.0.0` |
 
-### Automation with GitHub Actions (optional)
+### Automatisierung mit GitHub Actions (optional)
 
-Store an npm automation token under **GitHub → Settings → Secrets → Actions** as `NPM_TOKEN`, then create `.github/workflows/publish.yml`:
+Ein npm Automation-Token unter **GitHub → Settings → Secrets → Actions** als `NPM_TOKEN` hinterlegen, dann `.github/workflows/publish.yml` anlegen:
 
 ```yaml
 name: Publish to npm
@@ -713,10 +714,10 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 ```
 
-Trigger a release: `npm version minor && git push origin main --tags`
+Release auslösen: `npm version minor && git push origin main --tags`
 
 ---
 
-## License
+## Lizenz
 
 MIT © Thomas Schlender

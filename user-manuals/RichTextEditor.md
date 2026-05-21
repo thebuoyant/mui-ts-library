@@ -1,24 +1,26 @@
-# RichTextEditor — Benutzerhandbuch
+# RichTextEditor — User Manual
 
-## Überblick
+> [Deutsche Version →](RichTextEditor.de.md)
 
-Der `RichTextEditor` ist ein vollständiger WYSIWYG-Texteditor auf Basis von [TipTap v3](https://tiptap.dev) und Material UI. Er bietet eine formatreiche Eingabeoberfläche für Inhalte wie CMS-Texte, E-Mail-Templates, Kommentare und Beschreibungsfelder — vollständig in das MUI-Theme integriert, ohne externe CSS-Abhängigkeiten.
+## Overview
 
-**Typische Einsatzgebiete:**
+The `RichTextEditor` is a full-featured WYSIWYG text editor built on [TipTap v3](https://tiptap.dev) and Material UI. It provides a rich input interface for content such as CMS texts, email templates, comments, and description fields — fully integrated with the MUI theme, without any external CSS dependencies.
 
-- CMS-Formulare und Content-Management
-- Beschreibungsfelder in Ticketsystemen oder Projektmanagement-Tools
-- E-Mail-Template-Editoren
-- Kommentarfelder mit Formatierungsmöglichkeiten
-- Formularfelder die mehr als `<TextField multiline>` benötigen
+**Typical use cases:**
 
-![RichTextEditor – Komponentenvorschau](RichTextEditor.png)
+- CMS forms and content management
+- Description fields in ticketing systems or project management tools
+- Email template editors
+- Comment fields with formatting options
+- Form fields that need more than `<TextField multiline>`
+
+![RichTextEditor – Component Preview](RichTextEditor.png)
 
 ---
 
-## Technische Voraussetzungen
+## Prerequisites
 
-| Abhängigkeit | Mindestversion |
+| Dependency | Minimum version |
 |---|---|
 | React | 19 |
 | TypeScript | 5.x |
@@ -52,7 +54,7 @@ import type {
 
 ---
 
-## Schnellstart
+## Quick Start
 
 ```tsx
 import { RichTextEditor } from '@tsdev/mui-ts-library';
@@ -60,7 +62,7 @@ import { RichTextEditor } from '@tsdev/mui-ts-library';
 function App() {
   return (
     <RichTextEditor
-      placeholder="Hier tippen …"
+      placeholder="Start typing here…"
       onChange={(html) => console.log(html)}
     />
   );
@@ -71,29 +73,29 @@ function App() {
 
 ## Props
 
-| Prop | Typ | Standard | Beschreibung |
+| Prop | Type | Default | Description |
 |---|---|---|---|
-| `value` | `string` | — | Initialwert als HTML- oder JSON-String; ermöglicht kontrollierten Modus |
-| `onChange` | `(value: string) => void` | — | Wird bei jeder Inhaltsänderung aufgerufen |
-| `placeholder` | `string` | — | Platzhaltertext wenn der Editor leer ist |
-| `outputFormat` | `RichTextEditorOutputFormat` | `"html"` | Ausgabeformat für `onChange` — `"html"` oder `"json"` |
-| `height` | `number \| string` | `200` | Gesamthöhe des Editors (Toolbar + Inhalt). Zahlen → px. `"auto"` → füllt den umgebenden Flex-Container. Überschüssiger Inhalt scrollt vertikal. |
-| `width` | `number \| string` | `"100%"` | Breite des Editors. Zahlen → px. Leer oder nicht gesetzt → 100% des Elternelements. |
-| `showCharacterCount` | `boolean` | `false` | Zeigt Zeichenzähler unten rechts |
-| `maxCharacters` | `number` | — | Maximale Zeichenanzahl — Eingabe wird bei Erreichen blockiert |
-| `toolbarConfig` | `RichTextEditorToolbarConfig` | alle `true` | Einzelne Toolbar-Buttons ein-/ausblenden |
-| `disabled` | `boolean` | `false` | Deaktiviert Editor und Toolbar vollständig |
-| `readonly` | `boolean` | `false` | Schreibgeschützter Modus — keine Toolbar |
-| `name` | `string` | — | Name für natives Form-Submit (verstecktes `<input type="hidden">`) |
-| `error` | `boolean` | `false` | Roter Rahmen im Fehlerzustand |
-| `helperText` | `string` | — | Hilfetext unter dem Editor (wie MUI TextField) |
-| `translation` | `Partial<RichTextEditorTranslation>` | — | Abweichende Texte für Tooltips, Dialog und Zeichenzähler |
-| `onBlur` | `() => void` | — | Wird aufgerufen wenn der Editor den Fokus verliert |
-| `onFocus` | `() => void` | — | Wird aufgerufen wenn der Editor den Fokus erhält |
+| `value` | `string` | — | Initial value as an HTML or JSON string; enables controlled mode |
+| `onChange` | `(value: string) => void` | — | Called on every content change |
+| `placeholder` | `string` | — | Placeholder text when the editor is empty |
+| `outputFormat` | `RichTextEditorOutputFormat` | `"html"` | Output format for `onChange` — `"html"` or `"json"` |
+| `height` | `number \| string` | `200` | Total height of the editor (toolbar + content). Numbers → px. `"auto"` → fills the surrounding flex container. Excess content scrolls vertically. |
+| `width` | `number \| string` | `"100%"` | Width of the editor. Numbers → px. Empty or unset → 100% of the parent. |
+| `showCharacterCount` | `boolean` | `false` | Shows a character counter at the bottom right |
+| `maxCharacters` | `number` | — | Maximum character count — input is blocked when reached |
+| `toolbarConfig` | `RichTextEditorToolbarConfig` | all `true` | Show/hide individual toolbar buttons |
+| `disabled` | `boolean` | `false` | Disables the editor and toolbar completely |
+| `readonly` | `boolean` | `false` | Read-only mode — no toolbar |
+| `name` | `string` | — | Name for native form submission (hidden `<input type="hidden">`) |
+| `error` | `boolean` | `false` | Red border in error state |
+| `helperText` | `string` | — | Helper text below the editor (like MUI TextField) |
+| `translation` | `Partial<RichTextEditorTranslation>` | — | Override texts for tooltips, dialog, and character counter |
+| `onBlur` | `() => void` | — | Called when the editor loses focus |
+| `onFocus` | `() => void` | — | Called when the editor gains focus |
 
 ---
 
-## TypeScript-Typen
+## TypeScript Types
 
 ### `RichTextEditorOutputFormat`
 
@@ -125,7 +127,7 @@ type RichTextEditorToolbarConfig = {
 };
 ```
 
-Standard-Konfiguration (alle `true`):
+Default configuration (all `true`):
 
 ```tsx
 import { DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG } from '@tsdev/mui-ts-library';
@@ -135,7 +137,7 @@ import { DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG } from '@tsdev/mui-ts-library';
 
 ```ts
 type RichTextEditorTranslation = {
-  // Toolbar-Tooltips
+  // Toolbar tooltips
   bold:             string;
   italic:           string;
   underline:        string;
@@ -156,19 +158,19 @@ type RichTextEditorTranslation = {
   undo:             string;
   redo:             string;
   clearFormat:      string;
-  // Link-Dialog
+  // Link dialog
   linkDialogTitle:    string;
   linkDialogUrlLabel: string;
   linkDialogSave:     string;
   linkDialogCancel:   string;
   linkDialogRemove:   string;
-  // Zeichenzähler ({count} und {max} werden zur Laufzeit ersetzt)
+  // Character counter ({count} and {max} are replaced at runtime)
   characterCount:    string;
   characterCountMax: string;
 };
 ```
 
-Englische Standardwerte:
+English defaults:
 
 ```tsx
 import { DEFAULT_RICH_TEXT_EDITOR_TRANSLATION } from '@tsdev/mui-ts-library';
@@ -176,14 +178,14 @@ import { DEFAULT_RICH_TEXT_EDITOR_TRANSLATION } from '@tsdev/mui-ts-library';
 
 ---
 
-## Ausgabeformat
+## Output Format
 
-### HTML (Standard)
+### HTML (default)
 
-`onChange` liefert einen HTML-String, z. B.:
+`onChange` delivers an HTML string, e.g.:
 
 ```html
-<h2>Titel</h2><p>Text mit <strong>Fett</strong> und <em>Kursiv</em>.</p>
+<h2>Title</h2><p>Text with <strong>bold</strong> and <em>italic</em>.</p>
 ```
 
 ### JSON
@@ -192,14 +194,14 @@ import { DEFAULT_RICH_TEXT_EDITOR_TRANSLATION } from '@tsdev/mui-ts-library';
 <RichTextEditor outputFormat="json" onChange={(json) => JSON.parse(json)} />
 ```
 
-Der JSON-String entspricht dem TipTap/ProseMirror-Dokumentformat (kann direkt zurück an `value` übergeben werden).
+The JSON string follows the TipTap/ProseMirror document format (can be passed directly back to `value`).
 
 ---
 
-## Kontrollierter Modus
+## Controlled Mode
 
 ```tsx
-const [content, setContent] = useState('<p>Initialinhalt</p>');
+const [content, setContent] = useState('<p>Initial content</p>');
 
 <RichTextEditor
   value={content}
@@ -207,21 +209,21 @@ const [content, setContent] = useState('<p>Initialinhalt</p>');
 />
 ```
 
-Der Editor synchronisiert `value` → `editor.setContent()` automatisch, wenn sich der externe Wert ändert — ohne den Cursor zu verstellen.
+The editor automatically synchronizes `value` → `editor.setContent()` when the external value changes — without moving the cursor.
 
 ---
 
-## Textfarbe und Hervorhebung
+## Text Color and Highlight
 
-Text markieren und über die Toolbar-Buttons **Textfarbe** (A-Icon) oder **Hervorheben** (Pinsel-Icon) eine Farbe aus der Palette wählen:
+Select text and choose a color from the palette via the **Text Color** (A icon) or **Highlight** (brush icon) toolbar buttons:
 
 ```tsx
-<RichTextEditor placeholder="Markiere Text, dann wähle eine Farbe …" />
+<RichTextEditor placeholder="Select text, then choose a color…" />
 ```
 
-Beide Buttons zeigen eine farbige Indikatorlinie unter dem Icon — die zuletzt verwendete oder am Cursor aktive Farbe. Über den Regenbogen-Swatch in der Palette ist ein freier Farbwähler (nativer Browser-Picker) verfügbar. Der Papierkorb-Button entfernt die Farbe wieder.
+Both buttons show a colored indicator line below the icon — the most recently used or cursor-active color. A rainbow swatch in the palette opens a free color picker (native browser picker). The trash button removes the color again.
 
-Über `toolbarConfig` lassen sich beide Buttons einzeln ausblenden:
+Both buttons can be individually hidden via `toolbarConfig`:
 
 ```tsx
 <RichTextEditor
@@ -231,9 +233,9 @@ Beide Buttons zeigen eine farbige Indikatorlinie unter dem Icon — die zuletzt 
 
 ---
 
-## Toolbar konfigurieren
+## Configuring the Toolbar
 
-Nur Bold, Italic und Underline:
+Bold, Italic, and Underline only:
 
 ```tsx
 import { DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG } from '@tsdev/mui-ts-library';
@@ -258,80 +260,80 @@ import { DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG } from '@tsdev/mui-ts-library';
 
 ---
 
-## Zeichenbegrenzung
+## Character Limit
 
 ```tsx
-{/* Nur Anzeige, keine Begrenzung */}
+{/* Display only, no limit */}
 <RichTextEditor showCharacterCount />
 
-{/* Anzeige + Begrenzung auf 500 Zeichen */}
+{/* Display + limit to 500 characters */}
 <RichTextEditor maxCharacters={500} />
 ```
 
-Der Zähler färbt sich rot wenn das Limit erreicht ist.
+The counter turns red when the limit is reached.
 
 ---
 
-## Höhe und Breite
+## Height and Width
 
-Die Gesamtgröße des Editors (Toolbar + Inhaltsbereich) wird über `height` und `width` gesteuert. Numerische Werte werden automatisch in `px` umgewandelt; CSS-Strings wie `"50vh"` oder `"100%"` werden direkt übergeben.
+The total size of the editor (toolbar + content area) is controlled via `height` and `width`. Numeric values are automatically converted to `px`; CSS strings like `"50vh"` or `"100%"` are passed through directly.
 
 ```tsx
-{/* Standard: 200px hoch, 100% breit */}
+{/* Default: 200px tall, 100% wide */}
 <RichTextEditor />
 
-{/* Feste Höhe — Inhalt scrollt vertikal wenn er überläuft */}
+{/* Fixed height — content scrolls vertically when it overflows */}
 <RichTextEditor height={400} />
 
-{/* CSS-String direkt möglich */}
+{/* CSS string directly supported */}
 <RichTextEditor height="50vh" />
 
-{/* "auto" — Editor füllt den umgebenden Flex-Container */}
+{/* "auto" — editor fills the surrounding flex container */}
 <Box sx={{ height: 500, display: "flex", flexDirection: "column" }}>
   <RichTextEditor height="auto" />
 </Box>
 
-{/* Feste Breite */}
+{/* Fixed width */}
 <RichTextEditor width={600} />
 
-{/* Kombiniert */}
+{/* Combined */}
 <RichTextEditor height={300} width="80%" />
 ```
 
-**Hinweis zu `height="auto"`:** Der umgebende Container muss `display: flex` und `flex-direction: column` haben, damit sich der Editor daran orientieren kann.
+**Note on `height="auto"`:** The surrounding container must have `display: flex` and `flex-direction: column` for the editor to align to it.
 
 ---
 
-## Markdown einfügen (Paste)
+## Markdown Paste
 
-Der Editor konvertiert eingefügten Markdown-Text automatisch in Rich-Text. Kopierter Inhalt aus `.md`-Dateien, GitHub READMEs oder Markdown-Editoren wird korrekt formatiert:
+The editor automatically converts pasted Markdown text into rich text. Content copied from `.md` files, GitHub READMEs, or Markdown editors is correctly formatted:
 
-| Markdown-Syntax | Ergebnis |
+| Markdown syntax | Result |
 |---|---|
-| `## Überschrift` | H2-Heading |
-| `**fett**` / `*kursiv*` | Fett / Kursiv |
-| `- Punkt` / `1. Punkt` | Bullet-List / Numbered-List |
-| `> Zitat` | Blockquote |
-| `` `code` `` | Inline-Code |
-| `[Text](url)` | Klickbarer Link |
+| `## Heading` | H2 heading |
+| `**bold**` / `*italic*` | Bold / Italic |
+| `- item` / `1. item` | Bullet list / Numbered list |
+| `> quote` | Blockquote |
+| `` `code` `` | Inline code |
+| `[Text](url)` | Clickable link |
 
-**Hinweis:** Diese Konvertierung greift nur bei Inhalten aus der Zwischenablage (Plain-Text-Clipboard). Inhalte, die aus gerenderten Quellen (z.B. GitHub-Webansicht) kopiert werden, bringen bereits HTML mit und werden über den normalen HTML-Pfad eingefügt.
+**Note:** This conversion only applies to content from the clipboard (plain-text clipboard). Content copied from rendered sources (e.g. GitHub web view) already carries HTML and is inserted via the normal HTML path.
 
 ---
 
-## Readonly und Disabled
+## Readonly and Disabled
 
 ```tsx
-{/* Kein Editieren, keine Toolbar — reine Darstellung */}
+{/* No editing, no toolbar — pure display */}
 <RichTextEditor value={content} readonly />
 
-{/* Editor ausgegraut, Toolbar deaktiviert */}
+{/* Editor grayed out, toolbar disabled */}
 <RichTextEditor value={content} disabled />
 ```
 
 ---
 
-## Form-Integration
+## Form Integration
 
 ### React Hook Form
 
@@ -347,7 +349,7 @@ function MyForm() {
       <Controller
         name="description"
         control={control}
-        rules={{ required: 'Beschreibung ist erforderlich' }}
+        rules={{ required: 'Description is required' }}
         render={({ field }) => (
           <RichTextEditor
             value={field.value}
@@ -363,22 +365,22 @@ function MyForm() {
 }
 ```
 
-### Native Form-Submission
+### Native Form Submission
 
 ```tsx
 <form action="/submit" method="POST">
   <RichTextEditor name="content" />
-  <button type="submit">Absenden</button>
+  <button type="submit">Submit</button>
 </form>
 ```
 
-Der Wert wird über ein verstecktes `<input type="hidden" name="content">` im Formular mitgeschickt.
+The value is submitted via a hidden `<input type="hidden" name="content">` in the form.
 
 ---
 
-## i18n — Übersetzungen
+## i18n — Translations
 
-Nur abweichende Schlüssel angeben — alle anderen behalten den Standardwert:
+Only specify deviating keys — all others retain their default value:
 
 ```tsx
 import { DEFAULT_RICH_TEXT_EDITOR_TRANSLATION } from '@tsdev/mui-ts-library';
@@ -416,44 +418,44 @@ const DE_TRANSLATION = {
 <RichTextEditor translation={DE_TRANSLATION} />
 ```
 
-Das Merge-Muster ist `{ ...DEFAULT_RICH_TEXT_EDITOR_TRANSLATION, ...translation }` — nur überschriebene Schlüssel müssen angegeben werden.
+The merge pattern is `{ ...DEFAULT_RICH_TEXT_EDITOR_TRANSLATION, ...translation }` — only overridden keys need to be specified.
 
 ---
 
-## Fehlerzustand
+## Error State
 
 ```tsx
 <RichTextEditor
   error={true}
-  helperText="Dieses Feld ist erforderlich."
+  helperText="This field is required."
 />
 ```
 
-Der Editor-Rahmen erscheint in `error.main` (MUI-Fehlerfarbe), der `helperText` darunter ebenfalls in Rot — analog zum MUI `TextField`.
+The editor border appears in `error.main` (MUI error color), and the `helperText` below is also in red — analogous to MUI `TextField`.
 
 ---
 
-## API-Callbacks
+## API Callbacks
 
-| Callback | Signatur | Auslöser |
+| Callback | Signature | Trigger |
 |---|---|---|
-| `onChange` | `(value: string) => void` | Jede Inhaltsänderung (Tippen, Formatieren, Einfügen) |
-| `onBlur` | `() => void` | Editor verliert den Fokus |
-| `onFocus` | `() => void` | Editor erhält den Fokus |
+| `onChange` | `(value: string) => void` | Every content change (typing, formatting, pasting) |
+| `onBlur` | `() => void` | Editor loses focus |
+| `onFocus` | `() => void` | Editor gains focus |
 
-**Wichtig:** `onChange` feuert NICHT wenn `value` von außen über die Prop gesetzt wird (externer Sync via `setContent`). Dies verhindert Endlosschleifen im kontrollierten Modus.
+**Important:** `onChange` does NOT fire when `value` is set externally via the prop (external sync via `setContent`). This prevents infinite loops in controlled mode.
 
 ---
 
-## Architektur-Entscheidungen
+## Architecture Decisions
 
-| Thema | Entscheidung |
+| Topic | Decision |
 |---|---|
-| **Kein Zustand-Store** | TipTap `useEditor` verwaltet den Editor-State intern |
-| **Kein CSS** | Ausschließlich MUI `sx`-Prop und `.ProseMirror`-Selector |
-| **TipTap v3** | StarterKit enthält bereits `Link` und `Underline` — keine separaten Imports |
-| **`shouldRerenderOnTransaction: true`** | Notwendig in TipTap v3 damit Toolbar-Buttons ihren aktiven Zustand reflektieren |
-| **`onMouseDown` preventDefault** | Jeder Toolbar-Button verhindert damit das Blur des Editors beim Klicken |
-| **`height` auf `Paper`** | Die Gesamthöhe (Toolbar + Inhalt) sitzt auf dem `Paper`-Wrapper; der Inhaltsbereich füllt den Rest über `flex: 1` |
-| **`normalizeSize()`** | Konvertiert numerische Strings (`"300"`) zu Zahlen, damit MUI `px` anhängt — ermöglicht Storybook-Text-Controls |
-| **`tiptap-markdown`** | Freies Community-Paket (`transformPastedText: true`) — kein TipTap-Pro erforderlich |
+| **No state store** | TipTap `useEditor` manages the editor state internally |
+| **No CSS** | Exclusively MUI `sx` prop and `.ProseMirror` selector |
+| **TipTap v3** | StarterKit already includes `Link` and `Underline` — no separate imports needed |
+| **`shouldRerenderOnTransaction: true`** | Required in TipTap v3 so toolbar buttons reflect their active state |
+| **`onMouseDown` preventDefault** | Every toolbar button prevents the editor from losing focus when clicked |
+| **`height` on `Paper`** | The total height (toolbar + content) sits on the `Paper` wrapper; the content area fills the rest via `flex: 1` |
+| **`normalizeSize()`** | Converts numeric strings (`"300"`) to numbers so MUI appends `px` — enables Storybook text controls |
+| **`tiptap-markdown`** | Free community package (`transformPastedText: true`) — no TipTap Pro required |

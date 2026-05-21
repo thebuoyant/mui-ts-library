@@ -1,23 +1,25 @@
-# PasswordStrengthMeter — Benutzerhandbuch
+# PasswordStrengthMeter — User Manual
 
-## Überblick
+> [Deutsche Version →](PasswordStrengthMeter.de.md)
 
-Der `PasswordStrengthMeter` ist eine Passwort-Eingabe-Komponente auf Basis von React und Material UI. Sie kombiniert ein Textfeld mit einem animierten Stärke-Balken und einer Anforderungscheckliste. Die Komponente ist vollständig in Formulare integrierbar (React Hook Form, Formik, native HTML-Forms) und unterstützt kontrollierten sowie unkontrollierten Betrieb.
+## Overview
 
-**Typische Einsatzgebiete:**
+The `PasswordStrengthMeter` is a password input component built on React and Material UI. It combines a text field with an animated strength bar and a requirements checklist. The component is fully integrable into forms (React Hook Form, Formik, native HTML forms) and supports both controlled and uncontrolled operation.
 
-- Registrierungsformulare mit Passwort-Anforderungen
-- Passwort-Änderungs-Dialoge in Kontoeinstellungen
-- Onboarding-Flows mit Sicherheitshinweisen
-- Admin-Bereiche mit strengen Passwortrichtlinien
+**Typical use cases:**
 
-![PasswordStrengthMeter – Komponentenvorschau](PasswordStrengthMeter.png)
+- Registration forms with password requirements
+- Password change dialogs in account settings
+- Onboarding flows with security hints
+- Admin areas with strict password policies
+
+![PasswordStrengthMeter – Component Preview](PasswordStrengthMeter.png)
 
 ---
 
-## Technische Voraussetzungen
+## Prerequisites
 
-| Abhängigkeit | Mindestversion |
+| Dependency | Minimum version |
 |---|---|
 | React | 19 |
 | TypeScript | 5.x |
@@ -42,7 +44,7 @@ import type {
 
 ---
 
-## Schnellstart
+## Quick Start
 
 ```tsx
 import { PasswordStrengthMeter } from '@tsdev/mui-ts-library';
@@ -52,7 +54,7 @@ function App() {
     <PasswordStrengthMeter
       passwordMinLength={8}
       onPasswordChange={(password, result) => {
-        console.log(`Stärke: ${result.meterStatus} (Score ${result.score}/4)`);
+        console.log(`Strength: ${result.meterStatus} (Score ${result.score}/4)`);
       }}
     />
   );
@@ -61,60 +63,60 @@ function App() {
 
 ---
 
-## Props-Referenz
+## Props Reference
 
-### Kernfunktion
+### Core functionality
 
-| Prop | Typ | Standard | Beschreibung |
+| Prop | Type | Default | Description |
 |---|---|---|---|
-| `value` | `string` | — | Setzt die Komponente in den **kontrollierten Modus**: Das Passwort wird von außen gesteuert. Änderungen werden über `onPasswordChange` nach oben gegeben. Wenn nicht gesetzt, verwaltet die Komponente ihren eigenen internen Zustand (unkontrolliert). |
-| `passwordMinLength` | `number` | `8` | Mindestlänge des Passworts in Zeichen. Steuert die Anforderungscheckliste (Zeile „Mindestens {n} Zeichen") und beeinflusst den Scoring-Algorithmus direkt. Passwörter unter dieser Länge erhalten immer den Score `weak`. |
-| `showPasswordAdornment` | `boolean` | `true` | Zeigt einen Umschalten-Button am rechten Rand des Eingabefelds an, mit dem der Nutzer das Passwort im Klartext anzeigen kann. |
-| `showMeter` | `boolean` | `true` | Zeigt den animierten Stärke-Balken unterhalb des Eingabefelds an. Der Balken wechselt Farbe und Breite entsprechend dem berechneten Score. |
-| `showSummary` | `boolean` | `true` | Zeigt die Anforderungscheckliste unterhalb des Stärke-Balkens an. Jede Anforderung wird mit einem grünen Haken (erfüllt) oder einem roten Warnsymbol (nicht erfüllt) markiert. |
-| `inputSize` | `"small" \| "medium"` | `"medium"` | Größe des Eingabefelds gemäß MUI-Standard. Beeinflusst Schriftgröße, Innenabstand und Höhe. |
+| `value` | `string` | — | Puts the component into **controlled mode**: the password is managed externally. Changes are passed up via `onPasswordChange`. When not set, the component manages its own internal state (uncontrolled). |
+| `passwordMinLength` | `number` | `8` | Minimum password length in characters. Controls the requirements checklist ("At least {n} characters") and directly influences the scoring algorithm. Passwords below this length always receive a `weak` score. |
+| `showPasswordAdornment` | `boolean` | `true` | Shows a toggle button on the right side of the input field, allowing the user to reveal the password in plain text. |
+| `showMeter` | `boolean` | `true` | Shows the animated strength bar below the input field. The bar changes color and width according to the calculated score. |
+| `showSummary` | `boolean` | `true` | Shows the requirements checklist below the strength bar. Each requirement is marked with a green checkmark (met) or a red warning symbol (not met). |
+| `inputSize` | `"small" \| "medium"` | `"medium"` | Size of the input field per MUI standard. Affects font size, padding, and height. |
 
 ---
 
-### Form-Integration
+### Form integration
 
-Diese Props machen die Komponente vollständig kompatibel mit gängigen Formularbibliotheken und nativen HTML-Forms.
+These props make the component fully compatible with common form libraries and native HTML forms.
 
-| Prop | Typ | Standard | Beschreibung |
+| Prop | Type | Default | Description |
 |---|---|---|---|
-| `name` | `string` | — | Natives `name`-Attribut des `<input>`-Elements. Wird für `<form>`-Submissions verwendet und von `register()` in React Hook Form und Formik benötigt. |
-| `inputRef` | `React.Ref<HTMLInputElement>` | — | Ref, der auf das native `<input>`-Element zeigt. Wird von React Hook Form via `register().ref` und von Formik via `innerRef` verwendet. Ermöglicht programmatischen Fokus und Validierungsauslösung. |
-| `disabled` | `boolean` | `false` | Deaktiviert das Eingabefeld und den Sichtbarkeits-Umschalter. Stärke-Balken und Anforderungsliste bleiben sichtbar. |
-| `error` | `boolean` | `false` | Setzt das Eingabefeld in den Fehlerzustand (roter Rahmen). Der `helperText` wird ebenfalls in Rot dargestellt. Typisch für Formularvalidierung nach Submit-Versuch. |
-| `helperText` | `string` | — | Hilfs- oder Fehlermeldungstext unterhalb des Eingabefelds. Erscheint in Rot wenn `error={true}`. Kann für externe Validierungsmeldungen genutzt werden (z. B. „Passwort stimmt nicht überein"). |
-| `autoComplete` | `string` | — | Natives `autocomplete`-Attribut des `<input>`-Elements. Empfohlene Werte: `"new-password"` für Registrierungsformulare, `"current-password"` für Login-Formulare. Steuert das Browser-Autofill-Verhalten. |
+| `name` | `string` | — | Native `name` attribute of the `<input>` element. Used for `<form>` submissions and required by `register()` in React Hook Form and Formik. |
+| `inputRef` | `React.Ref<HTMLInputElement>` | — | Ref pointing to the native `<input>` element. Used by React Hook Form via `register().ref` and by Formik via `innerRef`. Enables programmatic focus and validation triggering. |
+| `disabled` | `boolean` | `false` | Disables the input field and the visibility toggle. Strength bar and requirements list remain visible. |
+| `error` | `boolean` | `false` | Puts the input field into error state (red border). The `helperText` is also displayed in red. Typical for form validation after a submit attempt. |
+| `helperText` | `string` | — | Helper or error message text below the input field. Appears in red when `error={true}`. Can be used for external validation messages (e.g. "Passwords do not match"). |
+| `autoComplete` | `string` | — | Native `autocomplete` attribute of the `<input>` element. Recommended values: `"new-password"` for registration forms, `"current-password"` for login forms. Controls browser autofill behavior. |
 
 ---
 
-### Farbanpassung
+### Color customization
 
-| Prop | Typ | Standard | Beschreibung |
+| Prop | Type | Default | Description |
 |---|---|---|---|
-| `meterColors` | `Partial<MeterColors>` | Rot → Grün | Farben des Stärke-Balkens für jeden der vier Stärke-Stufen. Nur abweichende Keys angeben — nicht gesetzte Keys behalten die Standardfarben. |
-| `checkColors` | `CheckColors` | Rot / Grün | Farben der Haken- und Warnsymbole in der Anforderungscheckliste. Beide Felder müssen angegeben werden wenn das Objekt gesetzt wird. |
+| `meterColors` | `Partial<MeterColors>` | Red → Green | Colors of the strength bar for each of the four strength levels. Only specify deviating keys — unset keys keep the default colors. |
+| `checkColors` | `CheckColors` | Red / Green | Colors of the checkmark and warning symbols in the requirements checklist. Both fields must be provided when the object is set. |
 
-**`MeterColors` — Struktur und Standardwerte:**
+**`MeterColors` — Structure and defaults:**
 
-| Feld | Typ | Standard | Stärke-Stufe |
+| Field | Type | Default | Strength level |
 |---|---|---|---|
-| `weak` | `string` | `"#cc0000"` | Score 1 — Passwort zu kurz oder zu einfach |
-| `ok` | `string` | `"#fdc010"` | Score 2 — Passwort erfüllt Mindestanforderungen |
-| `good` | `string` | `"#8bc34a"` | Score 3 — Passwort ist gut |
-| `veryGood` | `string` | `"#43a047"` | Score 4 — Passwort ist sehr stark |
+| `weak` | `string` | `"#cc0000"` | Score 1 — Password too short or too simple |
+| `ok` | `string` | `"#fdc010"` | Score 2 — Password meets minimum requirements |
+| `good` | `string` | `"#8bc34a"` | Score 3 — Password is good |
+| `veryGood` | `string` | `"#43a047"` | Score 4 — Password is very strong |
 
-**`CheckColors` — Struktur und Standardwerte:**
+**`CheckColors` — Structure and defaults:**
 
-| Feld | Typ | Standard | Verwendung |
+| Field | Type | Default | Usage |
 |---|---|---|---|
-| `failure` | `string` | `"#cc0000"` | Farbe des Warnsymbols (Anforderung nicht erfüllt) |
-| `success` | `string` | `"#43a047"` | Farbe des Häkchens (Anforderung erfüllt) |
+| `failure` | `string` | `"#cc0000"` | Color of the warning symbol (requirement not met) |
+| `success` | `string` | `"#43a047"` | Color of the checkmark (requirement met) |
 
-**TypeScript-Typen und Standardwerte:**
+**TypeScript types and defaults:**
 
 ```ts
 import {
@@ -136,27 +138,27 @@ type CheckColors = {
 };
 ```
 
-> **Hinweis:** `meterColors` akzeptiert `Partial<MeterColors>` — es müssen nur abweichende Keys angegeben werden. `checkColors` hingegen ist kein Partial: wenn das Objekt übergeben wird, müssen beide Felder (`failure` und `success`) gesetzt sein.
+> **Note:** `meterColors` accepts `Partial<MeterColors>` — only deviating keys need to be specified. `checkColors`, however, is not a Partial: when the object is passed, both fields (`failure` and `success`) must be set.
 
 ---
 
-### Übersetzung
+### Translation
 
-| Prop | Typ | Standard | Beschreibung |
+| Prop | Type | Default | Description |
 |---|---|---|---|
-| `translation` | `Partial<PasswordStrengthMeterTranslation>` | Englische Defaults | Texte für alle angezeigten Beschriftungen und Aria-Labels. Nur abweichende Keys angeben — nicht gesetzte Keys fallen auf die englischen Standardwerte zurück. |
+| `translation` | `Partial<PasswordStrengthMeterTranslation>` | English defaults | Texts for all displayed labels and aria labels. Only specify deviating keys — unset keys fall back to the English defaults. |
 
-Die englischen Standardwerte können direkt importiert werden:
+The English defaults can be imported directly:
 
 ```ts
 import { DEFAULT_PASSWORD_TRANSLATIONS } from '@tsdev/mui-ts-library';
 import type { PasswordStrengthMeterTranslation } from '@tsdev/mui-ts-library';
 
-// Vollständiger TypeScript-Typ:
+// Full TypeScript type:
 type PasswordStrengthMeterTranslation = {
   label:                string;
   summaryHeaderLabel:   string;
-  summaryMinChars:      string;  // {n} wird durch passwordMinLength ersetzt
+  summaryMinChars:      string;  // {n} is replaced by passwordMinLength at runtime
   summaryCapitalLetter: string;
   summaryLowerCaseLetter: string;
   summaryNumber:        string;
@@ -171,28 +173,28 @@ type PasswordStrengthMeterTranslation = {
 
 ## Callbacks / Events
 
-| Callback | Signatur | Wann ausgelöst |
+| Callback | Signature | When fired |
 |---|---|---|
-| `onPasswordChange` | `(password: string, result: StrengthResult) => void` | Wird bei jeder Eingabe-Änderung aufgerufen — also bei jedem Tastendruck. `password` ist der aktuelle Rohtext. `result` enthält die vollständige Stärkeanalyse (siehe [`StrengthResult`](#strengthresult)). |
+| `onPasswordChange` | `(password: string, result: StrengthResult) => void` | Called on every input change — i.e. on every keystroke. `password` is the current raw text. `result` contains the complete strength analysis (see [`StrengthResult`](#strengthresult)). |
 
 ---
 
-## `StrengthResult` — Rückgabewert von `onPasswordChange` {#strengthresult}
+## `StrengthResult` — Return value of `onPasswordChange` {#strengthresult}
 
-Das `result`-Objekt liefert alle Informationen über das aktuelle Passwort und kann für eigene Validierungslogik genutzt werden.
+The `result` object provides all information about the current password and can be used for custom validation logic.
 
-| Feld | Typ | Beschreibung |
+| Field | Type | Description |
 |---|---|---|
-| `score` | `0 \| 1 \| 2 \| 3 \| 4` | Numerischer Stärke-Score. `0` = leer, `1` = schwach, `2` = ok, `3` = gut, `4` = sehr gut. |
-| `percent` | `number` | Prozentwert entsprechend dem Score: `0` · `25` · `50` · `75` · `100`. Direkter Wert für eigene Progress-Bars oder UI-Elemente. |
-| `meterStatus` | `MeterStatus` | Textueller Status: `"weak"` · `"ok"` · `"good"` · `"very good"`. |
-| `length` | `number` | Aktuelle Länge des Passworts in Zeichen. |
-| `hasLower` | `boolean` | Enthält mindestens einen Kleinbuchstaben. |
-| `hasUpper` | `boolean` | Enthält mindestens einen Großbuchstaben. |
-| `hasDigit` | `boolean` | Enthält mindestens eine Ziffer. |
-| `hasSymbol` | `boolean` | Enthält mindestens ein Sonderzeichen (alles außer Buchstaben und Ziffern). |
+| `score` | `0 \| 1 \| 2 \| 3 \| 4` | Numeric strength score. `0` = empty, `1` = weak, `2` = ok, `3` = good, `4` = very good. |
+| `percent` | `number` | Percentage value corresponding to the score: `0` · `25` · `50` · `75` · `100`. Direct value for custom progress bars or UI elements. |
+| `meterStatus` | `MeterStatus` | Text status: `"weak"` · `"ok"` · `"good"` · `"very good"`. |
+| `length` | `number` | Current length of the password in characters. |
+| `hasLower` | `boolean` | Contains at least one lowercase letter. |
+| `hasUpper` | `boolean` | Contains at least one uppercase letter. |
+| `hasDigit` | `boolean` | Contains at least one digit. |
+| `hasSymbol` | `boolean` | Contains at least one special character (everything except letters and digits). |
 
-**TypeScript-Typen:**
+**TypeScript types:**
 
 ```ts
 type StrengthScore = 0 | 1 | 2 | 3 | 4;
@@ -212,56 +214,56 @@ type StrengthResult = {
 
 ---
 
-## Scoring-Algorithmus
+## Scoring Algorithm
 
-Der Score wird intern über die Funktion `scorePassword()` berechnet. Der Algorithmus ist deterministisch und clientseitig — es werden keine externen Services aufgerufen.
+The score is calculated internally by the `scorePassword()` function. The algorithm is deterministic and client-side — no external services are called.
 
-**Regeln (in Reihenfolge der Auswertung):**
+**Rules (in order of evaluation):**
 
-| Bedingung | Effekt |
+| Condition | Effect |
 |---|---|
-| Passwort ist leer | Score = `0`, Status = `"weak"` |
-| Passwort kürzer als `passwordMinLength` | Score = `1`, Status = `"weak"` — unabhängig von allen anderen Faktoren |
-| Mindestlänge erfüllt | +1 Punkt |
-| Länge ≥ `passwordMinLength + 4` | +1 Zusatzpunkt (Bonus für längere Passwörter) |
-| Mindestens 2 verschiedene Zeichenklassen (Groß, Klein, Ziffern, Sonderzeichen) | +1 Punkt |
-| Mindestens 3 verschiedene Zeichenklassen | +1 Punkt |
-| Nur wiederholte Zeichen (z. B. `"aaaaaaa"`) | −2 Punkte |
-| Bekanntes schwaches Muster (`"1234"`, `"abcd"`, `"password"` u. a.) | −2 Punkte |
+| Password is empty | Score = `0`, status = `"weak"` |
+| Password shorter than `passwordMinLength` | Score = `1`, status = `"weak"` — regardless of all other factors |
+| Minimum length met | +1 point |
+| Length ≥ `passwordMinLength + 4` | +1 bonus point (bonus for longer passwords) |
+| At least 2 different character classes (upper, lower, digits, special) | +1 point |
+| At least 3 different character classes | +1 point |
+| Only repeated characters (e.g. `"aaaaaaa"`) | −2 points |
+| Known weak pattern (`"1234"`, `"abcd"`, `"password"`, etc.) | −2 points |
 
-Der finale Score wird auf den Bereich `0–4` begrenzt (Clamp). Malus-Regeln können also nicht unter 0 fallen.
+The final score is clamped to the range `0–4`. Penalty rules cannot therefore go below 0.
 
-**Beispiele:**
+**Examples:**
 
-| Passwort | Score | Status |
+| Password | Score | Status |
 |---|---|---|
-| *(leer)* | 0 | weak |
-| `"abc"` (zu kurz) | 1 | weak |
-| `"password123"` (bekanntes Muster) | 1 | weak |
-| `"Montag08"` | 2 | ok |
-| `"Montag08!"` | 3 | good |
-| `"Montag08!xZ"` | 4 | very good |
+| *(empty)* | 0 | weak |
+| `"abc"` (too short) | 1 | weak |
+| `"password123"` (known pattern) | 1 | weak |
+| `"Monday08"` | 2 | ok |
+| `"Monday08!"` | 3 | good |
+| `"Monday08!xZ"` | 4 | very good |
 
 ---
 
-## Texte & Übersetzungen
+## Translations
 
-Alle angezeigten Texte und Aria-Labels können über die `translation`-Prop überschrieben werden.
+All displayed texts and aria labels can be overridden via the `translation` prop.
 
-| Key | Standard-Wert | Beschreibung |
+| Key | Default value | Description |
 |---|---|---|
-| `label` | `"Password"` | Label des Eingabefelds (schwebend, MUI-Standard). |
-| `summaryHeaderLabel` | `"Requirements for your password"` | Überschrift der Anforderungscheckliste. Nur sichtbar wenn `showSummary={true}`. |
-| `summaryMinChars` | `"At least {n} characters"` | Anforderungstext für die Mindestlänge. `{n}` wird zur Laufzeit durch den Wert von `passwordMinLength` ersetzt. |
-| `summaryCapitalLetter` | `"At least 1 capital letter"` | Anforderungstext für Großbuchstaben. |
-| `summaryLowerCaseLetter` | `"At least 1 lowercase letter"` | Anforderungstext für Kleinbuchstaben. |
-| `summaryNumber` | `"At least 1 number"` | Anforderungstext für Ziffern. |
-| `summarySpecialChar` | `"At least 1 special character"` | Anforderungstext für Sonderzeichen. |
-| `showPasswordLabel` | `"Show password"` | Aria-Label des Umschalters im Sichtbarmachen-Zustand. Für Screenreader relevant. |
-| `hidePasswordLabel` | `"Hide password"` | Aria-Label des Umschalters im Verbergen-Zustand. Für Screenreader relevant. |
-| `meterAriaLabel` | `"Password strength"` | Aria-Label des Stärke-Balkens für Screenreader. |
+| `label` | `"Password"` | Label of the input field (floating, MUI standard). |
+| `summaryHeaderLabel` | `"Requirements for your password"` | Heading of the requirements checklist. Only visible when `showSummary={true}`. |
+| `summaryMinChars` | `"At least {n} characters"` | Requirement text for minimum length. `{n}` is replaced at runtime by the value of `passwordMinLength`. |
+| `summaryCapitalLetter` | `"At least 1 capital letter"` | Requirement text for uppercase letters. |
+| `summaryLowerCaseLetter` | `"At least 1 lowercase letter"` | Requirement text for lowercase letters. |
+| `summaryNumber` | `"At least 1 number"` | Requirement text for digits. |
+| `summarySpecialChar` | `"At least 1 special character"` | Requirement text for special characters. |
+| `showPasswordLabel` | `"Show password"` | Aria label of the toggle in show state. Relevant for screen readers. |
+| `hidePasswordLabel` | `"Hide password"` | Aria label of the toggle in hide state. Relevant for screen readers. |
+| `meterAriaLabel` | `"Password strength"` | Aria label of the strength bar for screen readers. |
 
-**Vollständige deutsche Übersetzung:**
+**Full German translation:**
 
 ```tsx
 <PasswordStrengthMeter
@@ -283,24 +285,24 @@ Alle angezeigten Texte und Aria-Labels können über die `translation`-Prop übe
 
 ---
 
-## `data-testid`-Referenz
+## `data-testid` Reference
 
-Für automatisierte Tests stehen folgende stabile Test-IDs zur Verfügung:
+The following stable test IDs are available for automated tests:
 
-| `data-testid` | Element | Beschreibung |
+| `data-testid` | Element | Description |
 |---|---|---|
-| `psm-input` | Natives `<input>` | Das Texteingabefeld. Nutzen für `userEvent.type()` oder `.value`-Abfragen. |
-| `psm-toggle` | `<button>` (IconButton) | Sichtbarkeits-Umschalter. Nur vorhanden wenn `showPasswordAdornment={true}`. |
-| `psm-meter` | `<div>` (innerer Balken) | Der farbige Stärke-Balken. Hat `style.width` und `style.backgroundColor` als messbare Werte. |
-| `psm-summary` | `<div>` (äußere Box) | Container der Anforderungscheckliste. Nur vorhanden wenn `showSummary={true}`. |
-| `psm-req-success` | `<svg>` (CheckCircle-Icon) | Grüner Haken für eine erfüllte Anforderung. Mehrfach vorhanden. |
-| `psm-req-failure` | `<svg>` (ErrorOutline-Icon) | Rotes Warnsymbol für eine nicht erfüllte Anforderung. Mehrfach vorhanden. |
+| `psm-input` | Native `<input>` | The text input field. Use for `userEvent.type()` or `.value` queries. |
+| `psm-toggle` | `<button>` (IconButton) | Visibility toggle. Only present when `showPasswordAdornment={true}`. |
+| `psm-meter` | `<div>` (inner bar) | The colored strength bar. Has `style.width` and `style.backgroundColor` as measurable values. |
+| `psm-summary` | `<div>` (outer box) | Container of the requirements checklist. Only present when `showSummary={true}`. |
+| `psm-req-success` | `<svg>` (CheckCircle icon) | Green checkmark for a met requirement. Present multiple times. |
+| `psm-req-failure` | `<svg>` (ErrorOutline icon) | Red warning symbol for an unmet requirement. Present multiple times. |
 
 ---
 
-## Anwendungsbeispiele
+## Usage Examples
 
-### Unkontrolliert (einfachste Form)
+### Uncontrolled (simplest form)
 
 ```tsx
 <PasswordStrengthMeter
@@ -313,7 +315,7 @@ Für automatisierte Tests stehen folgende stabile Test-IDs zur Verfügung:
 />
 ```
 
-### Kontrollierter Modus (externer State)
+### Controlled mode (external state)
 
 ```tsx
 const [password, setPassword] = useState('');
@@ -324,7 +326,7 @@ const [password, setPassword] = useState('');
 />
 ```
 
-### Integration mit React Hook Form
+### Integration with React Hook Form
 
 ```tsx
 import { useForm } from 'react-hook-form';
@@ -341,7 +343,7 @@ function RegistrationForm() {
         name="password"
         autoComplete="new-password"
         error={!!errors.password}
-        helperText={errors.password ? 'Passwort muss mindestens 8 Zeichen haben.' : undefined}
+        helperText={errors.password ? 'Password must be at least 8 characters.' : undefined}
         passwordMinLength={8}
       />
     </form>
@@ -349,7 +351,7 @@ function RegistrationForm() {
 }
 ```
 
-### Integration mit Formik
+### Integration with Formik
 
 ```tsx
 import { useField } from 'formik';
@@ -370,17 +372,17 @@ function FormikPasswordField() {
 }
 ```
 
-### Nur Eingabefeld (ohne Meter und Zusammenfassung)
+### Input only (no meter or summary)
 
 ```tsx
-// Minimale Variante — nur das Passwortfeld mit Sichtbarkeits-Toggle.
+{/* Minimal variant — just the password field with visibility toggle. */}
 <PasswordStrengthMeter
   showMeter={false}
   showSummary={false}
 />
 ```
 
-### Benutzerdefinierte Farben
+### Custom colors
 
 ```tsx
 <PasswordStrengthMeter
@@ -397,7 +399,7 @@ function FormikPasswordField() {
 />
 ```
 
-### Formularvalidierung nach Submit
+### Form validation after submit
 
 ```tsx
 const [submitted, setSubmitted] = useState(false);
@@ -410,12 +412,12 @@ const [isStrong, setIsStrong] = useState(false);
     setIsStrong(result.score >= 3);
   }}
   error={submitted && !isStrong}
-  helperText={submitted && !isStrong ? 'Bitte wählen Sie ein stärkeres Passwort.' : undefined}
+  helperText={submitted && !isStrong ? 'Please choose a stronger password.' : undefined}
 />
-<button onClick={() => setSubmitted(true)}>Absenden</button>
+<button onClick={() => setSubmitted(true)}>Submit</button>
 ```
 
-### Deaktivierter Zustand
+### Disabled state
 
 ```tsx
 <PasswordStrengthMeter
@@ -426,22 +428,22 @@ const [isStrong, setIsStrong] = useState(false);
 
 ---
 
-## Barrierefreiheit
+## Accessibility
 
-- Der Stärke-Balken hat ein konfigurierbares `aria-label` (`translation.meterAriaLabel`) für Screenreader.
-- Der Sichtbarkeits-Umschalter hat separate Aria-Labels für „Anzeigen"- und „Verbergen"-Zustand (`showPasswordLabel` / `hidePasswordLabel`), die vom Screenreader korrekt angesagt werden.
-- `helperText` wird via MUI `FormHelperText` gerendert und ist mit dem Eingabefeld via `aria-describedby` verknüpft.
-- Der Fehlerzustand (`error={true}`) wird durch `aria-invalid` am nativen `<input>` signalisiert.
-- Die Anforderungsliste in `showSummary` ist visuell durch Farbe und Icon unterscheidbar — beide Signale sind vorhanden (kein reiner Color-only-Indikator).
+- The strength bar has a configurable `aria-label` (`translation.meterAriaLabel`) for screen readers.
+- The visibility toggle has separate aria labels for "show" and "hide" states (`showPasswordLabel` / `hidePasswordLabel`), which are correctly announced by screen readers.
+- `helperText` is rendered via MUI `FormHelperText` and linked to the input field via `aria-describedby`.
+- The error state (`error={true}`) is signaled by `aria-invalid` on the native `<input>`.
+- The requirements list in `showSummary` is visually distinguishable by both color and icon — both signals are present (no color-only indicator).
 
 ---
 
-## Hinweise und bekannte Einschränkungen
+## Notes and Known Limitations
 
-| Thema | Hinweis |
+| Topic | Note |
 |---|---|
-| **Score bei leerem Passwort** | Score `0` wird nur bei komplett leerem Passwort vergeben. Ein einziges Zeichen unter der Mindestlänge ergibt Score `1` (weak). |
-| **`value` ohne `onPasswordChange`** | Im kontrollierten Modus (`value` gesetzt) ohne `onPasswordChange` ist das Feld read-only — der Nutzer kann keine Eingabe machen. Immer `onPasswordChange` setzen wenn `value` verwendet wird. |
-| **Malus-Regeln kumulieren nicht** | Nur einer der beiden Malus-Faktoren (wiederholte Zeichen **oder** bekannte Muster) kann pro Passwort angewendet werden — nicht beide gleichzeitig. Der Algorithmus erkennt das erste zutreffende Muster. |
-| **`checkColors` ist kein Partial** | Im Gegensatz zu `meterColors` und `translation` muss `checkColors` als vollständiges Objekt übergeben werden (beide Felder `failure` und `success` sind Pflicht). |
-| **Keine serverseitige Validierung** | Der Scoring-Algorithmus läuft vollständig clientseitig. Er ersetzt keine serverseitige Passwortrichtlinien-Prüfung. Er dient als UX-Hilfe für den Nutzer. |
+| **Score for empty password** | Score `0` is only assigned for a completely empty password. A single character below the minimum length yields Score `1` (weak). |
+| **`value` without `onPasswordChange`** | In controlled mode (`value` set) without `onPasswordChange`, the field is read-only — the user cannot type. Always set `onPasswordChange` when using `value`. |
+| **Penalty rules do not accumulate** | Only one of the two penalty factors (repeated characters **or** known patterns) can be applied per password — not both simultaneously. The algorithm detects the first matching pattern. |
+| **`checkColors` is not a Partial** | Unlike `meterColors` and `translation`, `checkColors` must be passed as a complete object (both fields `failure` and `success` are required). |
+| **No server-side validation** | The scoring algorithm runs entirely client-side. It does not replace server-side password policy checks. It serves as a UX aid for the user. |

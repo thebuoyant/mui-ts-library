@@ -1,23 +1,25 @@
-# GanttChart — Benutzerhandbuch
+# GanttChart — User Manual
 
-## Überblick
+> [Deutsche Version →](GanttChart.de.md)
 
-Der `GanttChart` ist eine vollständig interaktive Projektplanungs-Komponente auf Basis von React und Material UI. Er visualisiert Aufgaben (Tasks) als Balken auf einer Zeitleiste und unterstützt hierarchische Strukturen, Abhängigkeiten zwischen Tasks, Drag & Drop, Inline-Bearbeitung sowie einen kritischen-Pfad-Modus.
+## Overview
 
-**Typische Einsatzgebiete:**
+The `GanttChart` is a fully interactive project planning component built on React and Material UI. It visualizes tasks as bars on a timeline and supports hierarchical structures, task dependencies, drag & drop, inline editing, and a critical path mode.
 
-- Projektmanagement-Anwendungen (Sprint-Planung, Release-Roadmaps)
-- Ressourcenplanung und Kapazitätsdarstellung
-- Visualisierung von Meilensteinen in agilen Projekten
-- Dashboards mit zeitlicher Übersicht über laufende Aufgaben
+**Typical use cases:**
 
-![GanttChart – Komponentenvorschau](GanttChart.png)
+- Project management applications (sprint planning, release roadmaps)
+- Resource planning and capacity visualization
+- Milestone tracking in agile projects
+- Dashboards with a temporal overview of ongoing tasks
+
+![GanttChart – Component Preview](GanttChart.png)
 
 ---
 
-## Technische Voraussetzungen
+## Prerequisites
 
-| Abhängigkeit | Mindestversion |
+| Dependency | Minimum version |
 |---|---|
 | React | 19 |
 | TypeScript | 5.x |
@@ -43,7 +45,7 @@ import type {
 
 ---
 
-## Schnellstart
+## Quick Start
 
 ```tsx
 import { GanttChart } from '@tsdev/mui-ts-library';
@@ -51,24 +53,24 @@ import type { GanttTask } from '@tsdev/mui-ts-library';
 
 const tasks: GanttTask[] = [
   {
-    id: 'projekt',
-    name: 'Webseite Relaunch',
+    id: 'project',
+    name: 'Website Relaunch',
     status: 'in-progress',
     startDate: new Date('2025-01-01'),
     endDate: new Date('2025-06-30'),
   },
   {
     id: 'design',
-    parentId: 'projekt',
-    name: 'Design-Phase',
+    parentId: 'project',
+    name: 'Design Phase',
     status: 'done',
     startDate: new Date('2025-01-01'),
     endDate: new Date('2025-02-28'),
   },
   {
-    id: 'entwicklung',
-    parentId: 'projekt',
-    name: 'Entwicklung',
+    id: 'development',
+    parentId: 'project',
+    name: 'Development',
     status: 'in-progress',
     startDate: new Date('2025-03-01'),
     endDate: new Date('2025-05-31'),
@@ -89,26 +91,26 @@ function App() {
 
 ---
 
-## Props-Referenz
+## Props Reference
 
-### Datenstruktur: `GanttTask`
+### Data structure: `GanttTask`
 
-Jede Aufgabe wird als `GanttTask`-Objekt übergeben. Die `tasks`-Prop erwartet ein flaches Array — die Hierarchie wird intern aus `parentId`-Referenzen aufgebaut.
+Each task is passed as a `GanttTask` object. The `tasks` prop expects a flat array — the hierarchy is built internally from `parentId` references.
 
-| Feld | Typ | Pflicht | Beschreibung |
+| Field | Type | Required | Description |
 |---|---|---|---|
-| `id` | `string` | **Ja** | Eindeutige Kennung des Tasks. Wird als React-Key und für Abhängigkeits-Referenzen verwendet. Muss innerhalb der `tasks`-Liste einmalig sein. |
-| `name` | `string` | **Ja** | Anzeigename des Tasks im linken Panel und in Dialogen. |
-| `status` | `GanttTaskStatus` | **Ja** | Aktueller Status: `"planned"` · `"in-progress"` · `"done"` · `"blocked"`. Steuert Balkenfarbe und Status-Chip. |
-| `startDate` | `Date` | **Ja** | Startdatum des Tasks. Bestimmt die linke Kante des Balkens. |
-| `endDate` | `Date` | **Ja** | Enddatum des Tasks. Bestimmt die rechte Kante des Balkens. |
-| `parentId` | `string` | Nein | ID des übergeordneten Tasks. Wird weggelassen für Root-Tasks (oberste Ebene). Erzeugt bei Angabe eine Einrückung im Panel und baut den Baum auf. |
-| `dependencies` | `string[]` | Nein | IDs von Vorgänger-Tasks. Wird im Bearbeiten-Dialog als Multiselect angezeigt. In Kombination mit `cascadeDependencies` werden Nachfolger automatisch verschoben. |
-| `isMilestone` | `boolean` | Nein | Wenn `true`, wird der Task als Raute (♦) statt als Balken dargestellt. Meilensteine sollten `startDate ≈ endDate` haben. |
-| `progress` | `number` | Nein | Fortschritt in Prozent (0–100). Wird als halbopaker Overlay-Balken über den Task-Balken gerendert. Interaktiv wenn `progressDraggable={true}`. |
-| `color` | `string` | Nein | Überschreibt die statusbasierte Balkenfarbe für diesen einzelnen Task (höchste Priorität). Beliebiger CSS-Farbwert (z. B. `"#e91e63"` oder `"rgb(0,150,136)"`). |
+| `id` | `string` | **Yes** | Unique task identifier. Used as a React key and for dependency references. Must be unique within the `tasks` array. |
+| `name` | `string` | **Yes** | Display name of the task in the left panel and in dialogs. |
+| `status` | `GanttTaskStatus` | **Yes** | Current status: `"planned"` · `"in-progress"` · `"done"` · `"blocked"`. Controls bar color and status chip. |
+| `startDate` | `Date` | **Yes** | Start date of the task. Determines the left edge of the bar. |
+| `endDate` | `Date` | **Yes** | End date of the task. Determines the right edge of the bar. |
+| `parentId` | `string` | No | ID of the parent task. Omit for root tasks (top level). When set, creates an indented row in the panel and builds the tree. |
+| `dependencies` | `string[]` | No | IDs of predecessor tasks. Shown as a multi-select in the edit dialog. When used with `cascadeDependencies`, successors are automatically shifted when a predecessor moves. |
+| `isMilestone` | `boolean` | No | When `true`, the task is rendered as a diamond (♦) instead of a bar. Milestones should have `startDate ≈ endDate`. |
+| `progress` | `number` | No | Progress in percent (0–100). Rendered as a semi-transparent overlay bar on top of the task bar. Interactive when `progressDraggable={true}`. |
+| `color` | `string` | No | Overrides the status-based bar color for this individual task (highest priority). Any CSS color value (e.g. `"#e91e63"` or `"rgb(0,150,136)"`). |
 
-**TypeScript-Typen:**
+**TypeScript types:**
 
 ```ts
 type GanttTaskStatus = "planned" | "in-progress" | "done" | "blocked";
@@ -130,87 +132,87 @@ type GanttTask = {
 
 ---
 
-### Komponenten-Props: `GanttChartProps`
+### Component props: `GanttChartProps`
 
-#### Kerndaten
+#### Core data
 
-| Prop | Typ | Standard | Beschreibung |
+| Prop | Type | Default | Description |
 |---|---|---|---|
-| `tasks` | `GanttTask[]` | — | **Pflichtfeld.** Flaches Array aller Tasks. Hierarchie wird intern über `parentId` aufgebaut. Änderungen werden über die `onTasksChange`-Callback nach oben gespiegelt. |
-| `timeScale` | `GanttTimeScale` | `"months"` | Initialer Zeitskalentyp: `"days"` · `"weeks"` · `"months"` · `"quarters"`. Der Nutzer kann die Skala über die Toolbar jederzeit wechseln. |
+| `tasks` | `GanttTask[]` | — | **Required.** Flat array of all tasks. Hierarchy is built internally via `parentId`. Changes are reflected back via the `onTasksChange` callback. |
+| `timeScale` | `GanttTimeScale` | `"months"` | Initial time scale: `"days"` · `"weeks"` · `"months"` · `"quarters"`. The user can switch the scale via the toolbar at any time. |
 
-#### Darstellung & Dimensionierung
+#### Display & sizing
 
-| Prop | Typ | Standard | Beschreibung |
+| Prop | Type | Default | Description |
 |---|---|---|---|
-| `height` | `number \| string` | `400` | Höhe des Gesamtcharts in Pixeln oder als CSS-Wert. `"auto"` passt sich dem Elternelement an. |
-| `width` | `number \| string` | `"100%"` | Breite des Gesamtcharts. Standard füllt den verfügbaren Platz. |
-| `minPanelWidth` | `number` | `200` | Mindestbreite des linken Aufgaben-Panels in Pixeln. Verhindert, dass der Nutzer das Panel zu schmal zieht. |
-| `maxPanelWidth` | `number` | `600` | Maximalbreite des linken Aufgaben-Panels in Pixeln. |
-| `virtualizeRows` | `boolean` | `false` | Wenn `true`, werden nur die aktuell sichtbaren Zeilen gerendert (virtuelle Liste). Empfohlen ab ca. 200 Tasks, da es die DOM-Größe drastisch reduziert. |
+| `height` | `number \| string` | `400` | Total chart height in pixels or as a CSS value. `"auto"` adapts to the parent element. |
+| `width` | `number \| string` | `"100%"` | Total chart width. Default fills the available space. |
+| `minPanelWidth` | `number` | `200` | Minimum width of the left task panel in pixels. Prevents the user from making the panel too narrow. |
+| `maxPanelWidth` | `number` | `600` | Maximum width of the left task panel in pixels. |
+| `virtualizeRows` | `boolean` | `false` | When `true`, only currently visible rows are rendered (virtual list). Recommended for ~200+ tasks as it drastically reduces DOM size. |
 
-#### Aufklappverhalten
+#### Expand behavior
 
-| Prop | Typ | Standard | Beschreibung |
+| Prop | Type | Default | Description |
 |---|---|---|---|
-| `initialExpandAll` | `boolean` | `false` | Startet den Chart mit allen Hierarchieebenen aufgeklappt. Standard: nur Root-Tasks sind aufgeklappt, ihre direkten Kinder sind sichtbar. |
+| `initialExpandAll` | `boolean` | `false` | Starts the chart with all hierarchy levels expanded. Default: only root tasks are expanded, their direct children are visible. |
 
-#### Zeitleiste & Bereich
+#### Timeline & range
 
-| Prop | Typ | Standard | Beschreibung |
+| Prop | Type | Default | Description |
 |---|---|---|---|
-| `defaultRangeStart` | `Date` | auto | Überschreibt den automatisch berechneten linken Rand der Zeitleiste. Nützlich um einen bestimmten Datumsbereich von Anfang an zu fixieren. |
-| `defaultRangeEnd` | `Date` | auto | Überschreibt den automatisch berechneten rechten Rand der Zeitleiste. |
+| `defaultRangeStart` | `Date` | auto | Overrides the automatically calculated left boundary of the timeline. Useful for fixing a specific date range from the start. |
+| `defaultRangeEnd` | `Date` | auto | Overrides the automatically calculated right boundary of the timeline. |
 
-> **Hinweis:** Werden `defaultRangeStart`/`defaultRangeEnd` nicht gesetzt, berechnet der Chart den Bereich automatisch aus den frühesten und spätesten Task-Daten und fügt einen 1-Monat-Puffer an beiden Enden hinzu.
+> **Note:** When `defaultRangeStart`/`defaultRangeEnd` are not set, the chart calculates the range automatically from the earliest and latest task dates and adds a 1-month buffer at both ends.
 
 #### Toolbar
 
-| Prop | Typ | Standard | Beschreibung |
+| Prop | Type | Default | Description |
 |---|---|---|---|
-| `showToolbar` | `boolean` | `true` | Blendet die gesamte Toolbar (Skalenbuttons, Datumsbereich, Aktionsbuttons) ein oder aus. |
-| `toolbarConfig` | `GanttToolbarConfig` | alle `true` | Feingranulare Steuerung einzelner Toolbar-Elemente. Nur abweichende Keys angeben — nicht gesetzte Keys bleiben sichtbar. Siehe [GanttToolbarConfig](#ganttToolbarConfig). |
+| `showToolbar` | `boolean` | `true` | Shows or hides the entire toolbar (scale buttons, date range, action buttons). |
+| `toolbarConfig` | `GanttToolbarConfig` | all `true` | Fine-grained control over individual toolbar elements. Only specify deviating keys — unset keys remain visible. See [GanttToolbarConfig](#gantttoolbarconfig). |
 
-#### Interaktionsmodi
+#### Interaction modes
 
-| Prop | Typ | Standard | Beschreibung |
+| Prop | Type | Default | Description |
 |---|---|---|---|
-| `enableBuiltinDialogs` | `boolean` | `true` | Wenn `true`, öffnen die Aktions-Icons (Hinzufügen, Bearbeiten, Löschen) eingebaute MUI-Dialoge. Wenn `false`, werden stattdessen nur die Callbacks `onAddTask`, `onEditTask`, `onDeleteTask` aufgerufen — für eigene Dialog-Implementierungen. |
-| `zoomable` | `boolean` | `false` | Ermöglicht Zoom per `Strg + Mausrad`. Ändert die Zeitskala zyklisch (Tage ↔ Wochen ↔ Monate ↔ Quartale). |
-| `draggable` | `boolean` | `false` | Erlaubt das horizontale Verschieben von Task-Balken per Drag. Ändert `startDate` und `endDate` synchron. |
-| `resizable` | `boolean` | `false` | Erlaubt das Verändern des `endDate` durch Ziehen am rechten Balkenrand. |
-| `cascadeDependencies` | `boolean` | `false` | Wenn `true`, werden beim Verschieben oder Resizen eines Tasks alle Finish-to-Start-Nachfolger (via `dependencies`) automatisch um den gleichen Zeitraum verschoben. Funktioniert transitiv über mehrere Ebenen. |
-| `inlineEdit` | `boolean` | `false` | Aktiviert Inline-Editierung des Task-Namens per Doppelklick direkt im Panel. |
-| `progressDraggable` | `boolean` | `false` | Zeigt einen Fortschritts-Handle am Task-Balken an. Der Nutzer kann den Fortschritt (0–100 %) per Drag direkt im Diagramm setzen. |
-| `showCriticalPath` | `boolean` | `false` | Hebt den kritischen Pfad farbig hervor — die längste Abhängigkeitskette, die die Projektlaufzeit bestimmt. |
+| `enableBuiltinDialogs` | `boolean` | `true` | When `true`, the action icons (Add, Edit, Delete) open built-in MUI dialogs. When `false`, only the callbacks `onAddTask`, `onEditTask`, `onDeleteTask` are called — for custom dialog implementations. |
+| `zoomable` | `boolean` | `false` | Enables zoom via `Ctrl + mouse wheel`. Cycles through time scales (Days ↔ Weeks ↔ Months ↔ Quarters). |
+| `draggable` | `boolean` | `false` | Allows horizontal dragging of task bars. Updates `startDate` and `endDate` in sync. |
+| `resizable` | `boolean` | `false` | Allows changing the `endDate` by dragging the right edge of a bar. |
+| `cascadeDependencies` | `boolean` | `false` | When `true`, moving or resizing a task automatically shifts all finish-to-start successors (via `dependencies`) by the same amount. Works transitively across multiple levels. |
+| `inlineEdit` | `boolean` | `false` | Enables inline editing of the task name by double-clicking directly in the panel. |
+| `progressDraggable` | `boolean` | `false` | Shows a progress handle on the task bar. The user can set the progress (0–100 %) by dragging directly in the chart. |
+| `showCriticalPath` | `boolean` | `false` | Highlights the critical path — the longest dependency chain that determines the project duration. |
 
-#### Theming & Farben
+#### Theming & colors
 
-| Prop | Typ | Standard | Beschreibung |
+| Prop | Type | Default | Description |
 |---|---|---|---|
-| `ganttTheme` | `GanttTheme` | — | Gebündeltes Theming-Objekt. Empfohlener Weg zur visuellen Anpassung. Einzelne Keys überschreiben die Defaults — nicht gesetzte Keys behalten ihr Standard-Aussehen. Siehe [GanttTheme](#ganttTheme). |
-| `statusColors` | `GanttStatusColors` | — | ⚠️ **Veraltet.** Bitte `ganttTheme.statusColors` verwenden. Überschreibt Balkenfarben je Status. |
-| `translations` | `Partial<GanttTranslations>` | Deutsch/Englisch | Texte für alle UI-Elemente. Nur abweichende Keys angeben. Siehe [Texte & Übersetzungen](#texte--übersetzungen). |
+| `ganttTheme` | `GanttTheme` | — | Bundled theming object. Recommended way for visual customization. Individual keys override the defaults — unset keys keep their default appearance. See [GanttTheme](#gantttheme). |
+| `statusColors` | `GanttStatusColors` | — | ⚠️ **Deprecated.** Use `ganttTheme.statusColors` instead. Overrides bar colors per status. |
+| `translations` | `Partial<GanttTranslations>` | German/English | Texts for all UI elements. Only specify deviating keys. See [Translations](#translations). |
 
 ---
 
-### `GanttToolbarConfig` {#ganttToolbarConfig}
+### `GanttToolbarConfig` {#gantttoolbarconfig}
 
-Erlaubt die selektive Ausblendung einzelner Toolbar-Elemente. Alle Felder sind optional — nicht gesetzte Keys bleiben sichtbar (`true`).
+Allows selectively hiding individual toolbar elements. All fields are optional — unset keys remain visible (`true`).
 
-| Feld | Typ | Standard | Was wird gesteuert |
+| Field | Type | Default | Controls |
 |---|---|---|---|
-| `showScaleDays` | `boolean` | `true` | Schaltfläche für Tages-Skala |
-| `showScaleWeeks` | `boolean` | `true` | Schaltfläche für Wochen-Skala |
-| `showScaleMonths` | `boolean` | `true` | Schaltfläche für Monats-Skala |
-| `showScaleQuarters` | `boolean` | `true` | Schaltfläche für Quartals-Skala |
-| `showExpandCollapseAll` | `boolean` | `true` | Alle aufklappen / Alle zuklappen |
-| `showScrollToToday` | `boolean` | `true` | „Zum heutigen Tag"-Button |
-| `showDateRange` | `boolean` | `true` | Von/Bis-Datumseingaben |
-| `showRangeReset` | `boolean` | `true` | Zurücksetzen-Button (erscheint nur wenn Bereich manuell angepasst wurde) |
-| `showResetView` | `boolean` | `true` | Ansicht zurücksetzen (Skala + Bereich auf Standardwerte) |
+| `showScaleDays` | `boolean` | `true` | Days scale button |
+| `showScaleWeeks` | `boolean` | `true` | Weeks scale button |
+| `showScaleMonths` | `boolean` | `true` | Months scale button |
+| `showScaleQuarters` | `boolean` | `true` | Quarters scale button |
+| `showExpandCollapseAll` | `boolean` | `true` | Expand all / Collapse all |
+| `showScrollToToday` | `boolean` | `true` | "Scroll to today" button |
+| `showDateRange` | `boolean` | `true` | From/To date inputs |
+| `showRangeReset` | `boolean` | `true` | Reset button (only appears when range has been manually adjusted) |
+| `showResetView` | `boolean` | `true` | Reset view (scale + range back to defaults) |
 
-**TypeScript-Typ:**
+**TypeScript type:**
 
 ```ts
 type GanttToolbarConfig = {
@@ -226,7 +228,7 @@ type GanttToolbarConfig = {
 };
 ```
 
-**Beispiel — nur Skalenbuttons anzeigen:**
+**Example — show only scale buttons:**
 
 ```tsx
 <GanttChart
@@ -243,20 +245,20 @@ type GanttToolbarConfig = {
 
 ---
 
-### `GanttTheme` {#ganttTheme}
+### `GanttTheme` {#gantttheme}
 
-Alle Felder sind optional. Nicht gesetzte Keys verwenden die MUI-Palette-Defaults.
+All fields are optional. Unset keys use the MUI palette defaults.
 
-| Feld | Typ | Standard | Beschreibung |
+| Field | Type | Default | Description |
 |---|---|---|---|
-| `statusColors` | `GanttStatusColors` | MUI-Palette | Balkenfarben je Status als CSS-Farbwerte. Alle vier Status können unabhängig gesetzt werden. |
-| `criticalPathColor` | `string` | `error.main` | Farbe der Hervorhebung für Tasks auf dem kritischen Pfad (nur relevant wenn `showCriticalPath={true}`). |
-| `milestoneColor` | `string` | `warning.main` | Farbe der Meilenstein-Raute. |
-| `todayLineColor` | `string` | `primary.main` | Farbe der vertikalen „Heute"-Linie in der Zeitleiste. |
-| `weekendColor` | `string` | `action.hover` | Hintergrundfarbe der Wochenend-Spalten (nur sichtbar in der Tages-Skala). |
-| `barBorderRadius` | `number` | `4` | Eckenradius der Task-Balken in Pixeln. `0` = eckige Balken. |
+| `statusColors` | `GanttStatusColors` | MUI palette | Bar colors per status as CSS color values. All four statuses can be set independently. |
+| `criticalPathColor` | `string` | `error.main` | Highlight color for tasks on the critical path (only relevant when `showCriticalPath={true}`). |
+| `milestoneColor` | `string` | `warning.main` | Color of the milestone diamond. |
+| `todayLineColor` | `string` | `primary.main` | Color of the vertical "today" line in the timeline. |
+| `weekendColor` | `string` | `action.hover` | Background color of weekend columns (only visible on the days scale). |
+| `barBorderRadius` | `number` | `4` | Corner radius of task bars in pixels. `0` = square bars. |
 
-**TypeScript-Typen:**
+**TypeScript types:**
 
 ```ts
 type GanttStatusColors = Partial<Record<GanttTaskStatus, string>>;
@@ -271,7 +273,7 @@ type GanttTheme = {
 };
 ```
 
-**Beispiel:**
+**Example:**
 
 ```tsx
 const ganttTheme: GanttTheme = {
@@ -292,38 +294,38 @@ const ganttTheme: GanttTheme = {
 
 ## Callbacks / Events
 
-| Callback | Signatur | Wann ausgelöst |
+| Callback | Signature | When fired |
 |---|---|---|
-| `onTaskClick` | `(task: GanttTask) => void` | Klick auf einen Task-Balken in der Zeitleiste. |
-| `onMilestoneClick` | `(task: GanttTask) => void` | Klick auf eine Meilenstein-Raute. |
-| `onAddTask` | `(parentTask?: GanttTask) => void` | Klick auf das „Hinzufügen"-Icon in einer Task-Zeile. `parentTask` ist gesetzt wenn der neue Task ein Kind sein soll. Wird nur ausgelöst wenn `enableBuiltinDialogs={false}`. |
-| `onEditTask` | `(task: GanttTask) => void` | Klick auf das „Bearbeiten"-Icon. Wird nur ausgelöst wenn `enableBuiltinDialogs={false}`. |
-| `onDeleteTask` | `(task: GanttTask) => void` | Klick auf das „Löschen"-Icon. Wird nur ausgelöst wenn `enableBuiltinDialogs={false}`. |
-| `onStatusChange` | `(task: GanttTask, status: GanttTaskStatus) => void` | Auswahl eines neuen Status im Rechtsklick-Kontextmenü des Balkens. |
-| `onTaskMoved` | `(task: GanttTask, newStart: Date, newEnd: Date) => void` | Task wurde per Drag horizontal verschoben (`draggable={true}`). `task` enthält die ursprünglichen Metadaten (id, name, status etc.) mit den **alten** Datumsangaben. Die neuen Daten befinden sich ausschließlich in `newStart` und `newEnd`. |
-| `onTaskResized` | `(task: GanttTask, newEnd: Date) => void` | Task-Balken wurde am rechten Rand per Drag verlängert/verkürzt (`resizable={true}`). |
-| `onTasksChange` | `(tasks: GanttTask[]) => void` | Wird nach **jeder** CRUD-Aktion mit der vollständigen, aktuellen Task-Liste aufgerufen. Zentraler Callback für datengetriebene Architekturen (z. B. Redux, Zustand, React Query). |
-| `onTaskCreated` | `(task: GanttTask) => void` | Neuer Task wurde über den eingebauten Dialog angelegt (`enableBuiltinDialogs={true}`). |
-| `onTaskUpdated` | `(task: GanttTask) => void` | Task wurde über den eingebauten Dialog bearbeitet (`enableBuiltinDialogs={true}`). |
-| `onTaskDeleted` | `(taskId: string) => void` | Task wurde über den eingebauten Bestätigungs-Dialog gelöscht (`enableBuiltinDialogs={true}`). |
+| `onTaskClick` | `(task: GanttTask) => void` | Click on a task bar in the timeline. |
+| `onMilestoneClick` | `(task: GanttTask) => void` | Click on a milestone diamond. |
+| `onAddTask` | `(parentTask?: GanttTask) => void` | Click on the "Add" icon in a task row. `parentTask` is set when the new task should be a child. Only fires when `enableBuiltinDialogs={false}`. |
+| `onEditTask` | `(task: GanttTask) => void` | Click on the "Edit" icon. Only fires when `enableBuiltinDialogs={false}`. |
+| `onDeleteTask` | `(task: GanttTask) => void` | Click on the "Delete" icon. Only fires when `enableBuiltinDialogs={false}`. |
+| `onStatusChange` | `(task: GanttTask, status: GanttTaskStatus) => void` | New status selected via the right-click context menu on the bar. |
+| `onTaskMoved` | `(task: GanttTask, newStart: Date, newEnd: Date) => void` | Task was horizontally moved by drag (`draggable={true}`). `task` contains the original metadata (id, name, status, etc.) with the **old** dates. The new dates are exclusively in `newStart` and `newEnd`. |
+| `onTaskResized` | `(task: GanttTask, newEnd: Date) => void` | Task bar was extended/shortened by dragging the right edge (`resizable={true}`). |
+| `onTasksChange` | `(tasks: GanttTask[]) => void` | Called after **every** CRUD action with the complete, current task list. Central callback for data-driven architectures (e.g. Redux, Zustand, React Query). |
+| `onTaskCreated` | `(task: GanttTask) => void` | New task was created via the built-in dialog (`enableBuiltinDialogs={true}`). |
+| `onTaskUpdated` | `(task: GanttTask) => void` | Task was edited via the built-in dialog (`enableBuiltinDialogs={true}`). |
+| `onTaskDeleted` | `(taskId: string) => void` | Task was deleted via the built-in confirmation dialog (`enableBuiltinDialogs={true}`). |
 
-> **Tipp — `onTasksChange` vs. spezifische Callbacks:** Für einfache Datenspeicherung reicht `onTasksChange` allein aus. Die spezifischen Callbacks (`onTaskCreated`, `onTaskUpdated` etc.) sind für Anwendungen gedacht, die auf bestimmte Aktionen unterschiedlich reagieren müssen (z. B. separate API-Calls für Create/Update/Delete).
+> **Tip — `onTasksChange` vs. specific callbacks:** For simple data persistence, `onTasksChange` alone is sufficient. The specific callbacks (`onTaskCreated`, `onTaskUpdated`, etc.) are intended for applications that need to react differently to specific actions (e.g. separate API calls for Create/Update/Delete).
 
 ---
 
-## Texte & Übersetzungen
+## Translations {#translations}
 
-Alle angezeigten Texte können über die `translations`-Prop überschrieben werden. Es müssen nur die Keys angegeben werden, die vom Standard abweichen.
+All displayed texts can be overridden via the `translations` prop. Only the keys that deviate from the default need to be specified.
 
-> **Wichtig:** Die Standardwerte der Komponente sind eine Mischung aus Deutsch (Toolbar-Labels) und Englisch (Status-Labels). Für eine vollständig einheitliche Sprache sollten **alle** Keys gesetzt werden.
+> **Important:** The component's default values are a mix of German (toolbar labels) and English (status labels). For a completely consistent language, **all** keys should be set.
 
-Die vorausgefüllten deutschen Standardwerte können direkt importiert werden:
+The pre-filled German default values can be imported directly:
 
 ```ts
 import { DEFAULT_GANTT_TRANSLATIONS } from '@tsdev/mui-ts-library';
 import type { GanttTranslations } from '@tsdev/mui-ts-library';
 
-// Vollständiger TypeScript-Typ:
+// Full TypeScript type:
 type GanttTranslations = {
   scaleDays: string;
   scaleWeeks: string;
@@ -361,55 +363,55 @@ type GanttTranslations = {
   dialogFieldMilestone: string;
   dialogFieldParent: string;
   dialogFieldParentNone: string;
-  dialogDeleteConfirm: string;  // {name} wird durch den Task-Namen ersetzt
+  dialogDeleteConfirm: string;  // {name} is replaced with the task name at runtime
   dialogFieldDependencies: string;
   dialogFieldDependenciesNone: string;
 };
 ```
 
-| Key | Standard-Wert | Beschreibung |
+| Key | Default value | Description |
 |---|---|---|
-| `scaleDays` | `"Tage"` | Toolbar-Button für Tages-Skala |
-| `scaleWeeks` | `"Wochen"` | Toolbar-Button für Wochen-Skala |
-| `scaleMonths` | `"Monate"` | Toolbar-Button für Monats-Skala |
-| `scaleQuarters` | `"Quartale"` | Toolbar-Button für Quartals-Skala |
-| `rangeFrom` | `"Von"` | Label des Start-Datumseingabe |
-| `rangeTo` | `"Bis"` | Label des End-Datumseingabe |
-| `rangeResetTooltip` | `"Bereich zurücksetzen"` | Tooltip des Zurücksetzen-Buttons |
-| `scrollToTodayTooltip` | `"Zum heutigen Tag"` | Tooltip des Heute-Buttons |
-| `expandAllTooltip` | `"Alle aufklappen"` | Tooltip des Aufklappen-Buttons |
-| `collapseAllTooltip` | `"Alle zuklappen"` | Tooltip des Zuklappen-Buttons |
-| `resetViewTooltip` | `"Ansicht zurücksetzen"` | Tooltip des Ansicht-Reset-Buttons |
-| `weekColumnPrefix` | `"KW"` | Prefix für Kalenderwochen-Spalten (z. B. „KW 12"). Englisch: `"W"` |
-| `dateLocale` | `"de-DE"` | BCP-47-Locale für die Datumsformatierung im Timeline-Header (z. B. `"en-US"`, `"fr-FR"`) |
-| `columnName` | `"Name"` | Spaltenheader des linken Panels |
-| `columnStatus` | `"Status"` | Spaltenheader des Status-Chips |
-| `columnActions` | `"Aktionen"` | Spaltenheader der Aktions-Icons |
-| `addTaskTooltip` | `"Aufgabe hinzufügen"` | Tooltip des Plus-Icons in einer Zeile |
-| `editTaskTooltip` | `"Aufgabe bearbeiten"` | Tooltip des Stift-Icons |
-| `deleteTaskTooltip` | `"Aufgabe löschen"` | Tooltip des Papierkorb-Icons |
-| `statusPlanned` | `"Planned"` | Label für Status „geplant" |
-| `statusInProgress` | `"In Progress"` | Label für Status „in Bearbeitung" |
-| `statusDone` | `"Done"` | Label für Status „erledigt" |
-| `statusBlocked` | `"Blocked"` | Label für Status „blockiert" |
-| `dialogAddTitle` | `"Aufgabe hinzufügen"` | Titel des Hinzufügen-Dialogs |
-| `dialogEditTitle` | `"Aufgabe bearbeiten"` | Titel des Bearbeiten-Dialogs |
-| `dialogDeleteTitle` | `"Aufgabe löschen"` | Titel des Löschen-Dialogs |
-| `dialogSave` | `"Speichern"` | Speichern-Button im Dialog |
-| `dialogCancel` | `"Abbrechen"` | Abbrechen-Button im Dialog |
-| `dialogDelete` | `"Löschen"` | Löschen-Button im Bestätigungs-Dialog |
-| `dialogFieldName` | `"Name"` | Formularfeld-Label für den Task-Namen |
-| `dialogFieldStartDate` | `"Startdatum"` | Formularfeld-Label für das Startdatum |
-| `dialogFieldEndDate` | `"Enddatum"` | Formularfeld-Label für das Enddatum |
-| `dialogFieldStatus` | `"Status"` | Formularfeld-Label für den Status |
-| `dialogFieldMilestone` | `"Ist Meilenstein"` | Checkbox-Label für Meilenstein-Flag |
-| `dialogFieldParent` | `"Übergeordnete Aufgabe"` | Formularfeld-Label für den Parent-Task |
-| `dialogFieldParentNone` | `"— Keine —"` | Option für „kein übergeordneter Task" |
-| `dialogFieldDependencies` | `"Vorgänger"` | Formularfeld-Label für Abhängigkeiten |
-| `dialogFieldDependenciesNone` | `"— Keine —"` | Option für „keine Abhängigkeiten" |
-| `dialogDeleteConfirm` | `"Soll die Aufgabe \"{name}\" wirklich gelöscht werden?"` | Bestätigungstext. `{name}` wird durch den Task-Namen ersetzt. |
+| `scaleDays` | `"Tage"` | Toolbar button for days scale |
+| `scaleWeeks` | `"Wochen"` | Toolbar button for weeks scale |
+| `scaleMonths` | `"Monate"` | Toolbar button for months scale |
+| `scaleQuarters` | `"Quartale"` | Toolbar button for quarters scale |
+| `rangeFrom` | `"Von"` | Label for the start date input |
+| `rangeTo` | `"Bis"` | Label for the end date input |
+| `rangeResetTooltip` | `"Bereich zurücksetzen"` | Tooltip for the reset button |
+| `scrollToTodayTooltip` | `"Zum heutigen Tag"` | Tooltip for the today button |
+| `expandAllTooltip` | `"Alle aufklappen"` | Tooltip for the expand all button |
+| `collapseAllTooltip` | `"Alle zuklappen"` | Tooltip for the collapse all button |
+| `resetViewTooltip` | `"Ansicht zurücksetzen"` | Tooltip for the reset view button |
+| `weekColumnPrefix` | `"KW"` | Prefix for calendar week columns (e.g. "KW 12"). English: `"W"` |
+| `dateLocale` | `"de-DE"` | BCP-47 locale for date formatting in the timeline header (e.g. `"en-US"`, `"fr-FR"`) |
+| `columnName` | `"Name"` | Column header of the left panel |
+| `columnStatus` | `"Status"` | Column header for the status chip |
+| `columnActions` | `"Aktionen"` | Column header for the action icons |
+| `addTaskTooltip` | `"Aufgabe hinzufügen"` | Tooltip for the plus icon in a row |
+| `editTaskTooltip` | `"Aufgabe bearbeiten"` | Tooltip for the edit icon |
+| `deleteTaskTooltip` | `"Aufgabe löschen"` | Tooltip for the delete icon |
+| `statusPlanned` | `"Planned"` | Label for "planned" status |
+| `statusInProgress` | `"In Progress"` | Label for "in progress" status |
+| `statusDone` | `"Done"` | Label for "done" status |
+| `statusBlocked` | `"Blocked"` | Label for "blocked" status |
+| `dialogAddTitle` | `"Aufgabe hinzufügen"` | Title of the add dialog |
+| `dialogEditTitle` | `"Aufgabe bearbeiten"` | Title of the edit dialog |
+| `dialogDeleteTitle` | `"Aufgabe löschen"` | Title of the delete dialog |
+| `dialogSave` | `"Speichern"` | Save button in the dialog |
+| `dialogCancel` | `"Abbrechen"` | Cancel button in the dialog |
+| `dialogDelete` | `"Löschen"` | Delete button in the confirmation dialog |
+| `dialogFieldName` | `"Name"` | Form field label for the task name |
+| `dialogFieldStartDate` | `"Startdatum"` | Form field label for the start date |
+| `dialogFieldEndDate` | `"Enddatum"` | Form field label for the end date |
+| `dialogFieldStatus` | `"Status"` | Form field label for the status |
+| `dialogFieldMilestone` | `"Ist Meilenstein"` | Checkbox label for the milestone flag |
+| `dialogFieldParent` | `"Übergeordnete Aufgabe"` | Form field label for the parent task |
+| `dialogFieldParentNone` | `"— Keine —"` | Option for "no parent task" |
+| `dialogFieldDependencies` | `"Vorgänger"` | Form field label for dependencies |
+| `dialogFieldDependenciesNone` | `"— Keine —"` | Option for "no dependencies" |
+| `dialogDeleteConfirm` | `"Soll die Aufgabe \"{name}\" wirklich gelöscht werden?"` | Confirmation text. `{name}` is replaced with the task name. |
 
-**Vollständige englische Übersetzung:**
+**Full English translation:**
 
 ```tsx
 <GanttChart
@@ -460,9 +462,9 @@ type GanttTranslations = {
 
 ---
 
-## Anwendungsbeispiele
+## Usage Examples
 
-### Nur-Lese-Ansicht (keine Bearbeitung)
+### Read-only view (no editing)
 
 ```tsx
 <GanttChart
@@ -470,11 +472,11 @@ type GanttTranslations = {
   timeScale="weeks"
   showToolbar={false}
   enableBuiltinDialogs={false}
-  onTaskClick={(task) => console.log('Geklickt:', task.name)}
+  onTaskClick={(task) => console.log('Clicked:', task.name)}
 />
 ```
 
-### Vollständig interaktiv mit externem State
+### Fully interactive with external state
 
 ```tsx
 const [tasks, setTasks] = useState<GanttTask[]>(initialTasks);
@@ -495,7 +497,7 @@ const [tasks, setTasks] = useState<GanttTask[]>(initialTasks);
 />
 ```
 
-### Mit benutzerdefiniertem Bearbeiten-Dialog
+### With a custom edit dialog
 
 ```tsx
 const [editTarget, setEditTarget] = useState<GanttTask | null>(null);
@@ -510,7 +512,7 @@ const [editTarget, setEditTarget] = useState<GanttTask | null>(null);
 {editTarget && <MyCustomDialog task={editTarget} onClose={() => setEditTarget(null)} />}
 ```
 
-### Meilensteine
+### Milestones
 
 ```tsx
 const tasks: GanttTask[] = [
@@ -525,10 +527,10 @@ const tasks: GanttTask[] = [
 ];
 ```
 
-### Virtualisierung für große Datensätze
+### Virtualization for large datasets
 
 ```tsx
-// Empfohlen ab ca. 200 Tasks
+{/* Recommended for 200+ tasks */}
 <GanttChart
   tasks={largeTasks}
   virtualizeRows
@@ -538,21 +540,21 @@ const tasks: GanttTask[] = [
 
 ---
 
-## Barrierefreiheit
+## Accessibility
 
-- Alle Aktions-Icons (Hinzufügen, Bearbeiten, Löschen) sind mit Tooltips versehen, die als `aria-label` dienen.
-- Status-Chips verwenden semantische MUI-Farbzuweisungen, die in Dark-Mode-Themes automatisch angepasst werden.
-- Die Texte der Toolbar-Buttons und Dialog-Labels sind vollständig über `translations` lokalisierbar, inklusive der `aria`-relevanten Beschriftungen.
-- Tastaturnavigation: Dialoge folgen dem MUI-Standard (Fokus-Trap, Escape zum Schließen).
+- All action icons (Add, Edit, Delete) are equipped with tooltips that serve as `aria-label`.
+- Status chips use semantic MUI color assignments that are automatically adapted in dark mode themes.
+- All toolbar button texts and dialog labels are fully localizable via `translations`, including accessibility-relevant labels.
+- Keyboard navigation: dialogs follow the MUI standard (focus trap, Escape to close).
 
 ---
 
-## Hinweise und bekannte Einschränkungen
+## Notes and Known Limitations
 
-| Thema | Hinweis |
+| Topic | Note |
 |---|---|
-| **Standard-Sprache** | Die Standardtexte sind eine Mischung: Toolbar auf Deutsch, Status-Labels auf Englisch. Für einheitliche Lokalisierung alle Keys setzen. |
-| **`statusColors` (deprecated)** | Die `statusColors`-Prop auf Komponentenebene ist veraltet. Bitte `ganttTheme.statusColors` verwenden. Wenn beide gesetzt sind, hat `ganttTheme.statusColors` Vorrang. |
-| **`virtualizeRows` in jsdom** | In Unit-Tests mit jsdom ist `clientHeight` immer 0, weshalb nur Overscan-Zeilen im DOM erscheinen. Das ist kein Fehler — in realen Browsern funktioniert die Virtualisierung korrekt. |
-| **`cascadeDependencies`** | Wirkt nur auf Finish-to-Start-Abhängigkeiten (via `dependencies`-Array). Zirkuläre Abhängigkeiten werden erkannt und abgebrochen. |
-| **Fortschritts-Drag** | `progressDraggable` benötigt `progress` in den Task-Daten. Wenn `progress` undefiniert ist, wird der Handle nicht angezeigt. |
+| **Default language** | The default texts are a mix: toolbar labels in German, status labels in English. For consistent localization, set all keys. |
+| **`statusColors` (deprecated)** | The `statusColors` prop at the component level is deprecated. Use `ganttTheme.statusColors` instead. When both are set, `ganttTheme.statusColors` takes precedence. |
+| **`virtualizeRows` in jsdom** | In unit tests with jsdom, `clientHeight` is always 0, so only overscan rows appear in the DOM. This is not a bug — virtualization works correctly in real browsers. |
+| **`cascadeDependencies`** | Only applies to finish-to-start dependencies (via the `dependencies` array). Circular dependencies are detected and aborted. |
+| **Progress drag** | `progressDraggable` requires `progress` in the task data. When `progress` is undefined, the handle is not shown. |

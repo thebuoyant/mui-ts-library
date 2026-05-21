@@ -1,23 +1,25 @@
-# TagSelection — Benutzerhandbuch
+# TagSelection — User Manual
 
-## Überblick
+> [Deutsche Version →](TagSelection.de.md)
 
-Die `TagSelection`-Komponente ist ein flexibles Multi-Tag-Auswahlfeld auf Basis von React und Material UI. Sie kombiniert eine Such-Autocomplete-Eingabe mit einer Chip-basierten Anzeige der ausgewählten Tags und unterstützt asynchrones Laden, Tag-Limits, freie Tag-Erstellung und vollständige Tastatursteuerung.
+## Overview
 
-**Typische Einsatzgebiete:**
+The `TagSelection` component is a flexible multi-tag selector built on React and Material UI. It combines a search autocomplete input with a chip-based display of selected tags, and supports async loading, tag limits, free tag creation, and full keyboard navigation.
 
-- Schlagwort- oder Kategorie-Zuweisung in Formularen (Artikel, Produkte, Tickets)
-- Skill-Auswahl in HR- oder Profil-Verwaltungsanwendungen
-- Filterauswahl in Suchmasken und Dashboard-Filtern
-- Tag-basiertes Labeling in Content-Management-Systemen
+**Typical use cases:**
 
-![TagSelection – Komponentenvorschau](TagSelection.png)
+- Keyword or category assignment in forms (articles, products, tickets)
+- Skill selection in HR or profile management applications
+- Filter selection in search masks and dashboard filters
+- Tag-based labeling in content management systems
+
+![TagSelection – Component Preview](TagSelection.png)
 
 ---
 
-## Technische Voraussetzungen
+## Prerequisites
 
-| Abhängigkeit | Mindestversion |
+| Dependency | Minimum version |
 |---|---|
 | React | 19 |
 | TypeScript | 5.x |
@@ -40,7 +42,7 @@ import type {
 
 ---
 
-## Schnellstart
+## Quick Start
 
 ```tsx
 import { TagSelection } from '@tsdev/mui-ts-library';
@@ -69,25 +71,25 @@ function App() {
 
 ---
 
-## Props-Referenz
+## Props Reference
 
-### Datenstruktur: `TagSelectionItem`
+### Data structure: `TagSelectionItem`
 
-Jeder Tag wird als `TagSelectionItem`-Objekt übergeben. Das gesamte Array (ausgewählte, verfügbare und deaktivierte Tags) wird in der `tags`-Prop zusammengefasst.
+Each tag is passed as a `TagSelectionItem` object. The entire array (selected, available, and disabled tags) is combined in the `tags` prop.
 
-| Feld | Typ | Pflicht | Beschreibung |
+| Field | Type | Required | Description |
 |---|---|---|---|
-| `id` | `string` | **Ja** | Eindeutige Kennung des Tags. Wird als React-Key und für interne Store-Operationen (Select/Delete) verwendet. Muss innerhalb des `tags`-Arrays einmalig sein. |
-| `label` | `string` | **Ja** | Angezeigter Text des Tags — erscheint im Chip und in der Autocomplete-Dropdown-Liste. |
-| `selected` | `boolean` | Nein | Wenn `true`, ist der Tag initial ausgewählt und erscheint im Chip-Bereich. Standard: `false`. |
-| `disabled` | `boolean` | Nein | Wenn `true`, ist der Tag nicht auswählbar und erscheint nicht in der Autocomplete-Dropdown-Liste. Bereits ausgewählte Tags können bei `disabled: true` nicht gelöscht werden. |
-| `color` | `TagColor` | Nein | Semantische MUI-Theme-Farbe des Chips: `"default"` · `"primary"` · `"secondary"` · `"error"` · `"info"` · `"success"` · `"warning"`. Empfohlener Weg für Dark-Mode-kompatible Farbgebung, da die Farben aus dem aktiven MUI-Theme stammen. |
-| `foregroundColor` | `string` | Nein | Individuelle Schriftfarbe als CSS-Farbwert (z. B. `"#ffffff"`). Hat Vorrang vor `color`. Escape-Hatch für Branding-Farben, die nicht im MUI-Theme definiert sind. |
-| `backgroundColor` | `string` | Nein | Individuelle Hintergrundfarbe als CSS-Farbwert. Wird auch als Rahmenfarbe verwendet. Hat Vorrang vor `color`. |
+| `id` | `string` | **Yes** | Unique tag identifier. Used as a React key and for internal store operations (Select/Delete). Must be unique within the `tags` array. |
+| `label` | `string` | **Yes** | Display text of the tag — appears in the chip and in the autocomplete dropdown list. |
+| `selected` | `boolean` | No | When `true`, the tag is initially selected and appears in the chip area. Default: `false`. |
+| `disabled` | `boolean` | No | When `true`, the tag cannot be selected and does not appear in the autocomplete dropdown list. Already selected tags with `disabled: true` cannot be deleted. |
+| `color` | `TagColor` | No | Semantic MUI theme color of the chip: `"default"` · `"primary"` · `"secondary"` · `"error"` · `"info"` · `"success"` · `"warning"`. Recommended approach for dark-mode-compatible coloring, as the colors come from the active MUI theme. |
+| `foregroundColor` | `string` | No | Custom text color as a CSS color value (e.g. `"#ffffff"`). Takes precedence over `color`. Escape hatch for brand colors not defined in the MUI theme. |
+| `backgroundColor` | `string` | No | Custom background color as a CSS color value. Also used as the border color. Takes precedence over `color`. |
 
-> **Hinweis zu Farb-Priorität:** Wenn `foregroundColor` oder `backgroundColor` gesetzt sind, wird `color` komplett ignoriert. Die beiden Systeme schließen sich gegenseitig aus.
+> **Note on color priority:** When `foregroundColor` or `backgroundColor` are set, `color` is completely ignored. The two systems are mutually exclusive.
 
-**TypeScript-Typen:**
+**TypeScript types:**
 
 ```ts
 type TagColor =
@@ -112,50 +114,50 @@ type TagSelectionItem = {
 
 ---
 
-### Komponenten-Props: `TagSelectionProps`
+### Component props: `TagSelectionProps`
 
-#### Darstellung & Sichtbarkeit
+#### Display & visibility
 
-| Prop | Typ | Standard | Beschreibung |
+| Prop | Type | Default | Description |
 |---|---|---|---|
-| `tags` | `TagSelectionItem[]` | — | **Pflichtfeld.** Vollständiges Tag-Array inklusive ausgewählter, verfügbarer und deaktivierter Tags. Zustandsänderungen (Select, Delete, Create) werden über Callbacks nach oben gespiegelt. |
-| `showSelectedTags` | `boolean` | `true` | Zeigt den oberen Bereich mit den ausgewählten Tags als Chips an. Wenn `false`, wird der gesamte Chip-Bereich ausgeblendet — die Autocomplete bleibt sichtbar. |
-| `showSelectedTagsLabel` | `boolean` | `true` | Zeigt das Label-Heading über dem Chip-Bereich an (Standard: „Selected tags"). Kann versteckt werden wenn der Kontext selbsterklärend ist. |
-| `showAutoComplete` | `boolean` | `true` | Zeigt das Such-Eingabefeld an. Wenn `false`, kann der Nutzer keine neuen Tags auswählen — der Chip-Bereich bleibt sichtbar (reine Anzeige). |
-| `inputSize` | `"small" \| "medium"` | `"medium"` | Größe der Autocomplete-Eingabe gemäß MUI-Standard. Beeinflusst Schriftgröße, Innenabstand und Höhe des Eingabefelds. |
-| `chipSize` | `"small" \| "medium"` | `"small"` | Größe aller Chips — sowohl im Auswahl-Bereich als auch in der Dropdown-Liste. Sollte zur `inputSize` passen (`"small"` + `"small"` oder `"medium"` + `"medium"`). |
+| `tags` | `TagSelectionItem[]` | — | **Required.** Complete tag array including selected, available, and disabled tags. State changes (Select, Delete, Create) are reflected back via callbacks. |
+| `showSelectedTags` | `boolean` | `true` | Shows the upper area with selected tags as chips. When `false`, the entire chip area is hidden — the autocomplete remains visible. |
+| `showSelectedTagsLabel` | `boolean` | `true` | Shows the label heading above the chip area (default: "Selected tags"). Can be hidden when the context is self-explanatory. |
+| `showAutoComplete` | `boolean` | `true` | Shows the search input field. When `false`, the user cannot add new tags — the chip area remains visible (display only). |
+| `inputSize` | `"small" \| "medium"` | `"medium"` | Size of the autocomplete input per MUI standard. Affects font size, padding, and input height. |
+| `chipSize` | `"small" \| "medium"` | `"small"` | Size of all chips — both in the selection area and in the dropdown list. Should match `inputSize` (`"small"` + `"small"` or `"medium"` + `"medium"`). |
 
-#### Zustand & Verhalten
+#### State & behavior
 
-| Prop | Typ | Standard | Beschreibung |
+| Prop | Type | Default | Description |
 |---|---|---|---|
-| `disabled` | `boolean` | `false` | Deaktiviert die gesamte Komponente. Das Autocomplete-Eingabefeld wird gesperrt; ausgewählte Chips werden grau dargestellt und sind nicht löschbar. Nützlich während Formular-Submissions oder in reinen Lese-Ansichten. |
-| `loading` | `boolean` | `false` | Zeigt einen Ladezustand im Autocomplete-Dropdown an. Gedacht für asynchrones Laden von Tags aus einer API. Die Ladeanimation erscheint wenn das Dropdown geöffnet ist und das `tags`-Array noch leer ist. |
-| `maxTags` | `number` | — | Maximale Anzahl gleichzeitig auswählbarer Tags. Wenn das Limit erreicht ist, wird das Autocomplete-Eingabefeld automatisch deaktiviert und ein Hinweistext erscheint. Das Entfernen eines ausgewählten Tags entsperrt das Feld wieder. |
-| `allowCreate` | `boolean` | `false` | Aktiviert den freien Texteingabe-Modus. Wenn der Nutzer einen Text eintippt, der keinem bestehenden Tag entspricht (auch keine Teilübereinstimmung), wechselt das Eingabefeld in den Create-Mode: Im Input erscheinen ein CheckIcon (bestätigen) und ein CloseIcon (abbrechen), darunter werden 7 Theme-Farb-Chips zur Farbauswahl angezeigt. Der neue Tag wird intern sofort als selektiert markiert. Bestätigen ist per Klick auf das CheckIcon **oder** per **Enter**-Taste möglich. `onTagCreate` informiert den Aufrufer über den erstellten Tag. |
-| `maxVisibleChips` | `number` | — | Maximale Anzahl sichtbarer Chips im Auswahl-Bereich. Überzählige Chips werden hinter einem `+N`-Chip verborgen. Ein Klick auf `+N` öffnet einen Popover mit den versteckten Chips — diese können dort auch gelöscht werden. Ohne diesen Prop werden alle Chips angezeigt. |
-| `popoverPlacement` | `"top" \| "bottom"` | `"bottom"` | Öffnungsrichtung des Overflow-Popovers (relativ zum `+N`-Chip). Nur relevant wenn `maxVisibleChips` gesetzt ist. |
-| `listboxMaxHeight` | `number` | — | Maximale Höhe der Autocomplete-Dropdown-Liste in Pixeln. Sobald die Liste höher wäre, erscheint eine vertikale Scrollbar. Ohne diesen Prop gilt MUI's interner Standard. |
+| `disabled` | `boolean` | `false` | Disables the entire component. The autocomplete input is locked; selected chips are grayed out and cannot be deleted. Useful during form submissions or in read-only views. |
+| `loading` | `boolean` | `false` | Shows a loading state in the autocomplete dropdown. Intended for async loading of tags from an API. The loading animation appears when the dropdown is open and the `tags` array is still empty. |
+| `maxTags` | `number` | — | Maximum number of simultaneously selectable tags. When the limit is reached, the autocomplete input is automatically disabled and a hint text appears. Removing a selected tag unlocks the field again. |
+| `allowCreate` | `boolean` | `false` | Enables free text input mode. When the user types text that does not match any existing tag (including no partial match), the input switches to create mode: a CheckIcon (confirm) and CloseIcon (cancel) appear in the input, and 7 theme color chips for color selection appear below. The new tag is immediately marked as selected internally. Confirmation is possible by clicking the CheckIcon **or pressing Enter**. `onTagCreate` informs the caller about the created tag. |
+| `maxVisibleChips` | `number` | — | Maximum number of visible chips in the selection area. Excess chips are hidden behind a `+N` chip. Clicking `+N` opens a popover with the hidden chips — they can also be deleted there. Without this prop, all chips are shown. |
+| `popoverPlacement` | `"top" \| "bottom"` | `"bottom"` | Opening direction of the overflow popover (relative to the `+N` chip). Only relevant when `maxVisibleChips` is set. |
+| `listboxMaxHeight` | `number` | — | Maximum height of the autocomplete dropdown list in pixels. Once the list would be taller, a vertical scrollbar appears. Without this prop, MUI's internal default applies. |
 
-#### Übersetzung
+#### Translation
 
-| Prop | Typ | Standard | Beschreibung |
+| Prop | Type | Default | Description |
 |---|---|---|---|
-| `translation` | `Partial<TagSelectionTranslation>` | Englische Defaults | Texte für alle angezeigten Beschriftungen. Nur abweichende Keys angeben — nicht gesetzte Keys fallen auf die englischen Standardwerte zurück. Siehe [Texte & Übersetzungen](#texte--übersetzungen). |
+| `translation` | `Partial<TagSelectionTranslation>` | English defaults | Texts for all displayed labels. Only specify deviating keys — unset keys fall back to the English defaults. See [Translations](#translations). |
 
 ---
 
 ## Callbacks / Events
 
-| Callback | Signatur | Wann ausgelöst |
+| Callback | Signature | When fired |
 |---|---|---|
-| `onTagSelect` | `(tag: TagSelectionItem, selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | Ein verfügbarer Tag wurde aus der Dropdown-Liste ausgewählt. `tag` enthält den ausgewählten Tag mit `selected: true`. `selectedTags` ist die vollständige Liste der nun ausgewählten Tags. `allTags` ist das vollständige Tag-Array inklusive deaktivierter Tags. |
-| `onTagDelete` | `(tag: TagSelectionItem, selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | Das Lösch-Icon eines ausgewählten Chips wurde geklickt. `tag` enthält den entfernten Tag mit `selected: false`. `selectedTags` ist die verbleibende Auswahl. `allTags` ist das vollständige Array nach dem Entfernen. |
-| `onTagsChange` | `(selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | Wird nach **jeder** Änderung der Auswahl aufgerufen — sowohl nach Select als auch nach Delete. Zentraler Callback für datengetriebene Architekturen. |
-| `onSearchChange` | `(searchValue: string) => void` | Wird bei jeder Änderung des Suchtexts im Autocomplete-Feld aufgerufen. Nützlich für serverseitige Filterung oder Suche. |
-| `onTagCreate` | `(label: string, color: TagColor) => void` | Wird ausgelöst wenn der Nutzer im Create-Mode das CheckIcon klickt **oder Enter drückt** (`allowCreate={true}`). `label` ist der eingetippte Text, `color` die gewählte MUI-Theme-Farbe (Standard: `"default"`). Der neue Tag wird intern bereits als selektiert markiert — `onTagCreate` dient der Synchronisation des externen States. |
+| `onTagSelect` | `(tag: TagSelectionItem, selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | An available tag was selected from the dropdown list. `tag` contains the selected tag with `selected: true`. `selectedTags` is the complete list of now selected tags. `allTags` is the complete tag array including disabled tags. |
+| `onTagDelete` | `(tag: TagSelectionItem, selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | The delete icon of a selected chip was clicked. `tag` contains the removed tag with `selected: false`. `selectedTags` is the remaining selection. `allTags` is the complete array after removal. |
+| `onTagsChange` | `(selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | Called after **every** selection change — both after Select and Delete. Central callback for data-driven architectures. |
+| `onSearchChange` | `(searchValue: string) => void` | Called on every change of the search text in the autocomplete field. Useful for server-side filtering or search. |
+| `onTagCreate` | `(label: string, color: TagColor) => void` | Fired when the user clicks the CheckIcon **or presses Enter** in create mode (`allowCreate={true}`). `label` is the typed text, `color` is the selected MUI theme color (default: `"default"`). The new tag is already internally marked as selected — `onTagCreate` serves to synchronize the external state. |
 
-> **Wichtig zu `onTagCreate`:** Der neue Tag wird von der Komponente intern sofort mit `selected: true` in den Store eingefügt. `onTagCreate` wird danach ausgelöst damit der Aufrufer seinen externen State (`tags`-Prop) synchronisieren kann. Dabei **muss `selected: true`** gesetzt werden, sonst überschreibt das nächste Re-Render den internen Zustand:
+> **Important about `onTagCreate`:** The new tag is immediately inserted into the store by the component with `selected: true`. `onTagCreate` is then fired so the caller can synchronize their external state (`tags` prop). **`selected: true` must be set**, otherwise the next re-render will overwrite the internal state:
 >
 > ```tsx
 > onTagCreate={(label, color) => {
@@ -168,15 +170,15 @@ type TagSelectionItem = {
 
 ---
 
-## Texte & Übersetzungen {#texte--übersetzungen}
+## Translations {#translations}
 
-Alle angezeigten Texte können über die `translation`-Prop überschrieben werden. Es müssen nur die Keys angegeben werden, die vom Standard abweichen. Die englischen Standardwerte können direkt importiert werden:
+All displayed texts can be overridden via the `translation` prop. Only the keys that deviate from the default need to be specified. The English default values can be imported directly:
 
 ```ts
 import { DEFAULT_TAG_SELECTION_TRANSLATION } from '@tsdev/mui-ts-library';
 import type { TagSelectionTranslation } from '@tsdev/mui-ts-library';
 
-// Vollständiger TypeScript-Typ:
+// Full TypeScript type:
 type TagSelectionTranslation = {
   selectedTagsLabel:   string;
   autoCompleteLabel:   string;
@@ -188,17 +190,17 @@ type TagSelectionTranslation = {
 };
 ```
 
-| Key | Standard-Wert | Beschreibung |
+| Key | Default value | Description |
 |---|---|---|
-| `selectedTagsLabel` | `"Selected tags"` | Überschrift über dem Chip-Bereich. Nur sichtbar wenn `showSelectedTagsLabel={true}`. |
-| `autoCompleteLabel` | `"Search and add tags"` | Label des Autocomplete-Eingabefelds (schwebend, MUI-Standard). Dient gleichzeitig als `aria-label` für Screenreader. |
-| `noSelectedTagsText` | `"No tags selected."` | Hinweistext im Chip-Bereich wenn noch keine Tags ausgewählt sind. |
-| `noAvailableTagsText` | `"No tags available."` | Text in der Dropdown-Liste wenn keine passenden Tags gefunden werden (Filterung oder leere Liste). |
-| `placeholder` | `"Type to search..."` | Platzhaltertext im Autocomplete-Eingabefeld. |
-| `loadingText` | `"Loading..."` | Text in der Dropdown-Liste während des Ladevorgangs (`loading={true}`). |
-| `maxTagsReachedText` | `"Maximum number of tags reached."` | Hilfstext unterhalb des Eingabefelds wenn das Tag-Limit erreicht ist (`maxTags` gesetzt). |
+| `selectedTagsLabel` | `"Selected tags"` | Heading above the chip area. Only visible when `showSelectedTagsLabel={true}`. |
+| `autoCompleteLabel` | `"Search and add tags"` | Label of the autocomplete input field (floating, MUI standard). Also serves as `aria-label` for screen readers. |
+| `noSelectedTagsText` | `"No tags selected."` | Hint text in the chip area when no tags are selected yet. |
+| `noAvailableTagsText` | `"No tags available."` | Text in the dropdown list when no matching tags are found (filtering or empty list). |
+| `placeholder` | `"Type to search..."` | Placeholder text in the autocomplete input field. |
+| `loadingText` | `"Loading..."` | Text in the dropdown list during loading (`loading={true}`). |
+| `maxTagsReachedText` | `"Maximum number of tags reached."` | Helper text below the input field when the tag limit is reached (`maxTags` set). |
 
-**Vollständige deutsche Übersetzung:**
+**Full German translation:**
 
 ```tsx
 <TagSelection
@@ -217,9 +219,9 @@ type TagSelectionTranslation = {
 
 ---
 
-## Anwendungsbeispiele
+## Usage Examples
 
-### Kompakte Variante (klein, ohne Label)
+### Compact variant (small, without label)
 
 ```tsx
 <TagSelection
@@ -231,17 +233,17 @@ type TagSelectionTranslation = {
 />
 ```
 
-### Nur Anzeige (keine Bearbeitung möglich)
+### Display only (no editing)
 
 ```tsx
-// Zeigt ausgewählte Tags ohne Eingabefeld (reine Anzeige, kein Hinzufügen möglich).
+{/* Shows selected tags without an input field (display only, no adding possible). */}
 <TagSelection
   tags={tags}
   showAutoComplete={false}
 />
 ```
 
-### Asynchrones Laden von Tags
+### Async tag loading
 
 ```tsx
 const [tags, setTags] = useState<TagSelectionItem[]>([]);
@@ -261,7 +263,7 @@ useEffect(() => {
 />
 ```
 
-### Serverseitige Filterung
+### Server-side filtering
 
 ```tsx
 const [tags, setTags] = useState<TagSelectionItem[]>([]);
@@ -281,23 +283,23 @@ const handleSearchChange = async (query: string) => {
 />
 ```
 
-### Tag-Limit mit Hinweistext
+### Tag limit with hint text
 
 ```tsx
 <TagSelection
   tags={tags}
   maxTags={3}
-  translation={{ maxTagsReachedText: 'Maximal 3 Tags erlaubt.' }}
+  translation={{ maxTagsReachedText: 'Maximum 3 tags allowed.' }}
   onTagsChange={(_, allTags) => setTags(allTags)}
 />
 ```
 
-### Neue Tags erstellen (Creatable Mode)
+### Creating new tags (Creatable Mode)
 
-Wenn `allowCreate={true}` und der Suchbegriff keinem bestehenden Tag entspricht, wechselt
-die Komponente in den Create-Mode: CheckIcon (bestätigen) und CloseIcon (abbrechen) erscheinen
-im Eingabefeld, darunter 7 Theme-Farb-Chips zur Farbauswahl. Der Tag kann per Klick auf das
-CheckIcon **oder mit der Enter-Taste** bestätigt werden.
+When `allowCreate={true}` and the search term does not match any existing tag, the component
+switches to create mode: a CheckIcon (confirm) and CloseIcon (cancel) appear in the input,
+with 7 theme color chips for color selection below. Confirm by clicking the CheckIcon
+**or pressing Enter**.
 
 ```tsx
 const [tags, setTags] = useState<TagSelectionItem[]>(initialTags);
@@ -306,13 +308,13 @@ const [tags, setTags] = useState<TagSelectionItem[]>(initialTags);
   tags={tags}
   allowCreate={true}
   onTagCreate={(label, color) => {
-    // selected: true ist wichtig — sonst überschreibt das nächste Re-Render den internen Zustand
+    // selected: true is important — otherwise the next re-render overwrites the internal state
     setTags((prev) => [
       ...prev,
       {
         id: label.toLowerCase().replace(/\s+/g, '-'),
         label,
-        color,         // vom User gewählte Theme-Farbe
+        color,         // theme color chosen by the user
         selected: true,
       },
     ]);
@@ -321,8 +323,8 @@ const [tags, setTags] = useState<TagSelectionItem[]>(initialTags);
 />
 ```
 
-Wer eigene Hex-Farben vergeben möchte, ignoriert einfach das `color`-Argument und setzt
-`backgroundColor`/`foregroundColor` nach eigener Logik:
+To assign custom hex colors, ignore the `color` argument and set
+`backgroundColor`/`foregroundColor` with your own logic:
 
 ```tsx
 onTagCreate={(label) => {
@@ -333,15 +335,16 @@ onTagCreate={(label) => {
       label,
       selected: true,
       foregroundColor: '#ffffff',
-      backgroundColor: computeBrandColor(label), // eigene Logik
+      backgroundColor: computeBrandColor(label), // custom logic
     },
   ]);
 }}
 ```
 
-### Overflow-Chips begrenzen
+### Limiting overflow chips
 
-Wenn die Komponente in einem platzbegrenzten Bereich eingesetzt wird, verhindert `maxVisibleChips` dass der Chip-Bereich unbegrenzt wächst. Überzählige Chips werden hinter einem `+N`-Chip verborgen und in einem Popover angezeigt:
+When the component is used in a space-constrained area, `maxVisibleChips` prevents the chip
+area from growing indefinitely. Excess chips are hidden behind a `+N` chip and shown in a popover:
 
 ```tsx
 <TagSelection
@@ -353,20 +356,20 @@ Wenn die Komponente in einem platzbegrenzten Bereich eingesetzt wird, verhindert
 />
 ```
 
-Der Popover öffnet sich beim Klick auf `+N` und schließt sich automatisch, sobald alle Overflow-Chips gelöscht wurden.
+The popover opens on click of `+N` and closes automatically once all overflow chips have been deleted.
 
-### Branding-Farben (Custom Colors)
+### Brand colors (Custom Colors)
 
 ```tsx
 const brandedTags: TagSelectionItem[] = [
-  { id: 'premium',  label: 'Premium',  selected: true, foregroundColor: '#ffffff', backgroundColor: '#6200ea' },
+  { id: 'premium',   label: 'Premium',   selected: true, foregroundColor: '#ffffff', backgroundColor: '#6200ea' },
   { id: 'highlight', label: 'Highlight', selected: true, foregroundColor: '#1a1a1a', backgroundColor: '#ffea00' },
 ];
 
 <TagSelection tags={brandedTags} />
 ```
 
-### Integration mit React Hook Form
+### Integration with React Hook Form
 
 ```tsx
 import { Controller } from 'react-hook-form';
@@ -388,7 +391,7 @@ import { Controller } from 'react-hook-form';
 />
 ```
 
-### Deaktivierter Zustand (z. B. während Formular-Submit)
+### Disabled state (e.g. during form submit)
 
 ```tsx
 const [submitting, setSubmitting] = useState(false);
@@ -402,25 +405,25 @@ const [submitting, setSubmitting] = useState(false);
 
 ---
 
-## Barrierefreiheit
+## Accessibility
 
-- Das Autocomplete-Eingabefeld hat ein Label, das als `aria-label` für Screenreader dient. Das Label ist über `translation.autoCompleteLabel` lokalisierbar.
-- Alle Chips folgen dem MUI-Standard mit `role="button"` und vollständiger Tastatursteuerung (Enter / Space zum Aktivieren, Delete/Backspace zum Entfernen).
-- Die Dropdown-Liste ist über Pfeiltasten navigierbar (MUI Autocomplete-Standard).
-- Deaktivierte Tags (`disabled: true`) werden für Screenreader als nicht interaktiv markiert.
-- Im `disabled`-Zustand der Komponente werden alle interaktiven Elemente mit `aria-disabled` versehen.
+- The autocomplete input field has a label that serves as `aria-label` for screen readers. The label is localizable via `translation.autoCompleteLabel`.
+- All chips follow the MUI standard with `role="button"` and full keyboard navigation (Enter / Space to activate, Delete/Backspace to remove).
+- The dropdown list is navigable with arrow keys (MUI Autocomplete standard).
+- Disabled tags (`disabled: true`) are marked as non-interactive for screen readers.
+- In the `disabled` state of the component, all interactive elements are provided with `aria-disabled`.
 
 ---
 
-## Hinweise und bekannte Einschränkungen
+## Notes and Known Limitations
 
-| Thema | Hinweis |
+| Topic | Note |
 |---|---|
-| **Externer State erforderlich** | Die Komponente verwaltet ihren internen Auswahlzustand selbst (via Zustand-Store). Gleichzeitig spiegelt sie alle Änderungen über Callbacks nach oben. Für persistente Datenspeicherung immer `onTagsChange` oder `onTagSelect`/`onTagDelete` verwenden und den State im übergeordneten Komponent halten. |
-| **`onTagCreate` und externer State** | Der neue Tag wird intern sofort als selektiert markiert. `onTagCreate` dient der Synchronisation des externen `tags`-Arrays. Dabei `selected: true` setzen — sonst fällt der Tag beim nächsten Re-Render aus der Auswahl. Die Komponente entscheidet nicht ob ein neuer Tag valide ist — API-Validierung oder andere Checks sind Aufgabe des `onTagCreate`-Handlers. |
-| **`loading` ohne Optionen** | Der `loadingText` ist nur sichtbar wenn das Autocomplete geöffnet ist **und** das `tags`-Array keine verfügbaren (nicht-ausgewählten, nicht-deaktivierten) Tags enthält. Mit verfügbaren Tags zeigt MUI Autocomplete diese und nicht den Ladetext. |
-| **`color` vs. Custom Colors** | `color` und `foregroundColor`/`backgroundColor` schließen sich gegenseitig aus. Wenn Custom Colors gesetzt sind, wird `color` vollständig ignoriert — auch für den Dark-Mode-Kontrast. |
-| **`maxTags` und Deaktivierung** | Wenn `maxTags` erreicht ist, werden bestehende Chips **nicht** deaktiviert — der Nutzer kann Tags entfernen um wieder Platz zu schaffen. Nur das Hinzufügen neuer Tags wird gesperrt. |
-| **Sortierung der ausgewählten Tags** | Ausgewählte Tags werden im Chip-Bereich immer **alphabetisch aufsteigend** sortiert angezeigt — unabhängig von der Reihenfolge im `tags`-Array oder der Reihenfolge in der sie ausgewählt wurden. |
-| **Sortierung der verfügbaren Tags** | Die Autocomplete-Dropdown-Liste zeigt verfügbare Tags ebenfalls **alphabetisch aufsteigend** sortiert — unabhängig von der Reihenfolge im `tags`-Array. |
-| **Overflow-Popover und `disabled`** | Im `disabled`-Zustand werden Chips im Overflow-Popover ohne Lösch-Icon angezeigt. Der `+N`-Chip selbst bleibt klickbar (nur Ansicht, kein Löschen möglich). |
+| **External state required** | The component manages its internal selection state itself (via Zustand store). At the same time, it reflects all changes via callbacks. For persistent data storage, always use `onTagsChange` or `onTagSelect`/`onTagDelete` and hold the state in the parent component. |
+| **`onTagCreate` and external state** | The new tag is immediately marked as selected internally. `onTagCreate` serves to synchronize the external `tags` array. Set `selected: true` — otherwise the tag falls out of the selection on the next re-render. The component does not decide whether a new tag is valid — API validation or other checks are the responsibility of the `onTagCreate` handler. |
+| **`loading` without options** | The `loadingText` is only visible when the autocomplete is open **and** the `tags` array contains no available (non-selected, non-disabled) tags. With available tags, MUI Autocomplete shows these rather than the loading text. |
+| **`color` vs. Custom Colors** | `color` and `foregroundColor`/`backgroundColor` are mutually exclusive. When custom colors are set, `color` is completely ignored — including for dark-mode contrast. |
+| **`maxTags` and disabling** | When `maxTags` is reached, existing chips are **not** disabled — the user can remove tags to make room. Only adding new tags is blocked. |
+| **Sorting of selected tags** | Selected tags are always displayed in **ascending alphabetical order** in the chip area — regardless of the order in the `tags` array or the order in which they were selected. |
+| **Sorting of available tags** | The autocomplete dropdown list also shows available tags in **ascending alphabetical order** — regardless of the order in the `tags` array. |
+| **Overflow popover and `disabled`** | In the `disabled` state, chips in the overflow popover are shown without a delete icon. The `+N` chip itself remains clickable (view only, no deleting possible). |
