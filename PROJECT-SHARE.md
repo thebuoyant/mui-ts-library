@@ -42,7 +42,7 @@ import {
   TagSelection,
   PasswordStrengthMeter,
   RichTextEditor,
-} from '@thebuoyant-tsdev/mui-ts-library';
+} from "@thebuoyant-tsdev/mui-ts-library";
 ```
 
 TypeScript-Typen sind automatisch verfügbar — kein separater `@types/...` Import nötig.
@@ -54,7 +54,7 @@ TypeScript-Typen sind automatisch verfügbar — kein separater `@types/...` Imp
 Wenn eine neue Version der Bibliothek gebaut wurde, einfach die neue `.tgz`-Datei teilen. Im Zielprojekt:
 
 ```bash
-npm install /pfad/zur/thebuoyant-tsdev-mui-ts-library-1.0.1.tgz
+npm install /pfad/zur/thebuoyant-tsdev-mui-ts-library-x.y.z.tgz
 ```
 
 ---
