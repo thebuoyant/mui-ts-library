@@ -72,6 +72,43 @@ Initial public release of `@thebuoyant-tsdev/mui-ts-library`.
 
 ---
 
-## [Unreleased]
+## [1.1.0] — 2026-05-22
 
-_No unreleased changes yet._
+### Added
+
+#### SqlEditor
+- SQL code editor based on CodeMirror 6 with the same MUI Paper layout as `RichTextEditor`
+- SQL syntax highlighting with MUI theme colors: keywords (`primary.main`, bold), strings (`success.main`, bold), identifiers (`info.main`), numbers (`warning.main`), functions (`secondary.main`), comments (`text.disabled`, italic)
+- Dark mode support — all colors sourced from the active MUI theme
+- 5 SQL dialects: Standard SQL, MySQL, PostgreSQL, SQLite, MS SQL Server
+- **Format button** — prettifies SQL via `sql-formatter` (dialect-aware, try/catch safe)
+- **Server-side linting** via async `onLint` callback (600 ms debounce); errors shown as wavy underlines and lint gutter markers
+- **Schema-aware autocomplete** — `schema` prop accepts `SqlSchema` (`tables` with `name` + `columns`) and suggests table/column names with type hints in the dropdown
+- **Configurable highlight colors** — `highlightColors` prop overrides keyword, string, and identifier colors independently
+- SQL keyword autocomplete out of the box (`autocompletion()` + `completionKeymap`)
+- Toolbar: Format, Copy (with "Copied!" feedback), Clear, Undo, Redo, Execute (off by default)
+- Footer: cursor position (`Ln {line}, Col {col}`) and error count (`showErrorCount`)
+- `toolbarConfig` prop to show/hide individual toolbar buttons
+- `translation` prop for full i18n of all toolbar tooltips and footer labels
+- `dialect` prop: `"standard"` | `"mysql"` | `"postgresql"` | `"sqlite"` | `"mssql"`
+- `showLineNumbers`, `showLineColumn`, `showErrorCount` display flags
+- Controlled mode via `value` / `onChange` (syncs without cursor jump)
+- `readonly` mode (no toolbar) and `disabled` mode (grayed out)
+- `error` state and `helperText` — consistent with MUI TextField
+- `onBlur` / `onFocus` callbacks
+- `onExecute` callback for the Execute button
+- `name` prop for native form submission via hidden `<input type="hidden">`
+- Configurable `height` and `width` (number → px, CSS strings, `"auto"` for flex containers)
+- 17 Storybook stories covering all features
+- Exported types: `SqlEditorProps`, `SqlEditorDialect`, `SqlEditorToolbarConfig`, `SqlEditorTranslation`, `SqlEditorHighlightColors`, `SqlLintError`, `SqlSchema`, `SqlTable`, `SqlColumn`
+- Exported defaults: `DEFAULT_SQL_EDITOR_TOOLBAR_CONFIG`, `DEFAULT_SQL_EDITOR_TRANSLATION`
+
+#### General
+- Added `@lezer/highlight` as explicit dependency (was previously only a transitive dep, used directly in `SqlEditorContent`)
+- Updated `package.json` description and keywords to include SqlEditor / CodeMirror / SQL
+- Security: patched `ws` (8.20.0 → 8.20.1) and `brace-expansion` (5.0.5 → 5.0.6) via `npm audit fix`
+- Bilingual user manual: `user-manuals/SqlEditor.md` (EN) and `user-manuals/SqlEditor.de.md` (DE)
+
+---
+
+## [1.0.0] — 2026-05-21

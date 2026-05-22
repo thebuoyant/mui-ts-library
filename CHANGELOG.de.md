@@ -9,6 +9,45 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [1.1.0] — 2026-05-22
+
+### Hinzugefügt
+
+#### SqlEditor
+- SQL-Code-Editor auf Basis CodeMirror 6 mit demselben MUI-Paper-Layout wie der `RichTextEditor`
+- SQL-Syntax-Highlighting mit MUI-Theme-Farben: Keywords (`primary.main`, fett), Strings (`success.main`, fett), Identifier (`info.main`), Zahlen (`warning.main`), Funktionen (`secondary.main`), Kommentare (`text.disabled`, kursiv)
+- Dark-Mode-Unterstützung — alle Farben aus dem aktiven MUI-Theme
+- 5 SQL-Dialekte: Standard SQL, MySQL, PostgreSQL, SQLite, MS SQL Server
+- **Format-Schaltfläche** — SQL verschönern via `sql-formatter` (dialektspezifisch, try/catch-sicher)
+- **Server-seitiges Linting** via asynchronem `onLint`-Callback (600 ms Debounce); Fehler als Wellenlinien und Lint-Gutter-Marker
+- **Schema-aware Autocomplete** — `schema`-Prop nimmt `SqlSchema` (`tables` mit `name` + `columns`) und schlägt Tabellen-/Spaltennamen mit Typ-Hinweisen vor
+- **Konfigurierbare Highlight-Farben** — `highlightColors`-Prop überschreibt Keyword-, String- und Identifier-Farben unabhängig voneinander
+- SQL-Keyword-Autocomplete out of the box (`autocompletion()` + `completionKeymap`)
+- Toolbar: Formatieren, Kopieren (mit „Kopiert!"-Feedback), Leeren, Rückgängig, Wiederholen, Ausführen (standardmäßig aus)
+- Footer: Cursor-Position (`Ln {line}, Sp. {col}`) und Fehleranzahl (`showErrorCount`)
+- `toolbarConfig`-Prop zum Ein-/Ausblenden einzelner Toolbar-Schaltflächen
+- `translation`-Prop für vollständige i18n aller Toolbar-Tooltips und Footer-Beschriftungen
+- `dialect`-Prop: `"standard"` | `"mysql"` | `"postgresql"` | `"sqlite"` | `"mssql"`
+- Anzeigeflags: `showLineNumbers`, `showLineColumn`, `showErrorCount`
+- Kontrollierter Modus via `value` / `onChange` (synchronisiert ohne Cursor-Sprung)
+- `readonly`-Modus (keine Toolbar) und `disabled`-Modus (ausgegraut)
+- `error`-Zustand und `helperText` — konsistent mit MUI TextField
+- `onBlur` / `onFocus`-Callbacks
+- `onExecute`-Callback für die Ausführen-Schaltfläche
+- `name`-Prop für native Formularübermittlung via verstecktem `<input type="hidden">`
+- Konfigurierbare `height` und `width` (Zahl → px, CSS-Strings, `"auto"` für Flex-Container)
+- 17 Storybook-Stories für alle Features
+- Exportierte Typen: `SqlEditorProps`, `SqlEditorDialect`, `SqlEditorToolbarConfig`, `SqlEditorTranslation`, `SqlEditorHighlightColors`, `SqlLintError`, `SqlSchema`, `SqlTable`, `SqlColumn`
+- Exportierte Defaults: `DEFAULT_SQL_EDITOR_TOOLBAR_CONFIG`, `DEFAULT_SQL_EDITOR_TRANSLATION`
+
+#### Allgemein
+- `@lezer/highlight` als explizite Dependency ergänzt (war zuvor nur transitive Dep, wird aber direkt in `SqlEditorContent` importiert)
+- `package.json`-Beschreibung und Keywords um SqlEditor / CodeMirror / SQL erweitert
+- Sicherheit: `ws` (8.20.0 → 8.20.1) und `brace-expansion` (5.0.5 → 5.0.6) via `npm audit fix` gepatcht
+- Zweisprachiges Benutzerhandbuch: `user-manuals/SqlEditor.md` (EN) und `user-manuals/SqlEditor.de.md` (DE)
+
+---
+
 ## [1.0.0] — 2026-05-21
 
 Erste öffentliche Veröffentlichung von `@thebuoyant-tsdev/mui-ts-library`.
