@@ -6,6 +6,7 @@ export type SqlLintError = {
 };
 
 export type SqlEditorToolbarConfig = {
+  showFormat?:   boolean;
   showCopy?:     boolean;
   showClear?:    boolean;
   showExecute?:  boolean;
@@ -13,6 +14,7 @@ export type SqlEditorToolbarConfig = {
 };
 
 export const DEFAULT_SQL_EDITOR_TOOLBAR_CONFIG: Required<SqlEditorToolbarConfig> = {
+  showFormat:   true,
   showCopy:     true,
   showClear:    true,
   showExecute:  false,
@@ -20,6 +22,7 @@ export const DEFAULT_SQL_EDITOR_TOOLBAR_CONFIG: Required<SqlEditorToolbarConfig>
 };
 
 export type SqlEditorTranslation = {
+  format:      string;
   copy:        string;
   copySuccess: string;
   clear:       string;
@@ -31,6 +34,7 @@ export type SqlEditorTranslation = {
 };
 
 export const DEFAULT_SQL_EDITOR_TRANSLATION: SqlEditorTranslation = {
+  format:      "Format SQL",
   copy:        "Copy",
   copySuccess: "Copied!",
   clear:       "Clear",

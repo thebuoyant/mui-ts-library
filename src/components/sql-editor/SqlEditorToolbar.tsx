@@ -2,18 +2,29 @@ import { useState } from "react";
 import { Box, Divider, IconButton, Tooltip } from "@mui/material";
 import ContentCopyIcon   from "@mui/icons-material/ContentCopy";
 import CheckIcon         from "@mui/icons-material/Check";
-import DeleteIcon from "@mui/icons-material/Delete";
+import DeleteIcon        from "@mui/icons-material/Delete";
 import UndoIcon          from "@mui/icons-material/Undo";
 import RedoIcon          from "@mui/icons-material/Redo";
 import PlayArrowIcon     from "@mui/icons-material/PlayArrow";
+import AutoFixHighIcon   from "@mui/icons-material/AutoFixHigh";
 import { undo, redo }   from "@codemirror/commands";
 import type { EditorView } from "@codemirror/view";
-import type { SqlEditorToolbarConfig, SqlEditorTranslation } from "./SqlEditor.types";
+import { format as formatSql, type SqlLanguage } from "sql-formatter";
+import type { SqlEditorDialect, SqlEditorToolbarConfig, SqlEditorTranslation } from "./SqlEditor.types";
+
+const DIALECT_MAP: Record<SqlEditorDialect, SqlLanguage> = {
+  standard:   "sql",
+  mysql:      "mysql",
+  postgresql: "postgresql",
+  sqlite:     "sqlite",
+  mssql:      "tsql",
+};
 
 type SqlEditorToolbarProps = {
   viewRef:       React.MutableRefObject<EditorView | null>;
   toolbarConfig: Required<SqlEditorToolbarConfig>;
   translation:   SqlEditorTranslation;
+  dialect:       SqlEditorDialect;
   disabled?:     boolean;
   onExecute?:    (sql: string) => void;
 };
@@ -49,6 +60,7 @@ export function SqlEditorToolbar({
   viewRef,
   toolbarConfig: tc,
   translation: t,
+  dialect,
   disabled,
   onExecute,
 }: SqlEditorToolbarProps) {
@@ -84,12 +96,26 @@ export function SqlEditorToolbar({
     view.focus();
   }
 
+  function handleFormat() {
+    const view = viewRef.current;
+    if (!view) return;
+    const sql = view.state.doc.toString();
+    try {
+      const formatted = formatSql(sql, { language: DIALECT_MAP[dialect] });
+      view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: formatted } });
+    } catch {
+      // leave editor unchanged if sql-formatter can't parse the input
+    }
+    view.focus();
+  }
+
   function handleExecute() {
     const view = viewRef.current;
     if (!view || !onExecute) return;
     onExecute(view.state.doc.toString());
   }
 
+  const hasFormatGroup  = tc.showFormat;
   const hasActionGroup  = tc.showCopy || tc.showClear;
   const hasHistoryGroup = tc.showUndoRedo;
   const hasExecuteGroup = tc.showExecute && !!onExecute;
@@ -100,6 +126,21 @@ export function SqlEditorToolbar({
       role="toolbar"
       aria-label="SQL editor actions"
     >
+      {hasFormatGroup && (
+        <Box sx={{ display: "flex", gap: 0.25 }}>
+          <ToolbarButton
+            label={t.format}
+            icon={<AutoFixHighIcon fontSize="small" />}
+            onClick={handleFormat}
+            disabled={isDisabled}
+          />
+        </Box>
+      )}
+
+      {hasFormatGroup && (hasActionGroup || hasHistoryGroup) && (
+        <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+      )}
+
       {hasActionGroup && (
         <Box sx={{ display: "flex", gap: 0.25 }}>
           {tc.showCopy && (
@@ -156,7 +197,7 @@ export function SqlEditorToolbar({
         </>
       )}
 
-      {!hasActionGroup && !hasHistoryGroup && !hasExecuteGroup && (
+      {!hasFormatGroup && !hasActionGroup && !hasHistoryGroup && !hasExecuteGroup && (
         <Box sx={{ height: 32 }} />
       )}
     </Box>

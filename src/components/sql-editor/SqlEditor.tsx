@@ -91,6 +91,7 @@ export function SqlEditor({
               viewRef={viewRef}
               toolbarConfig={tc}
               translation={t}
+              dialect={dialect}
               disabled={disabled}
               onExecute={onExecute}
             />

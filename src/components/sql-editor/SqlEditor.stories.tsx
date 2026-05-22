@@ -199,6 +199,13 @@ export const WithLinting: Story = {
   },
 };
 
+export const WithFormat: Story = {
+  args: {
+    value: "select u.id,u.name,u.email from users u where u.active=1 and u.created_at>='2024-01-01' order by u.name asc limit 50",
+    toolbarConfig: { showFormat: true },
+  },
+};
+
 export const GermanTranslation: Story = {
   args: {
     value: SAMPLE_SQL,

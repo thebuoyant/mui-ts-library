@@ -134,7 +134,7 @@ Zeile 4: Syntaxfehler — erwartet "ON", gefunden "WHERE"
 | **Clear** | ✅ Phase 1 | Editor leeren |
 | **Undo / Redo** | ✅ Phase 1 | CodeMirror History |
 | **Execute** | ✅ Phase 1 | `onExecute(sql)` — nur wenn Prop gesetzt |
-| **Format** | Phase 3 | SQL prettifizieren via `sql-formatter` |
+| **Format** | ✅ Phase 3 | SQL prettifizieren via `sql-formatter` |
 
 ---
 
@@ -165,9 +165,15 @@ Zeile 4: Syntaxfehler — erwartet "ON", gefunden "WHERE"
 - [x] `SqlLintError`-Typ: `{ line, col?, message, severity? }`
 - [x] Storybook-Story `WithLinting`
 
-### Phase 3 — Format (offen)
-- [ ] Format-Button: SQL prettifizieren mit `sql-formatter`
-- [ ] `npm install sql-formatter`
+### Phase 3 — Format ✅ FERTIG
+- [x] Format-Button: SQL prettifizieren mit `sql-formatter`
+- [x] `npm install sql-formatter`
+- [x] `showFormat`-Prop in `SqlEditorToolbarConfig` (default: `true`)
+- [x] `format`-Translation-Key in `SqlEditorTranslation` (default: `"Format SQL"`)
+- [x] Dialect-Mapping: `standard→sql`, `mysql→mysql`, `postgresql→postgresql`, `sqlite→sqlite`, `mssql→tsql`
+- [x] `AutoFixHighIcon` als Icon für den Format-Button
+- [x] Try/catch: Editor bleibt unverändert bei nicht parsbarem SQL
+- [x] Storybook-Story `WithFormat`
 
 ### Phase 4 — Schema-aware Autocomplete (optional)
 - [ ] `schema`-Prop: Tabellen- und Spaltennamen als Autocomplete-Quelle
