@@ -185,6 +185,20 @@ export const WithError: Story = {
   },
 };
 
+export const WithLinting: Story = {
+  args: {
+    value: "SELECT * FORM users WHER id = 1",
+    showErrorCount: true,
+    onLint: async (sql) => {
+      await new Promise((r) => setTimeout(r, 300));
+      const errors = [];
+      if (sql.includes("FORM"))  errors.push({ line: 1, col: 10, message: "Unknown keyword 'FORM' — did you mean 'FROM'?", severity: "error" as const });
+      if (sql.includes("WHER"))  errors.push({ line: 1, col: 22, message: "Unknown keyword 'WHER' — did you mean 'WHERE'?", severity: "error" as const });
+      return errors;
+    },
+  },
+};
+
 export const GermanTranslation: Story = {
   args: {
     value: SAMPLE_SQL,

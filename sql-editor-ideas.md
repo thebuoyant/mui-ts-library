@@ -155,12 +155,15 @@ Zeile 4: Syntaxfehler — erwartet "ON", gefunden "WHERE"
 - [x] Export aus `src/index.ts`
 - [x] Build grün, alle 271 Tests bestanden
 
-### Phase 2 — SQL Intelligence (offen)
-- [ ] Echtzeit-Linting via `@codemirror/lint`
-- [ ] Fehleranzeige im Footer (Anzahl + erste Fehlermeldung)
-- [ ] `onLint`-Callback für server-seitiges Linting
-- [ ] Autocomplete für SQL-Keywords (`@codemirror/autocomplete` — bereits installiert)
-- [ ] `showErrorCount`-Prop
+### Phase 2 — SQL Intelligence ✅ FERTIG
+- [x] Echtzeit-Linting via `@codemirror/lint` + `lintGutter()`
+- [x] Fehleranzeige im Footer mit ⚠-Icon (Anzahl + Fehlermeldung)
+- [x] `onLint`-Callback für server-seitiges Linting (async, 600ms debounce)
+- [x] Autocomplete für SQL-Keywords via `autocompletion()` + `completionKeymap`
+- [x] MUI-Theme-Styling für Autocomplete-Tooltip + Lint-Marker
+- [x] `showErrorCount`-Prop + `errorCount`-Translation-Key
+- [x] `SqlLintError`-Typ: `{ line, col?, message, severity? }`
+- [x] Storybook-Story `WithLinting`
 
 ### Phase 3 — Format (offen)
 - [ ] Format-Button: SQL prettifizieren mit `sql-formatter`

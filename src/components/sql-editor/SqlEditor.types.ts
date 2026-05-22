@@ -1,3 +1,10 @@
+export type SqlLintError = {
+  line:      number;
+  col?:      number;
+  message:   string;
+  severity?: "error" | "warning" | "info";
+};
+
 export type SqlEditorToolbarConfig = {
   showCopy?:     boolean;
   showClear?:    boolean;
@@ -20,6 +27,7 @@ export type SqlEditorTranslation = {
   undo:        string;
   redo:        string;
   lineColumn:  string;
+  errorCount:  string;
 };
 
 export const DEFAULT_SQL_EDITOR_TRANSLATION: SqlEditorTranslation = {
@@ -30,6 +38,7 @@ export const DEFAULT_SQL_EDITOR_TRANSLATION: SqlEditorTranslation = {
   undo:        "Undo",
   redo:        "Redo",
   lineColumn:  "Ln {line}, Col {col}",
+  errorCount:  "{count} error(s)",
 };
 
 export type SqlEditorDialect = "standard" | "mysql" | "postgresql" | "sqlite" | "mssql";
@@ -51,9 +60,11 @@ export type SqlEditorProps = {
   dialect?:    SqlEditorDialect;
   showLineNumbers?: boolean;
   showLineColumn?:  boolean;
+  showErrorCount?:  boolean;
   toolbarConfig?:   SqlEditorToolbarConfig;
   translation?:     Partial<SqlEditorTranslation>;
   onExecute?: (sql: string) => void;
+  onLint?:    (sql: string) => Promise<SqlLintError[]> | SqlLintError[];
   onBlur?:    () => void;
   onFocus?:   () => void;
 };

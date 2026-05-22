@@ -10,7 +10,6 @@ import { SqlEditorContent } from "./SqlEditorContent";
 import { SqlEditorToolbar } from "./SqlEditorToolbar";
 import { SqlEditorFooter }  from "./SqlEditorFooter";
 
-// Numeric strings ("300") → number so MUI appends "px"; everything else unchanged
 function normalizeSize(val: number | string | undefined): number | string | undefined {
   if (val === "" || val === undefined) return undefined;
   if (typeof val === "string" && val !== "auto" && !isNaN(Number(val))) return Number(val);
@@ -23,17 +22,19 @@ export function SqlEditor({
   placeholder,
   height,
   width,
-  disabled  = false,
-  readonly  = false,
-  error     = false,
+  disabled        = false,
+  readonly        = false,
+  error           = false,
   helperText,
   name,
-  dialect   = "standard",
+  dialect         = "standard",
   showLineNumbers = true,
   showLineColumn  = true,
+  showErrorCount  = false,
   toolbarConfig,
   translation,
   onExecute,
+  onLint,
   onBlur,
   onFocus,
 }: SqlEditorProps) {
@@ -46,7 +47,8 @@ export function SqlEditor({
   const effectH = isAutoH ? undefined : (normH ?? 300);
 
   const viewRef = useRef<EditorView | null>(null);
-  const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 });
+  const [cursorPos,        setCursorPos]        = useState({ line: 1, col: 1 });
+  const [diagnosticsCount, setDiagnosticsCount] = useState(0);
 
   const handleViewReady = useCallback((view: EditorView | null) => {
     viewRef.current = view;
@@ -56,7 +58,11 @@ export function SqlEditor({
     setCursorPos({ line, col });
   }, []);
 
-  const showFooter = showLineColumn || !!helperText;
+  const handleDiagnosticsChange = useCallback((count: number) => {
+    setDiagnosticsCount(count);
+  }, []);
+
+  const showFooter = showLineColumn || showErrorCount || !!helperText;
 
   return (
     <Box
@@ -99,6 +105,8 @@ export function SqlEditor({
           readonly={readonly}
           showLineNumbers={showLineNumbers}
           dialect={dialect}
+          onLint={onLint}
+          onDiagnosticsChange={onLint ? handleDiagnosticsChange : undefined}
           onViewReady={handleViewReady}
           onCursorChange={handleCursorChange}
           onBlur={onBlur}
@@ -111,6 +119,8 @@ export function SqlEditor({
           helperText={helperText}
           error={error}
           showLineColumn={showLineColumn}
+          showErrorCount={showErrorCount}
+          diagnosticsCount={diagnosticsCount}
           cursorLine={cursorPos.line}
           cursorCol={cursorPos.col}
           translation={t}

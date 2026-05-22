@@ -11,9 +11,11 @@ import { EditorState, Compartment } from "@codemirror/state";
 import { sql, MySQL, PostgreSQL, SQLite, MSSQL, StandardSQL } from "@codemirror/lang-sql";
 import { history, defaultKeymap, historyKeymap } from "@codemirror/commands";
 import { syntaxHighlighting, HighlightStyle } from "@codemirror/language";
+import { autocompletion, completionKeymap } from "@codemirror/autocomplete";
+import { linter, lintGutter, type Diagnostic } from "@codemirror/lint";
 import { tags } from "@lezer/highlight";
 import { Box, useTheme } from "@mui/material";
-import type { SqlEditorDialect } from "./SqlEditor.types";
+import type { SqlEditorDialect, SqlLintError } from "./SqlEditor.types";
 
 const DIALECT_MAP = {
   standard:   StandardSQL,
@@ -24,17 +26,19 @@ const DIALECT_MAP = {
 };
 
 type SqlEditorContentProps = {
-  value?:           string;
-  onChange?:        (sql: string) => void;
-  placeholder?:     string;
-  disabled?:        boolean;
-  readonly?:        boolean;
-  showLineNumbers?: boolean;
-  dialect?:         SqlEditorDialect;
-  onViewReady:      (view: EditorView | null) => void;
-  onCursorChange:   (line: number, col: number) => void;
-  onBlur?:          () => void;
-  onFocus?:         () => void;
+  value?:                string;
+  onChange?:             (sql: string) => void;
+  placeholder?:          string;
+  disabled?:             boolean;
+  readonly?:             boolean;
+  showLineNumbers?:      boolean;
+  dialect?:              SqlEditorDialect;
+  onLint?:               (sql: string) => Promise<SqlLintError[]> | SqlLintError[];
+  onDiagnosticsChange?:  (count: number) => void;
+  onViewReady:           (view: EditorView | null) => void;
+  onCursorChange:        (line: number, col: number) => void;
+  onBlur?:               () => void;
+  onFocus?:              () => void;
 };
 
 export function SqlEditorContent({
@@ -45,48 +49,54 @@ export function SqlEditorContent({
   readonly = false,
   showLineNumbers = true,
   dialect = "standard",
+  onLint,
+  onDiagnosticsChange,
   onViewReady,
   onCursorChange,
   onBlur,
   onFocus,
 }: SqlEditorContentProps) {
-  const containerRef   = useRef<HTMLDivElement>(null);
-  const viewRef        = useRef<EditorView | null>(null);
-  const onChangeRef    = useRef(onChange);
-  const onCursorRef    = useRef(onCursorChange);
-  const onBlurRef      = useRef(onBlur);
-  const onFocusRef     = useRef(onFocus);
-  const onViewReadyRef = useRef(onViewReady);
+  const containerRef          = useRef<HTMLDivElement>(null);
+  const viewRef               = useRef<EditorView | null>(null);
+  const onChangeRef           = useRef(onChange);
+  const onCursorRef           = useRef(onCursorChange);
+  const onBlurRef             = useRef(onBlur);
+  const onFocusRef            = useRef(onFocus);
+  const onViewReadyRef        = useRef(onViewReady);
+  const onLintRef             = useRef(onLint);
+  const onDiagnosticsRef      = useRef(onDiagnosticsChange);
 
   const editableCompartment = useRef(new Compartment());
   const readOnlyCompartment = useRef(new Compartment());
 
   const muiTheme = useTheme();
   const isDark   = muiTheme.palette.mode === "dark";
+  const hasLint  = !!onLint;
 
-  useEffect(() => { onChangeRef.current    = onChange;       }, [onChange]);
-  useEffect(() => { onCursorRef.current    = onCursorChange; }, [onCursorChange]);
-  useEffect(() => { onBlurRef.current      = onBlur;         }, [onBlur]);
-  useEffect(() => { onFocusRef.current     = onFocus;        }, [onFocus]);
-  useEffect(() => { onViewReadyRef.current = onViewReady;    }, [onViewReady]);
+  useEffect(() => { onChangeRef.current      = onChange;            }, [onChange]);
+  useEffect(() => { onCursorRef.current      = onCursorChange;      }, [onCursorChange]);
+  useEffect(() => { onBlurRef.current        = onBlur;              }, [onBlur]);
+  useEffect(() => { onFocusRef.current       = onFocus;             }, [onFocus]);
+  useEffect(() => { onViewReadyRef.current   = onViewReady;         }, [onViewReady]);
+  useEffect(() => { onLintRef.current        = onLint;              }, [onLint]);
+  useEffect(() => { onDiagnosticsRef.current = onDiagnosticsChange; }, [onDiagnosticsChange]);
 
-  // Recreate editor on theme-mode or dialect change
+  // Recreate editor on theme-mode, dialect, or lint toggle change
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Preserve current content when recreating (e.g. on dark-mode toggle)
     const currentDoc = viewRef.current?.state.doc.toString() ?? value ?? "";
 
     const highlightStyle = HighlightStyle.define([
-      { tag: tags.keyword,                              color: muiTheme.palette.primary.main,    fontWeight: "bold" },
+      { tag: tags.keyword,                              color: muiTheme.palette.primary.main,  fontWeight: "bold" },
       { tag: [tags.string, tags.special(tags.string)], color: muiTheme.palette.success.dark },
       { tag: tags.number,                              color: muiTheme.palette.warning.dark },
-      { tag: [tags.lineComment, tags.blockComment],    color: muiTheme.palette.text.disabled,   fontStyle: "italic" },
+      { tag: [tags.lineComment, tags.blockComment],    color: muiTheme.palette.text.disabled, fontStyle: "italic" },
       { tag: tags.operator,                            color: muiTheme.palette.text.secondary },
       { tag: [tags.function(tags.variableName), tags.function(tags.name)],
                                                        color: muiTheme.palette.secondary.main },
       { tag: tags.typeName,                            color: muiTheme.palette.info.main },
-      { tag: tags.invalid,                             color: muiTheme.palette.error.main,      textDecoration: "underline wavy" },
+      { tag: tags.invalid,                             color: muiTheme.palette.error.main,    textDecoration: "underline wavy" },
     ]);
 
     const editorTheme = EditorView.theme(
@@ -97,10 +107,7 @@ export function SqlEditorContent({
           fontSize:   "0.875rem",
         },
         ".cm-scroller": { overflow: "auto" },
-        ".cm-content": {
-          padding:    "8px 4px",
-          caretColor: muiTheme.palette.text.primary,
-        },
+        ".cm-content": { padding: "8px 4px", caretColor: muiTheme.palette.text.primary },
         ".cm-gutters": {
           backgroundColor: isDark ? muiTheme.palette.grey[900] : muiTheme.palette.grey[50],
           color:           muiTheme.palette.text.disabled,
@@ -116,21 +123,78 @@ export function SqlEditorContent({
         ".cm-cursor, .cm-dropCursor": { borderLeftColor: muiTheme.palette.text.primary },
         "&.cm-focused": { outline: "none" },
         ".cm-placeholder": { color: muiTheme.palette.text.disabled, fontStyle: "italic" },
+        // Autocomplete tooltip
+        ".cm-tooltip": {
+          backgroundColor: muiTheme.palette.background.paper,
+          border:          `1px solid ${muiTheme.palette.divider}`,
+          borderRadius:    "4px",
+          boxShadow:       muiTheme.shadows[4],
+        },
+        ".cm-tooltip-autocomplete > ul > li": {
+          color: muiTheme.palette.text.primary,
+        },
+        ".cm-tooltip-autocomplete > ul > li[aria-selected]": {
+          backgroundColor: muiTheme.palette.primary.main + "20",
+          color:           muiTheme.palette.primary.main,
+        },
+        ".cm-completionMatchedText": {
+          color:          muiTheme.palette.primary.main,
+          textDecoration: "none",
+          fontWeight:     "bold",
+        },
+        ".cm-completionDetail": {
+          color:      muiTheme.palette.text.secondary,
+          fontStyle:  "italic",
+        },
+        // Lint gutter
+        ".cm-gutter-lint": { width: "16px" },
+        ".cm-lint-marker-error":   { color: muiTheme.palette.error.main },
+        ".cm-lint-marker-warning": { color: muiTheme.palette.warning.main },
+        // Diagnostic tooltip
+        ".cm-tooltip.cm-tooltip-lint": {
+          backgroundColor: muiTheme.palette.background.paper,
+          border:          `1px solid ${muiTheme.palette.divider}`,
+          borderRadius:    "4px",
+        },
+        ".cm-diagnostic-error":   { borderLeft: `3px solid ${muiTheme.palette.error.main}` },
+        ".cm-diagnostic-warning": { borderLeft: `3px solid ${muiTheme.palette.warning.main}` },
+        ".cm-diagnostic-info":    { borderLeft: `3px solid ${muiTheme.palette.info.main}` },
       },
       { dark: isDark },
     );
+
+    const linterSource = async (view: EditorView): Promise<Diagnostic[]> => {
+      const onLintFn = onLintRef.current;
+      if (!onLintFn) return [];
+      const docStr = view.state.doc.toString();
+      try {
+        const errors = await onLintFn(docStr);
+        const diagnostics: Diagnostic[] = errors.map((e) => {
+          const safeLineNo = Math.max(1, Math.min(e.line, view.state.doc.lines));
+          const lineInfo   = view.state.doc.line(safeLineNo);
+          const from       = lineInfo.from + Math.max(0, (e.col ?? 1) - 1);
+          return { from, to: lineInfo.to, severity: e.severity ?? "error", message: e.message };
+        });
+        onDiagnosticsRef.current?.(diagnostics.length);
+        return diagnostics;
+      } catch {
+        return [];
+      }
+    };
 
     const extensions = [
       editorTheme,
       syntaxHighlighting(highlightStyle),
       sql({ dialect: DIALECT_MAP[dialect] }),
       history(),
-      keymap.of([...defaultKeymap, ...historyKeymap]),
+      autocompletion(),
+      keymap.of([...defaultKeymap, ...historyKeymap, ...completionKeymap]),
       editableCompartment.current.of(EditorView.editable.of(!disabled && !readonly)),
       readOnlyCompartment.current.of(EditorState.readOnly.of(readonly)),
       highlightActiveLine(),
       ...(showLineNumbers ? [lineNumbers(), highlightActiveLineGutter()] : []),
       ...(placeholder ? [cmPlaceholder(placeholder)] : []),
+      ...(hasLint ? [lintGutter(), linter(linterSource, { delay: 600 })] : []),
       EditorView.updateListener.of((update) => {
         if (update.docChanged) {
           onChangeRef.current?.(update.state.doc.toString());
@@ -159,7 +223,7 @@ export function SqlEditorContent({
       viewRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDark, dialect]);
+  }, [isDark, dialect, hasLint]);
 
   // Sync external value without resetting cursor
   useEffect(() => {
