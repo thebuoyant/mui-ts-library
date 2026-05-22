@@ -1,0 +1,6 @@
+services:
+  storybook:
+    build: .
+    ports:
+      - "6006:80"
+    restart: unless-stopped
