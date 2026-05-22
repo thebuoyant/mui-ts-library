@@ -11,11 +11,11 @@ import { EditorState, Compartment } from "@codemirror/state";
 import { sql, MySQL, PostgreSQL, SQLite, MSSQL, StandardSQL } from "@codemirror/lang-sql";
 import { history, defaultKeymap, historyKeymap } from "@codemirror/commands";
 import { syntaxHighlighting, HighlightStyle } from "@codemirror/language";
-import { autocompletion, completionKeymap } from "@codemirror/autocomplete";
+import { autocompletion, completionKeymap, type Completion } from "@codemirror/autocomplete";
 import { linter, lintGutter, type Diagnostic } from "@codemirror/lint";
 import { tags } from "@lezer/highlight";
 import { Box, useTheme } from "@mui/material";
-import type { SqlEditorDialect, SqlLintError } from "./SqlEditor.types";
+import type { SqlEditorDialect, SqlLintError, SqlSchema } from "./SqlEditor.types";
 
 const DIALECT_MAP = {
   standard:   StandardSQL,
@@ -36,6 +36,7 @@ type SqlEditorContentProps = {
   keywordColor?:         string;
   stringColor?:          string;
   identifierColor?:      string;
+  schema?:               SqlSchema;
   onLint?:               (sql: string) => Promise<SqlLintError[]> | SqlLintError[];
   onDiagnosticsChange?:  (count: number) => void;
   onViewReady:           (view: EditorView | null) => void;
@@ -55,6 +56,7 @@ export function SqlEditorContent({
   keywordColor,
   stringColor,
   identifierColor,
+  schema,
   onLint,
   onDiagnosticsChange,
   onViewReady,
@@ -75,9 +77,10 @@ export function SqlEditorContent({
   const editableCompartment = useRef(new Compartment());
   const readOnlyCompartment = useRef(new Compartment());
 
-  const muiTheme = useTheme();
-  const isDark   = muiTheme.palette.mode === "dark";
-  const hasLint  = !!onLint;
+  const muiTheme  = useTheme();
+  const isDark    = muiTheme.palette.mode === "dark";
+  const hasLint   = !!onLint;
+  const schemaKey = JSON.stringify(schema);
 
   useEffect(() => { onChangeRef.current      = onChange;            }, [onChange]);
   useEffect(() => { onCursorRef.current      = onCursorChange;      }, [onCursorChange]);
@@ -174,6 +177,19 @@ export function SqlEditorContent({
       { dark: isDark },
     );
 
+    const cmSchema: Record<string, Completion[]> | undefined = schema
+      ? Object.fromEntries(
+          schema.tables.map((t) => [
+            t.name,
+            (t.columns ?? []).map((c) => ({
+              label:  c.name,
+              detail: c.type,
+              type:   "property",
+            } satisfies Completion)),
+          ]),
+        )
+      : undefined;
+
     const linterSource = async (view: EditorView): Promise<Diagnostic[]> => {
       const onLintFn = onLintRef.current;
       if (!onLintFn) return [];
@@ -196,7 +212,7 @@ export function SqlEditorContent({
     const extensions = [
       editorTheme,
       syntaxHighlighting(highlightStyle),
-      sql({ dialect: DIALECT_MAP[dialect] }),
+      sql({ dialect: DIALECT_MAP[dialect], schema: cmSchema }),
       history(),
       autocompletion(),
       keymap.of([...defaultKeymap, ...historyKeymap, ...completionKeymap]),
@@ -234,7 +250,7 @@ export function SqlEditorContent({
       viewRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDark, dialect, hasLint, keywordColor, stringColor, identifierColor]);
+  }, [isDark, dialect, hasLint, keywordColor, stringColor, identifierColor, schemaKey]);
 
   // Sync external value without resetting cursor
   useEffect(() => {

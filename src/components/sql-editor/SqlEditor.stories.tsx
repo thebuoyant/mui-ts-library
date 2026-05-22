@@ -202,6 +202,46 @@ export const WithLinting: Story = {
   },
 };
 
+export const WithSchema: Story = {
+  args: {
+    value: "SELECT ",
+    schema: {
+      tables: [
+        {
+          name: "users",
+          columns: [
+            { name: "id",         type: "INT" },
+            { name: "name",       type: "VARCHAR" },
+            { name: "email",      type: "VARCHAR" },
+            { name: "active",     type: "BOOLEAN" },
+            { name: "created_at", type: "TIMESTAMP" },
+          ],
+        },
+        {
+          name: "orders",
+          columns: [
+            { name: "id",         type: "INT" },
+            { name: "user_id",    type: "INT" },
+            { name: "total",      type: "DECIMAL" },
+            { name: "status",     type: "VARCHAR" },
+            { name: "created_at", type: "TIMESTAMP" },
+          ],
+        },
+        {
+          name: "products",
+          columns: [
+            { name: "id",          type: "INT" },
+            { name: "name",        type: "VARCHAR" },
+            { name: "price",       type: "DECIMAL" },
+            { name: "category_id", type: "INT" },
+            { name: "stock",       type: "INT" },
+          ],
+        },
+      ],
+    },
+  },
+};
+
 export const CustomHighlightColors: Story = {
   args: {
     value: SAMPLE_SQL,

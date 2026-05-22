@@ -34,6 +34,7 @@ export function SqlEditor({
   toolbarConfig,
   translation,
   highlightColors,
+  schema,
   onExecute,
   onLint,
   onBlur,
@@ -110,6 +111,7 @@ export function SqlEditor({
           keywordColor={highlightColors?.keyword}
           stringColor={highlightColors?.string}
           identifierColor={highlightColors?.identifier}
+          schema={schema}
           onLint={onLint}
           onDiagnosticsChange={onLint ? handleDiagnosticsChange : undefined}
           onViewReady={handleViewReady}

@@ -175,10 +175,13 @@ Zeile 4: Syntaxfehler — erwartet "ON", gefunden "WHERE"
 - [x] Try/catch: Editor bleibt unverändert bei nicht parsbarem SQL
 - [x] Storybook-Story `WithFormat`
 
-### Phase 4 — Schema-aware Autocomplete (optional)
-- [ ] `schema`-Prop: Tabellen- und Spaltennamen als Autocomplete-Quelle
-- [ ] `SqlSchema`-Typ: `{ tables: { name: string; columns: { name: string; type?: string }[] }[] }`
-- [ ] Unit-Tests
+### Phase 4 — Schema-aware Autocomplete ✅ FERTIG
+- [x] `schema`-Prop: Tabellen- und Spaltennamen als Autocomplete-Quelle
+- [x] `SqlSchema`-Typ: `{ tables: SqlTable[] }` mit `SqlTable { name, columns? }` und `SqlColumn { name, type? }`
+- [x] Spalten-Typen (`INT`, `VARCHAR`, …) erscheinen als `detail` im Autocomplete-Tooltip
+- [x] Konvertierung in CodeMirror-Format (`Record<string, Completion[]>`) innerhalb des `useEffect`
+- [x] `schemaKey = JSON.stringify(schema)` als stabile Dependency für `useEffect`
+- [x] Storybook-Story `WithSchema` mit 3 Tabellen (users, orders, products)
 
 ---
 
