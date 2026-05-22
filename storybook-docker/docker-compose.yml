@@ -1,6 +1,9 @@
+# This file is a template — it is overwritten by the build script.
+# Do NOT run "docker compose up" from this folder.
+# Instead, unzip storybook-X.X.X.zip and run start.sh (Mac) or start.bat (Windows).
 services:
   storybook:
-    build: .
+    image: storybook-local:1.1.0
     ports:
       - "6006:80"
     restart: unless-stopped

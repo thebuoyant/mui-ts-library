@@ -40,11 +40,20 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Exportierte Typen: `SqlEditorProps`, `SqlEditorDialect`, `SqlEditorToolbarConfig`, `SqlEditorTranslation`, `SqlEditorHighlightColors`, `SqlLintError`, `SqlSchema`, `SqlTable`, `SqlColumn`
 - Exportierte Defaults: `DEFAULT_SQL_EDITOR_TOOLBAR_CONFIG`, `DEFAULT_SQL_EDITOR_TRANSLATION`
 
+#### Storybook Docker Distribution
+- Neues Script `npm run build-storybook-docker` — erstellt ein vollständiges ZIP zum Teilen von Storybook mit Nicht-Entwicklern
+- ZIP enthält ein vorgefertigtes Docker-Image (nginx:alpine + Storybook-Static-Files), `docker-compose.yml`, `start.sh` (macOS/Linux), `start.bat` (Windows) und zweisprachige Anleitungen
+- Empfänger benötigen nur Docker Desktop — kein Node.js, kein Build-Schritt
+- Ausgabe: `storybook-docker/storybook-{version}.zip`
+- Endnutzer-Anleitungen: `storybook-docker/how-to.md` (EN) und `storybook-docker/how-to.de.md` (DE)
+
 #### Allgemein
 - `@lezer/highlight` als explizite Dependency ergänzt (war zuvor nur transitive Dep, wird aber direkt in `SqlEditorContent` importiert)
 - `package.json`-Beschreibung und Keywords um SqlEditor / CodeMirror / SQL erweitert
 - Sicherheit: `ws` (8.20.0 → 8.20.1) und `brace-expansion` (5.0.5 → 5.0.6) via `npm audit fix` gepatcht
+- `.gitignore` erweitert: `storybook-docker/storybook-*/`, `storybook-docker/*.tar`, `*.tgz` vom Repository ausgeschlossen
 - Zweisprachiges Benutzerhandbuch: `user-manuals/SqlEditor.md` (EN) und `user-manuals/SqlEditor.de.md` (DE)
+- `PROJECT-SHARE.md` aktualisiert: deckt nun beide Verteilungswege ab (`.tgz`-Bibliothek und Storybook-Docker-ZIP)
 
 ---
 

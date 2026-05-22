@@ -12,6 +12,18 @@ Storybook is a visual catalog of all UI components in the library. You can brows
 
 ---
 
+## What's in this package?
+
+| File | Purpose |
+|---|---|
+| `storybook-X.X.X.tar` | Pre-built Docker image — contains the complete Storybook |
+| `docker-compose.yml` | Docker configuration |
+| `start.sh` | Start script for **macOS / Linux** |
+| `start.bat` | Start script for **Windows** |
+| `how-to.md` | This guide |
+
+---
+
 ## Step 1 — Install Docker Desktop
 
 If Docker Desktop is not yet installed on your computer, download and install it first:
@@ -22,7 +34,7 @@ If Docker Desktop is not yet installed on your computer, download and install it
 | **macOS** | https://www.docker.com/products/docker-desktop/ |
 | **Linux** | https://docs.docker.com/engine/install/ |
 
-After installation, **start Docker Desktop** and wait until the Docker icon in the taskbar/menu bar turns green (ready).
+After installation, **start Docker Desktop** and wait until the Docker icon in the taskbar / menu bar turns green (ready).
 
 > **Note:** Docker Desktop is free for personal and educational use.
 
@@ -36,56 +48,33 @@ You will get a folder called `storybook-1.1.0` (the version number may vary).
 
 ---
 
-## Step 3 — Open a Terminal
-
-You need to open a **terminal** (command prompt) and navigate to the unzipped folder.
-
-### Windows
-
-1. Press `Win + R`, type `cmd` and press **Enter**
-2. Type the following (adjust the path to match your folder):
-
-```
-cd C:\Users\YourName\Desktop\storybook-1.1.0
-```
+## Step 3 — Start Storybook
 
 ### macOS
 
 1. Open **Spotlight** with `Cmd + Space`, type `Terminal` and press **Enter**
-2. Type the following (adjust the path to match your folder):
+2. Navigate to the unzipped folder:
+   ```
+   cd /Users/YourName/Desktop/storybook-1.1.0
+   ```
+   **Tip:** You can drag the folder into the Terminal window after typing `cd ` — the path is inserted automatically.
+3. Run the start script:
+   ```
+   ./start.sh
+   ```
 
-```
-cd /Users/YourName/Desktop/storybook-1.1.0
-```
+### Windows
 
-**Tip for macOS:** You can also drag the folder directly into the Terminal window after typing `cd ` — the path will be inserted automatically.
+1. Open the unzipped folder in **File Explorer**
+2. **Double-click `start.bat`**
 
----
-
-## Step 4 — Start Storybook
-
-In the terminal, type the following command and press **Enter**:
-
-```
-docker compose up -d
-```
-
-Docker will now:
-1. Download the nginx web server (~25 MB, only on the first start)
-2. Build the Storybook image
-3. Start the container in the background
-
-You will see output similar to this — this is normal:
-
-```
-[+] Running 2/2
- ✔ Network storybook_default  Created
- ✔ Container storybook-1      Started
-```
+The script will:
+1. Load the pre-built Docker image (one-time, takes ~10–30 seconds)
+2. Start the Storybook container
 
 ---
 
-## Step 5 — Open in your browser
+## Step 4 — Open in your browser
 
 Open any browser and go to this address:
 
@@ -95,47 +84,55 @@ The Storybook component catalog will open. You can now browse all components.
 
 ---
 
-## Step 6 — Stop Storybook
+## Step 5 — Stop Storybook
 
-When you are done, type the following command in the terminal to stop Docker:
+### macOS / Linux — in the terminal:
 
 ```
 docker compose down
 ```
 
-The Storybook will stop and the memory will be freed. Your data is not deleted — you can start it again at any time with `docker compose up -d`.
+### Windows — in the same folder, double-click `start.bat` again, or open a command prompt and run:
+
+```
+docker compose down
+```
 
 ---
 
 ## Troubleshooting
 
+### "Permission denied" when running start.sh (macOS / Linux)
+
+Run this once to make the script executable:
+```
+chmod +x start.sh
+```
+Then try `./start.sh` again.
+
 ### "Port 6006 is already in use"
 
-Another program is already using port 6006. You can use a different port:
-
-1. Open the file `docker-compose.yml` in a text editor (e.g. Notepad on Windows, TextEdit on macOS)
-2. Find the line `- "6006:80"` and change `6006` to any other number, e.g.:
-   ```
-   - "7000:80"
-   ```
-3. Save the file and run `docker compose up -d` again
-4. Open **http://localhost:7000** in your browser
+Another program is using port 6006. Open `docker-compose.yml` in a text editor and change the port:
+```yaml
+ports:
+  - "7000:80"   # use port 7000 instead
+```
+Then open **http://localhost:7000** in your browser.
 
 ### "docker compose: command not found"
 
 Try the older syntax with a hyphen:
-
 ```
 docker-compose up -d
 ```
 
 ### Docker Desktop is not running
 
-Make sure Docker Desktop is started (the Docker icon in the taskbar/menu bar should be visible). Then try the command again.
+Make sure Docker Desktop is started (the Docker icon in the taskbar / menu bar should be visible). Then try again.
 
 ### The browser shows "This site can't be reached"
 
-Wait a few seconds and refresh the page. Docker sometimes needs a moment to fully start the container.
+Wait a few seconds and refresh the page — Docker sometimes needs a moment to fully start the container.
 
 ---
 
@@ -143,7 +140,7 @@ Wait a few seconds and refresh the page. Docker sometimes needs a moment to full
 
 | What | Command |
 |---|---|
-| Start Storybook | `docker compose up -d` |
+| Start Storybook | `./start.sh` (Mac) or `start.bat` (Windows) |
 | Stop Storybook | `docker compose down` |
 | Open in browser | http://localhost:6006 |
 | Check status | `docker compose ps` |

@@ -739,6 +739,18 @@ npm run storybook
 npm run build-storybook
 ```
 
+### Storybook Docker Distribution
+
+Share an interactive Storybook with non-developers (Product Owners, Designers) — no Node.js or development tools required on their end, only Docker.
+
+```bash
+npm run build-storybook-docker
+```
+
+Creates `storybook-docker/storybook-{version}.zip` — a self-contained package with a pre-built Docker image and start scripts (`start.sh` for macOS/Linux, `start.bat` for Windows). Recipients unzip, run the script, and open `http://localhost:6006`.
+
+See [`storybook-docker/how-to.md`](storybook-docker/how-to.md) for the full end-user guide.
+
 ### Tests
 
 Tests are written with [Vitest](https://vitest.dev/) and [@testing-library/react](https://testing-library.com/docs/react-testing-library/intro/).

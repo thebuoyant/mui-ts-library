@@ -29,4 +29,7 @@ storybook-static
 coverage
 
 storybook-docker/storybook-*.zip
+storybook-docker/storybook-*/
+storybook-docker/*.tar
 .storybook-docker-tmp
+*.tgz
