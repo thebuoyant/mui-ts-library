@@ -1,0 +1,201 @@
+import { type ComponentProps, useState } from "react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
+import { Box } from "@mui/material";
+import { SqlEditor } from "./SqlEditor";
+
+const meta: Meta<typeof SqlEditor> = {
+  title: "Components/SqlEditor",
+  component: SqlEditor,
+  argTypes: {
+    placeholder:     { control: "text" },
+    height:          { control: "text" },
+    width:           { control: "text" },
+    disabled:        { control: "boolean" },
+    readonly:        { control: "boolean" },
+    error:           { control: "boolean" },
+    helperText:      { control: "text" },
+    name:            { control: "text" },
+    showLineNumbers: { control: "boolean" },
+    showLineColumn:  { control: "boolean" },
+    dialect:         { control: "radio", options: ["standard", "mysql", "postgresql", "sqlite", "mssql"] },
+    value:           { control: false },
+    toolbarConfig:   { control: false },
+    translation:     { control: false },
+    onChange:        { control: false },
+    onExecute:       { control: false },
+    onBlur:          { control: false },
+    onFocus:         { control: false },
+  },
+  args: {
+    onChange:        fn(),
+    onBlur:          fn(),
+    onFocus:         fn(),
+    placeholder:     "Enter SQL query …",
+    height:          "",
+    width:           "",
+    disabled:        false,
+    readonly:        false,
+    error:           false,
+    helperText:      "",
+    name:            "",
+    showLineNumbers: true,
+    showLineColumn:  true,
+    dialect:         "standard",
+  },
+};
+
+export default meta;
+type Story = StoryObj<typeof SqlEditor>;
+
+const SAMPLE_SQL = `SELECT
+  u.id,
+  u.name,
+  u.email,
+  COUNT(o.id) AS order_count,
+  SUM(o.total) AS total_spent
+FROM users u
+LEFT JOIN orders o ON o.user_id = u.id
+WHERE u.active = 1
+  AND u.created_at >= '2024-01-01'
+GROUP BY u.id, u.name, u.email
+HAVING COUNT(o.id) > 0
+ORDER BY total_spent DESC
+LIMIT 50;`;
+
+const LONG_SQL = `-- Report: Monthly Revenue by Category
+SELECT
+  c.name AS category,
+  DATE_FORMAT(o.created_at, '%Y-%m') AS month,
+  COUNT(DISTINCT o.id) AS order_count,
+  COUNT(DISTINCT o.user_id) AS unique_customers,
+  SUM(oi.quantity) AS units_sold,
+  SUM(oi.quantity * oi.unit_price) AS gross_revenue,
+  SUM(oi.quantity * oi.unit_price * (1 - COALESCE(d.discount_pct, 0))) AS net_revenue
+FROM orders o
+JOIN order_items oi ON oi.order_id = o.id
+JOIN products p ON p.id = oi.product_id
+JOIN categories c ON c.id = p.category_id
+LEFT JOIN discounts d ON d.order_id = o.id
+WHERE o.status = 'completed'
+  AND o.created_at BETWEEN '2024-01-01' AND '2024-12-31'
+GROUP BY c.name, month
+ORDER BY month DESC, net_revenue DESC;`;
+
+export const Default: Story = {
+  args: {
+    placeholder: "Enter SQL query …",
+  },
+};
+
+export const WithQuery: Story = {
+  args: {
+    value: SAMPLE_SQL,
+  },
+};
+
+export const WithFixedHeight: Story = {
+  args: {
+    value:  LONG_SQL,
+    height: "200",
+  },
+};
+
+export const WithAutoHeight: Story = {
+  decorators: [
+    (Story) => (
+      <Box sx={{ height: 400, display: "flex", flexDirection: "column", border: "2px dashed", borderColor: "divider", p: 1 }}>
+        <Story />
+      </Box>
+    ),
+  ],
+  args: {
+    value:  SAMPLE_SQL,
+    height: "auto",
+  },
+};
+
+function ControlledStory(args: ComponentProps<typeof SqlEditor>) {
+  const [sql, setSql] = useState(SAMPLE_SQL);
+  return (
+    <SqlEditor
+      {...args}
+      value={sql}
+      onChange={(val) => {
+        setSql(val);
+        args.onChange?.(val);
+      }}
+    />
+  );
+}
+
+export const Controlled: Story = {
+  render: (args) => <ControlledStory {...args} />,
+};
+
+export const MySQLDialect: Story = {
+  args: {
+    dialect: "mysql",
+    value:   "SELECT * FROM users WHERE created_at >= NOW() - INTERVAL 7 DAY;",
+  },
+};
+
+export const PostgreSQLDialect: Story = {
+  args: {
+    dialect: "postgresql",
+    value:   "SELECT id, name, created_at::date FROM users WHERE active IS TRUE LIMIT 10;",
+  },
+};
+
+export const WithExecute: Story = {
+  args: {
+    value:        SAMPLE_SQL,
+    toolbarConfig: { showExecute: true },
+    onExecute:    fn(),
+  },
+};
+
+export const NoLineNumbers: Story = {
+  args: {
+    value:           SAMPLE_SQL,
+    showLineNumbers: false,
+    showLineColumn:  false,
+  },
+};
+
+export const ReadOnly: Story = {
+  args: {
+    value:    SAMPLE_SQL,
+    readonly: true,
+  },
+};
+
+export const Disabled: Story = {
+  args: {
+    value:    SAMPLE_SQL,
+    disabled: true,
+  },
+};
+
+export const WithError: Story = {
+  args: {
+    error:      true,
+    helperText: "Invalid SQL syntax.",
+    value:      "SELECT * FORM users",
+  },
+};
+
+export const GermanTranslation: Story = {
+  args: {
+    value: SAMPLE_SQL,
+    translation: {
+      copy:        "Kopieren",
+      copySuccess: "Kopiert!",
+      clear:       "Leeren",
+      execute:     "Ausführen",
+      undo:        "Rückgängig",
+      redo:        "Wiederholen",
+      lineColumn:  "Zeile {line}, Sp. {col}",
+    },
+  },
+};

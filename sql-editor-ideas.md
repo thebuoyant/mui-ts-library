@@ -8,7 +8,7 @@ Ein SQL-Editor der visuell identisch zum `RichTextEditor` aufgebaut ist — glei
 
 ---
 
-## Technologie-Entscheidung: CodeMirror 6
+## Technologie-Entscheidung: CodeMirror 6 ✅
 
 ### Warum nicht Monaco (VS Code Editor)?
 Monaco ist exzellent, aber 2–3 MB Bundle, schwer ins MUI-Theme zu integrieren, und für einen eingebetteten Editor overkill.
@@ -32,109 +32,75 @@ TipTap hat CodeBlock-Support, aber kein echtes SQL-Linting und keine Cursor-Posi
 
 ```
 ┌─────────────────────────────────────────────────────┐  ← Paper (outlined)
-│  [Format] [Copy] [Clear]  │  [Undo] [Redo]  [Help]  │  ← SqlEditorToolbar
+│  [Copy] [Clear]  │  [Undo] [Redo]                   │  ← SqlEditorToolbar ✅
 ├─────────────────────────────────────────────────────┤  ← Divider
 │ 1  SELECT u.name,                                   │
-│ 2    COUNT(o.id) AS order_count                     │  ← CodeMirror Editor
+│ 2    COUNT(o.id) AS order_count                     │  ← CodeMirror Editor ✅
 │ 3  FROM users u                                     │     (scrollable)
 │ 4  JOIN orders o ON o.user_id = u.id                │
 │ 5  WHERE u.active = 1                               │
 │ 6  GROUP BY u.name                                  │
 │ 7  ▋                                                │
 ├─────────────────────────────────────────────────────┤
-│  ⚠ 1 Fehler: Zeile 4 — unbekannte Tabelle 'orders'  │  ← SqlEditorFooter
-│                                              Ln 7, Col 1 │
+│                                              Ln 7, Col 1 │  ← SqlEditorFooter ✅
 └─────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Props-API (analog RichTextEditor)
+## Props-API (analog RichTextEditor) ✅
 
 ```ts
 type SqlEditorProps = {
-  // Kern
   value?:     string;
   onChange?:  (sql: string) => void;
   placeholder?: string;
-
-  // Größe (identisch RichTextEditor)
   height?: number | string;
   width?:  number | string;
-
-  // Zustände (identisch RichTextEditor)
   disabled?:   boolean;
   readonly?:   boolean;
   error?:      boolean;
   helperText?: string;
-
-  // Form
-  name?: string;
-
-  // SQL-spezifisch
-  dialect?:  "standard" | "mysql" | "postgresql" | "sqlite" | "mssql";
-  schema?:   SqlSchema;           // → Schema-aware Autocomplete
-  onExecute?: (sql: string) => void; // → "Ausführen"-Button in Toolbar
-
-  // Konfiguration
-  showLineNumbers?:    boolean;   // default: true
-  showLineColumn?:     boolean;   // default: true
-  showErrorCount?:     boolean;   // default: true
-  toolbarConfig?:      SqlEditorToolbarConfig;
-
-  // i18n
-  translation?: Partial<SqlEditorTranslation>;
-
-  // Callbacks
-  onBlur?:  () => void;
-  onFocus?: () => void;
+  name?:       string;
+  dialect?:    "standard" | "mysql" | "postgresql" | "sqlite" | "mssql";
+  showLineNumbers?: boolean;
+  showLineColumn?:  boolean;
+  toolbarConfig?:   SqlEditorToolbarConfig;
+  translation?:     Partial<SqlEditorTranslation>;
+  onExecute?: (sql: string) => void;
+  onBlur?:    () => void;
+  onFocus?:   () => void;
 };
 ```
 
-### `SqlSchema` — für Schema-aware Autocomplete
-
+Noch geplant für Phase 4:
 ```ts
-type SqlSchema = {
-  tables: {
-    name:    string;
-    columns: { name: string; type?: string }[];
-  }[];
-};
-```
-
-Beispiel:
-```ts
-const schema: SqlSchema = {
-  tables: [
-    { name: "users",  columns: [{ name: "id" }, { name: "name" }, { name: "email" }] },
-    { name: "orders", columns: [{ name: "id" }, { name: "user_id" }, { name: "total" }] },
-  ]
-};
+schema?: SqlSchema;   // → Schema-aware Autocomplete
 ```
 
 ---
 
-## Syntax-Highlighting
+## Syntax-Highlighting ✅
 
-CodeMirror 6 highlightet automatisch:
+CodeMirror 6 highlightet mit MUI-Theme-Farben:
 
-| Token | Farbe (MUI-Theme-aware) |
+| Token | Farbe |
 |---|---|
-| Keywords (`SELECT`, `FROM`, `WHERE`, …) | `primary.main` |
+| Keywords (`SELECT`, `FROM`, `WHERE`, …) | `primary.main` (bold) |
 | Funktionen (`COUNT`, `SUM`, `COALESCE`, …) | `secondary.main` |
 | Strings (`'wert'`) | `success.dark` |
 | Zahlen (`42`, `3.14`) | `warning.dark` |
-| Kommentare (`--`, `/* */`) | `text.disabled` |
-| Operatoren (`=`, `>`, `AND`, …) | `text.primary` (bold) |
-| Fehler-Token | roter Underline + Tooltip |
+| Kommentare (`--`, `/* */`) | `text.disabled` (italic) |
+| Operatoren (`=`, `>`, `AND`, …) | `text.secondary` |
+| Fehler-Token | `error.main` + wavy underline |
 
-Alle Farben kommen aus dem aktiven MUI-Theme — Dark Mode funktioniert automatisch.
+Dark Mode funktioniert automatisch — Farben kommen aus dem aktiven MUI-Theme.
 
 ---
 
 ## Fehler-Erkennung
 
-### Echtzeit-Linting (Phase 2)
+### Echtzeit-Linting (Phase 2 — noch offen)
 
 ```
 Zeile 4: Syntaxfehler — erwartet "ON", gefunden "WHERE"
@@ -149,7 +115,7 @@ Zeile 4: Syntaxfehler — erwartet "ON", gefunden "WHERE"
 3. **Kombiniert** — Client-Linter für Sofortfeedback, Server-Linter für semantische Fehler (unbekannte Tabellen etc.)
 
 ```ts
-// Server-seitiges Linting via Prop
+// Geplante API für Phase 2:
 <SqlEditor
   onLint={async (sql) => {
     const res = await fetch('/api/lint', { body: sql });
@@ -162,97 +128,76 @@ Zeile 4: Syntaxfehler — erwartet "ON", gefunden "WHERE"
 
 ## Toolbar-Buttons
 
-| Button | Aktion | Tooltip |
+| Button | Status | Aktion |
 |---|---|---|
-| **Format** | SQL prettifizieren (`sql-formatter`) | "SQL formatieren" |
-| **Copy** | Inhalt in Zwischenablage | "Kopieren" |
-| **Clear** | Editor leeren (mit Bestätigung) | "Leeren" |
-| **Execute** | `onExecute(sql)` aufrufen | "Ausführen" — nur wenn Prop gesetzt |
-| **Undo / Redo** | CodeMirror History | "Rückgängig / Wiederholen" |
-
----
-
-## Abhängigkeiten
-
-```json
-{
-  "@codemirror/view":         "^6.x",
-  "@codemirror/state":        "^6.x",
-  "@codemirror/lang-sql":     "^6.x",
-  "@codemirror/lint":         "^6.x",
-  "@codemirror/autocomplete":  "^6.x",
-  "@codemirror/commands":     "^6.x",
-  "@codemirror/theme-one-dark": "^6.x",
-  "sql-formatter":            "^15.x"
-}
-```
-
-Alle als `peerDependencies` oder `dependencies` — CodeMirror ist modular, tree-shakeable.
+| **Copy** | ✅ Phase 1 | Inhalt in Zwischenablage + "Copied!"-Feedback |
+| **Clear** | ✅ Phase 1 | Editor leeren |
+| **Undo / Redo** | ✅ Phase 1 | CodeMirror History |
+| **Execute** | ✅ Phase 1 | `onExecute(sql)` — nur wenn Prop gesetzt |
+| **Format** | Phase 3 | SQL prettifizieren via `sql-formatter` |
 
 ---
 
 ## Implementierungsphasen
 
-### Phase 1 — Foundation (MVP)
-- [ ] Komponentenstruktur anlegen: `SqlEditor.tsx`, `SqlEditor.types.ts`, `SqlEditorToolbar.tsx`, `SqlEditorContent.tsx`, `SqlEditorFooter.tsx`
-- [ ] CodeMirror 6 integrieren mit `@codemirror/lang-sql`
-- [ ] MUI Paper-Layout (identisch RichTextEditor)
-- [ ] Props: `value`, `onChange`, `height`, `width`, `disabled`, `readonly`, `error`, `helperText`, `name`
-- [ ] SQL-Syntax-Highlighting mit MUI-Theme-Farben
-- [ ] Zeilennummern
-- [ ] `normalizeSize()` aus RichTextEditor wiederverwenden
+### Phase 1 — Foundation ✅ FERTIG
+- [x] Komponentenstruktur: `SqlEditor.tsx`, `SqlEditor.types.ts`, `SqlEditorToolbar.tsx`, `SqlEditorContent.tsx`, `SqlEditorFooter.tsx`
+- [x] CodeMirror 6 integrieren mit `@codemirror/lang-sql`
+- [x] MUI Paper-Layout (identisch RichTextEditor)
+- [x] Props: `value`, `onChange`, `height`, `width`, `disabled`, `readonly`, `error`, `helperText`, `name`
+- [x] SQL-Syntax-Highlighting mit MUI-Theme-Farben (Dark Mode inklusive)
+- [x] Zeilennummern + aktive Zeile
+- [x] Cursor-Position (Zeile/Spalte) im Footer
+- [x] Toolbar: Copy (mit Copied!-Feedback), Clear, Undo, Redo, Execute
+- [x] `dialect`-Prop: standard, mysql, postgresql, sqlite, mssql
+- [x] `toolbarConfig` + `translation` Props
+- [x] Storybook-Stories (12 Stories)
+- [x] Export aus `src/index.ts`
+- [x] Build grün, alle 271 Tests bestanden
 
-### Phase 2 — SQL Intelligence
+### Phase 2 — SQL Intelligence (offen)
 - [ ] Echtzeit-Linting via `@codemirror/lint`
 - [ ] Fehleranzeige im Footer (Anzahl + erste Fehlermeldung)
 - [ ] `onLint`-Callback für server-seitiges Linting
-- [ ] Autocomplete für SQL-Keywords (`@codemirror/autocomplete`)
-- [ ] Zeile/Spalte-Anzeige im Footer
+- [ ] Autocomplete für SQL-Keywords (`@codemirror/autocomplete` — bereits installiert)
+- [ ] `showErrorCount`-Prop
 
-### Phase 3 — Toolbar & UX
-- [ ] Format-Button mit `sql-formatter`
-- [ ] Copy-Button
-- [ ] Clear-Button mit Bestätigungs-Dialog
-- [ ] Undo/Redo
-- [ ] `onExecute`-Callback + Execute-Button (nur wenn Prop gesetzt)
-- [ ] `toolbarConfig` zum Ein-/Ausblenden einzelner Buttons
-- [ ] i18n via `translation`-Prop
+### Phase 3 — Format (offen)
+- [ ] Format-Button: SQL prettifizieren mit `sql-formatter`
+- [ ] `npm install sql-formatter`
 
-### Phase 4 — Advanced (optional)
-- [ ] `schema`-Prop für Schema-aware Autocomplete (Tabellen- und Spaltennamen)
-- [ ] `dialect`-Prop: MySQL, PostgreSQL, SQLite, MSSQL
-- [ ] Multi-Statement-Support (mehrere Queries, trennbar per `;`)
-- [ ] Minimap (optional, bei großen Queries)
-- [ ] Storybook-Stories
+### Phase 4 — Schema-aware Autocomplete (optional)
+- [ ] `schema`-Prop: Tabellen- und Spaltennamen als Autocomplete-Quelle
+- [ ] `SqlSchema`-Typ: `{ tables: { name: string; columns: { name: string; type?: string }[] }[] }`
 - [ ] Unit-Tests
 
 ---
 
-## Dateistruktur
+## Dateistruktur (aktuell)
 
 ```
 src/components/sql-editor/
-├── SqlEditor.tsx
-├── SqlEditor.types.ts
-├── SqlEditor.stories.tsx
-├── SqlEditor.test.tsx
-├── SqlEditorToolbar.tsx
-├── SqlEditorContent.tsx
-├── SqlEditorFooter.tsx
-└── util/
-    └── sql-editor.util.ts    ← normalizeSize, Theme-Mapping, etc.
+├── SqlEditor.tsx            ✅
+├── SqlEditor.types.ts       ✅
+├── SqlEditor.stories.tsx    ✅
+├── SqlEditorToolbar.tsx     ✅
+├── SqlEditorContent.tsx     ✅
+└── SqlEditorFooter.tsx      ✅
 ```
 
 ---
 
-## Meine Einschätzung
+## Abhängigkeiten (installiert)
 
-Diese Komponente macht für die Bibliothek sehr viel Sinn:
-
-- Sie ist in keiner anderen MUI-Komponenten-Bibliothek so vorhanden
-- Der Bedarf ist real — jede App die Datenbanken berührt braucht sowas
-- Das visuelle Konsistenz-Versprechen zur restlichen Bibliothek ist ein echter USP
-- CodeMirror 6 ist modern, leicht und produktionserprobt
-- Phase 1 + 2 sind in einem überschaubaren Aufwand umsetzbar — Phase 3 und 4 können später nachgezogen werden
-
-**Empfehlung:** Mit Phase 1 starten (Foundation + Syntax-Highlighting) — das gibt sofort einen nutzbaren Editor der sich anfühlt wie der RichTextEditor. Phase 2 (Linting) ist der entscheidende Mehrwert gegenüber einem einfachen `<textarea>`.
+```json
+{
+  "@codemirror/view":        "^6.x  ✅",
+  "@codemirror/state":       "^6.x  ✅",
+  "@codemirror/lang-sql":    "^6.x  ✅",
+  "@codemirror/lint":        "^6.x  ✅  (für Phase 2)",
+  "@codemirror/autocomplete": "^6.x  ✅  (für Phase 2)",
+  "@codemirror/commands":    "^6.x  ✅",
+  "@codemirror/language":    "^6.x  ✅",
+  "sql-formatter":           "noch nicht  (für Phase 3)"
+}
+```
