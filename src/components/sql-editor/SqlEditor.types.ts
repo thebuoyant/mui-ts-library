@@ -47,6 +47,15 @@ export const DEFAULT_SQL_EDITOR_TRANSLATION: SqlEditorTranslation = {
 
 export type SqlEditorDialect = "standard" | "mysql" | "postgresql" | "sqlite" | "mssql";
 
+export type SqlEditorHighlightColors = {
+  /** SQL keywords like SELECT, FROM, WHERE. Default: theme primary.main (bold). */
+  keyword?:    string;
+  /** String literals like 'value'. Default: theme success.main (bold). */
+  string?:     string;
+  /** Identifiers: table names, column names, aliases. Default: theme info.main. */
+  identifier?: string;
+};
+
 export type SqlEditorProps = {
   value?:     string;
   onChange?:  (sql: string) => void;
@@ -65,8 +74,9 @@ export type SqlEditorProps = {
   showLineNumbers?: boolean;
   showLineColumn?:  boolean;
   showErrorCount?:  boolean;
-  toolbarConfig?:   SqlEditorToolbarConfig;
-  translation?:     Partial<SqlEditorTranslation>;
+  toolbarConfig?:    SqlEditorToolbarConfig;
+  translation?:      Partial<SqlEditorTranslation>;
+  highlightColors?:  SqlEditorHighlightColors;
   onExecute?: (sql: string) => void;
   onLint?:    (sql: string) => Promise<SqlLintError[]> | SqlLintError[];
   onBlur?:    () => void;

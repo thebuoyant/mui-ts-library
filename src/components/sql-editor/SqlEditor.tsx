@@ -33,6 +33,7 @@ export function SqlEditor({
   showErrorCount  = false,
   toolbarConfig,
   translation,
+  highlightColors,
   onExecute,
   onLint,
   onBlur,
@@ -106,6 +107,9 @@ export function SqlEditor({
           readonly={readonly}
           showLineNumbers={showLineNumbers}
           dialect={dialect}
+          keywordColor={highlightColors?.keyword}
+          stringColor={highlightColors?.string}
+          identifierColor={highlightColors?.identifier}
           onLint={onLint}
           onDiagnosticsChange={onLint ? handleDiagnosticsChange : undefined}
           onViewReady={handleViewReady}

@@ -18,10 +18,12 @@ const meta: Meta<typeof SqlEditor> = {
     name:            { control: "text" },
     showLineNumbers: { control: "boolean" },
     showLineColumn:  { control: "boolean" },
+    showErrorCount:  { control: "boolean" },
     dialect:         { control: "radio", options: ["standard", "mysql", "postgresql", "sqlite", "mssql"] },
     value:           { control: false },
     toolbarConfig:   { control: false },
     translation:     { control: false },
+    highlightColors: { control: false },
     onChange:        { control: false },
     onExecute:       { control: false },
     onBlur:          { control: false },
@@ -41,6 +43,7 @@ const meta: Meta<typeof SqlEditor> = {
     name:            "",
     showLineNumbers: true,
     showLineColumn:  true,
+    showErrorCount:  false,
     dialect:         "standard",
   },
 };
@@ -195,6 +198,17 @@ export const WithLinting: Story = {
       if (sql.includes("FORM"))  errors.push({ line: 1, col: 10, message: "Unknown keyword 'FORM' — did you mean 'FROM'?", severity: "error" as const });
       if (sql.includes("WHER"))  errors.push({ line: 1, col: 22, message: "Unknown keyword 'WHER' — did you mean 'WHERE'?", severity: "error" as const });
       return errors;
+    },
+  },
+};
+
+export const CustomHighlightColors: Story = {
+  args: {
+    value: SAMPLE_SQL,
+    highlightColors: {
+      keyword:    "#c678dd",   // purple — like One Dark
+      string:     "#98c379",   // green
+      identifier: "#e5c07b",   // golden — table/column names
     },
   },
 };

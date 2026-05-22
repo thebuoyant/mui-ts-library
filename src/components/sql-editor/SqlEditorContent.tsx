@@ -33,6 +33,9 @@ type SqlEditorContentProps = {
   readonly?:             boolean;
   showLineNumbers?:      boolean;
   dialect?:              SqlEditorDialect;
+  keywordColor?:         string;
+  stringColor?:          string;
+  identifierColor?:      string;
   onLint?:               (sql: string) => Promise<SqlLintError[]> | SqlLintError[];
   onDiagnosticsChange?:  (count: number) => void;
   onViewReady:           (view: EditorView | null) => void;
@@ -49,6 +52,9 @@ export function SqlEditorContent({
   readonly = false,
   showLineNumbers = true,
   dialect = "standard",
+  keywordColor,
+  stringColor,
+  identifierColor,
   onLint,
   onDiagnosticsChange,
   onViewReady,
@@ -87,10 +93,15 @@ export function SqlEditorContent({
 
     const currentDoc = viewRef.current?.state.doc.toString() ?? value ?? "";
 
+    const kwColor  = keywordColor    ?? muiTheme.palette.primary.main;
+    const strColor = stringColor     ?? muiTheme.palette.success.main;
+    const idColor  = identifierColor ?? muiTheme.palette.info.main;
+
     const highlightStyle = HighlightStyle.define([
-      { tag: tags.keyword,                              color: muiTheme.palette.primary.main,  fontWeight: "bold" },
-      { tag: [tags.string, tags.special(tags.string)], color: muiTheme.palette.success.dark },
-      { tag: tags.number,                              color: muiTheme.palette.warning.dark },
+      { tag: tags.keyword,                              color: kwColor,  fontWeight: "bold" },
+      { tag: tags.name,                                 color: idColor },
+      { tag: [tags.string, tags.special(tags.string)], color: strColor, fontWeight: "bold" },
+      { tag: tags.number,                              color: muiTheme.palette.warning.main },
       { tag: [tags.lineComment, tags.blockComment],    color: muiTheme.palette.text.disabled, fontStyle: "italic" },
       { tag: tags.operator,                            color: muiTheme.palette.text.secondary },
       { tag: [tags.function(tags.variableName), tags.function(tags.name)],
@@ -223,7 +234,7 @@ export function SqlEditorContent({
       viewRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDark, dialect, hasLint]);
+  }, [isDark, dialect, hasLint, keywordColor, stringColor, identifierColor]);
 
   // Sync external value without resetting cursor
   useEffect(() => {
