@@ -6,3 +6,5 @@ export * from "./components/tag-selection/TagSelection";
 export * from "./components/tag-selection/TagSelection.types";
 export * from "./components/rich-text-editor/RichTextEditor";
 export * from "./components/rich-text-editor/RichTextEditor.types";
+export * from "./components/sql-editor/SqlEditor";
+export * from "./components/sql-editor/SqlEditor.types";
