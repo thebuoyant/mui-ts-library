@@ -8,7 +8,7 @@ cd "${PROJECT_DIR}"
 
 VERSION=$(node -p "require('./package.json').version")
 PACKAGE_NAME="storybook-${VERSION}"
-OUTPUT_ZIP="${PACKAGE_NAME}.zip"
+OUTPUT_ZIP="storybook-docker/${PACKAGE_NAME}.zip"
 BUILD_DIR=".storybook-docker-tmp"
 
 echo "┌──────────────────────────────────────────────────┐"
@@ -36,7 +36,7 @@ cp storybook-docker/how-to.de.md      "${BUILD_DIR}/${PACKAGE_NAME}/"
 # ── 3. Create ZIP ─────────────────────────────────────────
 echo "▶ [3/3] Creating ${OUTPUT_ZIP} ..."
 rm -f "${OUTPUT_ZIP}"
-(cd "${BUILD_DIR}" && zip -qr "../${OUTPUT_ZIP}" "${PACKAGE_NAME}")
+(cd "${BUILD_DIR}" && zip -qr "${PROJECT_DIR}/${OUTPUT_ZIP}" "${PACKAGE_NAME}")
 rm -rf "${BUILD_DIR}"
 
 SIZE=$(du -sh "${OUTPUT_ZIP}" | cut -f1)

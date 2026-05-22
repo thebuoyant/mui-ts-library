@@ -28,5 +28,5 @@ storybook-static
 
 coverage
 
-storybook-*.zip
+storybook-docker/storybook-*.zip
 .storybook-docker-tmp
