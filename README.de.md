@@ -17,6 +17,7 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
   - [TagSelection](#tagselection)
   - [PasswordStrengthMeter](#passwordstrengthmeter)
   - [RichTextEditor](#richtexteditor)
+  - [SqlEditor](#sqleditor)
 - [Entwicklung](#entwicklung)
 - [Veröffentlichung auf npm](#veröffentlichung-auf-npm)
 - [Lizenz](#lizenz)
@@ -31,6 +32,7 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 | `TagSelection` | Multi-Tag-Auswahlfeld mit Such-Autocomplete, alphabetisch sortierter Chip-Anzeige und Dropdown-Liste, Overflow-Begrenzung (`maxVisibleChips`), freier Tag-Erstellung (`allowCreate`) per Klick oder Enter, MUI-Theme- und Custom-Farben, Tag-Limit und vollständiger Callback-API |
 | `PasswordStrengthMeter` | Passwort-Eingabefeld mit Live-Stärkebewertung, animiertem Meter und Anforderungscheckliste |
 | `RichTextEditor` | WYSIWYG-Editor auf Basis TipTap v3 mit MUI-Toolbar, Textfarbe, Hervorhebung, Link-Dialog, automatischer Markdown-Konvertierung beim Einfügen, Zeichenzähler, Zeichenbegrenzung, konfigurierbarer Höhe/Breite, Readonly/Disabled-Modus und vollständiger Form-Integration |
+| `SqlEditor` | SQL-Code-Editor auf Basis CodeMirror 6 mit MUI-Layout, SQL-Syntax-Highlighting, Multi-Dialekt-Unterstützung, Format-Schaltfläche, SQL-Linting per Callback, Schema-aware Autocomplete, konfigurierbarer Toolbar, Cursor-Position-Footer und vollständiger i18n |
 
 ---
 
@@ -44,6 +46,7 @@ Ausführliche Prop-Referenzen, Verwendungsbeispiele und i18n-Anleitungen für je
 | `TagSelection` | [user-manuals/TagSelection.md](user-manuals/TagSelection.md) |
 | `PasswordStrengthMeter` | [user-manuals/PasswordStrengthMeter.md](user-manuals/PasswordStrengthMeter.md) |
 | `RichTextEditor` | [user-manuals/RichTextEditor.md](user-manuals/RichTextEditor.md) |
+| `SqlEditor` | [user-manuals/SqlEditor.md](user-manuals/SqlEditor.md) |
 
 ---
 
@@ -601,6 +604,114 @@ import { Controller } from 'react-hook-form';
 
 ---
 
+### SqlEditor
+
+Ein SQL-Code-Editor auf Basis [CodeMirror 6](https://codemirror.net/) mit demselben MUI-Paper-Layout wie der `RichTextEditor`. Wichtigste Features:
+
+- **SQL-Syntax-Highlighting** — Keywords fett in `primary.main`, Strings in `success.main`, Identifier in `info.main`, Zahlen in `warning.main`
+- **5 SQL-Dialekte** — Standard SQL, MySQL, PostgreSQL, SQLite, MS SQL
+- **Format-Schaltfläche** — SQL verschönern via `sql-formatter` (Dialekt-spezifisch)
+- **Linting** — Server-seitige Lint-Fehler via asynchronem `onLint`-Callback mit Wellenlinien im Editor
+- **Schema-aware Autocomplete** — Tabellen- und Spaltennamen (mit Typ-Hinweisen) via `schema`-Prop
+- **Konfigurierbare Highlight-Farben** — Keyword-, String- und Identifier-Farben via `highlightColors`
+- **Footer** — Cursor-Position (Ln / Col) und Fehleranzahl
+- **Toolbar** — Format, Kopieren (mit Feedback), Leeren, Rückgängig, Wiederholen, Ausführen
+- **Vollständige i18n** — alle UI-Texte überschreibbar via `translation`-Prop
+
+```tsx
+import { SqlEditor } from '@thebuoyant-tsdev/mui-ts-library';
+
+function App() {
+  return (
+    <SqlEditor
+      placeholder="SQL-Abfrage eingeben …"
+      onChange={(sql) => console.log(sql)}
+    />
+  );
+}
+```
+
+**Kontrollierter Modus:**
+
+```tsx
+const [sql, setSql] = useState('SELECT * FROM users;');
+
+<SqlEditor value={sql} onChange={setSql} />
+```
+
+**Mit Ausführen-Schaltfläche:**
+
+```tsx
+<SqlEditor
+  value={sql}
+  toolbarConfig={{ showExecute: true }}
+  onExecute={(sql) => runQuery(sql)}
+/>
+```
+
+**Mit server-seitigem Linting:**
+
+```tsx
+<SqlEditor
+  value={sql}
+  showErrorCount
+  onLint={async (sql) => {
+    const res = await fetch('/api/lint', { method: 'POST', body: sql });
+    return res.json(); // SqlLintError[]
+  }}
+/>
+```
+
+**Mit Schema-aware Autocomplete:**
+
+```tsx
+import type { SqlSchema } from '@thebuoyant-tsdev/mui-ts-library';
+
+const schema: SqlSchema = {
+  tables: [
+    {
+      name: 'users',
+      columns: [
+        { name: 'id',    type: 'INT' },
+        { name: 'email', type: 'VARCHAR' },
+      ],
+    },
+    {
+      name: 'orders',
+      columns: [
+        { name: 'id',      type: 'INT' },
+        { name: 'user_id', type: 'INT' },
+        { name: 'total',   type: 'DECIMAL' },
+      ],
+    },
+  ],
+};
+
+<SqlEditor value={sql} schema={schema} />
+```
+
+**Mit eigenen Syntax-Highlight-Farben:**
+
+```tsx
+import type { SqlEditorHighlightColors } from '@thebuoyant-tsdev/mui-ts-library';
+
+const colors: SqlEditorHighlightColors = {
+  keyword:    '#c678dd',   // Lila
+  string:     '#98c379',   // Grün
+  identifier: '#e5c07b',   // Gold
+};
+
+<SqlEditor value={sql} highlightColors={colors} />
+```
+
+**Readonly-Modus (ohne Toolbar):**
+
+```tsx
+<SqlEditor value={sql} readonly />
+```
+
+---
+
 ## Entwicklung
 
 ### Lokales Setup
@@ -663,7 +774,7 @@ npm run npm-deploy
 
 Das Script läuft automatisch durch:
 
-1. **User-Check** — prüft ob npm-User `tsdev` eingeloggt ist; falls nicht, Abbruch mit Hinweis auf `npm login`
+1. **User-Check** — prüft ob npm-User `thebuoyant-tsdev` eingeloggt ist; falls nicht, Abbruch mit Hinweis auf `npm login`
 2. **Git-Check** — prüft ob keine uncommitteten Änderungen vorhanden sind
 3. **Versionsauswahl** — interaktiv: `patch` / `minor` / `major` oder keine Änderung
 4. **Tests → Build → Publish** — läuft automatisch via `prepublishOnly`
