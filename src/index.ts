@@ -1,3 +1,5 @@
+export * from "./components/confirm-dialog/ConfirmDialogProvider";
+export * from "./components/confirm-dialog/ConfirmDialog.types";
 export * from "./components/gantt-chart/GanttChart";
 export * from "./components/gantt-chart/GanttChart.types";
 export * from "./components/password-strength-meter/PasswordStrengthMeter";
