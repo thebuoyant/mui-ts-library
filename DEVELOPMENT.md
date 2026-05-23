@@ -126,39 +126,30 @@ If not logged in, run `npm login` first. For 2FA-protected accounts, use an **Au
 | New feature, backwards compatible | **minor** | `1.3.0` → `1.4.0` |
 | Breaking API change | **major** | `1.3.0` → `2.0.0` |
 
-### GitHub Actions (optional CI/CD)
+### Automated GitHub Releases (GitHub Actions)
 
-Store an npm Automation token as `NPM_TOKEN` in **GitHub → Settings → Secrets → Actions**, then create `.github/workflows/publish.yml`:
+Every push to `main` automatically creates a **GitHub Release** with the `.tgz` attached — but only when the version in `package.json` has changed. The workflow is already in place at [`.github/workflows/release.yml`](.github/workflows/release.yml).
 
-```yaml
-name: Publish to npm
+**What happens automatically:**
 
-on:
-  push:
-    tags:
-      - 'v*'
+1. Reads the current version from `package.json`
+2. Checks whether a release tag `v{version}` already exists — skips everything if it does
+3. If it's a new version: runs tests → build → `npm run pack-release`
+4. Creates a GitHub Release tagged `v{version}` with the `.tgz` attached and auto-generated release notes
 
-jobs:
-  publish:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
+**No secrets required** — `GITHUB_TOKEN` is provided automatically by GitHub Actions.
 
-    steps:
-      - uses: actions/checkout@v4
+**Your workflow as a developer:**
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          registry-url: 'https://registry.npmjs.org'
+```bash
+# 1. Bump the version in package.json
+#    (edit manually or use npm version)
+npm version patch   # 1.3.0 → 1.3.1
+npm version minor   # 1.3.0 → 1.4.0
+npm version major   # 1.3.0 → 2.0.0
 
-      - run: npm ci
-      - run: npm run test:run
-      - run: npm run build
-      - run: npm publish --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+# 2. Push to main — everything else is automatic
+git push origin main
 ```
 
-Trigger a release: `npm version minor && git push origin main --tags`
+Recipients download the `.tgz` directly from the **Releases** tab on GitHub — no file sharing via Slack or email needed.
