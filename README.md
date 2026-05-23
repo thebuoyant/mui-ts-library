@@ -13,6 +13,7 @@ A type-safe React component library built on **TypeScript** and **MUI (Material 
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Usage](#usage)
+  - [ConfirmDialog](#confirmdialog)
   - [GanttChart](#ganttchart)
   - [TagSelection](#tagselection)
   - [PasswordStrengthMeter](#passwordstrengthmeter)
@@ -28,6 +29,7 @@ A type-safe React component library built on **TypeScript** and **MUI (Material 
 
 | Component | Description |
 |---|---|
+| `ConfirmDialog` | Declarative confirmation dialog via a `useConfirm` hook — replaces the `useState + Dialog` boilerplate with a single `await confirm({ ... })` call; supports severity levels, custom labels, icon, ReactNode body, and full i18n |
 | `GanttChart` | Full project timeline with hierarchical tasks, milestones, dependency arrows, drag & drop, cascading dependencies, progress tracking, zoom, split pane, built-in CRUD dialogs, and a configurable toolbar |
 | `TagSelection` | Multi-tag selector with search autocomplete, alphabetically sorted chip display and dropdown list, overflow limit (`maxVisibleChips`), free tag creation (`allowCreate`) via click or Enter, MUI theme and custom colors, tag limit, and a complete callback API |
 | `PasswordStrengthMeter` | Password input with live strength rating, animated meter, and requirements checklist |
@@ -42,6 +44,7 @@ Full prop references, usage examples, and i18n guides for each component are loc
 
 | Component | User Manual |
 |---|---|
+| `ConfirmDialog` | [user-manuals/ConfirmDialog.md](user-manuals/ConfirmDialog.md) |
 | `GanttChart` | [user-manuals/GanttChart.md](user-manuals/GanttChart.md) |
 | `TagSelection` | [user-manuals/TagSelection.md](user-manuals/TagSelection.md) |
 | `PasswordStrengthMeter` | [user-manuals/PasswordStrengthMeter.md](user-manuals/PasswordStrengthMeter.md) |
@@ -84,7 +87,75 @@ pnpm add @thebuoyant-tsdev/mui-ts-library
 
 ## Usage
 
-Wrap your app in MUI's `ThemeProvider` as usual. No additional provider is required for this library.
+Wrap your app in MUI's `ThemeProvider` as usual. The `ConfirmDialog` component additionally requires a `ConfirmDialogProvider` near the root of your app — all other components work without a provider.
+
+---
+
+### ConfirmDialog
+
+A declarative confirmation dialog powered by a `useConfirm` hook. Place `ConfirmDialogProvider` once at the app root; use `useConfirm()` anywhere inside it.
+
+```tsx
+import { ConfirmDialogProvider, useConfirm } from '@thebuoyant-tsdev/mui-ts-library';
+
+// main.tsx / App.tsx
+function App() {
+  return (
+    <ConfirmDialogProvider translation={{ confirmLabel: 'Confirm', cancelLabel: 'Cancel' }}>
+      <MyApp />
+    </ConfirmDialogProvider>
+  );
+}
+```
+
+```tsx
+// Anywhere inside the app
+import { useConfirm } from '@thebuoyant-tsdev/mui-ts-library';
+
+function DeleteButton({ onDelete }: { onDelete: () => void }) {
+  const confirm = useConfirm();
+
+  const handleClick = async () => {
+    const confirmed = await confirm({
+      title:        'Delete entry?',
+      description:  'This action cannot be undone.',
+      confirmLabel: 'Delete',
+      severity:     'error',
+    });
+    if (confirmed) onDelete();
+  };
+
+  return <Button color="error" onClick={handleClick}>Delete</Button>;
+}
+```
+
+**Alert mode (no cancel button):**
+
+```tsx
+await confirm({
+  title:           'Session expires soon',
+  description:     'Your session will expire in 5 minutes. Please save your work.',
+  confirmLabel:    'Got it',
+  hideCancelButton: true,
+  severity:        'warning',
+});
+```
+
+**ReactNode body:**
+
+```tsx
+await confirm({
+  title:    'Terms of Service',
+  description: (
+    <Stack spacing={1}>
+      <Typography variant="body2">By confirming you agree to our terms.</Typography>
+      <Typography variant="body2" color="text.secondary">You can revoke consent at any time.</Typography>
+    </Stack>
+  ),
+  confirmLabel: 'I agree',
+  maxWidth: 'sm',
+});
+```
 
 ---
 

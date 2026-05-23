@@ -9,6 +9,32 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [1.2.0] — 2026-05-23
+
+### Hinzugefügt
+
+#### ConfirmDialog
+- Deklaratives Bestätigungs-Dialog-System — ersetzt den `useState + Dialog + DialogTitle + DialogContent + DialogActions`-Boilerplate durch einen einzigen Hook-Aufruf
+- `ConfirmDialogProvider` — rendert einen einzigen MUI-Dialog an der App-Wurzel; akzeptiert optionale Standard-`translation` (Bestätigen/Abbrechen-Labels)
+- `useConfirm`-Hook — gibt eine `async (options) => Promise<boolean>`-Funktion zurück, die überall innerhalb des Providers nutzbar ist
+- `ConfirmDialogOptions`-Konfiguration pro Aufruf:
+  - `title` — Dialog-Überschrift
+  - `description` — Body-Text (`string`) oder beliebiger React-Node (JSX, `<Stack>` etc.)
+  - `confirmLabel` / `cancelLabel` — Labels pro Aufruf überschreiben (Fallback auf Provider-`translation`)
+  - `severity` — `"info"` | `"warning"` | `"error"` | `"success"`: färbt den Bestätigen-Button und zeigt ein passendes Icon
+  - `hideCancelButton` — Alert-Modus mit nur einem Bestätigen-Button (für reine Informationshinweise)
+  - `maxWidth` — MUI-Dialog-Maximalbreite (`"xs"` Standard bis `"xl"`)
+  - `showIcon` — Severity-Icon im Titel ein-/ausblenden (Standard: `true`)
+- Backdrop-Klick und Escape-Taste lösen das Promise als `false` (Abbrechen) auf
+- Sequentielle Aufrufe: Ein zweites `confirm()` während ein Dialog offen ist, schließt den ersten automatisch mit `false` ab
+- `DEFAULT_CONFIRM_DIALOG_TRANSLATION` exportiert als Referenz
+- Exportierte Typen: `ConfirmDialogOptions`, `ConfirmDialogSeverity`, `ConfirmDialogTranslation`, `ConfirmDialogProviderProps`
+- 10 Storybook-Stories: Default, NoDescription, Destructive, Warning, Success, AlertOnly, NoIcon, CustomLabels, LargeDialog, GermanTranslation, MultipleDialogs
+- 16 Vitest-Unit-Tests für alle Optionen, Übersetzungen, Severity, sequentielle Aufrufe und ReactNode-Beschreibungen
+- Zweisprachiges Benutzerhandbuch: `user-manuals/ConfirmDialog.md` (EN) und `user-manuals/ConfirmDialog.de.md` (DE)
+
+---
+
 ## [1.1.0] — 2026-05-22
 
 ### Hinzugefügt

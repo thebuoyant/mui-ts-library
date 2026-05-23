@@ -13,6 +13,7 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 - [Voraussetzungen](#voraussetzungen)
 - [Installation](#installation)
 - [Verwendung](#verwendung)
+  - [ConfirmDialog](#confirmdialog)
   - [GanttChart](#ganttchart)
   - [TagSelection](#tagselection)
   - [PasswordStrengthMeter](#passwordstrengthmeter)
@@ -28,6 +29,7 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 
 | Komponente | Beschreibung |
 |---|---|
+| `ConfirmDialog` | Deklarativer Bestätigungs-Dialog über einen `useConfirm`-Hook — ersetzt den `useState + Dialog`-Boilerplate durch einen einzigen `await confirm({ ... })`-Aufruf; unterstützt Severity-Stufen, eigene Labels, Icon, ReactNode-Body und vollständige i18n |
 | `GanttChart` | Vollständige Projekt-Timeline mit hierarchischen Aufgaben, Meilensteinen, Abhängigkeitspfeilen, Drag & Drop, kaskadierenden Abhängigkeiten, Fortschritts-Tracking, Zoom, Split-Pane, integrierten CRUD-Dialogen und konfigurierbarer Toolbar |
 | `TagSelection` | Multi-Tag-Auswahlfeld mit Such-Autocomplete, alphabetisch sortierter Chip-Anzeige und Dropdown-Liste, Overflow-Begrenzung (`maxVisibleChips`), freier Tag-Erstellung (`allowCreate`) per Klick oder Enter, MUI-Theme- und Custom-Farben, Tag-Limit und vollständiger Callback-API |
 | `PasswordStrengthMeter` | Passwort-Eingabefeld mit Live-Stärkebewertung, animiertem Meter und Anforderungscheckliste |
@@ -42,6 +44,7 @@ Ausführliche Prop-Referenzen, Verwendungsbeispiele und i18n-Anleitungen für je
 
 | Komponente | Benutzerhandbuch |
 |---|---|
+| `ConfirmDialog` | [user-manuals/ConfirmDialog.de.md](user-manuals/ConfirmDialog.de.md) |
 | `GanttChart` | [user-manuals/GanttChart.md](user-manuals/GanttChart.md) |
 | `TagSelection` | [user-manuals/TagSelection.md](user-manuals/TagSelection.md) |
 | `PasswordStrengthMeter` | [user-manuals/PasswordStrengthMeter.md](user-manuals/PasswordStrengthMeter.md) |
@@ -84,7 +87,75 @@ pnpm add @thebuoyant-tsdev/mui-ts-library
 
 ## Verwendung
 
-Die App wie gewohnt in MUI's `ThemeProvider` einbetten. Für diese Bibliothek ist kein zusätzlicher Provider erforderlich.
+Die App wie gewohnt in MUI's `ThemeProvider` einbetten. Die `ConfirmDialog`-Komponente benötigt zusätzlich einen `ConfirmDialogProvider` nahe der App-Wurzel — alle anderen Komponenten funktionieren ohne Provider.
+
+---
+
+### ConfirmDialog
+
+Deklarativer Bestätigungs-Dialog über einen `useConfirm`-Hook. `ConfirmDialogProvider` einmalig an der App-Wurzel platzieren; `useConfirm()` überall innerhalb aufrufen.
+
+```tsx
+import { ConfirmDialogProvider, useConfirm } from '@thebuoyant-tsdev/mui-ts-library';
+
+// main.tsx / App.tsx
+function App() {
+  return (
+    <ConfirmDialogProvider translation={{ confirmLabel: 'Bestätigen', cancelLabel: 'Abbrechen' }}>
+      <MyApp />
+    </ConfirmDialogProvider>
+  );
+}
+```
+
+```tsx
+// Überall innerhalb der App
+import { useConfirm } from '@thebuoyant-tsdev/mui-ts-library';
+
+function DeleteButton({ onDelete }: { onDelete: () => void }) {
+  const confirm = useConfirm();
+
+  const handleClick = async () => {
+    const confirmed = await confirm({
+      title:        'Eintrag löschen?',
+      description:  'Diese Aktion kann nicht rückgängig gemacht werden.',
+      confirmLabel: 'Löschen',
+      severity:     'error',
+    });
+    if (confirmed) onDelete();
+  };
+
+  return <Button color="error" onClick={handleClick}>Löschen</Button>;
+}
+```
+
+**Alert-Modus (kein Abbrechen-Button):**
+
+```tsx
+await confirm({
+  title:           'Sitzung läuft bald ab',
+  description:     'Deine Sitzung läuft in 5 Minuten ab. Bitte speichere deine Arbeit.',
+  confirmLabel:    'Verstanden',
+  hideCancelButton: true,
+  severity:        'warning',
+});
+```
+
+**ReactNode-Body:**
+
+```tsx
+await confirm({
+  title:    'Nutzungsbedingungen',
+  description: (
+    <Stack spacing={1}>
+      <Typography variant="body2">Mit Bestätigen stimmst du unseren Nutzungsbedingungen zu.</Typography>
+      <Typography variant="body2" color="text.secondary">Du kannst die Zustimmung jederzeit widerrufen.</Typography>
+    </Stack>
+  ),
+  confirmLabel: 'Zustimmen',
+  maxWidth: 'sm',
+});
+```
 
 ---
 
@@ -509,7 +580,7 @@ function App() {
 **Kontrollierter Modus:**
 
 ```tsx
-const [content, setContent] = useState('<p>Initialinhalt</p>');
+const [content, setContent] = useState('<p>Initial content</p>');
 
 <RichTextEditor value={content} onChange={setContent} />
 ```

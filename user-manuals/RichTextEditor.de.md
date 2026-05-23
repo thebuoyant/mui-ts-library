@@ -201,7 +201,7 @@ Der JSON-String entspricht dem TipTap/ProseMirror-Dokumentformat (kann direkt zu
 ## Kontrollierter Modus
 
 ```tsx
-const [content, setContent] = useState('<p>Initialinhalt</p>');
+const [content, setContent] = useState('<p>Initial content</p>');
 
 <RichTextEditor
   value={content}

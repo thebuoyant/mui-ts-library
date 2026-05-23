@@ -8,7 +8,7 @@ Sammlung von Ideen für zukünftige Erweiterungen der `mui-ts-library`. Alle Vor
 
 ## Eingabe & Formulare
 
-### ConfirmDialog + `useConfirm`-Hook
+### ConfirmDialog + `useConfirm`-Hook ✅ Implementiert
 Deklarative API für Bestätigungs-Dialoge statt immer wieder `useState + Dialog + DialogTitle + DialogContent + DialogActions`. Ein `<ConfirmDialogProvider>` und ein Hook: `const confirm = useConfirm(); await confirm({ title: "Löschen?", ... })`. Löst den häufigsten Boilerplate in jeder MUI-App.
 
 ### FileUpload / Datei-Dropzone
@@ -97,7 +97,7 @@ Drag & Drop zwischen Statusspalten, virtualisierte Cards für große Listen, kon
 
 | # | Komponente | Begründung | Aufwand |
 |---|---|---|---|
-| 1 | **ConfirmDialog + `useConfirm`** | Größter Boilerplate-Pain, jede App braucht das | Klein |
+| 1 | ~~**ConfirmDialog + `useConfirm`**~~ ✅ | Größter Boilerplate-Pain, jede App braucht das | Klein |
 | 2 | **JsonEditor** | Nutzt SqlEditor-Infra wieder, hoher Mehrwert | Klein–Mittel |
 | 3 | **FileUpload** | Kein MUI-Equivalent, klare API | Mittel |
 | 4 | **OTP / PIN-Input** | 2FA ist in jeder modernen App Pflicht | Mittel |

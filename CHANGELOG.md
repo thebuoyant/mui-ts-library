@@ -72,6 +72,32 @@ Initial public release of `@thebuoyant-tsdev/mui-ts-library`.
 
 ---
 
+## [1.2.0] — 2026-05-23
+
+### Added
+
+#### ConfirmDialog
+- Declarative confirmation dialog system — replaces the `useState + Dialog + DialogTitle + DialogContent + DialogActions` boilerplate with a single hook call
+- `ConfirmDialogProvider` — renders a single MUI Dialog at the app root; accepts optional default `translation` (confirm/cancel labels)
+- `useConfirm` hook — returns an `async (options) => Promise<boolean>` function usable anywhere inside the provider
+- `ConfirmDialogOptions` per-call configuration:
+  - `title` — dialog heading
+  - `description` — body text (`string`) or any React node (JSX, `<Stack>`, etc.)
+  - `confirmLabel` / `cancelLabel` — per-call label overrides (fall back to provider `translation`)
+  - `severity` — `"info"` | `"warning"` | `"error"` | `"success"`: tints the confirm button and shows a matching icon
+  - `hideCancelButton` — alert mode with a single confirm button (useful for informational notices)
+  - `maxWidth` — MUI Dialog max width (`"xs"` default through `"xl"`)
+  - `showIcon` — show/hide the severity icon in the title (default: `true`)
+- Backdrop click and Escape key resolve the promise as `false` (cancel)
+- Sequential calls: a second `confirm()` while a dialog is open auto-cancels the first with `false`
+- `DEFAULT_CONFIRM_DIALOG_TRANSLATION` exported for reference
+- Exported types: `ConfirmDialogOptions`, `ConfirmDialogSeverity`, `ConfirmDialogTranslation`, `ConfirmDialogProviderProps`
+- 10 Storybook stories: Default, NoDescription, Destructive, Warning, Success, AlertOnly, NoIcon, CustomLabels, LargeDialog, GermanTranslation, MultipleDialogs
+- 16 Vitest unit tests covering all options, translations, severity, sequential calls, and ReactNode descriptions
+- Bilingual user manual: `user-manuals/ConfirmDialog.md` (EN) and `user-manuals/ConfirmDialog.de.md` (DE)
+
+---
+
 ## [1.1.0] — 2026-05-22
 
 ### Added
