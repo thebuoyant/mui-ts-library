@@ -19,6 +19,7 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
   - [PasswordStrengthMeter](#passwordstrengthmeter)
   - [RichTextEditor](#richtexteditor)
   - [SqlEditor](#sqleditor)
+  - [JsonEditor](#jsoneditor)
 - [Entwicklung](#entwicklung)
 - [Veröffentlichung auf npm](#veröffentlichung-auf-npm)
 - [Lizenz](#lizenz)
@@ -35,6 +36,7 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 | `PasswordStrengthMeter` | Passwort-Eingabefeld mit Live-Stärkebewertung, animiertem Meter und Anforderungscheckliste |
 | `RichTextEditor` | WYSIWYG-Editor auf Basis TipTap v3 mit MUI-Toolbar, Textfarbe, Hervorhebung, Link-Dialog, automatischer Markdown-Konvertierung beim Einfügen, Zeichenzähler, Zeichenbegrenzung, konfigurierbarer Höhe/Breite, Readonly/Disabled-Modus und vollständiger Form-Integration |
 | `SqlEditor` | SQL-Code-Editor auf Basis CodeMirror 6 mit MUI-Layout, SQL-Syntax-Highlighting, Multi-Dialekt-Unterstützung, Format-Schaltfläche, SQL-Linting per Callback, Schema-aware Autocomplete, konfigurierbarer Toolbar, Cursor-Position-Footer und vollständiger i18n |
+| `JsonEditor` | JSON-Code-Editor auf Basis CodeMirror 6 mit MUI-Layout, JSON-Syntax-Highlighting, eingebauter Echtzeit-JSON-Validierung mit Inline-Fehlermarkern, Format- (Pretty-Print) und Komprimieren-Schaltfläche, Validierungsstatus-Anzeige, konfigurierbaren Highlight-Farben, Cursor-Position-Footer und vollständiger i18n |
 
 ---
 
@@ -50,6 +52,7 @@ Ausführliche Prop-Referenzen, Verwendungsbeispiele und i18n-Anleitungen für je
 | `PasswordStrengthMeter` | [user-manuals/PasswordStrengthMeter.md](user-manuals/PasswordStrengthMeter.md) |
 | `RichTextEditor` | [user-manuals/RichTextEditor.md](user-manuals/RichTextEditor.md) |
 | `SqlEditor` | [user-manuals/SqlEditor.md](user-manuals/SqlEditor.md) |
+| `JsonEditor` | [user-manuals/JsonEditor.de.md](user-manuals/JsonEditor.de.md) |
 
 ---
 
@@ -779,6 +782,90 @@ const colors: SqlEditorHighlightColors = {
 
 ```tsx
 <SqlEditor value={sql} readonly />
+```
+
+---
+
+### JsonEditor
+
+Ein JSON-Code-Editor auf Basis von [CodeMirror 6](https://codemirror.net/) mit demselben MUI-Paper-Layout wie der `SqlEditor`. Wesentliche Features:
+
+- **JSON-Syntax-Highlighting** — Property-Namen fett in `primary.main`, Strings in `success.main`, Zahlen in `warning.main`, Boolean in `info.main`
+- **Eingebautes JSON-Linting** — Echtzeit-Fehlermarker und Wellenlinien für ungültiges JSON (via `jsonParseLinter`)
+- **Format-Schaltfläche** — JSON Pretty-Print mit konfigurierbarem Einzug (Standard: 2 Leerzeichen)
+- **Komprimieren-Schaltfläche** — JSON auf eine Zeile minimieren
+- **Validierungsstatus-Anzeige** — „Gültiges JSON" / „Ungültiges JSON" im Footer mit farbkodiertem Icon
+- **`onValidChange`-Callback** — Benachrichtigung bei jeder Änderung der JSON-Gültigkeit
+- **Konfigurierbare Highlight-Farben** — Property-Namen, Strings, Zahlen, Boolean und null
+- **Footer** — Cursor-Position (Ln / Sp.) und optionaler Validierungsstatus
+- **Toolbar** — Format, Komprimieren, Kopieren (mit Feedback), Leeren, Rückgängig, Wiederholen
+- **Vollständige i18n** — alle UI-Texte über `translation`-Prop überschreibbar
+
+```tsx
+import { JsonEditor } from '@thebuoyant-tsdev/mui-ts-library';
+
+function App() {
+  return (
+    <JsonEditor
+      placeholder="JSON eingeben …"
+      showValidation
+      onChange={(json) => console.log(json)}
+      onValidChange={(isValid) => console.log('Gültig:', isValid)}
+    />
+  );
+}
+```
+
+**Kontrollierter Modus:**
+
+```tsx
+const [json, setJson] = useState('{"name":"Alice"}');
+
+<JsonEditor value={json} onChange={setJson} showValidation />
+```
+
+**Mit React Hook Form:**
+
+```tsx
+import { Controller } from 'react-hook-form';
+
+<Controller
+  name="config"
+  control={control}
+  rules={{ validate: (v) => { try { JSON.parse(v); return true; } catch { return 'Ungültiges JSON'; } } }}
+  render={({ field, fieldState }) => (
+    <JsonEditor
+      value={field.value}
+      onChange={field.onChange}
+      onBlur={field.onBlur}
+      error={!!fieldState.error}
+      helperText={fieldState.error?.message}
+      showValidation
+    />
+  )}
+/>
+```
+
+**Mit benutzerdefinierten Highlight-Farben:**
+
+```tsx
+import type { JsonEditorHighlightColors } from '@thebuoyant-tsdev/mui-ts-library';
+
+const colors: JsonEditorHighlightColors = {
+  propertyName: '#c678dd',
+  string:       '#98c379',
+  number:       '#d19a66',
+  boolean:      '#56b6c2',
+  null:         '#abb2bf',
+};
+
+<JsonEditor value={json} highlightColors={colors} />
+```
+
+**Readonly-Modus (ohne Toolbar):**
+
+```tsx
+<JsonEditor value={json} readonly showValidation />
 ```
 
 ---

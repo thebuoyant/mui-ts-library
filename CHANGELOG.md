@@ -9,6 +9,107 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.0] — 2026-05-23
+
+### Added
+
+#### JsonEditor
+
+- JSON code editor based on CodeMirror 6 with the same MUI Paper layout as `SqlEditor`
+- Real-time JSON validation via built-in `jsonParseLinter` — inline error markers and wavy underlines
+- **Format** button — pretty-prints JSON with configurable indentation (`indent` prop, default: 2 spaces)
+- **Compact** button — minifies JSON to a single line
+- Validation status indicator in the footer — "Valid JSON" / "Invalid JSON" with color-coded icon (`showValidation`)
+- `onValidChange?: (isValid: boolean) => void` callback — fires whenever JSON validity changes
+- Configurable syntax highlight colors via `highlightColors` prop (property names, strings, numbers, booleans, null)
+- Full i18n via `Partial<JsonEditorTranslation>` — all toolbar tooltips, validation labels, and cursor position format
+- Cursor position footer (`showLineColumn`)
+- `readonly` mode — hides toolbar, editor is non-editable
+- `disabled` mode — toolbar disabled, editor grayed out
+- `error` + `helperText` for form integration consistent with MUI TextField
+- `name` prop — hidden `<input type="hidden">` for native form submission
+- `height` / `width` props — numeric values → px, CSS strings passed as-is, `"auto"` fills surrounding flex container
+- 14 Storybook stories: Default, WithJson, WithValidation, InvalidJson, CompactJson, WithFixedHeight, WithAutoHeight, Controlled, IndentFour, ReadOnly, Disabled, WithError, NoLineNumbers, CustomHighlightColors, GermanTranslation, LargeDataset
+- 17 Vitest unit tests covering all major use cases
+- Bilingual user manual: `user-manuals/JsonEditor.md` (EN) and `user-manuals/JsonEditor.de.md` (DE)
+- Added `@codemirror/lang-json` as dependency
+
+---
+
+## [1.2.0] — 2026-05-23
+
+### Added
+
+#### ConfirmDialog
+- Declarative confirmation dialog system — replaces the `useState + Dialog + DialogTitle + DialogContent + DialogActions` boilerplate with a single hook call
+- `ConfirmDialogProvider` — renders a single MUI Dialog at the app root; accepts optional default `translation` (confirm/cancel labels)
+- `useConfirm` hook — returns an `async (options) => Promise<boolean>` function usable anywhere inside the provider
+- `ConfirmDialogOptions` per-call configuration:
+  - `title` — dialog heading
+  - `description` — body text (`string`) or any React node (JSX, `<Stack>`, etc.)
+  - `confirmLabel` / `cancelLabel` — per-call label overrides (fall back to provider `translation`)
+  - `severity` — `"info"` | `"warning"` | `"error"` | `"success"`: tints the confirm button and shows a matching icon
+  - `hideCancelButton` — alert mode with a single confirm button (useful for informational notices)
+  - `maxWidth` — MUI Dialog max width (`"xs"` default through `"xl"`)
+  - `showIcon` — show/hide the severity icon in the title (default: `true`)
+- Backdrop click and Escape key resolve the promise as `false` (cancel)
+- Sequential calls: a second `confirm()` while a dialog is open auto-cancels the first with `false`
+- `DEFAULT_CONFIRM_DIALOG_TRANSLATION` exported for reference
+- Exported types: `ConfirmDialogOptions`, `ConfirmDialogSeverity`, `ConfirmDialogTranslation`, `ConfirmDialogProviderProps`
+- 11 Storybook stories: Default, NoDescription, Destructive, Warning, Success, AlertOnly, NoIcon, CustomLabels, LargeDialog, GermanTranslation, MultipleDialogs
+- 16 Vitest unit tests covering all options, translations, severity, sequential calls, and ReactNode descriptions
+- Bilingual user manual: `user-manuals/ConfirmDialog.md` (EN) and `user-manuals/ConfirmDialog.de.md` (DE)
+
+---
+
+## [1.1.0] — 2026-05-22
+
+### Added
+
+#### SqlEditor
+- SQL code editor based on CodeMirror 6 with the same MUI Paper layout as `RichTextEditor`
+- SQL syntax highlighting with MUI theme colors: keywords (`primary.main`, bold), strings (`success.main`, bold), identifiers (`info.main`), numbers (`warning.main`), functions (`secondary.main`), comments (`text.disabled`, italic)
+- Dark mode support — all colors sourced from the active MUI theme
+- 5 SQL dialects: Standard SQL, MySQL, PostgreSQL, SQLite, MS SQL Server
+- **Format button** — prettifies SQL via `sql-formatter` (dialect-aware, try/catch safe)
+- **Server-side linting** via async `onLint` callback (600 ms debounce); errors shown as wavy underlines and lint gutter markers
+- **Schema-aware autocomplete** — `schema` prop accepts `SqlSchema` (`tables` with `name` + `columns`) and suggests table/column names with type hints in the dropdown
+- **Configurable highlight colors** — `highlightColors` prop overrides keyword, string, and identifier colors independently
+- SQL keyword autocomplete out of the box (`autocompletion()` + `completionKeymap`)
+- Toolbar: Format, Copy (with "Copied!" feedback), Clear, Undo, Redo, Execute (off by default)
+- Footer: cursor position (`Ln {line}, Col {col}`) and error count (`showErrorCount`)
+- `toolbarConfig` prop to show/hide individual toolbar buttons
+- `translation` prop for full i18n of all toolbar tooltips and footer labels
+- `dialect` prop: `"standard"` | `"mysql"` | `"postgresql"` | `"sqlite"` | `"mssql"`
+- `showLineNumbers`, `showLineColumn`, `showErrorCount` display flags
+- Controlled mode via `value` / `onChange` (syncs without cursor jump)
+- `readonly` mode (no toolbar) and `disabled` mode (grayed out)
+- `error` state and `helperText` — consistent with MUI TextField
+- `onBlur` / `onFocus` callbacks
+- `onExecute` callback for the Execute button
+- `name` prop for native form submission via hidden `<input type="hidden">`
+- Configurable `height` and `width` (number → px, CSS strings, `"auto"` for flex containers)
+- 17 Storybook stories covering all features
+- Exported types: `SqlEditorProps`, `SqlEditorDialect`, `SqlEditorToolbarConfig`, `SqlEditorTranslation`, `SqlEditorHighlightColors`, `SqlLintError`, `SqlSchema`, `SqlTable`, `SqlColumn`
+- Exported defaults: `DEFAULT_SQL_EDITOR_TOOLBAR_CONFIG`, `DEFAULT_SQL_EDITOR_TRANSLATION`
+
+#### Storybook Docker Distribution
+- New `npm run build-storybook-docker` script — builds a self-contained ZIP for sharing Storybook with non-developers
+- ZIP contains a pre-built Docker image (nginx:alpine + Storybook static files), `docker-compose.yml`, `start.sh` (macOS/Linux), `start.bat` (Windows), and bilingual how-to guides
+- Recipients only need Docker Desktop — no Node.js, no build step
+- Output: `storybook-docker/storybook-{version}.zip`
+- End-user guides: `storybook-docker/how-to.md` (EN) and `storybook-docker/how-to.de.md` (DE)
+
+#### General
+- Added `@lezer/highlight` as explicit dependency (was previously only a transitive dep, used directly in `SqlEditorContent`)
+- Updated `package.json` description and keywords to include SqlEditor / CodeMirror / SQL
+- Security: patched `ws` (8.20.0 → 8.20.1) and `brace-expansion` (5.0.5 → 5.0.6) via `npm audit fix`
+- Updated `.gitignore`: `storybook-docker/storybook-*/`, `storybook-docker/*.tar`, `*.tgz` excluded from repository
+- Bilingual user manual: `user-manuals/SqlEditor.md` (EN) and `user-manuals/SqlEditor.de.md` (DE)
+- Updated `PROJECT-SHARE.md`: covers both `.tgz` (library) and Storybook Docker ZIP distribution
+
+---
+
 ## [1.0.0] — 2026-05-21
 
 Initial public release of `@thebuoyant-tsdev/mui-ts-library`.
@@ -69,81 +170,3 @@ Initial public release of `@thebuoyant-tsdev/mui-ts-library`.
 - Storybook 10 stories for all components
 - 271 unit tests with Vitest and Testing Library
 - Bilingual documentation: English (`*.md`) and German (`*.de.md`)
-
----
-
-## [1.2.0] — 2026-05-23
-
-### Added
-
-#### ConfirmDialog
-- Declarative confirmation dialog system — replaces the `useState + Dialog + DialogTitle + DialogContent + DialogActions` boilerplate with a single hook call
-- `ConfirmDialogProvider` — renders a single MUI Dialog at the app root; accepts optional default `translation` (confirm/cancel labels)
-- `useConfirm` hook — returns an `async (options) => Promise<boolean>` function usable anywhere inside the provider
-- `ConfirmDialogOptions` per-call configuration:
-  - `title` — dialog heading
-  - `description` — body text (`string`) or any React node (JSX, `<Stack>`, etc.)
-  - `confirmLabel` / `cancelLabel` — per-call label overrides (fall back to provider `translation`)
-  - `severity` — `"info"` | `"warning"` | `"error"` | `"success"`: tints the confirm button and shows a matching icon
-  - `hideCancelButton` — alert mode with a single confirm button (useful for informational notices)
-  - `maxWidth` — MUI Dialog max width (`"xs"` default through `"xl"`)
-  - `showIcon` — show/hide the severity icon in the title (default: `true`)
-- Backdrop click and Escape key resolve the promise as `false` (cancel)
-- Sequential calls: a second `confirm()` while a dialog is open auto-cancels the first with `false`
-- `DEFAULT_CONFIRM_DIALOG_TRANSLATION` exported for reference
-- Exported types: `ConfirmDialogOptions`, `ConfirmDialogSeverity`, `ConfirmDialogTranslation`, `ConfirmDialogProviderProps`
-- 10 Storybook stories: Default, NoDescription, Destructive, Warning, Success, AlertOnly, NoIcon, CustomLabels, LargeDialog, GermanTranslation, MultipleDialogs
-- 16 Vitest unit tests covering all options, translations, severity, sequential calls, and ReactNode descriptions
-- Bilingual user manual: `user-manuals/ConfirmDialog.md` (EN) and `user-manuals/ConfirmDialog.de.md` (DE)
-
----
-
-## [1.1.0] — 2026-05-22
-
-### Added
-
-#### SqlEditor
-- SQL code editor based on CodeMirror 6 with the same MUI Paper layout as `RichTextEditor`
-- SQL syntax highlighting with MUI theme colors: keywords (`primary.main`, bold), strings (`success.main`, bold), identifiers (`info.main`), numbers (`warning.main`), functions (`secondary.main`), comments (`text.disabled`, italic)
-- Dark mode support — all colors sourced from the active MUI theme
-- 5 SQL dialects: Standard SQL, MySQL, PostgreSQL, SQLite, MS SQL Server
-- **Format button** — prettifies SQL via `sql-formatter` (dialect-aware, try/catch safe)
-- **Server-side linting** via async `onLint` callback (600 ms debounce); errors shown as wavy underlines and lint gutter markers
-- **Schema-aware autocomplete** — `schema` prop accepts `SqlSchema` (`tables` with `name` + `columns`) and suggests table/column names with type hints in the dropdown
-- **Configurable highlight colors** — `highlightColors` prop overrides keyword, string, and identifier colors independently
-- SQL keyword autocomplete out of the box (`autocompletion()` + `completionKeymap`)
-- Toolbar: Format, Copy (with "Copied!" feedback), Clear, Undo, Redo, Execute (off by default)
-- Footer: cursor position (`Ln {line}, Col {col}`) and error count (`showErrorCount`)
-- `toolbarConfig` prop to show/hide individual toolbar buttons
-- `translation` prop for full i18n of all toolbar tooltips and footer labels
-- `dialect` prop: `"standard"` | `"mysql"` | `"postgresql"` | `"sqlite"` | `"mssql"`
-- `showLineNumbers`, `showLineColumn`, `showErrorCount` display flags
-- Controlled mode via `value` / `onChange` (syncs without cursor jump)
-- `readonly` mode (no toolbar) and `disabled` mode (grayed out)
-- `error` state and `helperText` — consistent with MUI TextField
-- `onBlur` / `onFocus` callbacks
-- `onExecute` callback for the Execute button
-- `name` prop for native form submission via hidden `<input type="hidden">`
-- Configurable `height` and `width` (number → px, CSS strings, `"auto"` for flex containers)
-- 17 Storybook stories covering all features
-- Exported types: `SqlEditorProps`, `SqlEditorDialect`, `SqlEditorToolbarConfig`, `SqlEditorTranslation`, `SqlEditorHighlightColors`, `SqlLintError`, `SqlSchema`, `SqlTable`, `SqlColumn`
-- Exported defaults: `DEFAULT_SQL_EDITOR_TOOLBAR_CONFIG`, `DEFAULT_SQL_EDITOR_TRANSLATION`
-
-#### Storybook Docker Distribution
-- New `npm run build-storybook-docker` script — builds a self-contained ZIP for sharing Storybook with non-developers
-- ZIP contains a pre-built Docker image (nginx:alpine + Storybook static files), `docker-compose.yml`, `start.sh` (macOS/Linux), `start.bat` (Windows), and bilingual how-to guides
-- Recipients only need Docker Desktop — no Node.js, no build step
-- Output: `storybook-docker/storybook-{version}.zip`
-- End-user guides: `storybook-docker/how-to.md` (EN) and `storybook-docker/how-to.de.md` (DE)
-
-#### General
-- Added `@lezer/highlight` as explicit dependency (was previously only a transitive dep, used directly in `SqlEditorContent`)
-- Updated `package.json` description and keywords to include SqlEditor / CodeMirror / SQL
-- Security: patched `ws` (8.20.0 → 8.20.1) and `brace-expansion` (5.0.5 → 5.0.6) via `npm audit fix`
-- Updated `.gitignore`: `storybook-docker/storybook-*/`, `storybook-docker/*.tar`, `*.tgz` excluded from repository
-- Bilingual user manual: `user-manuals/SqlEditor.md` (EN) and `user-manuals/SqlEditor.de.md` (DE)
-- Updated `PROJECT-SHARE.md`: covers both `.tgz` (library) and Storybook Docker ZIP distribution
-
----
-
-## [1.0.0] — 2026-05-21

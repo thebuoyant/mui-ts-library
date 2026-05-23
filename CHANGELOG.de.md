@@ -9,6 +9,33 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [1.3.0] — 2026-05-23
+
+### Hinzugefügt
+
+#### JsonEditor
+
+- JSON-Code-Editor auf Basis CodeMirror 6 mit demselben MUI-Paper-Layout wie der `SqlEditor`
+- Echtzeit-JSON-Validierung via eingebautem `jsonParseLinter` — Inline-Fehlermarker und Wellenlinien
+- **Format-Schaltfläche** — JSON verschönern mit konfigurierbarem Einzug (`indent`-Prop, Standard: 2 Leerzeichen)
+- **Komprimieren-Schaltfläche** — JSON auf eine Zeile minimieren
+- Validierungs-Statusanzeige im Footer — „Gültiges JSON" / „Ungültiges JSON" mit farbkodiertem Icon (`showValidation`)
+- `onValidChange?: (isValid: boolean) => void`-Callback — wird ausgelöst, wenn sich die JSON-Gültigkeit ändert
+- Konfigurierbare Syntax-Highlight-Farben über `highlightColors`-Prop (Property-Namen, Strings, Zahlen, Boolean, null)
+- Vollständige i18n über `Partial<JsonEditorTranslation>` — alle Toolbar-Tooltips, Validierungs-Labels und Cursor-Positionsformat
+- Cursor-Position im Footer (`showLineColumn`)
+- `readonly`-Modus — Toolbar versteckt, Editor nicht editierbar
+- `disabled`-Modus — Toolbar deaktiviert, Editor ausgegraut
+- `error` + `helperText` für Formular-Integration konsistent mit MUI TextField
+- `name`-Prop — verstecktes `<input type="hidden">` für native Formularübermittlung
+- `height` / `width`-Props — numerische Werte → px, CSS-Strings direkt übergeben, `"auto"` füllt umgebenden Flex-Container
+- 16 Storybook-Stories: Default, WithJson, WithValidation, InvalidJson, CompactJson, WithFixedHeight, WithAutoHeight, Controlled, IndentFour, ReadOnly, Disabled, WithError, NoLineNumbers, CustomHighlightColors, GermanTranslation, LargeDataset
+- 17 Vitest-Unit-Tests für alle wichtigen Anwendungsfälle
+- Zweisprachiges Benutzerhandbuch: `user-manuals/JsonEditor.md` (EN) und `user-manuals/JsonEditor.de.md` (DE)
+- `@codemirror/lang-json` als Dependency ergänzt
+
+---
+
 ## [1.2.0] — 2026-05-23
 
 ### Hinzugefügt
@@ -29,7 +56,7 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Sequentielle Aufrufe: Ein zweites `confirm()` während ein Dialog offen ist, schließt den ersten automatisch mit `false` ab
 - `DEFAULT_CONFIRM_DIALOG_TRANSLATION` exportiert als Referenz
 - Exportierte Typen: `ConfirmDialogOptions`, `ConfirmDialogSeverity`, `ConfirmDialogTranslation`, `ConfirmDialogProviderProps`
-- 10 Storybook-Stories: Default, NoDescription, Destructive, Warning, Success, AlertOnly, NoIcon, CustomLabels, LargeDialog, GermanTranslation, MultipleDialogs
+- 11 Storybook-Stories: Default, NoDescription, Destructive, Warning, Success, AlertOnly, NoIcon, CustomLabels, LargeDialog, GermanTranslation, MultipleDialogs
 - 16 Vitest-Unit-Tests für alle Optionen, Übersetzungen, Severity, sequentielle Aufrufe und ReactNode-Beschreibungen
 - Zweisprachiges Benutzerhandbuch: `user-manuals/ConfirmDialog.md` (EN) und `user-manuals/ConfirmDialog.de.md` (DE)
 
@@ -143,9 +170,3 @@ Erste öffentliche Veröffentlichung von `@thebuoyant-tsdev/mui-ts-library`.
 - Storybook-10-Stories für alle Komponenten
 - 271 Unit-Tests mit Vitest und Testing Library
 - Zweisprachige Dokumentation: Englisch (`*.md`) und Deutsch (`*.de.md`)
-
----
-
-## [Unveröffentlicht]
-
-_Noch keine unveröffentlichten Änderungen._

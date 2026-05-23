@@ -1,0 +1,244 @@
+import { type ComponentProps, useState } from "react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
+import { Box } from "@mui/material";
+import { JsonEditor } from "./JsonEditor";
+
+const meta: Meta<typeof JsonEditor> = {
+  title: "Components/JsonEditor",
+  component: JsonEditor,
+  argTypes: {
+    placeholder:     { control: "text" },
+    height:          { control: "text" },
+    width:           { control: "text" },
+    indent:          { control: "number" },
+    disabled:        { control: "boolean" },
+    readonly:        { control: "boolean" },
+    error:           { control: "boolean" },
+    helperText:      { control: "text" },
+    name:            { control: "text" },
+    showLineNumbers: { control: "boolean" },
+    showLineColumn:  { control: "boolean" },
+    showValidation:  { control: "boolean" },
+    value:           { control: false },
+    toolbarConfig:   { control: false },
+    translation:     { control: false },
+    highlightColors: { control: false },
+    onChange:        { control: false },
+    onValidChange:   { control: false },
+    onBlur:          { control: false },
+    onFocus:         { control: false },
+  },
+  args: {
+    onChange:        fn(),
+    onValidChange:   fn(),
+    onBlur:          fn(),
+    onFocus:         fn(),
+    placeholder:     "Enter JSON …",
+    height:          "",
+    width:           "",
+    indent:          2,
+    disabled:        false,
+    readonly:        false,
+    error:           false,
+    helperText:      "",
+    name:            "",
+    showLineNumbers: true,
+    showLineColumn:  true,
+    showValidation:  false,
+  },
+};
+
+export default meta;
+type Story = StoryObj<typeof JsonEditor>;
+
+const SAMPLE_JSON = JSON.stringify(
+  {
+    id: 1,
+    name: "Alice",
+    email: "alice@example.com",
+    active: true,
+    score: 98.5,
+    tags: ["admin", "editor"],
+    address: {
+      street: "123 Main St",
+      city: "Springfield",
+      zip: "12345",
+    },
+    metadata: null,
+  },
+  null,
+  2,
+);
+
+const LARGE_JSON = JSON.stringify(
+  Array.from({ length: 20 }, (_, i) => ({
+    id: i + 1,
+    name: `User ${i + 1}`,
+    email: `user${i + 1}@example.com`,
+    active: i % 2 === 0,
+    role: i % 3 === 0 ? "admin" : "viewer",
+    createdAt: "2024-01-15T10:30:00Z",
+  })),
+  null,
+  2,
+);
+
+const INVALID_JSON = `{
+  "name": "Alice",
+  "age": 30,
+  "active": true,
+  missing_quotes: "oops"
+}`;
+
+const COMPACT_JSON = `{"id":1,"name":"Alice","email":"alice@example.com","active":true,"score":98.5,"tags":["admin","editor"]}`;
+
+export const Default: Story = {
+  args: {
+    placeholder: "Enter JSON …",
+  },
+};
+
+export const WithJson: Story = {
+  args: {
+    value: SAMPLE_JSON,
+  },
+};
+
+export const WithValidation: Story = {
+  args: {
+    value:          SAMPLE_JSON,
+    showValidation: true,
+  },
+};
+
+export const InvalidJson: Story = {
+  args: {
+    value:          INVALID_JSON,
+    showValidation: true,
+  },
+};
+
+export const CompactJson: Story = {
+  args: {
+    value: COMPACT_JSON,
+  },
+};
+
+export const WithFixedHeight: Story = {
+  args: {
+    value:  LARGE_JSON,
+    height: "200",
+  },
+};
+
+export const WithAutoHeight: Story = {
+  decorators: [
+    (Story) => (
+      <Box sx={{ height: 500, display: "flex", flexDirection: "column", border: "2px dashed", borderColor: "divider", p: 1 }}>
+        <Story />
+      </Box>
+    ),
+  ],
+  args: {
+    value:  SAMPLE_JSON,
+    height: "auto",
+  },
+};
+
+function ControlledStory(args: ComponentProps<typeof JsonEditor>) {
+  const [json, setJson] = useState(SAMPLE_JSON);
+  return (
+    <JsonEditor
+      {...args}
+      value={json}
+      onChange={(val) => {
+        setJson(val);
+        args.onChange?.(val);
+      }}
+    />
+  );
+}
+
+export const Controlled: Story = {
+  render: (args) => <ControlledStory {...args} />,
+  args: {
+    showValidation: true,
+  },
+};
+
+export const IndentFour: Story = {
+  args: {
+    value:  SAMPLE_JSON,
+    indent: 4,
+  },
+};
+
+export const ReadOnly: Story = {
+  args: {
+    value:    SAMPLE_JSON,
+    readonly: true,
+  },
+};
+
+export const Disabled: Story = {
+  args: {
+    value:    SAMPLE_JSON,
+    disabled: true,
+  },
+};
+
+export const WithError: Story = {
+  args: {
+    error:      true,
+    helperText: "Invalid JSON provided.",
+    value:      INVALID_JSON,
+  },
+};
+
+export const NoLineNumbers: Story = {
+  args: {
+    value:           SAMPLE_JSON,
+    showLineNumbers: false,
+    showLineColumn:  false,
+  },
+};
+
+export const CustomHighlightColors: Story = {
+  args: {
+    value: SAMPLE_JSON,
+    highlightColors: {
+      propertyName: "#c678dd",
+      string:       "#98c379",
+      number:       "#d19a66",
+      boolean:      "#56b6c2",
+      null:         "#abb2bf",
+    },
+  },
+};
+
+export const GermanTranslation: Story = {
+  args: {
+    value:          SAMPLE_JSON,
+    showValidation: true,
+    translation: {
+      format:      "JSON formatieren",
+      compact:     "JSON komprimieren",
+      copy:        "Kopieren",
+      copySuccess: "Kopiert!",
+      clear:       "Leeren",
+      undo:        "Rückgängig",
+      redo:        "Wiederholen",
+      lineColumn:  "Zeile {line}, Sp. {col}",
+      validJson:   "Gültiges JSON",
+      invalidJson: "Ungültiges JSON",
+    },
+  },
+};
+
+export const LargeDataset: Story = {
+  args: {
+    value:  LARGE_JSON,
+    height: "500",
+  },
+};

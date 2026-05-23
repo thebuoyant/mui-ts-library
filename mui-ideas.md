@@ -2,7 +2,7 @@
 
 Sammlung von Ideen für zukünftige Erweiterungen der `mui-ts-library`. Alle Vorschläge adressieren reale Implementierungslücken im MUI-Alltag — entweder gar nicht in MUI vorhanden oder nur in der kostenpflichtigen MUI X Variante verfügbar.
 
-**Aktuell implementiert:** GanttChart · PasswordStrengthMeter · RichTextEditor · SqlEditor · TagSelection
+**Aktuell implementiert:** GanttChart · PasswordStrengthMeter · RichTextEditor · SqlEditor · TagSelection · ConfirmDialog · JsonEditor
 
 ---
 
@@ -36,7 +36,7 @@ Ländervorwahl-Selector (Flagge + Dial-Code) kombiniert mit formatierter Textein
 
 ## Editoren & Code
 
-### JsonEditor
+### JsonEditor ✅ Implementiert
 Gleiche Basis wie SqlEditor (CodeMirror 6), aber für JSON: Syntax-Highlighting, Live-Linting (ungültiges JSON), Format-Button. Sehr häufiger Use Case in Admin-Panels, DevTools und API-Konfigurationen. Geringer Zusatzaufwand durch Wiederverwendung der SqlEditor-Infrastruktur.
 
 ### JsonTreeViewer
@@ -98,7 +98,7 @@ Drag & Drop zwischen Statusspalten, virtualisierte Cards für große Listen, kon
 | # | Komponente | Begründung | Aufwand |
 |---|---|---|---|
 | 1 | ~~**ConfirmDialog + `useConfirm`**~~ ✅ | Größter Boilerplate-Pain, jede App braucht das | Klein |
-| 2 | **JsonEditor** | Nutzt SqlEditor-Infra wieder, hoher Mehrwert | Klein–Mittel |
+| 2 | ~~**JsonEditor**~~ ✅ | Nutzt SqlEditor-Infra wieder, hoher Mehrwert | Klein–Mittel |
 | 3 | **FileUpload** | Kein MUI-Equivalent, klare API | Mittel |
 | 4 | **OTP / PIN-Input** | 2FA ist in jeder modernen App Pflicht | Mittel |
 | 5 | **StatCard** | Dashboard-Standard, immer wieder neu gebaut | Klein |
