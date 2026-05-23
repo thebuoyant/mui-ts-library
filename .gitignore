@@ -34,3 +34,7 @@ storybook-docker/*.tar
 .storybook-docker-tmp
 *.tgz
 releases/
+memory/
+mui-ideas.md
+mui-ideas-progress.md
+sql-editor-ideas.md

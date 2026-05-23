@@ -16,13 +16,13 @@ Es gibt zwei Wege, die Bibliothek ohne npm-Account zu teilen:
 Im Bibliotheks-Projektordner:
 
 ```bash
-npm pack
+npm run pack-release
 ```
 
-Erstellt `thebuoyant-tsdev-mui-ts-library-1.3.0.tgz` im Projektordner.
+Erstellt `releases/thebuoyant-tsdev-mui-ts-library-1.3.0.tgz`.
 Die Datei per Slack, Teams, E-Mail oder Netzlaufwerk teilen.
 
-> **Hinweis:** Die `.tgz`-Datei ist nicht im Git-Repository enthalten — sie muss nach jedem `npm pack` neu geteilt werden.
+> **Hinweis:** Die `.tgz`-Datei ist nicht im Git-Repository enthalten — sie muss nach jedem Release neu geteilt werden. Alternativ: `.tgz` direkt vom **Releases**-Tab auf GitHub herunterladen.
 
 ### Im Zielprojekt installieren
 
