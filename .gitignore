@@ -33,3 +33,4 @@ storybook-docker/storybook-*/
 storybook-docker/*.tar
 .storybook-docker-tmp
 *.tgz
+releases/

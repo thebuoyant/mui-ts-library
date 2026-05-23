@@ -102,6 +102,7 @@
     "clean": "rm -rf dist",
     "build": "npm run clean && vite build && tsc -p tsconfig.build.json",
     "prepublishOnly": "npm run test:run && npm run build",
+    "pack-release": "npm run build && mkdir -p releases && npm pack --pack-destination releases/",
     "npm-deploy": "bash scripts/npm-deploy.sh",
     "lint": "eslint .",
     "preview": "vite preview",
