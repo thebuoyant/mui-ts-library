@@ -12,6 +12,8 @@
 - Informationshinweise mit einem einzelnen OK-Button
 - Binäre Ja/Nein-Entscheidung vor einem Seiteneffekt
 
+![ConfirmDialog – Komponentenvorschau](ConfirmDialog.png)
+
 ---
 
 ## Voraussetzungen

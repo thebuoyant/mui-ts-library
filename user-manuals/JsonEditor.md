@@ -14,6 +14,8 @@
 - Request body editors in REST API explorers
 - Debug views that allow in-place JSON editing
 
+![JsonEditor – Component Preview](JsonEditor.png)
+
 ---
 
 ## Prerequisites

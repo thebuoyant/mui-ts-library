@@ -14,6 +14,8 @@ Der `JsonEditor` ist ein vollständiger JSON-Code-Editor auf Basis von [CodeMirr
 - Request-Body-Editoren in REST-API-Explorern
 - Debug-Ansichten mit direkter JSON-Bearbeitung
 
+![JsonEditor – Komponentenvorschau](JsonEditor.png)
+
 ---
 
 ## Technische Voraussetzungen
