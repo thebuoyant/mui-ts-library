@@ -1,8 +1,8 @@
 {
   "name": "@thebuoyant-tsdev/mui-ts-library",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": false,
-  "description": "Type-safe React component library for MUI v9. Gantt chart with drag & drop, multi-tag selector with autocomplete, WYSIWYG rich text editor (TipTap v3), SQL code editor (CodeMirror 6), and password strength meter. Full TypeScript support, dark mode, i18n.",
+  "description": "Type-safe React component library for MUI v9. Confirm dialog with useConfirm hook, Gantt chart with drag & drop, multi-tag selector, WYSIWYG rich text editor (TipTap v3), SQL code editor (CodeMirror 6), and password strength meter. Full TypeScript, dark mode, i18n.",
   "author": {
     "name": "Thomas Schlender",
     "email": "thebuoyant@gmail.com"
@@ -85,7 +85,12 @@
     "code-editor",
     "sql-formatter",
     "syntax-highlighting",
-    "sql-autocomplete"
+    "sql-autocomplete",
+    "confirm-dialog",
+    "confirm",
+    "dialog",
+    "modal",
+    "alert-dialog"
   ],
   "scripts": {
     "dev": "vite",

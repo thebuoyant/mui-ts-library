@@ -19,7 +19,7 @@ Im Bibliotheks-Projektordner:
 npm pack
 ```
 
-Erstellt `thebuoyant-tsdev-mui-ts-library-1.1.0.tgz` im Projektordner.
+Erstellt `thebuoyant-tsdev-mui-ts-library-1.2.0.tgz` im Projektordner.
 Die Datei per Slack, Teams, E-Mail oder Netzlaufwerk teilen.
 
 > **Hinweis:** Die `.tgz`-Datei ist nicht im Git-Repository enthalten — sie muss nach jedem `npm pack` neu geteilt werden.
@@ -27,17 +27,17 @@ Die Datei per Slack, Teams, E-Mail oder Netzlaufwerk teilen.
 ### Im Zielprojekt installieren
 
 ```bash
-npm install /pfad/zur/thebuoyant-tsdev-mui-ts-library-1.1.0.tgz
+npm install /pfad/zur/thebuoyant-tsdev-mui-ts-library-1.2.0.tgz
 ```
 
 Beispiele:
 
 ```bash
 # Datei liegt im Downloads-Ordner
-npm install ~/Downloads/thebuoyant-tsdev-mui-ts-library-1.1.0.tgz
+npm install ~/Downloads/thebuoyant-tsdev-mui-ts-library-1.2.0.tgz
 
 # Datei liegt im selben Verzeichnis wie das Projekt
-npm install ./thebuoyant-tsdev-mui-ts-library-1.1.0.tgz
+npm install ./thebuoyant-tsdev-mui-ts-library-1.2.0.tgz
 ```
 
 ### Peer Dependencies installieren (falls noch nicht vorhanden)
@@ -82,7 +82,7 @@ Ideal für Product Owner, Designer oder andere Stakeholder, die die Komponenten 
 npm run build-storybook-docker
 ```
 
-Erstellt `storybook-docker/storybook-1.1.0.zip` — enthält ein vorgefertigtes Docker-Image und Startskripte.
+Erstellt `storybook-docker/storybook-1.2.0.zip` — enthält ein vorgefertigtes Docker-Image und Startskripte.
 
 ### ZIP weitergeben
 
