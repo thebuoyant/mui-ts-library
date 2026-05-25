@@ -67,26 +67,17 @@ Branch: `MTL-15`
 
 ---
 
-## 🟡 Sub-Komponenten-Extraktion — weitere Dateien
+## 🟡 Sub-Komponenten-Extraktion — weitere Dateien ✅ Alle erledigt
 
-### [PSM-1] `PasswordStrengthMeter.tsx` — Strength Bar extrahieren
+### [PSM-1] `PasswordStrengthMeter.tsx` — Strength Bar extrahieren — ✅ Erledigt 2026-05-25
 
-Der Fortschrittsbalken (Zeile 178–208) könnte eine `PasswordStrengthBar`-Komponente werden.
-
-**Fix:** `PasswordStrengthBar.tsx` — Props: `percent`, `color`. Besser testbar, wiederverwendbar.
+`PasswordStrengthBar.tsx` erstellt — Props: `percent`, `color`, `ariaLabel`. In PasswordStrengthMeter importiert.
 
 ---
 
-### [RTE-1] `RichTextEditorToolbar.tsx` — H1/H2/H3 Icons vereinheitlichen
+### [RTE-1] `RichTextEditorToolbar.tsx` — H1/H2/H3 Icons vereinheitlichen — ✅ Erledigt 2026-05-25
 
-Drei identische Komponenten `H1Icon`, `H2Icon`, `H3Icon` (Zeile 106–114):
-```tsx
-function H1Icon() { return <Box ...>H1</Box>; }
-function H2Icon() { return <Box ...>H2</Box>; }
-function H3Icon() { return <Box ...>H3</Box>; }
-```
-
-**Fix:** `function HeadingIcon({ level }: { level: 1 | 2 | 3 })` — eine Komponente.
+`H1Icon`, `H2Icon`, `H3Icon` → `HeadingIcon({ level: 1 | 2 | 3 })`. Alle drei Usages aktualisiert.
 
 ---
 
@@ -108,11 +99,9 @@ Unterschiedliche Prop-Namen für dasselbe Muster (Footer-Status-Anzeige).
 
 ---
 
-### [CONS-2] Fehlender `onClear`-Callback in SqlEditor und JsonEditor
+### [CONS-2] Fehlender `onClear`-Callback in SqlEditor und JsonEditor — ✅ Geprüft 2026-05-25
 
-`RichTextEditor` hat `onClear`? Check ob alle Code-Editoren einen `onClear`-Callback anbieten — Konsistenz.
-
-**Status:** Zu prüfen.
+Keiner der drei Editoren (SqlEditor, JsonEditor, RichTextEditor) hat einen `onClear`-Callback — kein Handlungsbedarf, da konsistent.
 
 ---
 
@@ -149,3 +138,4 @@ Einige Inline-Kommentare auf Englisch, die meisten auf Deutsch.
 |---|---|---|
 | 2026-05-25 | Branch angelegt (MTL-15), alle Issues analysiert und dokumentiert | Alles oben noch offen |
 | 2026-05-25 | DRY-1, DRY-2, DRY-3 erledigt; GANTT-2, GANTT-1, GANTT-3, GANTT-4, GANTT-5 erledigt | PSM-1, RTE-1, GANTT-6, CONS-*, CLEAN-* |
+| 2026-05-25 | PSM-1, RTE-1 erledigt; CONS-2 geprüft (konsistent, kein Fix nötig) | CONS-1, CONS-3 (Doku), CLEAN-1 (ESLint), CLEAN-2 (Kommentarsprache) |

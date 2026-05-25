@@ -69,14 +69,12 @@ function ColorButton({ label, icon, activeColor, disabled, onClick }: ColorButto
   );
 }
 
-function H1Icon() {
-  return <Box component="span" sx={{ fontWeight: "bold", fontSize: "0.875rem", lineHeight: 1 }}>H1</Box>;
-}
-function H2Icon() {
-  return <Box component="span" sx={{ fontWeight: "bold", fontSize: "0.875rem", lineHeight: 1 }}>H2</Box>;
-}
-function H3Icon() {
-  return <Box component="span" sx={{ fontWeight: "bold", fontSize: "0.875rem", lineHeight: 1 }}>H3</Box>;
+function HeadingIcon({ level }: { level: 1 | 2 | 3 }) {
+  return (
+    <Box component="span" sx={{ fontWeight: "bold", fontSize: "0.875rem", lineHeight: 1 }}>
+      H{level}
+    </Box>
+  );
 }
 
 export function RichTextEditorToolbar({
@@ -179,7 +177,7 @@ export function RichTextEditorToolbar({
             {tc.showHeading1 && (
               <ToolbarButton
                 label={t.heading1}
-                icon={<H1Icon />}
+                icon={<HeadingIcon level={1} />}
                 onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
                 active={editor?.isActive("heading", { level: 1 })}
                 disabled={isDisabled}
@@ -188,7 +186,7 @@ export function RichTextEditorToolbar({
             {tc.showHeading2 && (
               <ToolbarButton
                 label={t.heading2}
-                icon={<H2Icon />}
+                icon={<HeadingIcon level={2} />}
                 onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
                 active={editor?.isActive("heading", { level: 2 })}
                 disabled={isDisabled}
@@ -197,7 +195,7 @@ export function RichTextEditorToolbar({
             {tc.showHeading3 && (
               <ToolbarButton
                 label={t.heading3}
-                icon={<H3Icon />}
+                icon={<HeadingIcon level={3} />}
                 onClick={() => editor?.chain().focus().toggleHeading({ level: 3 }).run()}
                 active={editor?.isActive("heading", { level: 3 })}
                 disabled={isDisabled}

@@ -15,6 +15,7 @@ import ErrorOutlineIcon from "@mui/icons-material/ErrorOutlined";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutlined";
 import { useId, useMemo, useState } from "react";
 import { scorePassword } from "./util/password-strength.util";
+import { PasswordStrengthBar } from "./PasswordStrengthBar";
 import type {
   CheckColors,
   MeterColors,
@@ -176,35 +177,11 @@ export function PasswordStrengthMeter({
       </FormControl>
 
       {showMeter && (
-        // role="progressbar" macht den Balken für Screenreader verständlich –
-        // ohne diese Attribute ist er für assistive Technologien unsichtbar.
-        <Box
-          role="progressbar"
-          aria-label={t.meterAriaLabel}
-          aria-valuenow={strengthResult.percent}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          sx={{
-            width: "100%",
-            height: "8px",
-            border: "1px solid",
-            borderColor: "divider",
-            borderRadius: "6px",
-            mt: 0.5,
-            display: "flex",
-          }}
-        >
-          <Box
-            data-testid="psm-meter"
-            sx={{
-              height: "100%",
-              width: `${strengthResult.percent}%`,
-              backgroundColor: calculateStrengthColor(strengthResult),
-              borderRadius: "6px",
-              transition: "width 0.2s ease-in-out",
-            }}
-          />
-        </Box>
+        <PasswordStrengthBar
+          percent={strengthResult.percent}
+          color={calculateStrengthColor(strengthResult)}
+          ariaLabel={t.meterAriaLabel}
+        />
       )}
 
       {showSummary && (

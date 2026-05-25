@@ -22,6 +22,8 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Gemeinsame `ToolbarButton`-Komponente in `src/components/shared/` — ersetzt drei identische lokale Implementierungen
 - Gemeinsame `normalizeSize`-Hilfsfunktion in `src/components/shared/` — ersetzt drei identische lokale Funktionen
 - Gantt-Status-Farbmaps (`STATUS_BAR_COLOR`, `STATUS_CHIP_COLOR`) in `GanttChart.constants.ts` zusammengeführt
+- `PasswordStrengthBar`-Komponente aus `PasswordStrengthMeter` extrahiert — Props: `percent`, `color`, `ariaLabel`; bessere Testbarkeit und Wiederverwendbarkeit
+- Drei identische `H1Icon`/`H2Icon`/`H3Icon`-Komponenten durch `HeadingIcon({ level: 1 | 2 | 3 })` in `RichTextEditorToolbar` ersetzt
 
 ---
 
