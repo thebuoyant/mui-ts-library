@@ -147,16 +147,77 @@ Initial public release of `@thebuoyant-tsdev/mui-ts-library`.
 ### Added
 
 #### GanttChart
-- Hierarchical project timeline with collapsible task groups
-- Milestone markers with distinct visual treatment
-- Drag-and-drop row reordering via `@dnd-kit`
-- Dependency arrows between tasks
-- Zoom levels: day, week, month, quarter
-- Built-in CRUD dialogs for creating, editing, and deleting tasks
-- Today-line indicator with auto-scroll
-- Virtualized row rendering for large datasets
-- Full i18n support via `translation` prop
+
+A fully interactive project timeline built on React, MUI, and Zustand.
+
+**Data model**
+- Hierarchical task structure via flat `tasks` array + `parentId` — tree is built internally
+- Task fields: `id`, `name`, `status`, `startDate`, `endDate`, `parentId?`, `dependencies?`, `isMilestone?`, `progress?`, `color?`
+- 4 statuses: `"planned"` · `"in-progress"` · `"done"` · `"blocked"` — color-coded bars and status chips
+- Milestone markers rendered as rotated diamonds (♦) instead of bars
+- Per-task color override via `GanttTask.color` (any CSS color value)
+- Progress field (0–100 %) shown as a semi-transparent overlay on the bar
+
+**Timeline view**
+- 4 zoom levels: `"days"` · `"weeks"` · `"months"` · `"quarters"` — user can switch via toolbar
+- Z-shaped finish-to-start dependency arrows between tasks
+- Today-line indicator with automatic horizontal scroll to center on load
+- Weekend background highlights on the days scale
+- Resizable left panel via draggable divider (`minPanelWidth`, `maxPanelWidth`)
+- Virtualized row rendering for large datasets (`virtualizeRows`) via `@tanstack/react-virtual`
+- `defaultRangeStart` / `defaultRangeEnd` to pin the visible date range
+
+**Toolbar**
+- Scale buttons, date range inputs with From/To fields, Expand All / Collapse All, Scroll to Today, Reset View
+- Fine-grained control via `toolbarConfig` — show/hide individual toolbar elements independently
+- `showToolbar={false}` to hide the entire toolbar
+
+**Interaction**
+- `draggable` — move task bars horizontally; updates `startDate` and `endDate` in sync
+- `resizable` — drag right edge of a bar to change `endDate`
+- `progressDraggable` — drag handle on bar to set progress (0–100 %) interactively
+- `cascadeDependencies` — automatically shifts all finish-to-start successors when a predecessor moves (transitive, circular-dependency-safe)
+- `showCriticalPath` — highlights the longest dependency chain that determines project duration
+- `zoomable` — `Ctrl + mouse wheel` cycles through zoom levels
+- `inlineEdit` — double-click task name in the left panel for direct editing
+- Right-click context menu on task bars for instant status change (`onStatusChange` callback)
+- Panel row reordering via drag & drop (`@dnd-kit`)
+
+**CRUD dialogs**
+- Built-in MUI dialogs for Add / Edit / Delete (`enableBuiltinDialogs={true}`, default)
+- Dialog fields: name, start date, end date, status, parent task, milestone flag, dependencies (multi-select)
+- `enableBuiltinDialogs={false}` — bypasses built-in dialogs and calls `onAddTask` / `onEditTask` / `onDeleteTask` instead (custom dialog integration)
+
+**Theming** — via `ganttTheme: GanttTheme`
+- `statusColors` — bar colors per status as CSS values
+- `criticalPathColor` — highlight color for critical path (default: `error.main`)
+- `milestoneColor` — diamond color (default: `warning.main`)
+- `todayLineColor` — today-line color (default: `primary.main`)
+- `weekendColor` — weekend column background (default: `action.hover`)
+- `barBorderRadius` — task bar corner radius in px (default: `4`)
+
+**Callbacks**
+- `onTaskClick(task)` · `onMilestoneClick(task)` — click on bar / milestone diamond
+- `onTaskMoved(task, newStart, newEnd)` — fired after a successful bar drag
+- `onTaskResized(task, newEnd)` — fired after a resize drag
+- `onStatusChange(task, status)` — fired after context menu status selection
+- `onTasksChange(tasks)` — fires after every change with the complete current task list (central callback for data-driven architectures)
+- `onTaskCreated(task)` · `onTaskUpdated(task)` · `onTaskDeleted(taskId)` — specific callbacks for built-in dialog actions
+- `onAddTask(parent?)` · `onEditTask(task)` · `onDeleteTask(task)` — called when `enableBuiltinDialogs={false}`
+
+**TypeScript exports**
+- Types: `GanttTask`, `GanttTaskNode`, `GanttTaskStatus`, `GanttTimeScale`, `GanttTranslations`, `GanttTheme`, `GanttStatusColors`, `GanttChartProps`, `GanttToolbarConfig`
+- `DEFAULT_GANTT_TRANSLATIONS` — pre-filled default translations (mix of German/English)
+
+**i18n & accessibility**
+- All UI texts overridable via `translations` prop — 30+ keys including dialog labels, toolbar tooltips, status labels, date locale
+- Action icon tooltips double as `aria-label`; dialogs have focus trap + Escape handling
 - Dark mode support via MUI theme
+
+**Storybook & tests**
+- Storybook stories covering all major scenarios
+- Vitest unit tests (included in the 271-test total at v1.0.0)
+- Bilingual user manual: `user-manuals/GanttChart.md` (EN) + `user-manuals/GanttChart.de.md` (DE)
 
 #### TagSelection
 - Multi-tag selector with autocomplete search

@@ -147,16 +147,77 @@ Erste öffentliche Veröffentlichung von `@thebuoyant-tsdev/mui-ts-library`.
 ### Hinzugefügt
 
 #### GanttChart
-- Hierarchische Projekt-Zeitleiste mit ein-/ausklappbaren Aufgabengruppen
-- Meilenstein-Marker mit eigenem visuellen Stil
-- Drag-and-Drop zum Umsortieren von Zeilen via `@dnd-kit`
-- Abhängigkeitspfeile zwischen Aufgaben
-- Zoom-Stufen: Tag, Woche, Monat, Quartal
-- Integrierte CRUD-Dialoge zum Erstellen, Bearbeiten und Löschen von Aufgaben
-- Heute-Linie mit Auto-Scroll
-- Virtualisiertes Zeilen-Rendering für große Datensätze
-- Vollständige i18n-Unterstützung über `translation`-Prop
+
+Vollständig interaktive Projekt-Zeitleiste auf Basis von React, MUI und Zustand.
+
+**Datenmodell**
+- Hierarchische Aufgabenstruktur via flachem `tasks`-Array + `parentId` — Baum wird intern aufgebaut
+- Aufgaben-Felder: `id`, `name`, `status`, `startDate`, `endDate`, `parentId?`, `dependencies?`, `isMilestone?`, `progress?`, `color?`
+- 4 Status: `"planned"` · `"in-progress"` · `"done"` · `"blocked"` — farbkodierte Balken und Status-Chips
+- Meilenstein-Marker als rotierende Raute (♦) statt Balken
+- Individuelle Farb-Override pro Aufgabe via `GanttTask.color` (beliebige CSS-Farbe)
+- Fortschrittsfeld (0–100 %) als halbtransparenter Overlay-Streifen auf dem Balken
+
+**Timeline-Ansicht**
+- 4 Zoom-Stufen: `"days"` · `"weeks"` · `"months"` · `"quarters"` — jederzeit über Toolbar wechselbar
+- Z-förmige Finish-to-Start-Abhängigkeitspfeile zwischen Aufgaben
+- Heute-Linie mit automatischem horizontalem Scroll zum Mittelpunkt beim ersten Laden
+- Wochenend-Hintergrund-Hervorhebung in der Tages-Skala
+- Größenveränderbares linkes Panel via ziehbarem Trenner (`minPanelWidth`, `maxPanelWidth`)
+- Virtualisiertes Zeilen-Rendering für große Datensätze (`virtualizeRows`) via `@tanstack/react-virtual`
+- `defaultRangeStart` / `defaultRangeEnd` zur Fixierung des sichtbaren Datumsbereichs
+
+**Toolbar**
+- Skala-Schaltflächen, Von/Bis-Datumseingaben, Alle auf-/zuklappen, Zum heutigen Tag, Ansicht zurücksetzen
+- Feingranulare Steuerung via `toolbarConfig` — einzelne Toolbar-Elemente unabhängig ein-/ausblenden
+- `showToolbar={false}` zum Ausblenden der gesamten Toolbar
+
+**Interaktion**
+- `draggable` — Aufgaben-Balken horizontal verschieben; `startDate` und `endDate` werden synchron aktualisiert
+- `resizable` — rechte Balkenkante ziehen um `endDate` zu verändern
+- `progressDraggable` — Fortschritts-Handle auf dem Balken ziehen (0–100 %) für interaktive Eingabe
+- `cascadeDependencies` — verschiebt alle Finish-to-Start-Nachfolger automatisch wenn ein Vorgänger bewegt wird (transitiv, kreiserkennungs-sicher)
+- `showCriticalPath` — markiert den längsten Abhängigkeitspfad, der die Projektdauer bestimmt
+- `zoomable` — `Strg + Mausrad` wechselt durch Zoom-Stufen
+- `inlineEdit` — Doppelklick auf Aufgabenname im linken Panel für direkte Bearbeitung
+- Rechtsklick-Kontextmenü auf Balken für sofortigen Statuswechsel (`onStatusChange`-Callback)
+- Zeilen-Umsortierung im Panel via Drag & Drop (`@dnd-kit`)
+
+**CRUD-Dialoge**
+- Integrierte MUI-Dialoge für Hinzufügen / Bearbeiten / Löschen (`enableBuiltinDialogs={true}`, Standard)
+- Dialog-Felder: Name, Startdatum, Enddatum, Status, Übergeordnete Aufgabe, Meilenstein-Flag, Vorgänger (Mehrfachauswahl)
+- `enableBuiltinDialogs={false}` — deaktiviert integrierte Dialoge, ruft stattdessen `onAddTask` / `onEditTask` / `onDeleteTask` auf (eigene Dialog-Integration)
+
+**Theming** — via `ganttTheme: GanttTheme`
+- `statusColors` — Balkenfarben pro Status als CSS-Werte
+- `criticalPathColor` — Hervorhebungsfarbe für den kritischen Pfad (Standard: `error.main`)
+- `milestoneColor` — Rautenfarbe für Meilensteine (Standard: `warning.main`)
+- `todayLineColor` — Farbe der Heute-Linie (Standard: `primary.main`)
+- `weekendColor` — Hintergrundfarbe der Wochenend-Spalten (Standard: `action.hover`)
+- `barBorderRadius` — Ecken-Radius der Aufgaben-Balken in px (Standard: `4`)
+
+**Callbacks**
+- `onTaskClick(task)` · `onMilestoneClick(task)` — Klick auf Balken / Meilenstein-Raute
+- `onTaskMoved(task, newStart, newEnd)` — nach erfolgreichem Balken-Drag
+- `onTaskResized(task, newEnd)` — nach Resize-Drag
+- `onStatusChange(task, status)` — nach Kontextmenü-Statuswahl
+- `onTasksChange(tasks)` — nach jeder Änderung mit der vollständigen aktuellen Aufgabenliste (zentraler Callback für datengetriebene Architekturen)
+- `onTaskCreated(task)` · `onTaskUpdated(task)` · `onTaskDeleted(taskId)` — spezifische Callbacks für integrierte Dialog-Aktionen
+- `onAddTask(parent?)` · `onEditTask(task)` · `onDeleteTask(task)` — bei `enableBuiltinDialogs={false}`
+
+**TypeScript-Exports**
+- Typen: `GanttTask`, `GanttTaskNode`, `GanttTaskStatus`, `GanttTimeScale`, `GanttTranslations`, `GanttTheme`, `GanttStatusColors`, `GanttChartProps`, `GanttToolbarConfig`
+- `DEFAULT_GANTT_TRANSLATIONS` — vorbefüllte Standard-Übersetzungen (Mix aus Deutsch/Englisch)
+
+**i18n & Barrierefreiheit**
+- Alle UI-Texte über `translations`-Prop überschreibbar — 30+ Schlüssel inkl. Dialog-Labels, Toolbar-Tooltips, Status-Labels, Datums-Locale
+- Aktions-Icon-Tooltips dienen als `aria-label`; Dialoge haben Fokus-Trap + Escape-Handling
 - Dark-Mode-Unterstützung via MUI-Theme
+
+**Storybook & Tests**
+- Storybook-Stories für alle wichtigen Szenarien
+- Vitest-Unit-Tests (in den 271 Gesamttests bei v1.0.0 enthalten)
+- Zweisprachiges Benutzerhandbuch: `user-manuals/GanttChart.md` (EN) + `user-manuals/GanttChart.de.md` (DE)
 
 #### TagSelection
 - Multi-Tag-Selektor mit Autocomplete-Suche
