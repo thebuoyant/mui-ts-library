@@ -28,14 +28,8 @@ import {
   COLUMN_WIDTH_WEEK,
   HEADER_HEIGHT,
   ROW_HEIGHT,
+  STATUS_BAR_COLOR,
 } from "./GanttChart.constants";
-
-const BAR_COLOR: Record<string, string> = {
-  planned: "warning.light",
-  "in-progress": "info.main",
-  done: "success.main",
-  blocked: "error.main",
-};
 
 const MS_PER_DAY = 86_400_000;
 
@@ -610,7 +604,7 @@ export function GanttTimeline({
                           height: BAR_HEIGHT,
                           top: "50%",
                           transform: "translateY(-50%)",
-                          bgcolor: task.color ?? statusColors?.[task.status] ?? BAR_COLOR[task.status] ?? "grey.300",
+                          bgcolor: task.color ?? statusColors?.[task.status] ?? STATUS_BAR_COLOR[task.status] ?? "grey.300",
                           borderRadius: barBorderRadius !== undefined ? `${barBorderRadius}px` : 1,
                           overflow: "hidden",
                           opacity: isDragging ? 0.75 : 1,
