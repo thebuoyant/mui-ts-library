@@ -22,42 +22,13 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 
 ## Installation
 
-### Schritt 1 — Paketdatei erstellen
-
-Dieses Repository klonen und ausführen:
+### Schritt 1 — Bibliothek installieren
 
 ```bash
-npm install
-npm run pack-release
+npm install @thebuoyant-tsdev/mui-ts-library
 ```
 
-Dieser Befehl baut die Bibliothek und legt eine fertige Paketdatei im Ordner `releases/` ab:
-
-```
-releases/thebuoyant-tsdev-mui-ts-library-1.3.0.tgz
-```
-
-Diese Datei per Slack, E-Mail oder Netzlaufwerk an das Team weitergeben.
-
-### Schritt 2 — Im eigenen Projekt installieren
-
-Ein Terminal im **eigenen React-Projekt** öffnen und ausführen:
-
-```bash
-npm install /pfad/zur/thebuoyant-tsdev-mui-ts-library-1.3.0.tgz
-```
-
-**Beispiele:**
-
-```bash
-# Datei liegt im Downloads-Ordner
-npm install ~/Downloads/thebuoyant-tsdev-mui-ts-library-1.3.0.tgz
-
-# Datei liegt im Nachbarordner des Projekts
-npm install ../thebuoyant-tsdev-mui-ts-library-1.3.0.tgz
-```
-
-### Schritt 3 — Peer-Dependencies installieren
+### Schritt 2 — Peer-Dependencies installieren
 
 Falls MUI noch nicht im Projekt vorhanden ist:
 
@@ -65,7 +36,7 @@ Falls MUI noch nicht im Projekt vorhanden ist:
 npm install react@^19 react-dom@^19 @mui/material@^9 @emotion/react @emotion/styled @mui/icons-material@^9
 ```
 
-### Schritt 4 — Fertig
+### Schritt 3 — Fertig
 
 Beliebige Komponente importieren — TypeScript-Typen sind automatisch verfügbar:
 

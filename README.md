@@ -22,42 +22,13 @@ A type-safe React component library built on **TypeScript** and **MUI (Material 
 
 ## Installation
 
-### Step 1 — Get the package file
-
-Clone this repository and run:
+### Step 1 — Install the library
 
 ```bash
-npm install
-npm run pack-release
+npm install @thebuoyant-tsdev/mui-ts-library
 ```
 
-This builds the library and places a ready-to-use package file in the `releases/` folder:
-
-```
-releases/thebuoyant-tsdev-mui-ts-library-1.3.0.tgz
-```
-
-Share this file with your team via Slack, email, or a network drive.
-
-### Step 2 — Install in your project
-
-Open a terminal in **your own React project** and run:
-
-```bash
-npm install /path/to/thebuoyant-tsdev-mui-ts-library-1.3.0.tgz
-```
-
-**Examples:**
-
-```bash
-# File is in your Downloads folder
-npm install ~/Downloads/thebuoyant-tsdev-mui-ts-library-1.3.0.tgz
-
-# File is next to your project folder
-npm install ../thebuoyant-tsdev-mui-ts-library-1.3.0.tgz
-```
-
-### Step 3 — Install peer dependencies
+### Step 2 — Install peer dependencies
 
 If your project doesn't have MUI set up yet:
 
@@ -65,9 +36,9 @@ If your project doesn't have MUI set up yet:
 npm install react@^19 react-dom@^19 @mui/material@^9 @emotion/react @emotion/styled @mui/icons-material@^9
 ```
 
-### Step 4 — Done
+### Step 3 — Done
 
-Import any component and TypeScript types are included automatically:
+Import any component — TypeScript types are included automatically:
 
 ```tsx
 import { GanttChart, JsonEditor, useConfirm } from '@thebuoyant-tsdev/mui-ts-library';
