@@ -220,44 +220,151 @@ Vollständig interaktive Projekt-Zeitleiste auf Basis von React, MUI und Zustand
 - Zweisprachiges Benutzerhandbuch: `user-manuals/GanttChart.md` (EN) + `user-manuals/GanttChart.de.md` (DE)
 
 #### TagSelection
-- Multi-Tag-Selektor mit Autocomplete-Suche
-- Optionaler Tag-Erstellungsmodus (`allowCreate`) mit Enter-Taste als Shortcut
-- Konfigurierbare Chip-Größe und maximale Anzahl sichtbarer Chips
-- Alphabetische Sortierung der ausgewählten Chips und Dropdown-Optionen
-- `onTagCreate`-Callback zum Persistieren neu erstellter Tags
-- Vollständige i18n-Unterstützung über `translation`-Prop
-- Dark-Mode-Unterstützung via MUI-Theme
+
+Multi-Tag-Selektor mit Autocomplete, Chip-Anzeige, Async-Unterstützung und freier Tag-Erstellung.
+
+**Datenmodell**
+- `TagSelectionItem`-Felder: `id`, `label`, `selected?`, `disabled?`, `color?`, `foregroundColor?`, `backgroundColor?`
+- `TagColor`: `"default"` · `"primary"` · `"secondary"` · `"error"` · `"info"` · `"success"` · `"warning"`
+- Zwei Farbsysteme: semantisches `color` (MUI-Theme, Dark-Mode-sicher) oder `foregroundColor`/`backgroundColor` (CSS) — gegenseitig ausschließend
+- Deaktivierte Tags können nicht ausgewählt werden; bereits ausgewählte `disabled`-Tags können nicht entfernt werden
+- Chips und Dropdown-Einträge immer alphabetisch sortiert
+
+**Anzeige & Sichtbarkeit**
+- `showSelectedTags` — Chip-Bereich ein-/ausblenden
+- `showSelectedTagsLabel` — Überschrift über den Chips ein-/ausblenden
+- `showAutoComplete` — Suche ein-/ausblenden (reiner Anzeigemodus wenn `false`)
+- `inputSize` / `chipSize` — `"small"` oder `"medium"` (MUI-Standard)
+
+**Interaktion**
+- `maxTags` — maximale Anzahl gleichzeitig ausgewählter Tags; Input wird automatisch deaktiviert wenn Limit erreicht
+- `maxVisibleChips` — überzählige Chips hinter `+N`-Chip versteckt; Klick öffnet Overflow-Popover (`popoverPlacement`: `"top"` oder `"bottom"`)
+- `loading` — Ladezustand im Dropdown für asynchrone Tag-Quellen
+- `disabled` — gesamte Komponente gesperrt; Chips ohne Löschen-Icon sichtbar
+- `listboxMaxHeight` — maximale Höhe der Autocomplete-Dropdown-Liste in px
+
+**Freie Tag-Erstellung** (`allowCreate={true}`)
+- Wenn getippter Text keinem bestehenden Tag entspricht, wechselt der Input in den Erstellen-Modus
+- CheckIcon (Bestätigen) + CloseIcon (Abbrechen) im Feld; 7 MUI-Theme-Farb-Chips zur Farbauswahl
+- Bestätigung per CheckIcon-Klick **oder Enter-Taste**
+- Neuer Tag wird intern sofort als ausgewählt markiert; `onTagCreate` feuert zur externen Synchronisierung
+
+**Callbacks**
+- `onTagSelect(tag, selectedTags, allTags)` — Tag aus Dropdown ausgewählt
+- `onTagDelete(tag, selectedTags, allTags)` — Chip entfernt
+- `onTagsChange(selectedTags, allTags)` — zentraler Callback, feuert nach jeder Auswahlveränderung
+- `onSearchChange(value)` — für serverseitige Filterung und asynchrones Laden
+- `onTagCreate(label, color)` — neuer Tag in Erstellen-Modus bestätigt
+
+**TypeScript-Exports**
+- Typen: `TagSelectionItem`, `TagSelectionProps`, `TagSelectionTranslation`, `TagColor`
+- `DEFAULT_TAG_SELECTION_TRANSLATION`
+
+**i18n** (7 Schlüssel): `selectedTagsLabel`, `autoCompleteLabel`, `noSelectedTagsText`, `noAvailableTagsText`, `placeholder`, `loadingText`, `maxTagsReachedText`
+
+**Storybook & Tests**
+- Storybook-v10-Stories für alle wichtigen Szenarien
+- Vitest-Unit-Tests (in den 271 Gesamttests bei v1.0.0 enthalten)
+- Zweisprachiges Benutzerhandbuch: `user-manuals/TagSelection.md` (EN) + `user-manuals/TagSelection.de.md` (DE)
 
 #### PasswordStrengthMeter
-- Passwort-Eingabe mit Live-Stärkebewertung (0–4 Stufen)
-- Konfigurierbare Anforderungsliste für Passwort-Regeln
-- Sichtbarkeits-Umschalter
-- Anpassbare Stärkebezeichnungen über `translation`-Prop
-- Dark-Mode-Unterstützung via MUI-Theme
+
+Passwort-Eingabe mit animiertem Stärkebalken, Anforderungsliste und vollständiger Formular-Bibliothek-Integration.
+
+**Kernfunktionen**
+- Live-Stärkebewertung (5 Stufen: leer/schwach/ok/gut/sehr gut) bei jedem Tastendruck
+- Animierter Stärkebalken mit konfigurierbaren Farben pro Stufe (`meterColors`)
+- Anforderungsliste mit 5 Kriterien: Mindestlänge, Großbuchstabe, Kleinbuchstabe, Ziffer, Sonderzeichen
+- Sichtbarkeits-Umschalter (Passwort anzeigen/verbergen)
+- Kontrollierter und unkontrollierter Modus
+
+**Props**
+- `value` — kontrollierter Modus (externer State)
+- `passwordMinLength` (Standard: `8`) — Mindestlängen-Schwellwert; Passwörter darunter erhalten immer `weak`
+- `showMeter`, `showSummary`, `showPasswordAdornment` — einzelne UI-Bereiche unabhängig ein-/ausblenden
+- `inputSize` — `"small"` oder `"medium"` (MUI-Standard)
+
+**Formular-Integration**
+- `name` — für natives `<form>`-Submit und React Hook Form `register()`
+- `inputRef` — Ref auf das native `<input>` für React Hook Form / Formik
+- `disabled`, `error`, `helperText`, `autoComplete` — konsistent mit MUI `TextField`
+
+**Farb-Anpassung**
+- `meterColors: Partial<MeterColors>` — Balkenfarben für `weak`, `ok`, `good`, `veryGood`
+- `checkColors: CheckColors` — Icon-Farben für `failure` (nicht erfüllt) und `success` (erfüllt)
+- `DEFAULT_METER_COLORS`, `DEFAULT_CHECK_COLORS` als Referenz exportiert
+
+**Callback**
+- `onPasswordChange(password: string, result: StrengthResult)` — feuert bei jedem Tastendruck
+
+**`StrengthResult`** (Rückgabe in `onPasswordChange`)
+- `score: 0|1|2|3|4`, `percent: 0|25|50|75|100`, `meterStatus: "weak"|"ok"|"good"|"very good"`
+- `length`, `hasLower`, `hasUpper`, `hasDigit`, `hasSymbol`
+
+**Scoring-Algorithmus** (client-seitig, deterministisch, keine externen Dienste)
+- Basis: Mindestlänge erfüllt +1, Längen-Bonus +1
+- Zeichenvielfalt: 2 Klassen +1, 3 Klassen +1
+- Malus: Wiederholungszeichen −2, bekannte Schwach-Muster (`1234`, `password`, …) −2
+- Score auf 0–4 geklemmt
+
+**TypeScript-Exports**
+- Typen: `PasswordStrengthMeterProps`, `PasswordStrengthMeterTranslation`, `StrengthResult`, `StrengthScore`, `MeterStatus`, `MeterColors`, `CheckColors`
+- `DEFAULT_PASSWORD_TRANSLATIONS`, `DEFAULT_METER_COLORS`, `DEFAULT_CHECK_COLORS`
+
+**Stabile `data-testid`-Attribute**: `psm-input`, `psm-toggle`, `psm-meter`, `psm-summary`, `psm-req-success`, `psm-req-failure`
+
+**i18n** (10 Schlüssel): `label`, `summaryHeaderLabel`, `summaryMinChars` (mit `{n}`-Platzhalter für `passwordMinLength`), `summaryCapitalLetter`, `summaryLowerCaseLetter`, `summaryNumber`, `summarySpecialChar`, `showPasswordLabel`, `hidePasswordLabel`, `meterAriaLabel`
+
+**Storybook & Tests**
+- Storybook-v10-Stories für alle wichtigen Szenarien
+- Vitest-Unit-Tests (in den 271 Gesamttests bei v1.0.0 enthalten)
+- Zweisprachiges Benutzerhandbuch: `user-manuals/PasswordStrengthMeter.md` (EN) + `user-manuals/PasswordStrengthMeter.de.md` (DE)
 
 #### RichTextEditor
-- WYSIWYG-Editor auf Basis von TipTap v3 und ProseMirror
-- Toolbar: Fett, Kursiv, Unterstrichen, Durchgestrichen, Überschriften (H1–H3), Aufzählung, Nummerierte Liste, Zitat, Code-Block, Link, Trennlinie, Textfarbe, Hervorheben, Rückgängig/Wiederholen, Formatierung löschen
-- Konfigurierbare Toolbar über `toolbarConfig`-Prop (einzelne Buttons ein-/ausblenden)
-- Textfarbe und Hervorhebung mit Farbpalette und nativem Browser-Farbwähler
-- Dialog zum Einfügen und Bearbeiten von Links
-- Zeichenzähler mit optionalem Hartlimit (`maxCharacters`)
-- Kontrollierter Modus über `value` / `onChange`
-- Ausgabeformat: `"html"` (Standard) oder `"json"`
-- Markdown-zu-Rich-Text-Konvertierung beim Einfügen
-- `readonly`-Modus (ohne Toolbar) und `disabled`-Modus
-- Native Formular-Integration über verstecktes `<input type="hidden">`
-- `error`-Zustand und `helperText` — konsistent mit MUI TextField
-- `onBlur`- / `onFocus`-Callbacks
-- Konfigurierbare `height` und `width` (Zahl → px, CSS-Strings, `"auto"` für Flex-Container)
-- Vollständige i18n-Unterstützung über `translation`-Prop
-- Dark-Mode-Unterstützung via MUI-Theme
+
+Vollwertiger WYSIWYG-Editor auf Basis von TipTap v3 und ProseMirror — ohne externe CSS-Abhängigkeiten.
+
+**Toolbar** (alle Buttons über `toolbarConfig` einzeln ein-/ausblendbar)
+- Textformatierung: Fett, Kursiv, Unterstrichen, Durchgestrichen
+- Überschriften: H1, H2, H3
+- Listen: Aufzählung, Nummerierte Liste
+- Blöcke: Zitat, Code-Block, Trennlinie
+- Link: Einfügen-/Bearbeiten-Dialog mit URL-Feld und Entfernen-Button
+- Textfarbe + Hervorhebung: Farbpalette mit 10 Voreinstellungen, Regenbogen-Swatch öffnet nativen Browser-Farbwähler, Papierkorb entfernt Farbe
+- Verlauf: Rückgängig, Wiederholen, Formatierung löschen
+
+**Props**
+- `value` / `onChange` — kontrollierter Modus; externe Synchronisierung ohne Cursor-Sprung
+- `placeholder` — Platzhaltertext wenn Editor leer ist
+- `outputFormat` — `"html"` (Standard) oder `"json"` (TipTap/ProseMirror-Dokumentformat)
+- `showCharacterCount` — Zeichenzähler rechts unten
+- `maxCharacters` — Hartlimit; Eingabe blockiert wenn erreicht, Zähler wird rot
+- `height` / `width` — Zahl → px, CSS-Strings, `"auto"` füllt umgebenden Flex-Container
+- `readonly` — keine Toolbar, nicht editierbar
+- `disabled` — Toolbar deaktiviert, Editor ausgegraut
+- `name` — verstecktes `<input type="hidden">` für natives `<form>`-Submit
+- `error` + `helperText` — konsistent mit MUI `TextField`
+- `onBlur` / `onFocus`-Callbacks
+
+**Markdown-Einfügen**
+- Eingefügtes Markdown (aus `.md`-Dateien, GitHub-READMEs, Markdown-Editoren) wird automatisch in Rich-Text konvertiert via `tiptap-markdown` — Überschriften, Listen, Fett, Kursiv, Zitate, Code, Links
+
+**TypeScript-Exports**
+- Typen: `RichTextEditorProps`, `RichTextEditorOutputFormat`, `RichTextEditorToolbarConfig`, `RichTextEditorTranslation`
+- `DEFAULT_RICH_TEXT_EDITOR_TRANSLATION`, `DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG`
+
+**i18n** (26 Schlüssel): Toolbar-Tooltips für alle 18 Buttons, Link-Dialog-Labels (Titel/URL/Speichern/Abbrechen/Entfernen), Zeichenzähler-Format-Strings (`{count}`, `{count}/{max}`)
+
+**Storybook & Tests**
+- Storybook-v10-Stories für alle wichtigen Szenarien
+- Vitest-Unit-Tests (in den 271 Gesamttests bei v1.0.0 enthalten)
+- Zweisprachiges Benutzerhandbuch: `user-manuals/RichTextEditor.md` (EN) + `user-manuals/RichTextEditor.de.md` (DE)
 
 #### Allgemein
 - Dualer ESM + CJS Output (`dist/index.js` / `dist/index.cjs`)
 - Vollständige TypeScript-Deklarationen (`.d.ts`) für alle Komponenten und Typen
 - Tree-Shakeable (`sideEffects: false`)
 - Peer-Dependencies: React 19, MUI 9, Emotion
-- Storybook-10-Stories für alle Komponenten
+- Storybook-v10-Stories für alle Komponenten — mehrere Szenarien pro Komponente
 - 271 Unit-Tests mit Vitest und Testing Library
 - Zweisprachige Dokumentation: Englisch (`*.md`) und Deutsch (`*.de.md`)

@@ -220,44 +220,151 @@ A fully interactive project timeline built on React, MUI, and Zustand.
 - Bilingual user manual: `user-manuals/GanttChart.md` (EN) + `user-manuals/GanttChart.de.md` (DE)
 
 #### TagSelection
-- Multi-tag selector with autocomplete search
-- Optional tag creation mode (`allowCreate`) with Enter key shortcut
-- Configurable chip size and maximum visible chips
-- Alphabetical sorting of selected chips and dropdown options
-- `onTagCreate` callback for persisting newly created tags
-- Full i18n support via `translation` prop
-- Dark mode support via MUI theme
+
+Multi-tag selector with autocomplete, chip display, async support, and free-tag creation.
+
+**Data model**
+- `TagSelectionItem` fields: `id`, `label`, `selected?`, `disabled?`, `color?`, `foregroundColor?`, `backgroundColor?`
+- `TagColor`: `"default"` · `"primary"` · `"secondary"` · `"error"` · `"info"` · `"success"` · `"warning"`
+- Two color systems: semantic `color` (MUI theme, dark-mode-safe) or `foregroundColor`/`backgroundColor` (custom CSS) — mutually exclusive
+- Disabled tags cannot be selected; already-selected disabled tags cannot be removed
+- All chips and dropdown entries sorted alphabetically
+
+**Display & visibility**
+- `showSelectedTags` — show/hide the entire chip area
+- `showSelectedTagsLabel` — show/hide the heading above the chips
+- `showAutoComplete` — show/hide the search input (display-only mode when `false`)
+- `inputSize` / `chipSize` — `"small"` or `"medium"` (MUI standard)
+
+**Interaction**
+- `maxTags` — maximum simultaneously selected tags; input auto-disables when limit reached, with hint text
+- `maxVisibleChips` — excess chips hidden behind `+N` chip; clicking opens an overflow popover (`popoverPlacement`: `"top"` or `"bottom"`)
+- `loading` — loading indicator in dropdown for async tag sources
+- `disabled` — entire component locked; chips visible without delete icons
+- `listboxMaxHeight` — max height of the autocomplete dropdown list in px
+
+**Free tag creation** (`allowCreate={true}`)
+- When typed text matches no existing tag, the input switches to create mode
+- CheckIcon (confirm) + CloseIcon (cancel) appear in the field; 7 MUI theme color chips appear below for color selection
+- Confirm by clicking CheckIcon **or pressing Enter**
+- New tag is immediately marked as selected internally; `onTagCreate` fires for external state sync
+
+**Callbacks**
+- `onTagSelect(tag, selectedTags, allTags)` — tag selected from dropdown
+- `onTagDelete(tag, selectedTags, allTags)` — chip removed
+- `onTagsChange(selectedTags, allTags)` — central callback, fires after every selection change
+- `onSearchChange(value)` — for server-side filtering and async loading
+- `onTagCreate(label, color)` — new tag confirmed in create mode (`allowCreate={true}`)
+
+**TypeScript exports**
+- Types: `TagSelectionItem`, `TagSelectionProps`, `TagSelectionTranslation`, `TagColor`
+- `DEFAULT_TAG_SELECTION_TRANSLATION`
+
+**i18n** (7 keys): `selectedTagsLabel`, `autoCompleteLabel`, `noSelectedTagsText`, `noAvailableTagsText`, `placeholder`, `loadingText`, `maxTagsReachedText`
+
+**Storybook & tests**
+- Storybook stories covering all major scenarios (Storybook v10)
+- Vitest unit tests (included in 271 total at v1.0.0)
+- Bilingual user manual: `user-manuals/TagSelection.md` (EN) + `user-manuals/TagSelection.de.md` (DE)
 
 #### PasswordStrengthMeter
-- Password input with live strength rating (0–4 levels)
-- Configurable strength requirements checklist
-- Toggle visibility button
-- Strength label customization via `translation` prop
-- Dark mode support via MUI theme
+
+Password input with animated strength bar, requirements checklist, and full form library integration.
+
+**Core features**
+- Live strength scoring (5 levels: empty/weak/ok/good/very good) on every keystroke
+- Animated strength bar with configurable colors per level (`meterColors`)
+- Requirements checklist with 5 criteria: minimum length, uppercase, lowercase, digits, special characters
+- Visibility toggle button (show/hide password)
+- Controlled and uncontrolled modes
+
+**Props**
+- `value` — controlled mode (external state)
+- `passwordMinLength` (default: `8`) — minimum length threshold; passwords below always score `weak`
+- `showMeter`, `showSummary`, `showPasswordAdornment` — show/hide individual UI sections independently
+- `inputSize` — `"small"` or `"medium"` (MUI standard)
+
+**Form integration**
+- `name` — for native `<form>` submission and React Hook Form `register()`
+- `inputRef` — ref to the native `<input>` for React Hook Form / Formik
+- `disabled`, `error`, `helperText`, `autoComplete` — consistent with MUI `TextField`
+
+**Color customization**
+- `meterColors: Partial<MeterColors>` — bar colors for `weak`, `ok`, `good`, `veryGood`
+- `checkColors: CheckColors` — icon colors for `failure` (unmet) and `success` (met) requirements
+- `DEFAULT_METER_COLORS`, `DEFAULT_CHECK_COLORS` exported for reference
+
+**Callback**
+- `onPasswordChange(password: string, result: StrengthResult)` — fires on every keystroke
+
+**`StrengthResult`** (returned in `onPasswordChange`)
+- `score: 0|1|2|3|4`, `percent: 0|25|50|75|100`, `meterStatus: "weak"|"ok"|"good"|"very good"`
+- `length`, `hasLower`, `hasUpper`, `hasDigit`, `hasSymbol`
+
+**Scoring algorithm** (client-side, deterministic, no external services)
+- Base: minimum length met +1, extra length bonus +1
+- Character variety: 2 classes +1, 3 classes +1
+- Penalties: repeated chars −2, known weak patterns (`1234`, `password`, …) −2
+- Score clamped to 0–4
+
+**TypeScript exports**
+- Types: `PasswordStrengthMeterProps`, `PasswordStrengthMeterTranslation`, `StrengthResult`, `StrengthScore`, `MeterStatus`, `MeterColors`, `CheckColors`
+- `DEFAULT_PASSWORD_TRANSLATIONS`, `DEFAULT_METER_COLORS`, `DEFAULT_CHECK_COLORS`
+
+**Stable `data-testid` attributes**: `psm-input`, `psm-toggle`, `psm-meter`, `psm-summary`, `psm-req-success`, `psm-req-failure`
+
+**i18n** (10 keys): `label`, `summaryHeaderLabel`, `summaryMinChars` (with `{n}` placeholder for `passwordMinLength`), `summaryCapitalLetter`, `summaryLowerCaseLetter`, `summaryNumber`, `summarySpecialChar`, `showPasswordLabel`, `hidePasswordLabel`, `meterAriaLabel`
+
+**Storybook & tests**
+- Storybook stories covering all major scenarios (Storybook v10)
+- Vitest unit tests (included in 271 total at v1.0.0)
+- Bilingual user manual: `user-manuals/PasswordStrengthMeter.md` (EN) + `user-manuals/PasswordStrengthMeter.de.md` (DE)
 
 #### RichTextEditor
-- WYSIWYG editor based on TipTap v3 and ProseMirror
-- Toolbar: Bold, Italic, Underline, Strikethrough, Headings (H1–H3), Bullet List, Ordered List, Blockquote, Code Block, Link, Horizontal Rule, Text Color, Highlight, Undo/Redo, Clear Format
-- Configurable toolbar via `toolbarConfig` prop (show/hide individual buttons)
-- Text color and highlight with color palette and native browser color picker
-- Link insert/edit dialog
-- Character count display with optional hard limit (`maxCharacters`)
-- Controlled mode via `value` / `onChange`
-- Output format: `"html"` (default) or `"json"`
-- Markdown-to-rich-text conversion on paste
-- `readonly` mode (no toolbar) and `disabled` mode
-- Native form integration via hidden `<input type="hidden">`
-- `error` state and `helperText` — consistent with MUI TextField
+
+Full-featured WYSIWYG editor built on TipTap v3 and ProseMirror, zero external CSS dependencies.
+
+**Toolbar** (all buttons individually toggleable via `toolbarConfig`)
+- Text formatting: Bold, Italic, Underline, Strikethrough
+- Headings: H1, H2, H3
+- Lists: Bullet List, Ordered List
+- Blocks: Blockquote, Code Block, Horizontal Rule
+- Link: insert/edit dialog with URL field and Remove button
+- Text Color + Highlight: color palette with 10 presets, rainbow swatch opens native browser color picker, trash removes color
+- History: Undo, Redo, Clear Format
+
+**Props**
+- `value` / `onChange` — controlled mode; external sync without cursor jump
+- `placeholder` — placeholder text when editor is empty
+- `outputFormat` — `"html"` (default) or `"json"` (TipTap/ProseMirror document format)
+- `showCharacterCount` — character counter at bottom right
+- `maxCharacters` — hard limit; input is blocked when reached, counter turns red
+- `height` / `width` — numeric → px, CSS strings, `"auto"` fills surrounding flex container
+- `readonly` — no toolbar, non-editable
+- `disabled` — toolbar disabled, editor grayed out
+- `name` — hidden `<input type="hidden">` for native `<form>` submission
+- `error` + `helperText` — consistent with MUI `TextField`
 - `onBlur` / `onFocus` callbacks
-- Configurable `height` and `width` (number → px, CSS strings, `"auto"` for flex containers)
-- Full i18n support via `translation` prop
-- Dark mode support via MUI theme
+
+**Markdown paste**
+- Pasted Markdown (from `.md` files, GitHub READMEs, Markdown editors) is auto-converted to rich text via `tiptap-markdown` — headings, lists, bold, italic, blockquotes, code, links
+
+**TypeScript exports**
+- Types: `RichTextEditorProps`, `RichTextEditorOutputFormat`, `RichTextEditorToolbarConfig`, `RichTextEditorTranslation`
+- `DEFAULT_RICH_TEXT_EDITOR_TRANSLATION`, `DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG`
+
+**i18n** (26 keys): toolbar tooltips for all 18 buttons, link dialog labels (title/URL/Save/Cancel/Remove), character counter format strings (`{count}`, `{count}/{max}`)
+
+**Storybook & tests**
+- Storybook stories covering all major scenarios (Storybook v10)
+- Vitest unit tests (included in 271 total at v1.0.0)
+- Bilingual user manual: `user-manuals/RichTextEditor.md` (EN) + `user-manuals/RichTextEditor.de.md` (DE)
 
 #### General
 - Dual ESM + CJS output (`dist/index.js` / `dist/index.cjs`)
 - Full TypeScript declarations (`.d.ts`) for all components and types
 - Tree-shakeable (`sideEffects: false`)
 - Peer dependencies: React 19, MUI 9, Emotion
-- Storybook 10 stories for all components
+- Storybook v10 stories for all components — multiple scenarios per component
 - 271 unit tests with Vitest and Testing Library
 - Bilingual documentation: English (`*.md`) and German (`*.de.md`)
