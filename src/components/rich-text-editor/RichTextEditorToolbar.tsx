@@ -1,11 +1,6 @@
 import { useState } from "react";
 import { type Editor } from "@tiptap/react";
-import {
-  Box,
-  Divider,
-  IconButton,
-  Tooltip,
-} from "@mui/material";
+import { Box, Divider, IconButton, Tooltip } from "@mui/material";
 import FormatBoldIcon from "@mui/icons-material/FormatBold";
 import FormatItalicIcon from "@mui/icons-material/FormatItalic";
 import FormatUnderlinedIcon from "@mui/icons-material/FormatUnderlined";
@@ -27,6 +22,7 @@ import {
 } from "./RichTextEditor.types";
 import { RichTextEditorLinkDialog } from "./RichTextEditorLinkDialog";
 import { RichTextEditorColorPicker } from "./RichTextEditorColorPicker";
+import { ToolbarButton } from "../shared/ToolbarButton";
 
 type RichTextEditorToolbarProps = {
   editor:        Editor | null;
@@ -34,36 +30,6 @@ type RichTextEditorToolbarProps = {
   translation:   RichTextEditorTranslation;
   disabled?:     boolean;
 };
-
-type ToolbarButtonProps = {
-  label:     string;
-  icon:      React.ReactNode;
-  onClick:   () => void;
-  active?:   boolean;
-  disabled?: boolean;
-};
-
-function ToolbarButton({ label, icon, onClick, active, disabled }: ToolbarButtonProps) {
-  return (
-    <Tooltip title={label} arrow>
-      <span>
-        <IconButton
-          size="small"
-          // Verhindert dass der Editor seinen Fokus verliert wenn ein Toolbar-Button gedrückt wird
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={onClick}
-          disabled={disabled}
-          color={active ? "primary" : "default"}
-          sx={{ borderRadius: 1 }}
-          aria-label={label}
-          aria-pressed={active}
-        >
-          {icon}
-        </IconButton>
-      </span>
-    </Tooltip>
-  );
-}
 
 // Farb-Button mit farbiger Indikatorlinie unter dem Icon
 type ColorButtonProps = {

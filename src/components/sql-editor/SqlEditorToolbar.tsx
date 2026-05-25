@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Divider, IconButton, Tooltip } from "@mui/material";
+import { Box, Divider } from "@mui/material";
 import ContentCopyIcon   from "@mui/icons-material/ContentCopy";
 import CheckIcon         from "@mui/icons-material/Check";
 import DeleteIcon        from "@mui/icons-material/Delete";
@@ -11,6 +11,7 @@ import { undo, redo }   from "@codemirror/commands";
 import type { EditorView } from "@codemirror/view";
 import { format as formatSql, type SqlLanguage } from "sql-formatter";
 import type { SqlEditorDialect, SqlEditorToolbarConfig, SqlEditorTranslation } from "./SqlEditor.types";
+import { ToolbarButton } from "../shared/ToolbarButton";
 
 const DIALECT_MAP: Record<SqlEditorDialect, SqlLanguage> = {
   standard:   "sql",
@@ -28,33 +29,6 @@ type SqlEditorToolbarProps = {
   disabled?:     boolean;
   onExecute?:    (sql: string) => void;
 };
-
-type ToolbarButtonProps = {
-  label:     string;
-  icon:      React.ReactNode;
-  onClick:   () => void;
-  active?:   boolean;
-  disabled?: boolean;
-};
-
-function ToolbarButton({ label, icon, onClick, active, disabled }: ToolbarButtonProps) {
-  return (
-    <Tooltip title={label} arrow>
-      <span>
-        <IconButton
-          size="small"
-          onClick={onClick}
-          disabled={disabled}
-          color={active ? "primary" : "default"}
-          sx={{ borderRadius: 1 }}
-          aria-label={label}
-        >
-          {icon}
-        </IconButton>
-      </span>
-    </Tooltip>
-  );
-}
 
 export function SqlEditorToolbar({
   viewRef,

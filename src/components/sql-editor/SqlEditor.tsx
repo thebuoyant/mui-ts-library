@@ -9,12 +9,7 @@ import {
 import { SqlEditorContent } from "./SqlEditorContent";
 import { SqlEditorToolbar } from "./SqlEditorToolbar";
 import { SqlEditorFooter }  from "./SqlEditorFooter";
-
-function normalizeSize(val: number | string | undefined): number | string | undefined {
-  if (val === "" || val === undefined) return undefined;
-  if (typeof val === "string" && val !== "auto" && !isNaN(Number(val))) return Number(val);
-  return val;
-}
+import { normalizeSize } from "../shared/normalizeSize";
 
 export function SqlEditor({
   value,
