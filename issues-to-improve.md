@@ -3,7 +3,7 @@
 Gesammelte Refactoring- und Code-Quality-Aufgaben für `@thebuoyant-tsdev/mui-ts-library`.
 Wird am Ende jeder Session aktualisiert — so starten wir morgen optimal.
 
-Branch: `MTL-15`
+Branch: `MTL-15` — ✅ Merged / Released als v1.3.2
 
 ---
 
@@ -140,3 +140,4 @@ Einige Inline-Kommentare auf Englisch, die meisten auf Deutsch.
 | 2026-05-25 | DRY-1, DRY-2, DRY-3 erledigt; GANTT-2, GANTT-1, GANTT-3, GANTT-4, GANTT-5 erledigt | PSM-1, RTE-1, GANTT-6, CONS-*, CLEAN-* |
 | 2026-05-25 | PSM-1, RTE-1 erledigt; CONS-2 geprüft (konsistent, kein Fix nötig) | CONS-1, CONS-3 (Doku), CLEAN-1 (ESLint), CLEAN-2 (Kommentarsprache) |
 | 2026-05-25 | CONS-1, CONS-3 entschieden und dokumentiert; README auf npm-only; CHANGELOG v1.0.0 komplett nachgepflegt | CLEAN-1 (ESLint import/order), CLEAN-2 (Kommentarsprache) — separate Session |
+| 2026-05-25 | Version auf 1.3.2 angehoben; CHANGELOG [Unreleased] → [1.3.2]; MTL-15 abgeschlossen | CLEAN-1, CLEAN-2 — nächste Session |

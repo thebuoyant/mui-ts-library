@@ -11,6 +11,10 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unveröffentlicht]
 
+---
+
+## [1.3.2] — 2026-05-25
+
 ### Intern — MTL-15: Code-Qualität & Refactoring
 
 - `useGanttDrag`-Hook aus `GanttTimeline` extrahiert — gesamte Drag-, Resize- und Progress-Drag-Logik in `hooks/useGanttDrag.ts`; dokumentiert 4 Muster für komplexe Interaktions-Hooks (stabile Callback-Refs, Zwei-Ebenen-State, Document-Level-Listener, Suppress-Click)
