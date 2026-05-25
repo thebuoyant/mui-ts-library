@@ -1,10 +1,13 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
+
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { type RefObject, type UIEventHandler } from "react";
 import { Box, Menu, MenuItem, useTheme } from "@mui/material";
 import { useGanttChartStore, useGanttTheme, useGanttTranslations, useRawGanttChartStore } from "./GanttChart";
 import type { GanttTask, GanttTaskStatus } from "./GanttChart.types";
 import type { GanttTaskNode } from "./GanttChart.types";
+import { useGanttDrag } from "./hooks/useGanttDrag";
+import type { ActiveDrag, DragType } from "./hooks/useGanttDrag";
 import {
   addDays,
   calculateTaskPosition,
@@ -30,8 +33,6 @@ import {
   ROW_HEIGHT,
   STATUS_BAR_COLOR,
 } from "./GanttChart.constants";
-
-const MS_PER_DAY = 86_400_000;
 
 // ---------------------------------------------------------------------------
 // SVG-Abhängigkeitspfeile
@@ -105,24 +106,6 @@ function computeDependencyLines(
 }
 
 // ---------------------------------------------------------------------------
-// Drag-State-Typen
-// ---------------------------------------------------------------------------
-
-type DragType = "move" | "resize" | "progress";
-
-type DragInit = {
-  type: DragType;
-  taskId: string;
-  startX: number;
-  originalStart: Date;
-  originalEnd: Date;
-  initialProgress?: number;
-  barWidthPx?: number;
-};
-
-type ActiveDrag = { taskId: string; type: DragType; deltaDays: number; newProgress?: number };
-
-// ---------------------------------------------------------------------------
 // Komponente
 // ---------------------------------------------------------------------------
 
@@ -162,9 +145,9 @@ export function GanttTimeline({
   const allTasks = useGanttChartStore((s) => s.tasks);
   const expandedIds = useGanttChartStore((s) => s.expandedIds);
   const timelineRange = useGanttChartStore((s) => s.timelineRange);
-  const timeScale = useGanttChartStore((s) => s.timeScale);
-  const updateTask = useGanttChartStore((s) => s.updateTask);
-  const rawStore = useRawGanttChartStore();
+  const timeScale   = useGanttChartStore((s) => s.timeScale);
+  const updateTask  = useGanttChartStore((s) => s.updateTask);
+  const rawStore    = useRawGanttChartStore();
   const t = useGanttTranslations();
   const ganttTheme = useGanttTheme();
   const { statusColors, criticalPathColor, milestoneColor, todayLineColor, weekendColor, barBorderRadius } = ganttTheme;
@@ -297,154 +280,23 @@ export function GanttTimeline({
   const headerTotalHeight = groups ? HEADER_HEIGHT * 2 : HEADER_HEIGHT;
 
   // ---------------------------------------------------------------------------
-  // Drag & Resize
+  // Drag & Resize — ausgelagert in useGanttDrag
   // ---------------------------------------------------------------------------
 
-  const dayWidthPxRef = useRef(1);
-  dayWidthPxRef.current = totalWidth > 0
-    ? totalWidth / ((displayRange.end.getTime() - displayRange.start.getTime()) / MS_PER_DAY)
-    : 1;
-
-  // Ref für den Drag-Start (stabile Werte — keine Re-render nötig).
-  const dragInitRef = useRef<DragInit | null>(null);
-  // Ref für das aktuelle Delta (für Zugriff aus mouseup-Closure ohne stale state).
-  const activeDragRef = useRef<ActiveDrag | null>(null);
-  // State löst Re-render aus damit Balken-Position während Drag aktualisiert wird.
-  const [activeDrag, setActiveDrag] = useState<ActiveDrag | null>(null);
-  // Verhindert onClick nach echtem Drag (Maus bewegt sich ≥ 5px).
-  const suppressClickRef = useRef(false);
+  const { activeDrag, suppressClickRef, handleBarMouseDown, handleProgressMouseDown, formatDragDate } = useGanttDrag({
+    totalWidth,
+    displayRange,
+    onTaskMoved,
+    onTaskResized,
+    onTasksChange,
+  });
 
   // Context-Menu-State für Schnell-Statuswechsel per Rechtsklick.
   const [contextMenu, setContextMenu] = useState<{ task: GanttTaskNode; mouseX: number; mouseY: number } | null>(null);
 
-  // Refs damit die Callbacks immer die aktuellen Prop-Werte lesen ohne useCallback-Rebuilds.
-  const onTaskMovedRef = useRef(onTaskMoved);
-  onTaskMovedRef.current = onTaskMoved;
-  const onTaskResizedRef = useRef(onTaskResized);
-  onTaskResizedRef.current = onTaskResized;
-  const onTasksChangeRef = useRef(onTasksChange);
-  onTasksChangeRef.current = onTasksChange;
-  const onStatusChangeRef = useRef(onStatusChange);
-  onStatusChangeRef.current = onStatusChange;
-
-  const handleBarMouseDown = (e: React.MouseEvent, task: GanttTaskNode, type: DragType) => {
-    e.stopPropagation();
-    suppressClickRef.current = false;
-    dragInitRef.current = {
-      type,
-      taskId: task.id,
-      startX: e.clientX,
-      originalStart: task.startDate,
-      originalEnd: task.endDate,
-    };
-
-    document.body.style.cursor = type === "resize" ? "ew-resize" : "grabbing";
-
-    const onMouseMove = (ev: MouseEvent) => {
-      const init = dragInitRef.current;
-      if (!init || init.type === "progress") return;
-      const deltaPx = ev.clientX - init.startX;
-      const deltaDays = Math.round(deltaPx / dayWidthPxRef.current);
-      if (Math.abs(deltaPx) >= 5) suppressClickRef.current = true;
-      const drag: ActiveDrag = { taskId: init.taskId, type: init.type, deltaDays };
-      activeDragRef.current = drag;
-      setActiveDrag(drag);
-    };
-
-    const onMouseUp = () => {
-      document.body.style.cursor = "";
-      const init = dragInitRef.current;
-      const drag = activeDragRef.current;
-
-      if (init && drag && suppressClickRef.current && drag.deltaDays !== 0) {
-        const currentTask = rawStore.getState().tasks.find((t) => t.id === init.taskId);
-        if (currentTask) {
-          if (drag.type === "move") {
-            const newStart = addDays(init.originalStart, drag.deltaDays);
-            const newEnd = addDays(init.originalEnd, drag.deltaDays);
-            updateTask({ ...currentTask, startDate: newStart, endDate: newEnd });
-            onTaskMovedRef.current?.(currentTask, newStart, newEnd);
-          } else {
-            const rawNewEnd = addDays(init.originalEnd, drag.deltaDays);
-            const newEnd = rawNewEnd > init.originalStart
-              ? rawNewEnd
-              : addDays(init.originalStart, 1);
-            updateTask({ ...currentTask, endDate: newEnd });
-            onTaskResizedRef.current?.(currentTask, newEnd);
-          }
-          onTasksChangeRef.current?.(rawStore.getState().tasks);
-        }
-      }
-
-      dragInitRef.current = null;
-      activeDragRef.current = null;
-      setActiveDrag(null);
-      document.removeEventListener("mousemove", onMouseMove);
-      document.removeEventListener("mouseup", onMouseUp);
-    };
-
-    document.addEventListener("mousemove", onMouseMove);
-    document.addEventListener("mouseup", onMouseUp);
-  };
-
-  const handleProgressMouseDown = (
-    e: React.MouseEvent,
-    task: GanttTaskNode,
-    initialProgress: number,
-    barWidthPx: number,
-  ) => {
-    e.stopPropagation();
-    suppressClickRef.current = false;
-    dragInitRef.current = {
-      type: "progress",
-      taskId: task.id,
-      startX: e.clientX,
-      originalStart: task.startDate,
-      originalEnd: task.endDate,
-      initialProgress,
-      barWidthPx,
-    };
-
-    document.body.style.cursor = "ew-resize";
-
-    const onMouseMove = (ev: MouseEvent) => {
-      const init = dragInitRef.current;
-      if (!init || init.type !== "progress") return;
-      const deltaPx = ev.clientX - init.startX;
-      if (Math.abs(deltaPx) >= 5) suppressClickRef.current = true;
-      const deltaPercent = (deltaPx / (init.barWidthPx ?? 1)) * 100;
-      const newProgress = Math.round(Math.max(0, Math.min(100, (init.initialProgress ?? 0) + deltaPercent)));
-      const drag: ActiveDrag = { taskId: init.taskId, type: "progress", deltaDays: 0, newProgress };
-      activeDragRef.current = drag;
-      setActiveDrag(drag);
-    };
-
-    const onMouseUp = () => {
-      document.body.style.cursor = "";
-      const init = dragInitRef.current;
-      const drag = activeDragRef.current;
-
-      if (init && drag && drag.type === "progress" && drag.newProgress !== undefined && suppressClickRef.current) {
-        const currentTask = rawStore.getState().tasks.find((t) => t.id === init.taskId);
-        if (currentTask) {
-          updateTask({ ...currentTask, progress: drag.newProgress });
-          onTasksChangeRef.current?.(rawStore.getState().tasks);
-        }
-      }
-
-      dragInitRef.current = null;
-      activeDragRef.current = null;
-      setActiveDrag(null);
-      document.removeEventListener("mousemove", onMouseMove);
-      document.removeEventListener("mouseup", onMouseUp);
-    };
-
-    document.addEventListener("mousemove", onMouseMove);
-    document.addEventListener("mouseup", onMouseUp);
-  };
-
-  const formatDragDate = (d: Date) =>
-    d.toLocaleDateString(t.dateLocale, { day: "2-digit", month: "short" });
+  // Stable refs für Callbacks im Status-Context-Menu (Callback-Ref-Muster — siehe useGanttDrag).
+  const onStatusChangeRef  = useRef(onStatusChange);  onStatusChangeRef.current  = onStatusChange;
+  const onTasksChangeRef   = useRef(onTasksChange);   onTasksChangeRef.current   = onTasksChange;
 
   return (
     <Box ref={scrollRef} onScroll={onScroll} data-testid="gantt-timeline-scroll" sx={{ flex: 1, overflow: "auto" }}>
