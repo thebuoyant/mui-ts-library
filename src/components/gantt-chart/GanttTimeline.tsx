@@ -2,8 +2,8 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { type RefObject, type UIEventHandler } from "react";
-import { Box, Menu, MenuItem, useTheme } from "@mui/material";
-import { useGanttChartStore, useGanttTheme, useGanttTranslations, useRawGanttChartStore } from "./GanttChart";
+import { Box } from "@mui/material";
+import { useGanttChartStore, useGanttTranslations, useRawGanttChartStore } from "./GanttChart";
 import type { GanttTask, GanttTaskStatus } from "./GanttChart.types";
 import type { GanttTaskNode } from "./GanttChart.types";
 import { useGanttDrag } from "./hooks/useGanttDrag";
@@ -21,6 +21,9 @@ import {
 import type { TimelineRange } from "./util/gantt-chart.util";
 import { GanttTimelineHeader } from "./GanttTimelineHeader";
 import { GanttBarRow } from "./GanttBarRow";
+import { GanttWeekendStrips } from "./GanttWeekendStrips";
+import { GanttStatusContextMenu } from "./GanttStatusContextMenu";
+import { GanttDependencyArrows } from "./GanttDependencyArrows";
 import type { HeaderColumn, HeaderGroup } from "./GanttTimelineHeader";
 import {
   COLUMN_WIDTH_DAY,
@@ -137,7 +140,6 @@ export function GanttTimeline({
   onTasksChange,
   onStatusChange,
 }: GanttTimelineProps) {
-  const theme = useTheme();
   const taskTree = useGanttChartStore((s) => s.taskTree);
   const allTasks = useGanttChartStore((s) => s.tasks);
   const expandedIds = useGanttChartStore((s) => s.expandedIds);
@@ -146,9 +148,6 @@ export function GanttTimeline({
   const updateTask  = useGanttChartStore((s) => s.updateTask);
   const rawStore    = useRawGanttChartStore();
   const t = useGanttTranslations();
-  const ganttTheme = useGanttTheme();
-  const { todayLineColor, weekendColor } = ganttTheme;
-
   // Jede Instanz braucht eine eigene Marker-ID damit mehrere GanttCharts auf einer Seite
   // nicht dieselbe SVG-defs-Referenz teilen.
   const instanceId = useId().replace(/:/g, "");
@@ -301,35 +300,12 @@ export function GanttTimeline({
       <Box sx={{ minWidth: totalWidth, position: "relative" }}>
         <GanttTimelineHeader columns={columns} groups={groups} />
 
-        {/* Wochenend-Hintergrund — ein Layer für alle Zeilen, pointerEvents: none damit Klicks durchgehen. */}
-        {weekendStrips.length > 0 && (
-          <Box
-            aria-hidden
-            data-testid="gantt-weekend-strips"
-            sx={{
-              position: "absolute",
-              top: headerTotalHeight,
-              left: 0,
-              width: totalWidth,
-              height: visibleTasks.length * ROW_HEIGHT,
-              pointerEvents: "none",
-            }}
-          >
-            {weekendStrips.map((strip) => (
-              <Box
-                key={strip.key}
-                sx={{
-                  position: "absolute",
-                  left: strip.left,
-                  width: COLUMN_WIDTH_DAY,
-                  top: 0,
-                  height: "100%",
-                  bgcolor: weekendColor ?? "action.hover",
-                }}
-              />
-            ))}
-          </Box>
-        )}
+        <GanttWeekendStrips
+          strips={weekendStrips}
+          totalWidth={totalWidth}
+          height={visibleTasks.length * ROW_HEIGHT}
+          top={headerTotalHeight}
+        />
 
         {virtualizeRows ? (
           <Box sx={{ position: "relative", height: rowVirtualizer.getTotalSize() }}>
@@ -382,100 +358,27 @@ export function GanttTimeline({
           </>
         )}
 
-        {/* Kontext-Menü für Schnell-Statuswechsel per Rechtsklick auf einen Balken. */}
-        <Menu
-          open={contextMenu !== null}
+        <GanttStatusContextMenu
+          contextMenu={contextMenu}
           onClose={() => setContextMenu(null)}
-          anchorReference="anchorPosition"
-          anchorPosition={
-            contextMenu !== null
-              ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
-              : undefined
-          }
-        >
-          {(["planned", "in-progress", "done", "blocked"] as GanttTaskStatus[]).map((s) => {
-            const labels: Record<GanttTaskStatus, string> = {
-              planned: t.statusPlanned,
-              "in-progress": t.statusInProgress,
-              done: t.statusDone,
-              blocked: t.statusBlocked,
-            };
-            return (
-              <MenuItem
-                key={s}
-                selected={contextMenu?.task.status === s}
-                data-testid={`gantt-status-menu-${s}`}
-                onClick={() => {
-                  if (!contextMenu) return;
-                  const currentTask =
-                    rawStore.getState().tasks.find((tt) => tt.id === contextMenu.task.id) ??
-                    contextMenu.task;
-                  updateTask({ ...currentTask, status: s });
-                  onStatusChangeRef.current?.(currentTask, s);
-                  onTasksChangeRef.current?.(rawStore.getState().tasks);
-                  setContextMenu(null);
-                }}
-              >
-                {labels[s]}
-              </MenuItem>
-            );
-          })}
-        </Menu>
+          onSelect={(task, status) => {
+            const currentTask =
+              rawStore.getState().tasks.find((tt) => tt.id === task.id) ?? task;
+            updateTask({ ...currentTask, status });
+            onStatusChangeRef.current?.(currentTask, status);
+            onTasksChangeRef.current?.(rawStore.getState().tasks);
+            setContextMenu(null);
+          }}
+        />
 
-        {/* SVG-Layer über allen Balken — pointer-events: none damit Klicks durchgehen. */}
-        {(dependencyLines.length > 0 || todayX !== null) && (
-          <svg
-            data-testid="gantt-dependency-arrows"
-            style={{
-              position: "absolute",
-              top: headerTotalHeight,
-              left: 0,
-              width: totalWidth,
-              height: visibleTasks.length * ROW_HEIGHT,
-              pointerEvents: "none",
-              overflow: "visible",
-            }}
-          >
-            {dependencyLines.length > 0 && (
-              <defs>
-                <marker
-                  id={arrowMarkerId}
-                  markerWidth="6"
-                  markerHeight="4"
-                  refX="5"
-                  refY="2"
-                  orient="auto"
-                >
-                  <polygon points="0 0, 6 2, 0 4" fill="currentColor" />
-                </marker>
-              </defs>
-            )}
-            {dependencyLines.map((line) => (
-              <path
-                key={line.key}
-                data-testid={`gantt-dep-${line.key}`}
-                d={line.d}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={1.5}
-                strokeOpacity={0.4}
-                markerEnd={`url(#${arrowMarkerId})`}
-              />
-            ))}
-            {todayX !== null && (
-              <line
-                data-testid="gantt-today-line"
-                x1={todayX}
-                y1={0}
-                x2={todayX}
-                y2={visibleTasks.length * ROW_HEIGHT}
-                stroke={todayLineColor ?? theme.palette.primary.main}
-                strokeWidth={1.5}
-                strokeDasharray="4 2"
-              />
-            )}
-          </svg>
-        )}
+        <GanttDependencyArrows
+          dependencyLines={dependencyLines}
+          todayX={todayX}
+          totalWidth={totalWidth}
+          height={visibleTasks.length * ROW_HEIGHT}
+          top={headerTotalHeight}
+          arrowMarkerId={arrowMarkerId}
+        />
       </Box>
     </Box>
   );

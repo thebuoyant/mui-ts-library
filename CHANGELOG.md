@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Internal — MTL-15: Code Quality & Refactoring
+
+- Extract `useGanttDrag` hook from `GanttTimeline` — all drag, resize, and progress-drag logic lives in `hooks/useGanttDrag.ts`; documents 4 patterns for complex interaction hooks (stable callback refs, two-level state, document-level listeners, suppress-click)
+- Extract `GanttBarRow` component from `GanttTimeline` — bar rendering with sub-components `GanttMilestoneBar`, `GanttTaskBar`, `DragTooltip`; reads theme internally via `useGanttTheme()`
+- Extract `GanttWeekendStrips` component — weekend background strips, reads `weekendColor` from `useGanttTheme()`
+- Extract `GanttStatusContextMenu` component — right-click status menu, purely presentational; business logic stays in GanttTimeline via `onSelect` callback
+- Extract `GanttDependencyArrows` component — SVG layer for dependency arrows and today-line, reads theme internally
+- `GanttTimeline.tsx` reduced from 811 to ~300 lines
+- Shared `ToolbarButton` component in `src/components/shared/` — replaces three identical local implementations in SqlEditorToolbar, JsonEditorToolbar, RichTextEditorToolbar
+- Shared `normalizeSize` utility in `src/components/shared/` — replaces three identical local functions
+- Unified Gantt status color maps (`STATUS_BAR_COLOR`, `STATUS_CHIP_COLOR`) in `GanttChart.constants.ts`
+
+---
+
 ## [1.3.1] — 2026-05-25
 
 ### Fixed

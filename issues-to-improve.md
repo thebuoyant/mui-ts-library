@@ -3,7 +3,7 @@
 Gesammelte Refactoring- und Code-Quality-Aufgaben für `@thebuoyant-tsdev/mui-ts-library`.
 Wird am Ende jeder Session aktualisiert — so starten wir morgen optimal.
 
-Branch: `refactor/code-quality`
+Branch: `MTL-15`
 
 ---
 
@@ -15,79 +15,55 @@ Branch: `refactor/code-quality`
 
 ---
 
-## 🔴 DRY-Verletzungen — sofort beheben
+## 🔴 DRY-Verletzungen — sofort beheben ✅ Alle erledigt
 
-### [DRY-1] `ToolbarButton` dreifach dupliziert
+### [DRY-1] `ToolbarButton` dreifach dupliziert — ✅ Erledigt 2026-05-25
 
-Identische (oder fast identische) Komponente in drei Dateien:
-- `src/components/sql-editor/SqlEditorToolbar.tsx:40`
-- `src/components/json-editor/JsonEditorToolbar.tsx:29`
-- `src/components/rich-text-editor/RichTextEditorToolbar.tsx:46`
-
-**Fix:** Gemeinsame Datei `src/components/shared/ToolbarButton.tsx` mit allen Varianten (mit `active`-Prop, ohne). Von allen drei Toolbars importieren.
+`src/components/shared/ToolbarButton.tsx` erstellt, in SqlEditorToolbar, JsonEditorToolbar, RichTextEditorToolbar importiert.
 
 ---
 
-### [DRY-2] `normalizeSize()` dreifach dupliziert
+### [DRY-2] `normalizeSize()` dreifach dupliziert — ✅ Erledigt 2026-05-25
 
-Identische Funktion in drei Dateien:
-- `src/components/rich-text-editor/RichTextEditor.tsx:21`
-- `src/components/sql-editor/SqlEditor.tsx:13`
-- `src/components/json-editor/JsonEditor.tsx:13`
-
-**Fix:** `src/components/shared/normalizeSize.ts` — einmal, überall importieren.
+`src/components/shared/normalizeSize.ts` erstellt, in SqlEditor, JsonEditor, RichTextEditor importiert.
 
 ---
 
-### [DRY-3] Gantt Status-Farb-Maps dupliziert
+### [DRY-3] Gantt Status-Farb-Maps dupliziert — ✅ Erledigt 2026-05-25
 
-`BAR_COLOR` in `GanttTimeline.tsx:33` und `STATUS_DOT_COLOR` + `STATUS_CHIP_COLOR` in `GanttTaskPanel.tsx:16/23` — alle bilden denselben Status → Farbe ab.
-
-**Fix:** Alle Status-Farb-Maps in `GanttChart.constants.ts` zusammenführen. Beide Dateien importieren daraus.
+`STATUS_BAR_COLOR` und `STATUS_CHIP_COLOR` in `GanttChart.constants.ts` zusammengeführt. GanttTimeline und GanttTaskPanel importieren daraus.
 
 ---
 
-## 🔴 Sub-Komponenten-Extraktion — GanttTimeline.tsx (811 Zeilen)
+## 🔴 Sub-Komponenten-Extraktion — GanttTimeline.tsx (811 → ~300 Zeilen) ✅ Alle erledigt
 
-Die größte Datei im Projekt. Folgende Teile müssen raus:
+### [GANTT-2] Drag-Logik → `useGanttDrag` Hook — ✅ Erledigt 2026-05-25
 
-### [GANTT-1] `renderBarRow` → `GanttBarRow` Komponente
-
-`renderBarRow` ist eine Inline-Closure-Funktion innerhalb des JSX-Returns (Zeile 493–701). Bei jedem Render neu erstellt, nicht testbar, zu groß.
-
-**Fix:** Eigene Datei `GanttBarRow.tsx` — Props: `task`, `activeDrag`, `displayRange`, `totalWidth`, Callbacks. Dann in GanttTimeline importieren.
+`src/components/gantt-chart/hooks/useGanttDrag.ts` erstellt. Dokumentiert 4 Muster für komplexe Interaktions-Hooks.
 
 ---
 
-### [GANTT-2] Drag-Logik → `useGanttDrag` Hook
+### [GANTT-1] `renderBarRow` → `GanttBarRow` Komponente — ✅ Erledigt 2026-05-25
 
-`handleBarMouseDown` (Zeile 336–394) und `handleProgressMouseDown` (396–450) plus alle zugehörigen Refs sind ~120 Zeilen reine Drag-Logik in einer Render-Komponente.
-
-**Fix:** `src/components/gantt-chart/hooks/useGanttDrag.ts` — gibt `activeDrag`, `handleBarMouseDown`, `handleProgressMouseDown` zurück.
+`GanttBarRow.tsx` mit Sub-Komponenten `GanttMilestoneBar`, `GanttTaskBar`, `DragTooltip`. Theme intern via `useGanttTheme()`.
 
 ---
 
-### [GANTT-3] Dependency-Arrows → `GanttDependencyArrows` Komponente
+### [GANTT-3] Dependency-Arrows → `GanttDependencyArrows` Komponente — ✅ Erledigt 2026-05-25
 
-Der SVG-Layer (Zeile 754–807) ist eigenständig genug für eine eigene Komponente.
-
-**Fix:** `GanttDependencyArrows.tsx` — Props: `dependencyLines`, `todayX`, `totalWidth`, `height`, `arrowMarkerId`, Theme-Farben.
+`GanttDependencyArrows.tsx` — SVG-Layer mit Abhängigkeitspfeilen und Today-Line. Theme intern via `useTheme()` + `useGanttTheme()`.
 
 ---
 
-### [GANTT-4] Status-Context-Menu → `GanttStatusContextMenu` Komponente
+### [GANTT-4] Status-Context-Menu → `GanttStatusContextMenu` Komponente — ✅ Erledigt 2026-05-25
 
-Das `<Menu>` für Rechtsklick-Statuswechsel (Zeile 714–752) ist vollständig isolierbar.
-
-**Fix:** `GanttStatusContextMenu.tsx` — Props: `contextMenu`, `onClose`, `onStatusChange`, Translations.
+`GanttStatusContextMenu.tsx` — rein präsentational, Business-Logik (Store-Update, Callbacks) bleibt in GanttTimeline via `onSelect`-Prop.
 
 ---
 
-### [GANTT-5] Weekend-Strips → `GanttWeekendStrips` Komponente
+### [GANTT-5] Weekend-Strips → `GanttWeekendStrips` Komponente — ✅ Erledigt 2026-05-25
 
-Die Wochenend-Hintergrund-Schicht (Zeile 462–489) ist vollständig isolierbar.
-
-**Fix:** `GanttWeekendStrips.tsx` — Props: `weekendStrips`, `totalWidth`, `height`, `weekendColor`.
+`GanttWeekendStrips.tsx` — `weekendColor` intern via `useGanttTheme()`.
 
 ---
 
@@ -171,4 +147,5 @@ Einige Inline-Kommentare auf Englisch, die meisten auf Deutsch.
 
 | Datum | Was erledigt | Was noch offen |
 |---|---|---|
-| 2026-05-25 | Branch angelegt, alle Issues analysiert und dokumentiert | Alles oben noch offen |
+| 2026-05-25 | Branch angelegt (MTL-15), alle Issues analysiert und dokumentiert | Alles oben noch offen |
+| 2026-05-25 | DRY-1, DRY-2, DRY-3 erledigt; GANTT-2, GANTT-1, GANTT-3, GANTT-4, GANTT-5 erledigt | PSM-1, RTE-1, GANTT-6, CONS-*, CLEAN-* |

@@ -9,6 +9,22 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [Unveröffentlicht]
+
+### Intern — MTL-15: Code-Qualität & Refactoring
+
+- `useGanttDrag`-Hook aus `GanttTimeline` extrahiert — gesamte Drag-, Resize- und Progress-Drag-Logik in `hooks/useGanttDrag.ts`; dokumentiert 4 Muster für komplexe Interaktions-Hooks (stabile Callback-Refs, Zwei-Ebenen-State, Document-Level-Listener, Suppress-Click)
+- `GanttBarRow`-Komponente aus `GanttTimeline` extrahiert — Balken-Rendering mit Sub-Komponenten `GanttMilestoneBar`, `GanttTaskBar`, `DragTooltip`; liest Theme intern via `useGanttTheme()`
+- `GanttWeekendStrips`-Komponente extrahiert — Wochenend-Hintergrundstreifen, liest `weekendColor` aus `useGanttTheme()`
+- `GanttStatusContextMenu`-Komponente extrahiert — Rechtsklick-Statusmenü, rein präsentational; Business-Logik bleibt in GanttTimeline via `onSelect`-Callback
+- `GanttDependencyArrows`-Komponente extrahiert — SVG-Layer für Abhängigkeitspfeile und Today-Line, liest Theme intern
+- `GanttTimeline.tsx` von 811 auf ~300 Zeilen reduziert
+- Gemeinsame `ToolbarButton`-Komponente in `src/components/shared/` — ersetzt drei identische lokale Implementierungen
+- Gemeinsame `normalizeSize`-Hilfsfunktion in `src/components/shared/` — ersetzt drei identische lokale Funktionen
+- Gantt-Status-Farbmaps (`STATUS_BAR_COLOR`, `STATUS_CHIP_COLOR`) in `GanttChart.constants.ts` zusammengeführt
+
+---
+
 ## [1.3.1] — 2026-05-25
 
 ### Behoben
