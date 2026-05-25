@@ -91,11 +91,11 @@ Branch: `MTL-15`
 
 ## 🟡 Konsistenz zwischen Komponenten
 
-### [CONS-1] `SqlEditor` hat `showErrorCount`, `JsonEditor` hat `showValidation` — beide meinen dasselbe Konzept
+### [CONS-1] `SqlEditor` hat `showErrorCount`, `JsonEditor` hat `showValidation` — ✅ Entschieden 2026-05-25
 
 Unterschiedliche Prop-Namen für dasselbe Muster (Footer-Status-Anzeige).
 
-**Fix:** Nicht umbenennen (Breaking Change), aber in Doku einheitlich erklären und in zukünftigen Komponenten `showStatus` verwenden.
+**Entscheidung:** Nicht umbenennen — wäre ein Breaking Change für bestehende Nutzer. Bestehende Namen bleiben. In zukünftigen Komponenten wird `showStatus` als einheitlicher Name verwendet. In den User-Manuals ist der Zweck beider Props klar erklärt.
 
 ---
 
@@ -105,11 +105,11 @@ Keiner der drei Editoren (SqlEditor, JsonEditor, RichTextEditor) hat einen `onCl
 
 ---
 
-### [CONS-3] GanttChart hat kein `helperText`/`error`-Prop
+### [CONS-3] GanttChart hat kein `helperText`/`error`-Prop — ✅ Entschieden 2026-05-25
 
 Alle Code-Editoren und PasswordStrengthMeter haben `error` + `helperText` für Form-Integration. GanttChart nicht.
 
-**Fix:** Nicht notwendig (GanttChart ist kein Form-Field), aber in Doku erklären warum.
+**Entscheidung:** Kein `error`/`helperText` nötig — GanttChart ist kein Formular-Feld sondern ein eigenständiges Planungs-Widget. Eingetragen in User Manual unter "Notes and Known Limitations".
 
 ---
 
@@ -139,3 +139,4 @@ Einige Inline-Kommentare auf Englisch, die meisten auf Deutsch.
 | 2026-05-25 | Branch angelegt (MTL-15), alle Issues analysiert und dokumentiert | Alles oben noch offen |
 | 2026-05-25 | DRY-1, DRY-2, DRY-3 erledigt; GANTT-2, GANTT-1, GANTT-3, GANTT-4, GANTT-5 erledigt | PSM-1, RTE-1, GANTT-6, CONS-*, CLEAN-* |
 | 2026-05-25 | PSM-1, RTE-1 erledigt; CONS-2 geprüft (konsistent, kein Fix nötig) | CONS-1, CONS-3 (Doku), CLEAN-1 (ESLint), CLEAN-2 (Kommentarsprache) |
+| 2026-05-25 | CONS-1, CONS-3 entschieden und dokumentiert; README auf npm-only; CHANGELOG v1.0.0 komplett nachgepflegt | CLEAN-1 (ESLint import/order), CLEAN-2 (Kommentarsprache) — separate Session |
