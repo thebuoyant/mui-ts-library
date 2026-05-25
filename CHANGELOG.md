@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.1] — 2026-05-25
+
+### Fixed
+
+- Externalize all `dependencies` in the Vite build (TipTap, CodeMirror, sql-formatter, zustand, @tanstack/react-virtual) — they are no longer bundled into the dist files
+- `dist/index.js` reduced from 1.7 MB to 124 KB, `dist/index.cjs` from 1.4 MB to 91 KB
+- Package size reduced from 922 kB to 69 kB (packed)
+- Fix publint warning: split `exports` types for ESM (`index.d.ts`) and CJS (`index.d.cts`)
+- Fix `repository.url` — added `git+` prefix per npm convention
+
+---
+
 ## [1.3.0] — 2026-05-23
 
 ### Added
