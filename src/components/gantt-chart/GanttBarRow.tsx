@@ -1,5 +1,6 @@
 import { useTheme } from "@mui/material";
 import { Box } from "@mui/material";
+import type { Theme } from "@mui/material/styles";
 import { useGanttTheme } from "./GanttChart";
 import type { GanttTask, GanttTaskNode } from "./GanttChart.types";
 import { addDays, calculateTaskPosition } from "./util/gantt-chart.util";
@@ -148,7 +149,7 @@ type GanttMilestoneBarProps = {
   criticalPathColor?: string;
   isCritical:        boolean;
   onMilestoneClick?: (task: GanttTask) => void;
-  theme:             ReturnType<typeof useTheme>;
+  theme:             Theme;
 };
 
 function GanttMilestoneBar({ task, left, milestoneColor, criticalPathColor, isCritical, onMilestoneClick, theme }: GanttMilestoneBarProps) {
@@ -200,7 +201,7 @@ type GanttTaskBarProps = {
   handleBarMouseDown: (e: React.MouseEvent, task: GanttTaskNode, type: DragType) => void;
   handleProgressMouseDown: (e: React.MouseEvent, task: GanttTaskNode, initialProgress: number, barWidthPx: number) => void;
   formatDragDate:     (d: Date) => string;
-  theme:              ReturnType<typeof useTheme>;
+  theme:              Theme;
 };
 
 function GanttTaskBar({
