@@ -1,6 +1,6 @@
 {
   "name": "@thebuoyant-tsdev/mui-ts-library",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "private": false,
   "description": "Type-safe React component library for MUI v9. Confirm dialog with useConfirm hook, Gantt chart with drag & drop, multi-tag selector, WYSIWYG rich text editor (TipTap v3), SQL code editor (CodeMirror 6), JSON editor with real-time validation (CodeMirror 6), and password strength meter. Full TypeScript, dark mode, i18n.",
   "author": {

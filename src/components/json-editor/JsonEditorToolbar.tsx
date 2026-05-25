@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Divider, IconButton, Tooltip } from "@mui/material";
+import { Box, Divider } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import CheckIcon       from "@mui/icons-material/Check";
 import DeleteIcon      from "@mui/icons-material/Delete";
@@ -10,6 +10,7 @@ import CompressIcon    from "@mui/icons-material/Compress";
 import { undo, redo } from "@codemirror/commands";
 import type { EditorView } from "@codemirror/view";
 import type { JsonEditorToolbarConfig, JsonEditorTranslation } from "./JsonEditor.types";
+import { ToolbarButton } from "../shared/ToolbarButton";
 
 type JsonEditorToolbarProps = {
   viewRef:       React.MutableRefObject<EditorView | null>;
@@ -18,32 +19,6 @@ type JsonEditorToolbarProps = {
   indent:        number;
   disabled?:     boolean;
 };
-
-type ToolbarButtonProps = {
-  label:     string;
-  icon:      React.ReactNode;
-  onClick:   () => void;
-  disabled?: boolean;
-};
-
-function ToolbarButton({ label, icon, onClick, disabled }: ToolbarButtonProps) {
-  return (
-    <Tooltip title={label} arrow>
-      <span>
-        <IconButton
-          size="small"
-          onClick={onClick}
-          disabled={disabled}
-          color="default"
-          sx={{ borderRadius: 1 }}
-          aria-label={label}
-        >
-          {icon}
-        </IconButton>
-      </span>
-    </Tooltip>
-  );
-}
 
 export function JsonEditorToolbar({
   viewRef,

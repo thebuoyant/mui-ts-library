@@ -9,6 +9,28 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [Unveröffentlicht]
+
+---
+
+## [1.3.2] — 2026-05-25
+
+### Intern — MTL-15: Code-Qualität & Refactoring
+
+- `useGanttDrag`-Hook aus `GanttTimeline` extrahiert — gesamte Drag-, Resize- und Progress-Drag-Logik in `hooks/useGanttDrag.ts`; dokumentiert 4 Muster für komplexe Interaktions-Hooks (stabile Callback-Refs, Zwei-Ebenen-State, Document-Level-Listener, Suppress-Click)
+- `GanttBarRow`-Komponente aus `GanttTimeline` extrahiert — Balken-Rendering mit Sub-Komponenten `GanttMilestoneBar`, `GanttTaskBar`, `DragTooltip`; liest Theme intern via `useGanttTheme()`
+- `GanttWeekendStrips`-Komponente extrahiert — Wochenend-Hintergrundstreifen, liest `weekendColor` aus `useGanttTheme()`
+- `GanttStatusContextMenu`-Komponente extrahiert — Rechtsklick-Statusmenü, rein präsentational; Business-Logik bleibt in GanttTimeline via `onSelect`-Callback
+- `GanttDependencyArrows`-Komponente extrahiert — SVG-Layer für Abhängigkeitspfeile und Today-Line, liest Theme intern
+- `GanttTimeline.tsx` von 811 auf ~300 Zeilen reduziert
+- Gemeinsame `ToolbarButton`-Komponente in `src/components/shared/` — ersetzt drei identische lokale Implementierungen
+- Gemeinsame `normalizeSize`-Hilfsfunktion in `src/components/shared/` — ersetzt drei identische lokale Funktionen
+- Gantt-Status-Farbmaps (`STATUS_BAR_COLOR`, `STATUS_CHIP_COLOR`) in `GanttChart.constants.ts` zusammengeführt
+- `PasswordStrengthBar`-Komponente aus `PasswordStrengthMeter` extrahiert — Props: `percent`, `color`, `ariaLabel`; bessere Testbarkeit und Wiederverwendbarkeit
+- Drei identische `H1Icon`/`H2Icon`/`H3Icon`-Komponenten durch `HeadingIcon({ level: 1 | 2 | 3 })` in `RichTextEditorToolbar` ersetzt
+
+---
+
 ## [1.3.1] — 2026-05-25
 
 ### Behoben
@@ -129,56 +151,224 @@ Erste öffentliche Veröffentlichung von `@thebuoyant-tsdev/mui-ts-library`.
 ### Hinzugefügt
 
 #### GanttChart
-- Hierarchische Projekt-Zeitleiste mit ein-/ausklappbaren Aufgabengruppen
-- Meilenstein-Marker mit eigenem visuellen Stil
-- Drag-and-Drop zum Umsortieren von Zeilen via `@dnd-kit`
-- Abhängigkeitspfeile zwischen Aufgaben
-- Zoom-Stufen: Tag, Woche, Monat, Quartal
-- Integrierte CRUD-Dialoge zum Erstellen, Bearbeiten und Löschen von Aufgaben
-- Heute-Linie mit Auto-Scroll
-- Virtualisiertes Zeilen-Rendering für große Datensätze
-- Vollständige i18n-Unterstützung über `translation`-Prop
+
+Vollständig interaktive Projekt-Zeitleiste auf Basis von React, MUI und Zustand.
+
+**Datenmodell**
+- Hierarchische Aufgabenstruktur via flachem `tasks`-Array + `parentId` — Baum wird intern aufgebaut
+- Aufgaben-Felder: `id`, `name`, `status`, `startDate`, `endDate`, `parentId?`, `dependencies?`, `isMilestone?`, `progress?`, `color?`
+- 4 Status: `"planned"` · `"in-progress"` · `"done"` · `"blocked"` — farbkodierte Balken und Status-Chips
+- Meilenstein-Marker als rotierende Raute (♦) statt Balken
+- Individuelle Farb-Override pro Aufgabe via `GanttTask.color` (beliebige CSS-Farbe)
+- Fortschrittsfeld (0–100 %) als halbtransparenter Overlay-Streifen auf dem Balken
+
+**Timeline-Ansicht**
+- 4 Zoom-Stufen: `"days"` · `"weeks"` · `"months"` · `"quarters"` — jederzeit über Toolbar wechselbar
+- Z-förmige Finish-to-Start-Abhängigkeitspfeile zwischen Aufgaben
+- Heute-Linie mit automatischem horizontalem Scroll zum Mittelpunkt beim ersten Laden
+- Wochenend-Hintergrund-Hervorhebung in der Tages-Skala
+- Größenveränderbares linkes Panel via ziehbarem Trenner (`minPanelWidth`, `maxPanelWidth`)
+- Virtualisiertes Zeilen-Rendering für große Datensätze (`virtualizeRows`) via `@tanstack/react-virtual`
+- `defaultRangeStart` / `defaultRangeEnd` zur Fixierung des sichtbaren Datumsbereichs
+
+**Toolbar**
+- Skala-Schaltflächen, Von/Bis-Datumseingaben, Alle auf-/zuklappen, Zum heutigen Tag, Ansicht zurücksetzen
+- Feingranulare Steuerung via `toolbarConfig` — einzelne Toolbar-Elemente unabhängig ein-/ausblenden
+- `showToolbar={false}` zum Ausblenden der gesamten Toolbar
+
+**Interaktion**
+- `draggable` — Aufgaben-Balken horizontal verschieben; `startDate` und `endDate` werden synchron aktualisiert
+- `resizable` — rechte Balkenkante ziehen um `endDate` zu verändern
+- `progressDraggable` — Fortschritts-Handle auf dem Balken ziehen (0–100 %) für interaktive Eingabe
+- `cascadeDependencies` — verschiebt alle Finish-to-Start-Nachfolger automatisch wenn ein Vorgänger bewegt wird (transitiv, kreiserkennungs-sicher)
+- `showCriticalPath` — markiert den längsten Abhängigkeitspfad, der die Projektdauer bestimmt
+- `zoomable` — `Strg + Mausrad` wechselt durch Zoom-Stufen
+- `inlineEdit` — Doppelklick auf Aufgabenname im linken Panel für direkte Bearbeitung
+- Rechtsklick-Kontextmenü auf Balken für sofortigen Statuswechsel (`onStatusChange`-Callback)
+- Zeilen-Umsortierung im Panel via Drag & Drop (`@dnd-kit`)
+
+**CRUD-Dialoge**
+- Integrierte MUI-Dialoge für Hinzufügen / Bearbeiten / Löschen (`enableBuiltinDialogs={true}`, Standard)
+- Dialog-Felder: Name, Startdatum, Enddatum, Status, Übergeordnete Aufgabe, Meilenstein-Flag, Vorgänger (Mehrfachauswahl)
+- `enableBuiltinDialogs={false}` — deaktiviert integrierte Dialoge, ruft stattdessen `onAddTask` / `onEditTask` / `onDeleteTask` auf (eigene Dialog-Integration)
+
+**Theming** — via `ganttTheme: GanttTheme`
+- `statusColors` — Balkenfarben pro Status als CSS-Werte
+- `criticalPathColor` — Hervorhebungsfarbe für den kritischen Pfad (Standard: `error.main`)
+- `milestoneColor` — Rautenfarbe für Meilensteine (Standard: `warning.main`)
+- `todayLineColor` — Farbe der Heute-Linie (Standard: `primary.main`)
+- `weekendColor` — Hintergrundfarbe der Wochenend-Spalten (Standard: `action.hover`)
+- `barBorderRadius` — Ecken-Radius der Aufgaben-Balken in px (Standard: `4`)
+
+**Callbacks**
+- `onTaskClick(task)` · `onMilestoneClick(task)` — Klick auf Balken / Meilenstein-Raute
+- `onTaskMoved(task, newStart, newEnd)` — nach erfolgreichem Balken-Drag
+- `onTaskResized(task, newEnd)` — nach Resize-Drag
+- `onStatusChange(task, status)` — nach Kontextmenü-Statuswahl
+- `onTasksChange(tasks)` — nach jeder Änderung mit der vollständigen aktuellen Aufgabenliste (zentraler Callback für datengetriebene Architekturen)
+- `onTaskCreated(task)` · `onTaskUpdated(task)` · `onTaskDeleted(taskId)` — spezifische Callbacks für integrierte Dialog-Aktionen
+- `onAddTask(parent?)` · `onEditTask(task)` · `onDeleteTask(task)` — bei `enableBuiltinDialogs={false}`
+
+**TypeScript-Exports**
+- Typen: `GanttTask`, `GanttTaskNode`, `GanttTaskStatus`, `GanttTimeScale`, `GanttTranslations`, `GanttTheme`, `GanttStatusColors`, `GanttChartProps`, `GanttToolbarConfig`
+- `DEFAULT_GANTT_TRANSLATIONS` — vorbefüllte Standard-Übersetzungen (Mix aus Deutsch/Englisch)
+
+**i18n & Barrierefreiheit**
+- Alle UI-Texte über `translations`-Prop überschreibbar — 30+ Schlüssel inkl. Dialog-Labels, Toolbar-Tooltips, Status-Labels, Datums-Locale
+- Aktions-Icon-Tooltips dienen als `aria-label`; Dialoge haben Fokus-Trap + Escape-Handling
 - Dark-Mode-Unterstützung via MUI-Theme
+
+**Storybook & Tests**
+- Storybook-Stories für alle wichtigen Szenarien
+- Vitest-Unit-Tests (in den 271 Gesamttests bei v1.0.0 enthalten)
+- Zweisprachiges Benutzerhandbuch: `user-manuals/GanttChart.md` (EN) + `user-manuals/GanttChart.de.md` (DE)
 
 #### TagSelection
-- Multi-Tag-Selektor mit Autocomplete-Suche
-- Optionaler Tag-Erstellungsmodus (`allowCreate`) mit Enter-Taste als Shortcut
-- Konfigurierbare Chip-Größe und maximale Anzahl sichtbarer Chips
-- Alphabetische Sortierung der ausgewählten Chips und Dropdown-Optionen
-- `onTagCreate`-Callback zum Persistieren neu erstellter Tags
-- Vollständige i18n-Unterstützung über `translation`-Prop
-- Dark-Mode-Unterstützung via MUI-Theme
+
+Multi-Tag-Selektor mit Autocomplete, Chip-Anzeige, Async-Unterstützung und freier Tag-Erstellung.
+
+**Datenmodell**
+- `TagSelectionItem`-Felder: `id`, `label`, `selected?`, `disabled?`, `color?`, `foregroundColor?`, `backgroundColor?`
+- `TagColor`: `"default"` · `"primary"` · `"secondary"` · `"error"` · `"info"` · `"success"` · `"warning"`
+- Zwei Farbsysteme: semantisches `color` (MUI-Theme, Dark-Mode-sicher) oder `foregroundColor`/`backgroundColor` (CSS) — gegenseitig ausschließend
+- Deaktivierte Tags können nicht ausgewählt werden; bereits ausgewählte `disabled`-Tags können nicht entfernt werden
+- Chips und Dropdown-Einträge immer alphabetisch sortiert
+
+**Anzeige & Sichtbarkeit**
+- `showSelectedTags` — Chip-Bereich ein-/ausblenden
+- `showSelectedTagsLabel` — Überschrift über den Chips ein-/ausblenden
+- `showAutoComplete` — Suche ein-/ausblenden (reiner Anzeigemodus wenn `false`)
+- `inputSize` / `chipSize` — `"small"` oder `"medium"` (MUI-Standard)
+
+**Interaktion**
+- `maxTags` — maximale Anzahl gleichzeitig ausgewählter Tags; Input wird automatisch deaktiviert wenn Limit erreicht
+- `maxVisibleChips` — überzählige Chips hinter `+N`-Chip versteckt; Klick öffnet Overflow-Popover (`popoverPlacement`: `"top"` oder `"bottom"`)
+- `loading` — Ladezustand im Dropdown für asynchrone Tag-Quellen
+- `disabled` — gesamte Komponente gesperrt; Chips ohne Löschen-Icon sichtbar
+- `listboxMaxHeight` — maximale Höhe der Autocomplete-Dropdown-Liste in px
+
+**Freie Tag-Erstellung** (`allowCreate={true}`)
+- Wenn getippter Text keinem bestehenden Tag entspricht, wechselt der Input in den Erstellen-Modus
+- CheckIcon (Bestätigen) + CloseIcon (Abbrechen) im Feld; 7 MUI-Theme-Farb-Chips zur Farbauswahl
+- Bestätigung per CheckIcon-Klick **oder Enter-Taste**
+- Neuer Tag wird intern sofort als ausgewählt markiert; `onTagCreate` feuert zur externen Synchronisierung
+
+**Callbacks**
+- `onTagSelect(tag, selectedTags, allTags)` — Tag aus Dropdown ausgewählt
+- `onTagDelete(tag, selectedTags, allTags)` — Chip entfernt
+- `onTagsChange(selectedTags, allTags)` — zentraler Callback, feuert nach jeder Auswahlveränderung
+- `onSearchChange(value)` — für serverseitige Filterung und asynchrones Laden
+- `onTagCreate(label, color)` — neuer Tag in Erstellen-Modus bestätigt
+
+**TypeScript-Exports**
+- Typen: `TagSelectionItem`, `TagSelectionProps`, `TagSelectionTranslation`, `TagColor`
+- `DEFAULT_TAG_SELECTION_TRANSLATION`
+
+**i18n** (7 Schlüssel): `selectedTagsLabel`, `autoCompleteLabel`, `noSelectedTagsText`, `noAvailableTagsText`, `placeholder`, `loadingText`, `maxTagsReachedText`
+
+**Storybook & Tests**
+- Storybook-v10-Stories für alle wichtigen Szenarien
+- Vitest-Unit-Tests (in den 271 Gesamttests bei v1.0.0 enthalten)
+- Zweisprachiges Benutzerhandbuch: `user-manuals/TagSelection.md` (EN) + `user-manuals/TagSelection.de.md` (DE)
 
 #### PasswordStrengthMeter
-- Passwort-Eingabe mit Live-Stärkebewertung (0–4 Stufen)
-- Konfigurierbare Anforderungsliste für Passwort-Regeln
-- Sichtbarkeits-Umschalter
-- Anpassbare Stärkebezeichnungen über `translation`-Prop
-- Dark-Mode-Unterstützung via MUI-Theme
+
+Passwort-Eingabe mit animiertem Stärkebalken, Anforderungsliste und vollständiger Formular-Bibliothek-Integration.
+
+**Kernfunktionen**
+- Live-Stärkebewertung (5 Stufen: leer/schwach/ok/gut/sehr gut) bei jedem Tastendruck
+- Animierter Stärkebalken mit konfigurierbaren Farben pro Stufe (`meterColors`)
+- Anforderungsliste mit 5 Kriterien: Mindestlänge, Großbuchstabe, Kleinbuchstabe, Ziffer, Sonderzeichen
+- Sichtbarkeits-Umschalter (Passwort anzeigen/verbergen)
+- Kontrollierter und unkontrollierter Modus
+
+**Props**
+- `value` — kontrollierter Modus (externer State)
+- `passwordMinLength` (Standard: `8`) — Mindestlängen-Schwellwert; Passwörter darunter erhalten immer `weak`
+- `showMeter`, `showSummary`, `showPasswordAdornment` — einzelne UI-Bereiche unabhängig ein-/ausblenden
+- `inputSize` — `"small"` oder `"medium"` (MUI-Standard)
+
+**Formular-Integration**
+- `name` — für natives `<form>`-Submit und React Hook Form `register()`
+- `inputRef` — Ref auf das native `<input>` für React Hook Form / Formik
+- `disabled`, `error`, `helperText`, `autoComplete` — konsistent mit MUI `TextField`
+
+**Farb-Anpassung**
+- `meterColors: Partial<MeterColors>` — Balkenfarben für `weak`, `ok`, `good`, `veryGood`
+- `checkColors: CheckColors` — Icon-Farben für `failure` (nicht erfüllt) und `success` (erfüllt)
+- `DEFAULT_METER_COLORS`, `DEFAULT_CHECK_COLORS` als Referenz exportiert
+
+**Callback**
+- `onPasswordChange(password: string, result: StrengthResult)` — feuert bei jedem Tastendruck
+
+**`StrengthResult`** (Rückgabe in `onPasswordChange`)
+- `score: 0|1|2|3|4`, `percent: 0|25|50|75|100`, `meterStatus: "weak"|"ok"|"good"|"very good"`
+- `length`, `hasLower`, `hasUpper`, `hasDigit`, `hasSymbol`
+
+**Scoring-Algorithmus** (client-seitig, deterministisch, keine externen Dienste)
+- Basis: Mindestlänge erfüllt +1, Längen-Bonus +1
+- Zeichenvielfalt: 2 Klassen +1, 3 Klassen +1
+- Malus: Wiederholungszeichen −2, bekannte Schwach-Muster (`1234`, `password`, …) −2
+- Score auf 0–4 geklemmt
+
+**TypeScript-Exports**
+- Typen: `PasswordStrengthMeterProps`, `PasswordStrengthMeterTranslation`, `StrengthResult`, `StrengthScore`, `MeterStatus`, `MeterColors`, `CheckColors`
+- `DEFAULT_PASSWORD_TRANSLATIONS`, `DEFAULT_METER_COLORS`, `DEFAULT_CHECK_COLORS`
+
+**Stabile `data-testid`-Attribute**: `psm-input`, `psm-toggle`, `psm-meter`, `psm-summary`, `psm-req-success`, `psm-req-failure`
+
+**i18n** (10 Schlüssel): `label`, `summaryHeaderLabel`, `summaryMinChars` (mit `{n}`-Platzhalter für `passwordMinLength`), `summaryCapitalLetter`, `summaryLowerCaseLetter`, `summaryNumber`, `summarySpecialChar`, `showPasswordLabel`, `hidePasswordLabel`, `meterAriaLabel`
+
+**Storybook & Tests**
+- Storybook-v10-Stories für alle wichtigen Szenarien
+- Vitest-Unit-Tests (in den 271 Gesamttests bei v1.0.0 enthalten)
+- Zweisprachiges Benutzerhandbuch: `user-manuals/PasswordStrengthMeter.md` (EN) + `user-manuals/PasswordStrengthMeter.de.md` (DE)
 
 #### RichTextEditor
-- WYSIWYG-Editor auf Basis von TipTap v3 und ProseMirror
-- Toolbar: Fett, Kursiv, Unterstrichen, Durchgestrichen, Überschriften (H1–H3), Aufzählung, Nummerierte Liste, Zitat, Code-Block, Link, Trennlinie, Textfarbe, Hervorheben, Rückgängig/Wiederholen, Formatierung löschen
-- Konfigurierbare Toolbar über `toolbarConfig`-Prop (einzelne Buttons ein-/ausblenden)
-- Textfarbe und Hervorhebung mit Farbpalette und nativem Browser-Farbwähler
-- Dialog zum Einfügen und Bearbeiten von Links
-- Zeichenzähler mit optionalem Hartlimit (`maxCharacters`)
-- Kontrollierter Modus über `value` / `onChange`
-- Ausgabeformat: `"html"` (Standard) oder `"json"`
-- Markdown-zu-Rich-Text-Konvertierung beim Einfügen
-- `readonly`-Modus (ohne Toolbar) und `disabled`-Modus
-- Native Formular-Integration über verstecktes `<input type="hidden">`
-- `error`-Zustand und `helperText` — konsistent mit MUI TextField
-- `onBlur`- / `onFocus`-Callbacks
-- Konfigurierbare `height` und `width` (Zahl → px, CSS-Strings, `"auto"` für Flex-Container)
-- Vollständige i18n-Unterstützung über `translation`-Prop
-- Dark-Mode-Unterstützung via MUI-Theme
+
+Vollwertiger WYSIWYG-Editor auf Basis von TipTap v3 und ProseMirror — ohne externe CSS-Abhängigkeiten.
+
+**Toolbar** (alle Buttons über `toolbarConfig` einzeln ein-/ausblendbar)
+- Textformatierung: Fett, Kursiv, Unterstrichen, Durchgestrichen
+- Überschriften: H1, H2, H3
+- Listen: Aufzählung, Nummerierte Liste
+- Blöcke: Zitat, Code-Block, Trennlinie
+- Link: Einfügen-/Bearbeiten-Dialog mit URL-Feld und Entfernen-Button
+- Textfarbe + Hervorhebung: Farbpalette mit 10 Voreinstellungen, Regenbogen-Swatch öffnet nativen Browser-Farbwähler, Papierkorb entfernt Farbe
+- Verlauf: Rückgängig, Wiederholen, Formatierung löschen
+
+**Props**
+- `value` / `onChange` — kontrollierter Modus; externe Synchronisierung ohne Cursor-Sprung
+- `placeholder` — Platzhaltertext wenn Editor leer ist
+- `outputFormat` — `"html"` (Standard) oder `"json"` (TipTap/ProseMirror-Dokumentformat)
+- `showCharacterCount` — Zeichenzähler rechts unten
+- `maxCharacters` — Hartlimit; Eingabe blockiert wenn erreicht, Zähler wird rot
+- `height` / `width` — Zahl → px, CSS-Strings, `"auto"` füllt umgebenden Flex-Container
+- `readonly` — keine Toolbar, nicht editierbar
+- `disabled` — Toolbar deaktiviert, Editor ausgegraut
+- `name` — verstecktes `<input type="hidden">` für natives `<form>`-Submit
+- `error` + `helperText` — konsistent mit MUI `TextField`
+- `onBlur` / `onFocus`-Callbacks
+
+**Markdown-Einfügen**
+- Eingefügtes Markdown (aus `.md`-Dateien, GitHub-READMEs, Markdown-Editoren) wird automatisch in Rich-Text konvertiert via `tiptap-markdown` — Überschriften, Listen, Fett, Kursiv, Zitate, Code, Links
+
+**TypeScript-Exports**
+- Typen: `RichTextEditorProps`, `RichTextEditorOutputFormat`, `RichTextEditorToolbarConfig`, `RichTextEditorTranslation`
+- `DEFAULT_RICH_TEXT_EDITOR_TRANSLATION`, `DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG`
+
+**i18n** (26 Schlüssel): Toolbar-Tooltips für alle 18 Buttons, Link-Dialog-Labels (Titel/URL/Speichern/Abbrechen/Entfernen), Zeichenzähler-Format-Strings (`{count}`, `{count}/{max}`)
+
+**Storybook & Tests**
+- Storybook-v10-Stories für alle wichtigen Szenarien
+- Vitest-Unit-Tests (in den 271 Gesamttests bei v1.0.0 enthalten)
+- Zweisprachiges Benutzerhandbuch: `user-manuals/RichTextEditor.md` (EN) + `user-manuals/RichTextEditor.de.md` (DE)
 
 #### Allgemein
 - Dualer ESM + CJS Output (`dist/index.js` / `dist/index.cjs`)
 - Vollständige TypeScript-Deklarationen (`.d.ts`) für alle Komponenten und Typen
 - Tree-Shakeable (`sideEffects: false`)
 - Peer-Dependencies: React 19, MUI 9, Emotion
-- Storybook-10-Stories für alle Komponenten
+- Storybook-v10-Stories für alle Komponenten — mehrere Szenarien pro Komponente
 - 271 Unit-Tests mit Vitest und Testing Library
 - Zweisprachige Dokumentation: Englisch (`*.md`) und Deutsch (`*.de.md`)

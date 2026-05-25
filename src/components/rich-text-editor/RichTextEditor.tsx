@@ -16,13 +16,7 @@ import {
 import { RichTextEditorContent } from "./RichTextEditorContent";
 import { RichTextEditorToolbar } from "./RichTextEditorToolbar";
 import { RichTextEditorFooter } from "./RichTextEditorFooter";
-
-// Numerische Strings ("300") → Zahl, damit MUI "px" anhängt; alles andere unverändert
-function normalizeSize(val: number | string | undefined): number | string | undefined {
-  if (val === "" || val === undefined) return undefined;
-  if (typeof val === "string" && val !== "auto" && !isNaN(Number(val))) return Number(val);
-  return val;
-}
+import { normalizeSize } from "../shared/normalizeSize";
 
 export function RichTextEditor({
   value,

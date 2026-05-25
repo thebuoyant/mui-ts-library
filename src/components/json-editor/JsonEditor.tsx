@@ -9,12 +9,7 @@ import {
 import { JsonEditorContent } from "./JsonEditorContent";
 import { JsonEditorToolbar } from "./JsonEditorToolbar";
 import { JsonEditorFooter }  from "./JsonEditorFooter";
-
-function normalizeSize(val: number | string | undefined): number | string | undefined {
-  if (val === "" || val === undefined) return undefined;
-  if (typeof val === "string" && val !== "auto" && !isNaN(Number(val))) return Number(val);
-  return val;
-}
+import { normalizeSize } from "../shared/normalizeSize";
 
 function isValidJson(str: string): boolean {
   if (!str.trim()) return false;

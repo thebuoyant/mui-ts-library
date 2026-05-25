@@ -8,27 +8,9 @@ import EditIcon from "@mui/icons-material/Edit";
 import { useGanttChartStore, useGanttTheme, useGanttTranslations, useRawGanttChartStore } from "./GanttChart";
 import type { GanttTask, GanttTaskNode, GanttTaskStatus, GanttTranslations } from "./GanttChart.types";
 import { getVisibleTasks } from "./util/gantt-chart.util";
-import { ROW_HEIGHT, HEADER_HEIGHT, ACTIONS_COL_WIDTH, STATUS_COL_WIDTH } from "./GanttChart.constants";
+import { ROW_HEIGHT, HEADER_HEIGHT, ACTIONS_COL_WIDTH, STATUS_COL_WIDTH, STATUS_BAR_COLOR, STATUS_CHIP_COLOR } from "./GanttChart.constants";
 import { GanttTaskDialog } from "./GanttTaskDialog";
 import { GanttDeleteDialog } from "./GanttDeleteDialog";
-
-
-const STATUS_DOT_COLOR: Record<string, string> = {
-  planned: "warning.main",
-  "in-progress": "info.main",
-  done: "success.main",
-  blocked: "error.main",
-};
-
-const STATUS_CHIP_COLOR: Record<
-  GanttTaskStatus,
-  "default" | "warning" | "info" | "success" | "error"
-> = {
-  planned: "warning",
-  "in-progress": "info",
-  done: "success",
-  blocked: "error",
-};
 
 function getStatusLabel(status: GanttTaskStatus, t: GanttTranslations): string {
   const map: Record<GanttTaskStatus, string> = {
@@ -135,7 +117,7 @@ function GanttTaskRow({
             borderRadius: task.isMilestone ? 0 : "50%",
             transform: task.isMilestone ? "rotate(45deg)" : undefined,
             flexShrink: 0,
-            bgcolor: task.color ?? statusColors?.[task.status] ?? STATUS_DOT_COLOR[task.status] ?? "grey.400",
+            bgcolor: task.color ?? statusColors?.[task.status] ?? STATUS_BAR_COLOR[task.status] ?? "grey.400",
           }}
         />
 

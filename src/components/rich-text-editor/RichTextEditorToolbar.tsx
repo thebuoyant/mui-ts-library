@@ -1,11 +1,6 @@
 import { useState } from "react";
 import { type Editor } from "@tiptap/react";
-import {
-  Box,
-  Divider,
-  IconButton,
-  Tooltip,
-} from "@mui/material";
+import { Box, Divider, IconButton, Tooltip } from "@mui/material";
 import FormatBoldIcon from "@mui/icons-material/FormatBold";
 import FormatItalicIcon from "@mui/icons-material/FormatItalic";
 import FormatUnderlinedIcon from "@mui/icons-material/FormatUnderlined";
@@ -27,6 +22,7 @@ import {
 } from "./RichTextEditor.types";
 import { RichTextEditorLinkDialog } from "./RichTextEditorLinkDialog";
 import { RichTextEditorColorPicker } from "./RichTextEditorColorPicker";
+import { ToolbarButton } from "../shared/ToolbarButton";
 
 type RichTextEditorToolbarProps = {
   editor:        Editor | null;
@@ -34,36 +30,6 @@ type RichTextEditorToolbarProps = {
   translation:   RichTextEditorTranslation;
   disabled?:     boolean;
 };
-
-type ToolbarButtonProps = {
-  label:     string;
-  icon:      React.ReactNode;
-  onClick:   () => void;
-  active?:   boolean;
-  disabled?: boolean;
-};
-
-function ToolbarButton({ label, icon, onClick, active, disabled }: ToolbarButtonProps) {
-  return (
-    <Tooltip title={label} arrow>
-      <span>
-        <IconButton
-          size="small"
-          // Verhindert dass der Editor seinen Fokus verliert wenn ein Toolbar-Button gedrückt wird
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={onClick}
-          disabled={disabled}
-          color={active ? "primary" : "default"}
-          sx={{ borderRadius: 1 }}
-          aria-label={label}
-          aria-pressed={active}
-        >
-          {icon}
-        </IconButton>
-      </span>
-    </Tooltip>
-  );
-}
 
 // Farb-Button mit farbiger Indikatorlinie unter dem Icon
 type ColorButtonProps = {
@@ -103,14 +69,12 @@ function ColorButton({ label, icon, activeColor, disabled, onClick }: ColorButto
   );
 }
 
-function H1Icon() {
-  return <Box component="span" sx={{ fontWeight: "bold", fontSize: "0.875rem", lineHeight: 1 }}>H1</Box>;
-}
-function H2Icon() {
-  return <Box component="span" sx={{ fontWeight: "bold", fontSize: "0.875rem", lineHeight: 1 }}>H2</Box>;
-}
-function H3Icon() {
-  return <Box component="span" sx={{ fontWeight: "bold", fontSize: "0.875rem", lineHeight: 1 }}>H3</Box>;
+function HeadingIcon({ level }: { level: 1 | 2 | 3 }) {
+  return (
+    <Box component="span" sx={{ fontWeight: "bold", fontSize: "0.875rem", lineHeight: 1 }}>
+      H{level}
+    </Box>
+  );
 }
 
 export function RichTextEditorToolbar({
@@ -213,7 +177,7 @@ export function RichTextEditorToolbar({
             {tc.showHeading1 && (
               <ToolbarButton
                 label={t.heading1}
-                icon={<H1Icon />}
+                icon={<HeadingIcon level={1} />}
                 onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
                 active={editor?.isActive("heading", { level: 1 })}
                 disabled={isDisabled}
@@ -222,7 +186,7 @@ export function RichTextEditorToolbar({
             {tc.showHeading2 && (
               <ToolbarButton
                 label={t.heading2}
-                icon={<H2Icon />}
+                icon={<HeadingIcon level={2} />}
                 onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
                 active={editor?.isActive("heading", { level: 2 })}
                 disabled={isDisabled}
@@ -231,7 +195,7 @@ export function RichTextEditorToolbar({
             {tc.showHeading3 && (
               <ToolbarButton
                 label={t.heading3}
-                icon={<H3Icon />}
+                icon={<HeadingIcon level={3} />}
                 onClick={() => editor?.chain().focus().toggleHeading({ level: 3 }).run()}
                 active={editor?.isActive("heading", { level: 3 })}
                 disabled={isDisabled}

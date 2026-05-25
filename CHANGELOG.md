@@ -9,6 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+---
+
+## [1.3.2] — 2026-05-25
+
+### Internal — MTL-15: Code Quality & Refactoring
+
+- Extract `useGanttDrag` hook from `GanttTimeline` — all drag, resize, and progress-drag logic lives in `hooks/useGanttDrag.ts`; documents 4 patterns for complex interaction hooks (stable callback refs, two-level state, document-level listeners, suppress-click)
+- Extract `GanttBarRow` component from `GanttTimeline` — bar rendering with sub-components `GanttMilestoneBar`, `GanttTaskBar`, `DragTooltip`; reads theme internally via `useGanttTheme()`
+- Extract `GanttWeekendStrips` component — weekend background strips, reads `weekendColor` from `useGanttTheme()`
+- Extract `GanttStatusContextMenu` component — right-click status menu, purely presentational; business logic stays in GanttTimeline via `onSelect` callback
+- Extract `GanttDependencyArrows` component — SVG layer for dependency arrows and today-line, reads theme internally
+- `GanttTimeline.tsx` reduced from 811 to ~300 lines
+- Shared `ToolbarButton` component in `src/components/shared/` — replaces three identical local implementations in SqlEditorToolbar, JsonEditorToolbar, RichTextEditorToolbar
+- Shared `normalizeSize` utility in `src/components/shared/` — replaces three identical local functions
+- Unified Gantt status color maps (`STATUS_BAR_COLOR`, `STATUS_CHIP_COLOR`) in `GanttChart.constants.ts`
+- Extract `PasswordStrengthBar` component from `PasswordStrengthMeter` — props: `percent`, `color`, `ariaLabel`; better testability and reusability
+- Replace three identical `H1Icon`/`H2Icon`/`H3Icon` components with single `HeadingIcon({ level: 1 | 2 | 3 })` in `RichTextEditorToolbar`
+
+---
+
 ## [1.3.1] — 2026-05-25
 
 ### Fixed
@@ -129,56 +151,224 @@ Initial public release of `@thebuoyant-tsdev/mui-ts-library`.
 ### Added
 
 #### GanttChart
-- Hierarchical project timeline with collapsible task groups
-- Milestone markers with distinct visual treatment
-- Drag-and-drop row reordering via `@dnd-kit`
-- Dependency arrows between tasks
-- Zoom levels: day, week, month, quarter
-- Built-in CRUD dialogs for creating, editing, and deleting tasks
-- Today-line indicator with auto-scroll
-- Virtualized row rendering for large datasets
-- Full i18n support via `translation` prop
+
+A fully interactive project timeline built on React, MUI, and Zustand.
+
+**Data model**
+- Hierarchical task structure via flat `tasks` array + `parentId` — tree is built internally
+- Task fields: `id`, `name`, `status`, `startDate`, `endDate`, `parentId?`, `dependencies?`, `isMilestone?`, `progress?`, `color?`
+- 4 statuses: `"planned"` · `"in-progress"` · `"done"` · `"blocked"` — color-coded bars and status chips
+- Milestone markers rendered as rotated diamonds (♦) instead of bars
+- Per-task color override via `GanttTask.color` (any CSS color value)
+- Progress field (0–100 %) shown as a semi-transparent overlay on the bar
+
+**Timeline view**
+- 4 zoom levels: `"days"` · `"weeks"` · `"months"` · `"quarters"` — user can switch via toolbar
+- Z-shaped finish-to-start dependency arrows between tasks
+- Today-line indicator with automatic horizontal scroll to center on load
+- Weekend background highlights on the days scale
+- Resizable left panel via draggable divider (`minPanelWidth`, `maxPanelWidth`)
+- Virtualized row rendering for large datasets (`virtualizeRows`) via `@tanstack/react-virtual`
+- `defaultRangeStart` / `defaultRangeEnd` to pin the visible date range
+
+**Toolbar**
+- Scale buttons, date range inputs with From/To fields, Expand All / Collapse All, Scroll to Today, Reset View
+- Fine-grained control via `toolbarConfig` — show/hide individual toolbar elements independently
+- `showToolbar={false}` to hide the entire toolbar
+
+**Interaction**
+- `draggable` — move task bars horizontally; updates `startDate` and `endDate` in sync
+- `resizable` — drag right edge of a bar to change `endDate`
+- `progressDraggable` — drag handle on bar to set progress (0–100 %) interactively
+- `cascadeDependencies` — automatically shifts all finish-to-start successors when a predecessor moves (transitive, circular-dependency-safe)
+- `showCriticalPath` — highlights the longest dependency chain that determines project duration
+- `zoomable` — `Ctrl + mouse wheel` cycles through zoom levels
+- `inlineEdit` — double-click task name in the left panel for direct editing
+- Right-click context menu on task bars for instant status change (`onStatusChange` callback)
+- Panel row reordering via drag & drop (`@dnd-kit`)
+
+**CRUD dialogs**
+- Built-in MUI dialogs for Add / Edit / Delete (`enableBuiltinDialogs={true}`, default)
+- Dialog fields: name, start date, end date, status, parent task, milestone flag, dependencies (multi-select)
+- `enableBuiltinDialogs={false}` — bypasses built-in dialogs and calls `onAddTask` / `onEditTask` / `onDeleteTask` instead (custom dialog integration)
+
+**Theming** — via `ganttTheme: GanttTheme`
+- `statusColors` — bar colors per status as CSS values
+- `criticalPathColor` — highlight color for critical path (default: `error.main`)
+- `milestoneColor` — diamond color (default: `warning.main`)
+- `todayLineColor` — today-line color (default: `primary.main`)
+- `weekendColor` — weekend column background (default: `action.hover`)
+- `barBorderRadius` — task bar corner radius in px (default: `4`)
+
+**Callbacks**
+- `onTaskClick(task)` · `onMilestoneClick(task)` — click on bar / milestone diamond
+- `onTaskMoved(task, newStart, newEnd)` — fired after a successful bar drag
+- `onTaskResized(task, newEnd)` — fired after a resize drag
+- `onStatusChange(task, status)` — fired after context menu status selection
+- `onTasksChange(tasks)` — fires after every change with the complete current task list (central callback for data-driven architectures)
+- `onTaskCreated(task)` · `onTaskUpdated(task)` · `onTaskDeleted(taskId)` — specific callbacks for built-in dialog actions
+- `onAddTask(parent?)` · `onEditTask(task)` · `onDeleteTask(task)` — called when `enableBuiltinDialogs={false}`
+
+**TypeScript exports**
+- Types: `GanttTask`, `GanttTaskNode`, `GanttTaskStatus`, `GanttTimeScale`, `GanttTranslations`, `GanttTheme`, `GanttStatusColors`, `GanttChartProps`, `GanttToolbarConfig`
+- `DEFAULT_GANTT_TRANSLATIONS` — pre-filled default translations (mix of German/English)
+
+**i18n & accessibility**
+- All UI texts overridable via `translations` prop — 30+ keys including dialog labels, toolbar tooltips, status labels, date locale
+- Action icon tooltips double as `aria-label`; dialogs have focus trap + Escape handling
 - Dark mode support via MUI theme
+
+**Storybook & tests**
+- Storybook stories covering all major scenarios
+- Vitest unit tests (included in the 271-test total at v1.0.0)
+- Bilingual user manual: `user-manuals/GanttChart.md` (EN) + `user-manuals/GanttChart.de.md` (DE)
 
 #### TagSelection
-- Multi-tag selector with autocomplete search
-- Optional tag creation mode (`allowCreate`) with Enter key shortcut
-- Configurable chip size and maximum visible chips
-- Alphabetical sorting of selected chips and dropdown options
-- `onTagCreate` callback for persisting newly created tags
-- Full i18n support via `translation` prop
-- Dark mode support via MUI theme
+
+Multi-tag selector with autocomplete, chip display, async support, and free-tag creation.
+
+**Data model**
+- `TagSelectionItem` fields: `id`, `label`, `selected?`, `disabled?`, `color?`, `foregroundColor?`, `backgroundColor?`
+- `TagColor`: `"default"` · `"primary"` · `"secondary"` · `"error"` · `"info"` · `"success"` · `"warning"`
+- Two color systems: semantic `color` (MUI theme, dark-mode-safe) or `foregroundColor`/`backgroundColor` (custom CSS) — mutually exclusive
+- Disabled tags cannot be selected; already-selected disabled tags cannot be removed
+- All chips and dropdown entries sorted alphabetically
+
+**Display & visibility**
+- `showSelectedTags` — show/hide the entire chip area
+- `showSelectedTagsLabel` — show/hide the heading above the chips
+- `showAutoComplete` — show/hide the search input (display-only mode when `false`)
+- `inputSize` / `chipSize` — `"small"` or `"medium"` (MUI standard)
+
+**Interaction**
+- `maxTags` — maximum simultaneously selected tags; input auto-disables when limit reached, with hint text
+- `maxVisibleChips` — excess chips hidden behind `+N` chip; clicking opens an overflow popover (`popoverPlacement`: `"top"` or `"bottom"`)
+- `loading` — loading indicator in dropdown for async tag sources
+- `disabled` — entire component locked; chips visible without delete icons
+- `listboxMaxHeight` — max height of the autocomplete dropdown list in px
+
+**Free tag creation** (`allowCreate={true}`)
+- When typed text matches no existing tag, the input switches to create mode
+- CheckIcon (confirm) + CloseIcon (cancel) appear in the field; 7 MUI theme color chips appear below for color selection
+- Confirm by clicking CheckIcon **or pressing Enter**
+- New tag is immediately marked as selected internally; `onTagCreate` fires for external state sync
+
+**Callbacks**
+- `onTagSelect(tag, selectedTags, allTags)` — tag selected from dropdown
+- `onTagDelete(tag, selectedTags, allTags)` — chip removed
+- `onTagsChange(selectedTags, allTags)` — central callback, fires after every selection change
+- `onSearchChange(value)` — for server-side filtering and async loading
+- `onTagCreate(label, color)` — new tag confirmed in create mode (`allowCreate={true}`)
+
+**TypeScript exports**
+- Types: `TagSelectionItem`, `TagSelectionProps`, `TagSelectionTranslation`, `TagColor`
+- `DEFAULT_TAG_SELECTION_TRANSLATION`
+
+**i18n** (7 keys): `selectedTagsLabel`, `autoCompleteLabel`, `noSelectedTagsText`, `noAvailableTagsText`, `placeholder`, `loadingText`, `maxTagsReachedText`
+
+**Storybook & tests**
+- Storybook stories covering all major scenarios (Storybook v10)
+- Vitest unit tests (included in 271 total at v1.0.0)
+- Bilingual user manual: `user-manuals/TagSelection.md` (EN) + `user-manuals/TagSelection.de.md` (DE)
 
 #### PasswordStrengthMeter
-- Password input with live strength rating (0–4 levels)
-- Configurable strength requirements checklist
-- Toggle visibility button
-- Strength label customization via `translation` prop
-- Dark mode support via MUI theme
+
+Password input with animated strength bar, requirements checklist, and full form library integration.
+
+**Core features**
+- Live strength scoring (5 levels: empty/weak/ok/good/very good) on every keystroke
+- Animated strength bar with configurable colors per level (`meterColors`)
+- Requirements checklist with 5 criteria: minimum length, uppercase, lowercase, digits, special characters
+- Visibility toggle button (show/hide password)
+- Controlled and uncontrolled modes
+
+**Props**
+- `value` — controlled mode (external state)
+- `passwordMinLength` (default: `8`) — minimum length threshold; passwords below always score `weak`
+- `showMeter`, `showSummary`, `showPasswordAdornment` — show/hide individual UI sections independently
+- `inputSize` — `"small"` or `"medium"` (MUI standard)
+
+**Form integration**
+- `name` — for native `<form>` submission and React Hook Form `register()`
+- `inputRef` — ref to the native `<input>` for React Hook Form / Formik
+- `disabled`, `error`, `helperText`, `autoComplete` — consistent with MUI `TextField`
+
+**Color customization**
+- `meterColors: Partial<MeterColors>` — bar colors for `weak`, `ok`, `good`, `veryGood`
+- `checkColors: CheckColors` — icon colors for `failure` (unmet) and `success` (met) requirements
+- `DEFAULT_METER_COLORS`, `DEFAULT_CHECK_COLORS` exported for reference
+
+**Callback**
+- `onPasswordChange(password: string, result: StrengthResult)` — fires on every keystroke
+
+**`StrengthResult`** (returned in `onPasswordChange`)
+- `score: 0|1|2|3|4`, `percent: 0|25|50|75|100`, `meterStatus: "weak"|"ok"|"good"|"very good"`
+- `length`, `hasLower`, `hasUpper`, `hasDigit`, `hasSymbol`
+
+**Scoring algorithm** (client-side, deterministic, no external services)
+- Base: minimum length met +1, extra length bonus +1
+- Character variety: 2 classes +1, 3 classes +1
+- Penalties: repeated chars −2, known weak patterns (`1234`, `password`, …) −2
+- Score clamped to 0–4
+
+**TypeScript exports**
+- Types: `PasswordStrengthMeterProps`, `PasswordStrengthMeterTranslation`, `StrengthResult`, `StrengthScore`, `MeterStatus`, `MeterColors`, `CheckColors`
+- `DEFAULT_PASSWORD_TRANSLATIONS`, `DEFAULT_METER_COLORS`, `DEFAULT_CHECK_COLORS`
+
+**Stable `data-testid` attributes**: `psm-input`, `psm-toggle`, `psm-meter`, `psm-summary`, `psm-req-success`, `psm-req-failure`
+
+**i18n** (10 keys): `label`, `summaryHeaderLabel`, `summaryMinChars` (with `{n}` placeholder for `passwordMinLength`), `summaryCapitalLetter`, `summaryLowerCaseLetter`, `summaryNumber`, `summarySpecialChar`, `showPasswordLabel`, `hidePasswordLabel`, `meterAriaLabel`
+
+**Storybook & tests**
+- Storybook stories covering all major scenarios (Storybook v10)
+- Vitest unit tests (included in 271 total at v1.0.0)
+- Bilingual user manual: `user-manuals/PasswordStrengthMeter.md` (EN) + `user-manuals/PasswordStrengthMeter.de.md` (DE)
 
 #### RichTextEditor
-- WYSIWYG editor based on TipTap v3 and ProseMirror
-- Toolbar: Bold, Italic, Underline, Strikethrough, Headings (H1–H3), Bullet List, Ordered List, Blockquote, Code Block, Link, Horizontal Rule, Text Color, Highlight, Undo/Redo, Clear Format
-- Configurable toolbar via `toolbarConfig` prop (show/hide individual buttons)
-- Text color and highlight with color palette and native browser color picker
-- Link insert/edit dialog
-- Character count display with optional hard limit (`maxCharacters`)
-- Controlled mode via `value` / `onChange`
-- Output format: `"html"` (default) or `"json"`
-- Markdown-to-rich-text conversion on paste
-- `readonly` mode (no toolbar) and `disabled` mode
-- Native form integration via hidden `<input type="hidden">`
-- `error` state and `helperText` — consistent with MUI TextField
+
+Full-featured WYSIWYG editor built on TipTap v3 and ProseMirror, zero external CSS dependencies.
+
+**Toolbar** (all buttons individually toggleable via `toolbarConfig`)
+- Text formatting: Bold, Italic, Underline, Strikethrough
+- Headings: H1, H2, H3
+- Lists: Bullet List, Ordered List
+- Blocks: Blockquote, Code Block, Horizontal Rule
+- Link: insert/edit dialog with URL field and Remove button
+- Text Color + Highlight: color palette with 10 presets, rainbow swatch opens native browser color picker, trash removes color
+- History: Undo, Redo, Clear Format
+
+**Props**
+- `value` / `onChange` — controlled mode; external sync without cursor jump
+- `placeholder` — placeholder text when editor is empty
+- `outputFormat` — `"html"` (default) or `"json"` (TipTap/ProseMirror document format)
+- `showCharacterCount` — character counter at bottom right
+- `maxCharacters` — hard limit; input is blocked when reached, counter turns red
+- `height` / `width` — numeric → px, CSS strings, `"auto"` fills surrounding flex container
+- `readonly` — no toolbar, non-editable
+- `disabled` — toolbar disabled, editor grayed out
+- `name` — hidden `<input type="hidden">` for native `<form>` submission
+- `error` + `helperText` — consistent with MUI `TextField`
 - `onBlur` / `onFocus` callbacks
-- Configurable `height` and `width` (number → px, CSS strings, `"auto"` for flex containers)
-- Full i18n support via `translation` prop
-- Dark mode support via MUI theme
+
+**Markdown paste**
+- Pasted Markdown (from `.md` files, GitHub READMEs, Markdown editors) is auto-converted to rich text via `tiptap-markdown` — headings, lists, bold, italic, blockquotes, code, links
+
+**TypeScript exports**
+- Types: `RichTextEditorProps`, `RichTextEditorOutputFormat`, `RichTextEditorToolbarConfig`, `RichTextEditorTranslation`
+- `DEFAULT_RICH_TEXT_EDITOR_TRANSLATION`, `DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG`
+
+**i18n** (26 keys): toolbar tooltips for all 18 buttons, link dialog labels (title/URL/Save/Cancel/Remove), character counter format strings (`{count}`, `{count}/{max}`)
+
+**Storybook & tests**
+- Storybook stories covering all major scenarios (Storybook v10)
+- Vitest unit tests (included in 271 total at v1.0.0)
+- Bilingual user manual: `user-manuals/RichTextEditor.md` (EN) + `user-manuals/RichTextEditor.de.md` (DE)
 
 #### General
 - Dual ESM + CJS output (`dist/index.js` / `dist/index.cjs`)
 - Full TypeScript declarations (`.d.ts`) for all components and types
 - Tree-shakeable (`sideEffects: false`)
 - Peer dependencies: React 19, MUI 9, Emotion
-- Storybook 10 stories for all components
+- Storybook v10 stories for all components — multiple scenarios per component
 - 271 unit tests with Vitest and Testing Library
 - Bilingual documentation: English (`*.md`) and German (`*.de.md`)
