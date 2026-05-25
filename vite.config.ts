@@ -3,6 +3,13 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { resolve } from "node:path";
+import { readFileSync } from "node:fs";
+
+const pkg = JSON.parse(readFileSync("./package.json", "utf-8"));
+const externalPackages = [
+  ...Object.keys(pkg.dependencies ?? {}),
+  ...Object.keys(pkg.peerDependencies ?? {}),
+];
 
 export default defineConfig({
   plugins: [react()],
@@ -16,14 +23,9 @@ export default defineConfig({
       formats: ["es", "cjs"],
     },
     rollupOptions: {
-      external: [
-        "react",
-        "react-dom",
-        "@mui/material",
-        "@mui/icons-material",
-        "@emotion/react",
-        "@emotion/styled",
-      ],
+      // Alle dependencies + peerDependencies externalisieren — nicht in dist bundeln
+      external: (id) =>
+        externalPackages.some((dep) => id === dep || id.startsWith(dep + "/")),
     },
   },
   test: {

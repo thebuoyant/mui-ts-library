@@ -11,7 +11,7 @@
   "homepage": "https://github.com/thebuoyant/mui-ts-library#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/thebuoyant/mui-ts-library.git"
+    "url": "git+https://github.com/thebuoyant/mui-ts-library.git"
   },
   "bugs": {
     "url": "https://github.com/thebuoyant/mui-ts-library/issues"
@@ -25,9 +25,14 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
   "files": [
@@ -100,7 +105,7 @@
   "scripts": {
     "dev": "vite",
     "clean": "rm -rf dist",
-    "build": "npm run clean && vite build && tsc -p tsconfig.build.json",
+    "build": "npm run clean && vite build && tsc -p tsconfig.build.json && cp dist/index.d.ts dist/index.d.cts",
     "prepublishOnly": "npm run test:run && npm run build",
     "pack-release": "npm run build && mkdir -p releases && npm pack --pack-destination releases/",
     "npm-deploy": "bash scripts/npm-deploy.sh",
