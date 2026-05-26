@@ -113,25 +113,28 @@ export const DEFAULT_RICH_TEXT_EDITOR_TRANSLATION: RichTextEditorTranslation = {
 };
 
 export type RichTextEditorProps = {
-  value?:        string;
-  onChange?:     (value: string) => void;
-  placeholder?:  string;
-  outputFormat?: RichTextEditorOutputFormat;
+  disabled?:           boolean;
+  error?:              boolean;
   /** Gesamthöhe des Editors (Toolbar + Inhalt). Zahlen → px. "auto" → füllt den umgebenden Flex-Container. */
-  height?: number | string;
-  /** Breite des Editors. Zahlen → px. "auto" oder leer → 100% des Elternelements. */
-  width?:  number | string;
-  showCharacterCount?: boolean;
+  height?:             number | string;
+  helperText?:         string;
   maxCharacters?:      number;
+  name?:               string;
+  outputFormat?:       RichTextEditorOutputFormat;
+  placeholder?:        string;
+  readonly?:           boolean;
+  showCharacterCount?: boolean;
+  /** Blendet die Toolbar aus ohne den Editor in den readonly-Modus zu versetzen */
+  showToolbar?:        boolean;
   /** Zeigt einen Wörter-Zähler im Footer an */
   showWordCount?:      boolean;
-  toolbarConfig?: RichTextEditorToolbarConfig;
-  disabled?: boolean;
-  readonly?: boolean;
-  name?:       string;
-  error?:      boolean;
-  helperText?: string;
-  translation?: Partial<RichTextEditorTranslation>;
-  onBlur?:  () => void;
-  onFocus?: () => void;
+  toolbarConfig?:      RichTextEditorToolbarConfig;
+  translation?:        Partial<RichTextEditorTranslation>;
+  value?:              string;
+  /** Breite des Editors. Zahlen → px. "auto" oder leer → 100% des Elternelements. */
+  width?:              number | string;
+  // Callbacks
+  onBlur?:   () => void;
+  onChange?:  (value: string) => void;
+  onFocus?:  () => void;
 };

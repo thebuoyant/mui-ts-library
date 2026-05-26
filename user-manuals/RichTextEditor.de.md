@@ -75,23 +75,24 @@ function App() {
 
 | Prop | Typ | Standard | Beschreibung |
 |---|---|---|---|
-| `value` | `string` | — | Initialwert als HTML- oder JSON-String; ermöglicht kontrollierten Modus |
-| `onChange` | `(value: string) => void` | — | Wird bei jeder Inhaltsänderung aufgerufen |
-| `placeholder` | `string` | — | Platzhaltertext wenn der Editor leer ist |
-| `outputFormat` | `RichTextEditorOutputFormat` | `"html"` | Ausgabeformat für `onChange` — `"html"` oder `"json"` |
+| `disabled` | `boolean` | `false` | Deaktiviert Editor und Toolbar vollständig |
+| `error` | `boolean` | `false` | Roter Rahmen im Fehlerzustand |
 | `height` | `number \| string` | `200` | Gesamthöhe des Editors (Toolbar + Inhalt). Zahlen → px. `"auto"` → füllt den umgebenden Flex-Container. Überschüssiger Inhalt scrollt vertikal. |
-| `width` | `number \| string` | `"100%"` | Breite des Editors. Zahlen → px. Leer oder nicht gesetzt → 100% des Elternelements. |
-| `showCharacterCount` | `boolean` | `false` | Zeigt Zeichenzähler unten rechts |
+| `helperText` | `string` | — | Hilfetext unter dem Editor (wie MUI TextField) |
 | `maxCharacters` | `number` | — | Maximale Zeichenanzahl — Eingabe wird bei Erreichen blockiert |
+| `name` | `string` | — | Name für natives Form-Submit (verstecktes `<input type="hidden">`) |
+| `outputFormat` | `RichTextEditorOutputFormat` | `"html"` | Ausgabeformat für `onChange` — `"html"` oder `"json"` |
+| `placeholder` | `string` | — | Platzhaltertext wenn der Editor leer ist |
+| `readonly` | `boolean` | `false` | Schreibgeschützter Modus — keine Toolbar, Inhalt nicht editierbar |
+| `showCharacterCount` | `boolean` | `false` | Zeigt Zeichenzähler unten rechts |
+| `showToolbar` | `boolean` | `true` | Blendet die Toolbar aus ohne den Editor in den readonly-Modus zu versetzen (im Gegensatz zu `readonly`) |
 | `showWordCount` | `boolean` | `false` | Zeigt einen Wörter-Zähler unten rechts (neben dem Zeichen-Zähler wenn beide aktiv sind) |
 | `toolbarConfig` | `RichTextEditorToolbarConfig` | siehe unten | Einzelne Toolbar-Buttons ein-/ausblenden |
-| `disabled` | `boolean` | `false` | Deaktiviert Editor und Toolbar vollständig |
-| `readonly` | `boolean` | `false` | Schreibgeschützter Modus — keine Toolbar |
-| `name` | `string` | — | Name für natives Form-Submit (verstecktes `<input type="hidden">`) |
-| `error` | `boolean` | `false` | Roter Rahmen im Fehlerzustand |
-| `helperText` | `string` | — | Hilfetext unter dem Editor (wie MUI TextField) |
-| `translation` | `Partial<RichTextEditorTranslation>` | — | Abweichende Texte für Tooltips, Dialog und Zeichenzähler |
+| `translation` | `Partial<RichTextEditorTranslation>` | — | Abweichende Texte für Tooltips, Dialog und Zähler-Labels |
+| `value` | `string` | — | Initialwert als HTML- oder JSON-String; ermöglicht kontrollierten Modus |
+| `width` | `number \| string` | `"100%"` | Breite des Editors. Zahlen → px. Leer oder nicht gesetzt → 100% des Elternelements. |
 | `onBlur` | `() => void` | — | Wird aufgerufen wenn der Editor den Fokus verliert |
+| `onChange` | `(value: string) => void` | — | Wird bei jeder Inhaltsänderung aufgerufen |
 | `onFocus` | `() => void` | — | Wird aufgerufen wenn der Editor den Fokus erhält |
 
 ---

@@ -19,23 +19,24 @@ import { RichTextEditorFooter } from "./RichTextEditorFooter";
 import { normalizeSize } from "../shared/normalizeSize";
 
 export function RichTextEditor({
-  value,
-  onChange,
-  placeholder,
-  outputFormat = "html",
+  disabled = false,
+  error = false,
   height,
-  width,
-  showCharacterCount = false,
+  helperText,
   maxCharacters,
+  name,
+  outputFormat = "html",
+  placeholder,
+  readonly = false,
+  showCharacterCount = false,
+  showToolbar = true,
   showWordCount = false,
   toolbarConfig,
-  disabled = false,
-  readonly = false,
-  name,
-  error = false,
-  helperText,
   translation,
+  value,
+  width,
   onBlur,
+  onChange,
   onFocus,
 }: RichTextEditorProps) {
   const t = { ...DEFAULT_RICH_TEXT_EDITOR_TRANSLATION, ...translation };
@@ -147,7 +148,7 @@ export function RichTextEditor({
           },
         }}
       >
-        {!readonly && (
+        {showToolbar && !readonly && (
           <>
             <RichTextEditorToolbar
               editor={editor}
