@@ -103,3 +103,4 @@ Basis: `component-features-nice-to-have.md` — RichTextEditor-Abschnitt.
 |---|---|---|
 | 2026-05-25 | Datei angelegt, 3 Phasen + offene Entscheidungen definiert | Alles oben noch offen |
 | 2026-05-26 | Phase 1 vollständig implementiert (v1.4.0) — Word Count + Fullscreen, 9 Tests, Stories, Doku | Phase 2 (Content Enrichment, v1.5.0): Tabellen, Bild-Embed, Emoji Picker |
+| 2026-05-26 | Library-wide: Props A-Z für alle 7 Komponenten abgeschlossen (TagSelection, GanttChart, ConfirmDialog + vorher JsonEditor, SqlEditor, PasswordStrengthMeter, RichTextEditor). 313/313 Tests grün. Alle types, stories, Manuale (EN+DE) konsistent. | Phase 2 unverändert |
