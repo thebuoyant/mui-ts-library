@@ -13,26 +13,25 @@ Basis: `component-features-nice-to-have.md` — RichTextEditor-Abschnitt.
 
 ---
 
-## Phase 1 — Quick Wins
+## Phase 1 — Quick Wins ✅ ERLEDIGT (v1.4.0 — 2026-05-26)
 
 **Ziel:** Sofort spürbarer Mehrwert, wenig Aufwand, keine neuen Dependencies.  
-**Version:** `1.4.0` (Minor — neue Props/Features, keine Breaking Changes)
+**Version:** `1.4.0`
 
-| ID | Feature | Aufwand | Beschreibung |
+| ID | Feature | Aufwand | Status |
 |---|---|---|---|
-| RTE-QW-1 | Word Count | 🟢 Niedrig | Wörter- und Zeichen-Zähler im Footer — neuer `showWordCount`-Prop |
-| RTE-QW-2 | Full Screen Mode | 🟢 Niedrig | Editor nimmt den gesamten Viewport ein — neuer `fullScreenButton`-Prop in der Toolbar |
+| RTE-QW-1 | Word Count | 🟢 Niedrig | ✅ Implementiert |
+| RTE-QW-2 | Full Screen Mode | 🟢 Niedrig | ✅ Implementiert |
 
 ### Ergebnisse Phase 1
 
-- `RichTextEditor` hat zwei neue optionale Props: `showWordCount` und `fullScreenButton`
-- Wort-/Zeichen-Zähler erscheint im Footer neben dem bestehenden Zeichen-Zähler (`showCharacterCount`)
-- Full-Screen-Button in der Toolbar: Editor expandiert auf 100vw × 100vh mit eigenem Close-Button
-- Full-Screen nutzt MUI `Modal` oder CSS `position: fixed` — kein neues Paket
-- i18n: beide Features vollständig übersetzbar (`RichTextEditorTranslation` erweitern)
-- Storybook: je eine neue Story
-- Tests: je mind. 3 neue Vitest-Tests
-- CHANGELOG + User Manual aktualisiert
+- `showWordCount`-Prop → Wörter-Zähler im Footer, neben Zeichen-Zähler (`showCharacterCount`)
+- `toolbarConfig.showFullscreenButton` (opt-in, Standard `false`) → Button rechts in Toolbar; CSS `position: fixed` — kein neues Paket
+- 3 neue Translation-Keys: `wordCount`, `fullscreen`, `exitFullscreen`
+- 2 neue Stories: `WithWordCount`, `WithFullscreen`
+- 9 neue Tests (313 gesamt, alle grün)
+- CHANGELOG.md + CHANGELOG.de.md: v1.4.0 eingetragen
+- User Manual (EN + DE): neue Abschnitte "Word Count" und "Fullscreen Mode"
 
 ---
 
@@ -103,3 +102,4 @@ Basis: `component-features-nice-to-have.md` — RichTextEditor-Abschnitt.
 | Datum | Was erledigt | Was noch offen |
 |---|---|---|
 | 2026-05-25 | Datei angelegt, 3 Phasen + offene Entscheidungen definiert | Alles oben noch offen |
+| 2026-05-26 | Phase 1 vollständig implementiert (v1.4.0) — Word Count + Fullscreen, 9 Tests, Stories, Doku | Phase 2 (Content Enrichment, v1.5.0): Tabellen, Bild-Embed, Emoji Picker |

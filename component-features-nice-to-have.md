@@ -24,17 +24,17 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 
 ## RichTextEditor
 
-| Feature | Beschreibung | Aufwand |
-|---|---|---|
-| Tabellen | Tiptap Table Extension — Zeilen/Spalten einfügen | Mittel |
-| Bild-Embed | `<img>` per URL oder Base64 einfügen | Mittel |
-| Mention (@) | Personen oder Entitäten referenzieren mit Autocomplete | Hoch |
-| Slash Commands (/) | Kontextmenü beim Tippen von `/` für Blöcke | Hoch |
-| Emoji Picker | 😀 Button mit Such-Emoji-Popover | Mittel |
-| Mathformel (KaTeX) | `$$`-Block für LaTeX-Formeln | Hoch |
-| Word Count | Wörter- und Zeichen-Zähler im Footer | Niedrig |
-| Full Screen Mode | Editor nimmt den gesamten Viewport ein | Niedrig |
-| Diff View | Zwei Versionen vergleichen (readonly) | Hoch |
+| Feature | Beschreibung | Aufwand | Status |
+|---|---|---|---|
+| ~~Word Count~~ | ~~Wörter- und Zeichen-Zähler im Footer~~ | ~~Niedrig~~ | ✅ v1.4.0 |
+| ~~Full Screen Mode~~ | ~~Editor nimmt den gesamten Viewport ein~~ | ~~Niedrig~~ | ✅ v1.4.0 |
+| Tabellen | Tiptap Table Extension — Zeilen/Spalten einfügen | Mittel | — |
+| Bild-Embed | `<img>` per URL oder Base64 einfügen | Mittel | — |
+| Emoji Picker | 😀 Button mit Such-Emoji-Popover | Mittel | — |
+| Mention (@) | Personen oder Entitäten referenzieren mit Autocomplete | Hoch | — |
+| Slash Commands (/) | Kontextmenü beim Tippen von `/` für Blöcke | Hoch | — |
+| Mathformel (KaTeX) | `$$`-Block für LaTeX-Formeln | Hoch | — |
+| Diff View | Zwei Versionen vergleichen (readonly) | Hoch | — |
 
 ---
 

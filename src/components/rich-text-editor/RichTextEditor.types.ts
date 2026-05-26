@@ -1,43 +1,46 @@
 export type RichTextEditorOutputFormat = "html" | "json";
 
 export type RichTextEditorToolbarConfig = {
-  showBold?:           boolean;
-  showItalic?:         boolean;
-  showUnderline?:      boolean;
-  showStrike?:         boolean;
-  showHeading1?:       boolean;
-  showHeading2?:       boolean;
-  showHeading3?:       boolean;
-  showBulletList?:     boolean;
-  showOrderedList?:    boolean;
-  showBlockquote?:     boolean;
-  showCodeBlock?:      boolean;
-  showLink?:           boolean;
-  showHorizontalRule?: boolean;
-  showTextColor?:      boolean;
-  showHighlight?:      boolean;
-  showUndoRedo?:       boolean;
-  showClearFormat?:    boolean;
+  showBold?:             boolean;
+  showItalic?:           boolean;
+  showUnderline?:        boolean;
+  showStrike?:           boolean;
+  showHeading1?:         boolean;
+  showHeading2?:         boolean;
+  showHeading3?:         boolean;
+  showBulletList?:       boolean;
+  showOrderedList?:      boolean;
+  showBlockquote?:       boolean;
+  showCodeBlock?:        boolean;
+  showLink?:             boolean;
+  showHorizontalRule?:   boolean;
+  showTextColor?:        boolean;
+  showHighlight?:        boolean;
+  showUndoRedo?:         boolean;
+  showClearFormat?:      boolean;
+  /** Fullscreen-Button in der Toolbar — standardmäßig deaktiviert (opt-in) */
+  showFullscreenButton?: boolean;
 };
 
 export const DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG: Required<RichTextEditorToolbarConfig> = {
-  showBold:           true,
-  showItalic:         true,
-  showUnderline:      true,
-  showStrike:         true,
-  showHeading1:       true,
-  showHeading2:       true,
-  showHeading3:       true,
-  showBulletList:     true,
-  showOrderedList:    true,
-  showBlockquote:     true,
-  showCodeBlock:      true,
-  showLink:           true,
-  showHorizontalRule: true,
-  showTextColor:      true,
-  showHighlight:      true,
-  showUndoRedo:       true,
-  showClearFormat:    true,
+  showBold:             true,
+  showItalic:           true,
+  showUnderline:        true,
+  showStrike:           true,
+  showHeading1:         true,
+  showHeading2:         true,
+  showHeading3:         true,
+  showBulletList:       true,
+  showOrderedList:      true,
+  showBlockquote:       true,
+  showCodeBlock:        true,
+  showLink:             true,
+  showHorizontalRule:   true,
+  showTextColor:        true,
+  showHighlight:        true,
+  showUndoRedo:         true,
+  showClearFormat:      true,
+  showFullscreenButton: false,
 };
 
 export type RichTextEditorTranslation = {
@@ -68,6 +71,12 @@ export type RichTextEditorTranslation = {
   linkDialogRemove:   string;
   characterCount:    string;
   characterCountMax: string;
+  /** Wörter-Zähler im Footer, z.B. "{count} words" */
+  wordCount:         string;
+  /** Tooltip für den Fullscreen-Button */
+  fullscreen:        string;
+  /** Tooltip für den Exit-Fullscreen-Button */
+  exitFullscreen:    string;
 };
 
 export const DEFAULT_RICH_TEXT_EDITOR_TRANSLATION: RichTextEditorTranslation = {
@@ -98,6 +107,9 @@ export const DEFAULT_RICH_TEXT_EDITOR_TRANSLATION: RichTextEditorTranslation = {
   linkDialogRemove:   "Remove link",
   characterCount:    "{count} characters",
   characterCountMax: "{count} / {max} characters",
+  wordCount:         "{count} words",
+  fullscreen:        "Full screen",
+  exitFullscreen:    "Exit full screen",
 };
 
 export type RichTextEditorProps = {
@@ -111,6 +123,8 @@ export type RichTextEditorProps = {
   width?:  number | string;
   showCharacterCount?: boolean;
   maxCharacters?:      number;
+  /** Zeigt einen Wörter-Zähler im Footer an */
+  showWordCount?:      boolean;
   toolbarConfig?: RichTextEditorToolbarConfig;
   disabled?: boolean;
   readonly?: boolean;

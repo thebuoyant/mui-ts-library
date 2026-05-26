@@ -16,6 +16,7 @@ const meta: Meta<typeof RichTextEditor> = {
     width:              { control: "text" },
     showCharacterCount: { control: "boolean" },
     maxCharacters:      { control: "number" },
+    showWordCount:      { control: "boolean" },
     disabled:           { control: "boolean" },
     readonly:           { control: "boolean" },
     error:              { control: "boolean" },
@@ -40,6 +41,7 @@ const meta: Meta<typeof RichTextEditor> = {
     width:              "",
     showCharacterCount: false,
     maxCharacters:      0,
+    showWordCount:      false,
     disabled:           false,
     readonly:           false,
     error:              false,
@@ -239,6 +241,23 @@ export const WithHighlight: Story = {
   },
 };
 
+export const WithWordCount: Story = {
+  args: {
+    showWordCount:      true,
+    showCharacterCount: true,
+    placeholder:        "Tippen — Wörter und Zeichen werden unten gezählt …",
+    value:              SAMPLE_HTML,
+  },
+};
+
+export const WithFullscreen: Story = {
+  args: {
+    toolbarConfig: { showFullscreenButton: true },
+    value:         SAMPLE_HTML,
+    placeholder:   "Fullscreen-Button in der Toolbar rechts oben …",
+  },
+};
+
 export const GermanTranslation: Story = {
   args: {
     placeholder: "Hier tippen …",
@@ -271,6 +290,9 @@ export const GermanTranslation: Story = {
       linkDialogRemove:   "Link entfernen",
       characterCount:    "{count} Zeichen",
       characterCountMax: "{count} / {max} Zeichen",
+      wordCount:         "{count} Wörter",
+      fullscreen:        "Vollbild",
+      exitFullscreen:    "Vollbild beenden",
     },
   },
 };

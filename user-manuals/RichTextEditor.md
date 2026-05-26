@@ -83,7 +83,8 @@ function App() {
 | `width` | `number \| string` | `"100%"` | Width of the editor. Numbers → px. Empty or unset → 100% of the parent. |
 | `showCharacterCount` | `boolean` | `false` | Shows a character counter at the bottom right |
 | `maxCharacters` | `number` | — | Maximum character count — input is blocked when reached |
-| `toolbarConfig` | `RichTextEditorToolbarConfig` | all `true` | Show/hide individual toolbar buttons |
+| `showWordCount` | `boolean` | `false` | Shows a word counter at the bottom right (next to the character counter if both are active) |
+| `toolbarConfig` | `RichTextEditorToolbarConfig` | see below | Show/hide individual toolbar buttons |
 | `disabled` | `boolean` | `false` | Disables the editor and toolbar completely |
 | `readonly` | `boolean` | `false` | Read-only mode — no toolbar |
 | `name` | `string` | — | Name for native form submission (hidden `<input type="hidden">`) |
@@ -107,27 +108,29 @@ type RichTextEditorOutputFormat = "html" | "json";
 
 ```ts
 type RichTextEditorToolbarConfig = {
-  showBold?:           boolean;
-  showItalic?:         boolean;
-  showUnderline?:      boolean;
-  showStrike?:         boolean;
-  showHeading1?:       boolean;
-  showHeading2?:       boolean;
-  showHeading3?:       boolean;
-  showBulletList?:     boolean;
-  showOrderedList?:    boolean;
-  showBlockquote?:     boolean;
-  showCodeBlock?:      boolean;
-  showLink?:           boolean;
-  showHorizontalRule?: boolean;
-  showTextColor?:      boolean;
-  showHighlight?:      boolean;
-  showUndoRedo?:       boolean;
-  showClearFormat?:    boolean;
+  showBold?:             boolean;
+  showItalic?:           boolean;
+  showUnderline?:        boolean;
+  showStrike?:           boolean;
+  showHeading1?:         boolean;
+  showHeading2?:         boolean;
+  showHeading3?:         boolean;
+  showBulletList?:       boolean;
+  showOrderedList?:      boolean;
+  showBlockquote?:       boolean;
+  showCodeBlock?:        boolean;
+  showLink?:             boolean;
+  showHorizontalRule?:   boolean;
+  showTextColor?:        boolean;
+  showHighlight?:        boolean;
+  showUndoRedo?:         boolean;
+  showClearFormat?:      boolean;
+  /** Fullscreen button at the far right of the toolbar — opt-in, default false */
+  showFullscreenButton?: boolean;
 };
 ```
 
-Default configuration (all `true`):
+Default: all formatting buttons `true`, `showFullscreenButton: false`.
 
 ```tsx
 import { DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG } from '@thebuoyant-tsdev/mui-ts-library';
@@ -167,6 +170,11 @@ type RichTextEditorTranslation = {
   // Character counter ({count} and {max} are replaced at runtime)
   characterCount:    string;
   characterCountMax: string;
+  // Word counter ({count} is replaced at runtime)
+  wordCount:         string;
+  // Fullscreen button tooltips
+  fullscreen:        string;
+  exitFullscreen:    string;
 };
 ```
 
@@ -271,6 +279,58 @@ import { DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG } from '@thebuoyant-tsdev/mui-t
 ```
 
 The counter turns red when the limit is reached.
+
+---
+
+## Word Count
+
+```tsx
+{/* Word counter only */}
+<RichTextEditor showWordCount />
+
+{/* Word counter + character counter combined */}
+<RichTextEditor showWordCount showCharacterCount />
+```
+
+The word count is displayed at the bottom right of the editor. When both `showWordCount` and `showCharacterCount` are active, words appear to the left of the character count.
+
+The label uses the `wordCount` translation key (default: `"{count} words"`):
+
+```tsx
+<RichTextEditor
+  showWordCount
+  translation={{ wordCount: "{count} Wörter" }}
+/>
+```
+
+---
+
+## Fullscreen Mode
+
+```tsx
+<RichTextEditor
+  toolbarConfig={{ showFullscreenButton: true }}
+/>
+```
+
+The fullscreen button appears at the far right of the toolbar (separated from the formatting buttons). Clicking it expands the editor to cover the entire viewport (`100vw × 100vh`). A second click restores the original size.
+
+- Uses CSS `position: fixed` — no new dependencies
+- `zIndex: 1300` (above MUI dialogs)
+- The button tooltip switches between `fullscreen` and `exitFullscreen` translation keys
+- All other toolbar functions, word count, and character count remain active in fullscreen mode
+
+Customise the tooltip labels:
+
+```tsx
+<RichTextEditor
+  toolbarConfig={{ showFullscreenButton: true }}
+  translation={{
+    fullscreen:     "Vollbild",
+    exitFullscreen: "Vollbild beenden",
+  }}
+/>
+```
 
 ---
 
@@ -413,6 +473,9 @@ const DE_TRANSLATION = {
   linkDialogRemove:   "Link entfernen",
   characterCount:    "{count} Zeichen",
   characterCountMax: "{count} / {max} Zeichen",
+  wordCount:         "{count} Wörter",
+  fullscreen:        "Vollbild",
+  exitFullscreen:    "Vollbild beenden",
 };
 
 <RichTextEditor translation={DE_TRANSLATION} />

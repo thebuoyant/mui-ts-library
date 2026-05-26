@@ -7,6 +7,8 @@ type RichTextEditorFooterProps = {
   showCharacterCount?: boolean;
   charCount:           number;
   maxCharacters?:      number;
+  showWordCount?:      boolean;
+  wordCount:           number;
   translation:         RichTextEditorTranslation;
 };
 
@@ -16,6 +18,8 @@ export function RichTextEditorFooter({
   showCharacterCount,
   charCount,
   maxCharacters,
+  showWordCount,
+  wordCount,
   translation: t,
 }: RichTextEditorFooterProps) {
   const countLabel =
@@ -28,11 +32,22 @@ export function RichTextEditorFooter({
   const countColor =
     maxCharacters !== undefined && charCount >= maxCharacters ? "error" : "text.secondary";
 
+  const wordLabel = t.wordCount.replace("{count}", String(wordCount));
+
+  const showRight = showCharacterCount || showWordCount;
+
   return (
     <Box sx={{ display: "flex", justifyContent: "space-between", mt: 0.5, px: 0.5 }}>
       <FormHelperText error={error}>{helperText ?? ""}</FormHelperText>
-      {showCharacterCount && (
-        <FormHelperText sx={{ color: countColor }}>{countLabel}</FormHelperText>
+      {showRight && (
+        <Box sx={{ display: "flex", gap: 1.5, alignItems: "center" }}>
+          {showWordCount && (
+            <FormHelperText sx={{ color: "text.secondary" }}>{wordLabel}</FormHelperText>
+          )}
+          {showCharacterCount && (
+            <FormHelperText sx={{ color: countColor }}>{countLabel}</FormHelperText>
+          )}
+        </Box>
       )}
     </Box>
   );

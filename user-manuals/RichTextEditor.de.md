@@ -83,7 +83,8 @@ function App() {
 | `width` | `number \| string` | `"100%"` | Breite des Editors. Zahlen → px. Leer oder nicht gesetzt → 100% des Elternelements. |
 | `showCharacterCount` | `boolean` | `false` | Zeigt Zeichenzähler unten rechts |
 | `maxCharacters` | `number` | — | Maximale Zeichenanzahl — Eingabe wird bei Erreichen blockiert |
-| `toolbarConfig` | `RichTextEditorToolbarConfig` | alle `true` | Einzelne Toolbar-Buttons ein-/ausblenden |
+| `showWordCount` | `boolean` | `false` | Zeigt einen Wörter-Zähler unten rechts (neben dem Zeichen-Zähler wenn beide aktiv sind) |
+| `toolbarConfig` | `RichTextEditorToolbarConfig` | siehe unten | Einzelne Toolbar-Buttons ein-/ausblenden |
 | `disabled` | `boolean` | `false` | Deaktiviert Editor und Toolbar vollständig |
 | `readonly` | `boolean` | `false` | Schreibgeschützter Modus — keine Toolbar |
 | `name` | `string` | — | Name für natives Form-Submit (verstecktes `<input type="hidden">`) |
@@ -107,27 +108,29 @@ type RichTextEditorOutputFormat = "html" | "json";
 
 ```ts
 type RichTextEditorToolbarConfig = {
-  showBold?:           boolean;
-  showItalic?:         boolean;
-  showUnderline?:      boolean;
-  showStrike?:         boolean;
-  showHeading1?:       boolean;
-  showHeading2?:       boolean;
-  showHeading3?:       boolean;
-  showBulletList?:     boolean;
-  showOrderedList?:    boolean;
-  showBlockquote?:     boolean;
-  showCodeBlock?:      boolean;
-  showLink?:           boolean;
-  showHorizontalRule?: boolean;
-  showTextColor?:      boolean;
-  showHighlight?:      boolean;
-  showUndoRedo?:       boolean;
-  showClearFormat?:    boolean;
+  showBold?:             boolean;
+  showItalic?:           boolean;
+  showUnderline?:        boolean;
+  showStrike?:           boolean;
+  showHeading1?:         boolean;
+  showHeading2?:         boolean;
+  showHeading3?:         boolean;
+  showBulletList?:       boolean;
+  showOrderedList?:      boolean;
+  showBlockquote?:       boolean;
+  showCodeBlock?:        boolean;
+  showLink?:             boolean;
+  showHorizontalRule?:   boolean;
+  showTextColor?:        boolean;
+  showHighlight?:        boolean;
+  showUndoRedo?:         boolean;
+  showClearFormat?:      boolean;
+  /** Fullscreen-Button rechts in der Toolbar — opt-in, Standard false */
+  showFullscreenButton?: boolean;
 };
 ```
 
-Standard-Konfiguration (alle `true`):
+Standard: alle Formatierungs-Buttons `true`, `showFullscreenButton: false`.
 
 ```tsx
 import { DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG } from '@thebuoyant-tsdev/mui-ts-library';
@@ -167,6 +170,11 @@ type RichTextEditorTranslation = {
   // Zeichenzähler ({count} und {max} werden zur Laufzeit ersetzt)
   characterCount:    string;
   characterCountMax: string;
+  // Wörter-Zähler ({count} wird zur Laufzeit ersetzt)
+  wordCount:         string;
+  // Fullscreen-Button-Tooltips
+  fullscreen:        string;
+  exitFullscreen:    string;
 };
 ```
 
@@ -271,6 +279,58 @@ import { DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG } from '@thebuoyant-tsdev/mui-t
 ```
 
 Der Zähler färbt sich rot wenn das Limit erreicht ist.
+
+---
+
+## Wörter-Zähler
+
+```tsx
+{/* Nur Wörter-Zähler */}
+<RichTextEditor showWordCount />
+
+{/* Wörter-Zähler + Zeichen-Zähler kombiniert */}
+<RichTextEditor showWordCount showCharacterCount />
+```
+
+Der Wörter-Zähler erscheint unten rechts am Editor. Wenn beide Zähler aktiv sind, steht der Wörter-Zähler links vom Zeichen-Zähler.
+
+Das Label verwendet den Translation-Key `wordCount` (Standard: `"{count} words"`):
+
+```tsx
+<RichTextEditor
+  showWordCount
+  translation={{ wordCount: "{count} Wörter" }}
+/>
+```
+
+---
+
+## Vollbild-Modus
+
+```tsx
+<RichTextEditor
+  toolbarConfig={{ showFullscreenButton: true }}
+/>
+```
+
+Der Fullscreen-Button erscheint am rechten Rand der Toolbar (getrennt von den Formatierungs-Buttons). Ein Klick expandiert den Editor auf den gesamten Viewport (`100vw × 100vh`). Ein zweiter Klick stellt die ursprüngliche Größe wieder her.
+
+- Verwendet CSS `position: fixed` — keine neuen Dependencies
+- `zIndex: 1300` (über MUI-Dialogen)
+- Der Button-Tooltip wechselt zwischen den Translation-Keys `fullscreen` und `exitFullscreen`
+- Alle Toolbar-Funktionen, Wörter-Zähler und Zeichen-Zähler bleiben im Vollbild aktiv
+
+Tooltip-Labels anpassen:
+
+```tsx
+<RichTextEditor
+  toolbarConfig={{ showFullscreenButton: true }}
+  translation={{
+    fullscreen:     "Vollbild",
+    exitFullscreen: "Vollbild beenden",
+  }}
+/>
+```
 
 ---
 
@@ -413,6 +473,9 @@ const DE_TRANSLATION = {
   linkDialogRemove:   "Link entfernen",
   characterCount:    "{count} Zeichen",
   characterCountMax: "{count} / {max} Zeichen",
+  wordCount:         "{count} Wörter",
+  fullscreen:        "Vollbild",
+  exitFullscreen:    "Vollbild beenden",
 };
 
 <RichTextEditor translation={DE_TRANSLATION} />

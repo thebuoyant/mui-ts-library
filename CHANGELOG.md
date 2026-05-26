@@ -13,6 +13,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.0] — 2026-05-26
+
+### Added
+
+#### RichTextEditor — Phase 1: Quick Wins (MTL-16)
+
+- **`showWordCount` prop** — displays a word counter in the footer alongside the existing character counter; fully independent (can be used with or without `showCharacterCount` or `maxCharacters`); the `CharacterCount` TipTap extension is loaded automatically when enabled
+- **`showFullscreenButton` in `toolbarConfig`** (default: `false`, opt-in) — adds a fullscreen toggle button at the right end of the toolbar; clicking expands the editor to cover the full viewport (`100vw × 100vh`) with a CSS `position: fixed` overlay; no new dependencies
+- **3 new translation keys** in `RichTextEditorTranslation`: `wordCount` (default: `"{count} words"`), `fullscreen` (default: `"Full screen"`), `exitFullscreen` (default: `"Exit full screen"`)
+- 2 new Storybook stories: `WithWordCount`, `WithFullscreen`
+- 9 new Vitest tests (4 for Word Count, 5 for Fullscreen)
+
+---
+
 ## [1.3.2] — 2026-05-25
 
 ### Internal — MTL-15: Code Quality & Refactoring
