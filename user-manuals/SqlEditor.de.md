@@ -80,28 +80,28 @@ function App() {
 
 | Prop | Typ | Standard | Beschreibung |
 |---|---|---|---|
-| `value` | `string` | — | SQL-Inhalt; aktiviert den kontrollierten Modus |
-| `onChange` | `(sql: string) => void` | — | Bei jeder Inhaltsänderung aufgerufen |
-| `placeholder` | `string` | — | Platzhaltertext bei leerem Editor |
-| `height` | `number \| string` | `300` | Gesamthöhe (Toolbar + Inhalt). Zahlen → px. `"auto"` → füllt den umgebenden Flex-Container. |
-| `width` | `number \| string` | `"100%"` | Breite des Editors. Zahlen → px. |
-| `disabled` | `boolean` | `false` | Deaktiviert Editor und Toolbar vollständig |
-| `readonly` | `boolean` | `false` | Nur-Lesen-Modus — keine Toolbar |
-| `error` | `boolean` | `false` | Roter Rahmen im Fehlerzustand |
-| `helperText` | `string` | — | Hilfetext unterhalb des Editors (wie MUI TextField) |
-| `name` | `string` | — | Name für native Formularübermittlung (verstecktes `<input type="hidden">`) |
 | `dialect` | `SqlEditorDialect` | `"standard"` | SQL-Dialekt für Syntax-Highlighting und Formatierung |
-| `showLineNumbers` | `boolean` | `true` | Zeilennummern ein-/ausblenden |
-| `showLineColumn` | `boolean` | `true` | Cursor-Position (Ln / Col) im Footer ein-/ausblenden |
+| `disabled` | `boolean` | `false` | Deaktiviert Editor und Toolbar vollständig |
+| `error` | `boolean` | `false` | Roter Rahmen im Fehlerzustand |
+| `height` | `number \| string` | `300` | Gesamthöhe (Toolbar + Inhalt). Zahlen → px. `"auto"` → füllt den umgebenden Flex-Container. |
+| `helperText` | `string` | — | Hilfetext unterhalb des Editors (wie MUI TextField) |
+| `highlightColors` | `SqlEditorHighlightColors` | — | Syntax-Highlight-Farben für Keywords, Strings und Identifier |
+| `name` | `string` | — | Name für native Formularübermittlung (verstecktes `<input type="hidden">`) |
+| `placeholder` | `string` | — | Platzhaltertext bei leerem Editor |
+| `readonly` | `boolean` | `false` | Nur-Lesen-Modus — keine Toolbar |
+| `schema` | `SqlSchema` | — | Tabellen- und Spaltendefinitionen für Schema-aware Autocomplete |
 | `showErrorCount` | `boolean` | `false` | Fehleranzahl im Footer ein-/ausblenden (benötigt `onLint`) |
+| `showLineColumn` | `boolean` | `true` | Cursor-Position (Ln / Col) im Footer ein-/ausblenden |
+| `showLineNumbers` | `boolean` | `true` | Zeilennummern ein-/ausblenden |
 | `toolbarConfig` | `SqlEditorToolbarConfig` | alle `true` außer `showExecute` | Toolbar-Schaltflächen einzeln ein-/ausblenden |
 | `translation` | `Partial<SqlEditorTranslation>` | — | UI-Texte für Toolbar-Tooltips und Footer überschreiben |
-| `highlightColors` | `SqlEditorHighlightColors` | — | Syntax-Highlight-Farben für Keywords, Strings und Identifier |
-| `schema` | `SqlSchema` | — | Tabellen- und Spaltendefinitionen für Schema-aware Autocomplete |
-| `onExecute` | `(sql: string) => void` | — | Wird bei Klick auf Ausführen aufgerufen (benötigt `toolbarConfig.showExecute: true`) |
-| `onLint` | `(sql: string) => Promise<SqlLintError[]> \| SqlLintError[]` | — | Asynchroner Lint-Callback — Fehler werden als Wellenlinien im Editor angezeigt |
+| `value` | `string` | — | SQL-Inhalt; aktiviert den kontrollierten Modus |
+| `width` | `number \| string` | `"100%"` | Breite des Editors. Zahlen → px. |
 | `onBlur` | `() => void` | — | Wird aufgerufen wenn der Editor den Fokus verliert |
+| `onChange` | `(sql: string) => void` | — | Bei jeder Inhaltsänderung aufgerufen |
+| `onExecute` | `(sql: string) => void` | — | Wird bei Klick auf Ausführen aufgerufen (benötigt `toolbarConfig.showExecute: true`) |
 | `onFocus` | `() => void` | — | Wird aufgerufen wenn der Editor den Fokus erhält |
+| `onLint` | `(sql: string) => Promise<SqlLintError[]> \| SqlLintError[]` | — | Asynchroner Lint-Callback — Fehler werden als Wellenlinien im Editor angezeigt |
 
 ---
 

@@ -71,29 +71,30 @@ export type SqlEditorHighlightColors = {
 };
 
 export type SqlEditorProps = {
-  value?:     string;
-  onChange?:  (sql: string) => void;
-  placeholder?: string;
+  dialect?:         SqlEditorDialect;
+  disabled?:        boolean;
+  error?:           boolean;
   /** Total height (toolbar + content). Numbers → px. "auto" → fills surrounding flex container. */
-  height?: number | string;
-  /** Width. Numbers → px. Default → 100%. */
-  width?:  number | string;
-  disabled?:   boolean;
-  readonly?:   boolean;
-  error?:      boolean;
-  helperText?: string;
+  height?:          number | string;
+  helperText?:      string;
+  highlightColors?: SqlEditorHighlightColors;
   /** Name for native form submission via hidden input. */
-  name?:       string;
-  dialect?:    SqlEditorDialect;
-  showLineNumbers?: boolean;
-  showLineColumn?:  boolean;
+  name?:            string;
+  placeholder?:     string;
+  readonly?:        boolean;
+  schema?:          SqlSchema;
   showErrorCount?:  boolean;
-  toolbarConfig?:    SqlEditorToolbarConfig;
-  translation?:      Partial<SqlEditorTranslation>;
-  highlightColors?:  SqlEditorHighlightColors;
-  schema?:           SqlSchema;
-  onExecute?: (sql: string) => void;
-  onLint?:    (sql: string) => Promise<SqlLintError[]> | SqlLintError[];
+  showLineColumn?:  boolean;
+  showLineNumbers?: boolean;
+  toolbarConfig?:   SqlEditorToolbarConfig;
+  translation?:     Partial<SqlEditorTranslation>;
+  value?:           string;
+  /** Width. Numbers → px. Default → 100%. */
+  width?:           number | string;
+  // Callbacks
   onBlur?:    () => void;
+  onChange?:  (sql: string) => void;
+  onExecute?: (sql: string) => void;
   onFocus?:   () => void;
+  onLint?:    (sql: string) => Promise<SqlLintError[]> | SqlLintError[];
 };

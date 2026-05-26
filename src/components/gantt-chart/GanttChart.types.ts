@@ -161,62 +161,63 @@ export type GanttToolbarConfig = {
 };
 
 export type GanttChartProps = {
-  tasks: GanttTask[];
-  timeScale?: GanttTimeScale;
-  /** Höhe des Charts. "auto" = 100 % des Eltern-Containers. Standard: 400. */
-  height?: number | string;
-  /** Breite des Charts. "auto" = 100 % des Eltern-Containers. Standard: "100%". */
-  width?: number | string;
-  // Wenn true, startet der Chart mit allen Knoten aufgeklappt statt nur den Root-Tasks.
-  initialExpandAll?: boolean;
-  // Toolbar mit Skalen-Switcher und Datumsbereich ein-/ausblenden (Standard: true).
-  showToolbar?: boolean;
-  // Feingranulare Toolbar-Konfiguration — nur abweichende Keys angeben, Rest bleibt sichtbar.
-  toolbarConfig?: GanttToolbarConfig;
-  // Optionaler initialer Sichtbereich — überschreibt die automatische Berechnung aus den Tasks.
-  defaultRangeStart?: Date;
-  defaultRangeEnd?: Date;
-  // Texte überschreiben für einfache Lokalisierung — nur abweichende Keys angeben.
-  translations?: Partial<GanttTranslations>;
-  // Mindestbreite des linken Panels in Pixeln (Standard: 200).
-  minPanelWidth?: number;
-  // Maximalbreite des linken Panels in Pixeln (Standard: 600).
-  maxPanelWidth?: number;
-  // Wenn true (Standard), öffnen Add/Edit/Delete-Icons MUI-Dialoge statt Callbacks direkt aufzurufen.
-  enableBuiltinDialogs?: boolean;
-  // Wenn true, ändert Strg+Mausrad die Zeitskala (days ↔ weeks ↔ months ↔ quarters).
-  zoomable?: boolean;
-  // Drag & Drop — Balken horizontal verschieben (Default: false).
-  draggable?: boolean;
-  // Resize — endDate am rechten Balkenrand per Drag ändern (Default: false).
-  resizable?: boolean;
   // Wenn true, werden beim Verschieben/Resizen alle Finish-to-Start-Nachfolger automatisch mitverschoben.
   cascadeDependencies?: boolean;
-  // Hebt den kritischen Pfad (längste Abhängigkeitskette) farbig hervor (Default: false).
-  showCriticalPath?: boolean;
+  // Optionaler initialer Sichtbereich — überschreibt die automatische Berechnung aus den Tasks.
+  defaultRangeEnd?: Date;
+  defaultRangeStart?: Date;
+  // Drag & Drop — Balken horizontal verschieben (Default: false).
+  draggable?: boolean;
+  // Wenn true (Standard), öffnen Add/Edit/Delete-Icons MUI-Dialoge statt Callbacks direkt aufzurufen.
+  enableBuiltinDialogs?: boolean;
+  // Gebündeltes Theming-Objekt — überschreibt alle visuellen Defaults auf einmal.
+  ganttTheme?: GanttTheme;
+  /** Höhe des Charts. "auto" = 100 % des Eltern-Containers. Standard: 400. */
+  height?: number | string;
+  // Wenn true, startet der Chart mit allen Knoten aufgeklappt statt nur den Root-Tasks.
+  initialExpandAll?: boolean;
   // Doppelklick auf Task-Namen startet Inline-Editierung (Default: false).
   inlineEdit?: boolean;
+  // Maximalbreite des linken Panels in Pixeln (Standard: 600).
+  maxPanelWidth?: number;
+  // Mindestbreite des linken Panels in Pixeln (Standard: 200).
+  minPanelWidth?: number;
   // Fortschritt per Drag am Progress-Handle direkt im Balken setzen (Default: false).
   progressDraggable?: boolean;
-  // Wenn true, werden nur sichtbare Zeilen gerendert (für 200+ Tasks empfohlen). Default: false.
-  virtualizeRows?: boolean;
+  // Resize — endDate am rechten Balkenrand per Drag ändern (Default: false).
+  resizable?: boolean;
+  // Hebt den kritischen Pfad (längste Abhängigkeitskette) farbig hervor (Default: false).
+  showCriticalPath?: boolean;
+  // Toolbar mit Skalen-Switcher und Datumsbereich ein-/ausblenden (Standard: true).
+  showToolbar?: boolean;
   // Überschreibt die Standard-Balkenfarben je Status — beliebige CSS-Farbwerte.
   // @deprecated — bitte `ganttTheme.statusColors` verwenden.
   statusColors?: GanttStatusColors;
-  // Gebündeltes Theming-Objekt — überschreibt alle visuellen Defaults auf einmal.
-  ganttTheme?: GanttTheme;
-  onTaskClick?: (task: GanttTask) => void;
-  onMilestoneClick?: (task: GanttTask) => void;
+  tasks: GanttTask[];
+  timeScale?: GanttTimeScale;
+  // Feingranulare Toolbar-Konfiguration — nur abweichende Keys angeben, Rest bleibt sichtbar.
+  toolbarConfig?: GanttToolbarConfig;
+  // Texte überschreiben für einfache Lokalisierung — nur abweichende Keys angeben.
+  translations?: Partial<GanttTranslations>;
+  // Wenn true, werden nur sichtbare Zeilen gerendert (für 200+ Tasks empfohlen). Default: false.
+  virtualizeRows?: boolean;
+  /** Breite des Charts. "auto" = 100 % des Eltern-Containers. Standard: "100%". */
+  width?: number | string;
+  // Wenn true, ändert Strg+Mausrad die Zeitskala (days ↔ weeks ↔ months ↔ quarters).
+  zoomable?: boolean;
+  // Callbacks
   onAddTask?: (parentTask?: GanttTask) => void;
-  onEditTask?: (task: GanttTask) => void;
   onDeleteTask?: (task: GanttTask) => void;
+  onEditTask?: (task: GanttTask) => void;
+  onMilestoneClick?: (task: GanttTask) => void;
   onStatusChange?: (task: GanttTask, status: GanttTaskStatus) => void;
+  onTaskClick?: (task: GanttTask) => void;
+  // Dialog-Callbacks — werden nur ausgelöst wenn enableBuiltinDialogs=true
+  onTaskCreated?: (task: GanttTask) => void;
+  onTaskDeleted?: (taskId: string) => void;
   onTaskMoved?: (task: GanttTask, newStart: Date, newEnd: Date) => void;
   onTaskResized?: (task: GanttTask, newEnd: Date) => void;
   // Wird nach jeder CRUD-Aktion mit der vollständigen aktuellen Task-Liste aufgerufen.
   onTasksChange?: (tasks: GanttTask[]) => void;
-  // Dialog-Callbacks — werden nur ausgelöst wenn enableBuiltinDialogs=true
-  onTaskCreated?: (task: GanttTask) => void;
   onTaskUpdated?: (task: GanttTask) => void;
-  onTaskDeleted?: (taskId: string) => void;
 };

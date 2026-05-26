@@ -8,34 +8,35 @@ const meta: Meta<typeof PasswordStrengthMeter> = {
   title: "Components/PasswordStrengthMeter",
   component: PasswordStrengthMeter,
   args: {
+    // A–Z
+    disabled:              false,
+    error:                 false,
+    inputSize:             "medium",
+    passwordMinLength:     8,
+    showMeter:             true,
     showPasswordAdornment: true,
-    showMeter: true,
-    showSummary: true,
-    inputSize: "medium",
-    passwordMinLength: 8,
-    disabled: false,
-    error: false,
+    showSummary:           true,
+    // Callback
     onPasswordChange: fn(),
   },
   argTypes: {
+    // A–Z: kontrollierbare Props
+    disabled:              { control: "boolean" },
+    error:                 { control: "boolean" },
+    helperText:            { control: "text" },
+    inputSize:             { control: "radio", options: ["small", "medium"] },
+    passwordMinLength:     { control: "number" },
+    showMeter:             { control: "boolean" },
     showPasswordAdornment: { control: "boolean" },
-    showMeter: { control: "boolean" },
-    showSummary: { control: "boolean" },
-    disabled: { control: "boolean" },
-    error: { control: "boolean" },
-    helperText: { control: "text" },
-    inputSize: { control: "radio", options: ["small", "medium"] },
-    passwordMinLength: { control: "number" },
-    // Wird über render in der Controlled-Story gesteuert — nicht direkt editierbar.
-    value: { control: false },
-    // Form-Integration-Props — über dedizierte Stories oder per render übergeben.
-    name: { control: false },
-    inputRef: { control: false },
-    autoComplete: { control: false },
-    // Komplexe Objekte — stattdessen dedizierte Stories verwenden.
-    translation: { control: false },
-    meterColors: { control: false },
-    checkColors: { control: false },
+    showSummary:           { control: "boolean" },
+    // Komplexe Objekte / Form-Props — dedizierte Stories oder render verwenden
+    autoComplete:     { control: false },
+    checkColors:      { control: false },
+    inputRef:         { control: false },
+    meterColors:      { control: false },
+    name:             { control: false },
+    translation:      { control: false },
+    value:            { control: false },
     onPasswordChange: { control: false },
   },
 };

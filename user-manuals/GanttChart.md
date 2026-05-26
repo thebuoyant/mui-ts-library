@@ -134,65 +134,33 @@ type GanttTask = {
 
 ### Component props: `GanttChartProps`
 
-#### Core data
-
 | Prop | Type | Default | Description |
 |---|---|---|---|
+| `cascadeDependencies` | `boolean` | `false` | When `true`, moving or resizing a task automatically shifts all finish-to-start successors (via `dependencies`) by the same amount. Works transitively across multiple levels. |
+| `defaultRangeEnd` | `Date` | auto | Overrides the automatically calculated right boundary of the timeline. |
+| `defaultRangeStart` | `Date` | auto | Overrides the automatically calculated left boundary of the timeline. Useful for fixing a specific date range from the start. |
+| `draggable` | `boolean` | `false` | Allows horizontal dragging of task bars. Updates `startDate` and `endDate` in sync. |
+| `enableBuiltinDialogs` | `boolean` | `true` | When `true`, the action icons (Add, Edit, Delete) open built-in MUI dialogs. When `false`, only the callbacks `onAddTask`, `onEditTask`, `onDeleteTask` are called — for custom dialog implementations. |
+| `ganttTheme` | `GanttTheme` | — | Bundled theming object. Recommended way for visual customization. Individual keys override the defaults — unset keys keep their default appearance. See [GanttTheme](#gantttheme). |
+| `height` | `number \| string` | `400` | Total chart height in pixels or as a CSS value. `"auto"` adapts to the parent element. |
+| `initialExpandAll` | `boolean` | `false` | Starts the chart with all hierarchy levels expanded. Default: only root tasks are expanded, their direct children are visible. |
+| `inlineEdit` | `boolean` | `false` | Enables inline editing of the task name by double-clicking directly in the panel. |
+| `maxPanelWidth` | `number` | `600` | Maximum width of the left task panel in pixels. |
+| `minPanelWidth` | `number` | `200` | Minimum width of the left task panel in pixels. Prevents the user from making the panel too narrow. |
+| `progressDraggable` | `boolean` | `false` | Shows a progress handle on the task bar. The user can set the progress (0–100 %) by dragging directly in the chart. |
+| `resizable` | `boolean` | `false` | Allows changing the `endDate` by dragging the right edge of a bar. |
+| `showCriticalPath` | `boolean` | `false` | Highlights the critical path — the longest dependency chain that determines the project duration. |
+| `showToolbar` | `boolean` | `true` | Shows or hides the entire toolbar (scale buttons, date range, action buttons). |
+| `statusColors` | `GanttStatusColors` | — | ⚠️ **Deprecated.** Use `ganttTheme.statusColors` instead. Overrides bar colors per status. |
 | `tasks` | `GanttTask[]` | — | **Required.** Flat array of all tasks. Hierarchy is built internally via `parentId`. Changes are reflected back via the `onTasksChange` callback. |
 | `timeScale` | `GanttTimeScale` | `"months"` | Initial time scale: `"days"` · `"weeks"` · `"months"` · `"quarters"`. The user can switch the scale via the toolbar at any time. |
-
-#### Display & sizing
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `height` | `number \| string` | `400` | Total chart height in pixels or as a CSS value. `"auto"` adapts to the parent element. |
-| `width` | `number \| string` | `"100%"` | Total chart width. Default fills the available space. |
-| `minPanelWidth` | `number` | `200` | Minimum width of the left task panel in pixels. Prevents the user from making the panel too narrow. |
-| `maxPanelWidth` | `number` | `600` | Maximum width of the left task panel in pixels. |
-| `virtualizeRows` | `boolean` | `false` | When `true`, only currently visible rows are rendered (virtual list). Recommended for ~200+ tasks as it drastically reduces DOM size. |
-
-#### Expand behavior
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `initialExpandAll` | `boolean` | `false` | Starts the chart with all hierarchy levels expanded. Default: only root tasks are expanded, their direct children are visible. |
-
-#### Timeline & range
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `defaultRangeStart` | `Date` | auto | Overrides the automatically calculated left boundary of the timeline. Useful for fixing a specific date range from the start. |
-| `defaultRangeEnd` | `Date` | auto | Overrides the automatically calculated right boundary of the timeline. |
-
-> **Note:** When `defaultRangeStart`/`defaultRangeEnd` are not set, the chart calculates the range automatically from the earliest and latest task dates and adds a 1-month buffer at both ends.
-
-#### Toolbar
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `showToolbar` | `boolean` | `true` | Shows or hides the entire toolbar (scale buttons, date range, action buttons). |
 | `toolbarConfig` | `GanttToolbarConfig` | all `true` | Fine-grained control over individual toolbar elements. Only specify deviating keys — unset keys remain visible. See [GanttToolbarConfig](#gantttoolbarconfig). |
-
-#### Interaction modes
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `enableBuiltinDialogs` | `boolean` | `true` | When `true`, the action icons (Add, Edit, Delete) open built-in MUI dialogs. When `false`, only the callbacks `onAddTask`, `onEditTask`, `onDeleteTask` are called — for custom dialog implementations. |
-| `zoomable` | `boolean` | `false` | Enables zoom via `Ctrl + mouse wheel`. Cycles through time scales (Days ↔ Weeks ↔ Months ↔ Quarters). |
-| `draggable` | `boolean` | `false` | Allows horizontal dragging of task bars. Updates `startDate` and `endDate` in sync. |
-| `resizable` | `boolean` | `false` | Allows changing the `endDate` by dragging the right edge of a bar. |
-| `cascadeDependencies` | `boolean` | `false` | When `true`, moving or resizing a task automatically shifts all finish-to-start successors (via `dependencies`) by the same amount. Works transitively across multiple levels. |
-| `inlineEdit` | `boolean` | `false` | Enables inline editing of the task name by double-clicking directly in the panel. |
-| `progressDraggable` | `boolean` | `false` | Shows a progress handle on the task bar. The user can set the progress (0–100 %) by dragging directly in the chart. |
-| `showCriticalPath` | `boolean` | `false` | Highlights the critical path — the longest dependency chain that determines the project duration. |
-
-#### Theming & colors
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `ganttTheme` | `GanttTheme` | — | Bundled theming object. Recommended way for visual customization. Individual keys override the defaults — unset keys keep their default appearance. See [GanttTheme](#gantttheme). |
-| `statusColors` | `GanttStatusColors` | — | ⚠️ **Deprecated.** Use `ganttTheme.statusColors` instead. Overrides bar colors per status. |
 | `translations` | `Partial<GanttTranslations>` | German/English | Texts for all UI elements. Only specify deviating keys. See [Translations](#translations). |
+| `virtualizeRows` | `boolean` | `false` | When `true`, only currently visible rows are rendered (virtual list). Recommended for ~200+ tasks as it drastically reduces DOM size. |
+| `width` | `number \| string` | `"100%"` | Total chart width. Default fills the available space. |
+| `zoomable` | `boolean` | `false` | Enables zoom via `Ctrl + mouse wheel`. Cycles through time scales (Days ↔ Weeks ↔ Months ↔ Quarters). |
+
+> **Note on `defaultRangeStart`/`defaultRangeEnd`:** When not set, the chart calculates the range automatically from the earliest and latest task dates and adds a 1-month buffer at both ends.
 
 ---
 

@@ -65,40 +65,24 @@ function App() {
 
 ## Props-Referenz
 
-### Kernfunktion
-
 | Prop | Typ | Standard | Beschreibung |
 |---|---|---|---|
-| `value` | `string` | — | Setzt die Komponente in den **kontrollierten Modus**: Das Passwort wird von außen gesteuert. Änderungen werden über `onPasswordChange` nach oben gegeben. Wenn nicht gesetzt, verwaltet die Komponente ihren eigenen internen Zustand (unkontrolliert). |
-| `passwordMinLength` | `number` | `8` | Mindestlänge des Passworts in Zeichen. Steuert die Anforderungscheckliste (Zeile „Mindestens {n} Zeichen") und beeinflusst den Scoring-Algorithmus direkt. Passwörter unter dieser Länge erhalten immer den Score `weak`. |
-| `showPasswordAdornment` | `boolean` | `true` | Zeigt einen Umschalten-Button am rechten Rand des Eingabefelds an, mit dem der Nutzer das Passwort im Klartext anzeigen kann. |
-| `showMeter` | `boolean` | `true` | Zeigt den animierten Stärke-Balken unterhalb des Eingabefelds an. Der Balken wechselt Farbe und Breite entsprechend dem berechneten Score. |
-| `showSummary` | `boolean` | `true` | Zeigt die Anforderungscheckliste unterhalb des Stärke-Balkens an. Jede Anforderung wird mit einem grünen Haken (erfüllt) oder einem roten Warnsymbol (nicht erfüllt) markiert. |
-| `inputSize` | `"small" \| "medium"` | `"medium"` | Größe des Eingabefelds gemäß MUI-Standard. Beeinflusst Schriftgröße, Innenabstand und Höhe. |
-
----
-
-### Form-Integration
-
-Diese Props machen die Komponente vollständig kompatibel mit gängigen Formularbibliotheken und nativen HTML-Forms.
-
-| Prop | Typ | Standard | Beschreibung |
-|---|---|---|---|
-| `name` | `string` | — | Natives `name`-Attribut des `<input>`-Elements. Wird für `<form>`-Submissions verwendet und von `register()` in React Hook Form und Formik benötigt. |
-| `inputRef` | `React.Ref<HTMLInputElement>` | — | Ref, der auf das native `<input>`-Element zeigt. Wird von React Hook Form via `register().ref` und von Formik via `innerRef` verwendet. Ermöglicht programmatischen Fokus und Validierungsauslösung. |
-| `disabled` | `boolean` | `false` | Deaktiviert das Eingabefeld und den Sichtbarkeits-Umschalter. Stärke-Balken und Anforderungsliste bleiben sichtbar. |
-| `error` | `boolean` | `false` | Setzt das Eingabefeld in den Fehlerzustand (roter Rahmen). Der `helperText` wird ebenfalls in Rot dargestellt. Typisch für Formularvalidierung nach Submit-Versuch. |
-| `helperText` | `string` | — | Hilfs- oder Fehlermeldungstext unterhalb des Eingabefelds. Erscheint in Rot wenn `error={true}`. Kann für externe Validierungsmeldungen genutzt werden (z. B. „Passwort stimmt nicht überein"). |
-| `autoComplete` | `string` | — | Natives `autocomplete`-Attribut des `<input>`-Elements. Empfohlene Werte: `"new-password"` für Registrierungsformulare, `"current-password"` für Login-Formulare. Steuert das Browser-Autofill-Verhalten. |
-
----
-
-### Farbanpassung
-
-| Prop | Typ | Standard | Beschreibung |
-|---|---|---|---|
-| `meterColors` | `Partial<MeterColors>` | Rot → Grün | Farben des Stärke-Balkens für jeden der vier Stärke-Stufen. Nur abweichende Keys angeben — nicht gesetzte Keys behalten die Standardfarben. |
+| `autoComplete` | `string` | — | Natives `autocomplete`-Attribut. Empfohlene Werte: `"new-password"` (Registrierung) oder `"current-password"` (Login). |
 | `checkColors` | `CheckColors` | Rot / Grün | Farben der Haken- und Warnsymbole in der Anforderungscheckliste. Beide Felder müssen angegeben werden wenn das Objekt gesetzt wird. |
+| `disabled` | `boolean` | `false` | Deaktiviert das Eingabefeld und den Sichtbarkeits-Umschalter. Stärke-Balken und Anforderungsliste bleiben sichtbar. |
+| `error` | `boolean` | `false` | Setzt das Eingabefeld in den Fehlerzustand (roter Rahmen). Der `helperText` wird ebenfalls in Rot dargestellt. |
+| `helperText` | `string` | — | Hilfs- oder Fehlermeldungstext unterhalb des Eingabefelds. Erscheint in Rot wenn `error={true}`. |
+| `inputRef` | `React.Ref<HTMLInputElement>` | — | Ref auf das native `<input>`-Element. Wird von React Hook Form (`register().ref`) und Formik (`innerRef`) verwendet. |
+| `inputSize` | `"small" \| "medium"` | `"medium"` | Größe des Eingabefelds gemäß MUI-Standard. Beeinflusst Schriftgröße, Innenabstand und Höhe. |
+| `meterColors` | `Partial<MeterColors>` | Rot → Grün | Farben des Stärke-Balkens für jeden der vier Stärke-Stufen. Nur abweichende Keys angeben — nicht gesetzte Keys behalten die Standardfarben. |
+| `name` | `string` | — | Natives `name`-Attribut des `<input>`-Elements. Benötigt von `register()` in React Hook Form und Formik. |
+| `passwordMinLength` | `number` | `8` | Mindestlänge des Passworts. Steuert die Anforderungscheckliste und den Scoring-Algorithmus. Passwörter unter dieser Länge erhalten immer den Score `weak`. |
+| `showMeter` | `boolean` | `true` | Zeigt den animierten Stärke-Balken unterhalb des Eingabefelds an. |
+| `showPasswordAdornment` | `boolean` | `true` | Zeigt einen Button zum Sichtbar-Machen des Passworts im Klartext. |
+| `showSummary` | `boolean` | `true` | Zeigt die Anforderungscheckliste unterhalb des Stärke-Balkens an. |
+| `translation` | `Partial<PasswordStrengthMeterTranslation>` | — | UI-Texte überschreiben — nur abweichende Keys angeben. |
+| `value` | `string` | — | Setzt die Komponente in den **kontrollierten Modus**: Das Passwort wird von außen gesteuert. Änderungen werden über `onPasswordChange` nach oben gegeben. |
+| `onPasswordChange` | `(password: string, strengthResult: StrengthResult) => void` | — | Wird bei jedem Tastendruck mit dem aktuellen Passwort und dem Stärke-Ergebnis aufgerufen. |
 
 **`MeterColors` — Struktur und Standardwerte:**
 

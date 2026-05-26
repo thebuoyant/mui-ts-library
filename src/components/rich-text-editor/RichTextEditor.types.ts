@@ -1,5 +1,3 @@
-export type RichTextEditorOutputFormat = "html" | "json";
-
 export type RichTextEditorToolbarConfig = {
   showBold?:             boolean;
   showItalic?:           boolean;
@@ -120,7 +118,6 @@ export type RichTextEditorProps = {
   helperText?:         string;
   maxCharacters?:      number;
   name?:               string;
-  outputFormat?:       RichTextEditorOutputFormat;
   placeholder?:        string;
   readonly?:           boolean;
   showCharacterCount?: boolean;

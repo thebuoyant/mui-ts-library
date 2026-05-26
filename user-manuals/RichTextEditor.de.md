@@ -46,7 +46,6 @@ import {
 } from '@thebuoyant-tsdev/mui-ts-library';
 import type {
   RichTextEditorProps,
-  RichTextEditorOutputFormat,
   RichTextEditorToolbarConfig,
   RichTextEditorTranslation,
 } from '@thebuoyant-tsdev/mui-ts-library';
@@ -81,7 +80,6 @@ function App() {
 | `helperText` | `string` | — | Hilfetext unter dem Editor (wie MUI TextField) |
 | `maxCharacters` | `number` | — | Maximale Zeichenanzahl — Eingabe wird bei Erreichen blockiert |
 | `name` | `string` | — | Name für natives Form-Submit (verstecktes `<input type="hidden">`) |
-| `outputFormat` | `RichTextEditorOutputFormat` | `"html"` | Ausgabeformat für `onChange` — `"html"` oder `"json"` |
 | `placeholder` | `string` | — | Platzhaltertext wenn der Editor leer ist |
 | `readonly` | `boolean` | `false` | Schreibgeschützter Modus — keine Toolbar, Inhalt nicht editierbar |
 | `showCharacterCount` | `boolean` | `false` | Zeigt Zeichenzähler unten rechts |
@@ -89,7 +87,7 @@ function App() {
 | `showWordCount` | `boolean` | `false` | Zeigt einen Wörter-Zähler unten rechts (neben dem Zeichen-Zähler wenn beide aktiv sind) |
 | `toolbarConfig` | `RichTextEditorToolbarConfig` | siehe unten | Einzelne Toolbar-Buttons ein-/ausblenden |
 | `translation` | `Partial<RichTextEditorTranslation>` | — | Abweichende Texte für Tooltips, Dialog und Zähler-Labels |
-| `value` | `string` | — | Initialwert als HTML- oder JSON-String; ermöglicht kontrollierten Modus |
+| `value` | `string` | — | Initialer HTML-String; ermöglicht kontrollierten Modus |
 | `width` | `number \| string` | `"100%"` | Breite des Editors. Zahlen → px. Leer oder nicht gesetzt → 100% des Elternelements. |
 | `onBlur` | `() => void` | — | Wird aufgerufen wenn der Editor den Fokus verliert |
 | `onChange` | `(value: string) => void` | — | Wird bei jeder Inhaltsänderung aufgerufen |
@@ -98,12 +96,6 @@ function App() {
 ---
 
 ## TypeScript-Typen
-
-### `RichTextEditorOutputFormat`
-
-```ts
-type RichTextEditorOutputFormat = "html" | "json";
-```
 
 ### `RichTextEditorToolbarConfig`
 
@@ -189,21 +181,11 @@ import { DEFAULT_RICH_TEXT_EDITOR_TRANSLATION } from '@thebuoyant-tsdev/mui-ts-l
 
 ## Ausgabeformat
 
-### HTML (Standard)
-
-`onChange` liefert einen HTML-String, z. B.:
+`onChange` liefert immer einen HTML-String, z. B.:
 
 ```html
 <h2>Titel</h2><p>Text mit <strong>Fett</strong> und <em>Kursiv</em>.</p>
 ```
-
-### JSON
-
-```tsx
-<RichTextEditor outputFormat="json" onChange={(json) => JSON.parse(json)} />
-```
-
-Der JSON-String entspricht dem TipTap/ProseMirror-Dokumentformat (kann direkt zurück an `value` übergeben werden).
 
 ---
 

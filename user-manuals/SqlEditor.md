@@ -80,28 +80,28 @@ function App() {
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `value` | `string` | — | SQL content; enables controlled mode |
-| `onChange` | `(sql: string) => void` | — | Called on every content change |
-| `placeholder` | `string` | — | Placeholder shown when the editor is empty |
-| `height` | `number \| string` | `300` | Total height (toolbar + content). Numbers → px. `"auto"` → fills the surrounding flex container. |
-| `width` | `number \| string` | `"100%"` | Width of the editor. Numbers → px. |
-| `disabled` | `boolean` | `false` | Disables the editor and toolbar completely |
-| `readonly` | `boolean` | `false` | Read-only mode — no toolbar shown |
-| `error` | `boolean` | `false` | Red border in error state |
-| `helperText` | `string` | — | Helper text below the editor (like MUI TextField) |
-| `name` | `string` | — | Name for native form submission (hidden `<input type="hidden">`) |
 | `dialect` | `SqlEditorDialect` | `"standard"` | SQL dialect for syntax highlighting and formatting |
-| `showLineNumbers` | `boolean` | `true` | Show/hide the line number gutter |
-| `showLineColumn` | `boolean` | `true` | Show/hide the cursor position (Ln / Col) in the footer |
+| `disabled` | `boolean` | `false` | Disables the editor and toolbar completely |
+| `error` | `boolean` | `false` | Red border in error state |
+| `height` | `number \| string` | `300` | Total height (toolbar + content). Numbers → px. `"auto"` → fills the surrounding flex container. |
+| `helperText` | `string` | — | Helper text below the editor (like MUI TextField) |
+| `highlightColors` | `SqlEditorHighlightColors` | — | Override syntax highlight colors for keywords, strings, and identifiers |
+| `name` | `string` | — | Name for native form submission (hidden `<input type="hidden">`) |
+| `placeholder` | `string` | — | Placeholder shown when the editor is empty |
+| `readonly` | `boolean` | `false` | Read-only mode — no toolbar shown |
+| `schema` | `SqlSchema` | — | Table and column definitions for schema-aware autocomplete |
 | `showErrorCount` | `boolean` | `false` | Show/hide the error count in the footer (requires `onLint`) |
+| `showLineColumn` | `boolean` | `true` | Show/hide the cursor position (Ln / Col) in the footer |
+| `showLineNumbers` | `boolean` | `true` | Show/hide the line number gutter |
 | `toolbarConfig` | `SqlEditorToolbarConfig` | all `true` except `showExecute` | Show/hide individual toolbar buttons |
 | `translation` | `Partial<SqlEditorTranslation>` | — | Override texts for toolbar tooltips and footer |
-| `highlightColors` | `SqlEditorHighlightColors` | — | Override syntax highlight colors for keywords, strings, and identifiers |
-| `schema` | `SqlSchema` | — | Table and column definitions for schema-aware autocomplete |
-| `onExecute` | `(sql: string) => void` | — | Called when the Execute button is clicked (requires `toolbarConfig.showExecute: true`) |
-| `onLint` | `(sql: string) => Promise<SqlLintError[]> \| SqlLintError[]` | — | Async linting callback — errors are shown as wavy underlines in the editor |
+| `value` | `string` | — | SQL content; enables controlled mode |
+| `width` | `number \| string` | `"100%"` | Width of the editor. Numbers → px. |
 | `onBlur` | `() => void` | — | Called when the editor loses focus |
+| `onChange` | `(sql: string) => void` | — | Called on every content change |
+| `onExecute` | `(sql: string) => void` | — | Called when the Execute button is clicked (requires `toolbarConfig.showExecute: true`) |
 | `onFocus` | `() => void` | — | Called when the editor gains focus |
+| `onLint` | `(sql: string) => Promise<SqlLintError[]> \| SqlLintError[]` | — | Async linting callback — errors are shown as wavy underlines in the editor |
 
 ---
 

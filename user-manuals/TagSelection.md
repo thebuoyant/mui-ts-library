@@ -116,33 +116,21 @@ type TagSelectionItem = {
 
 ### Component props: `TagSelectionProps`
 
-#### Display & visibility
-
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `tags` | `TagSelectionItem[]` | — | **Required.** Complete tag array including selected, available, and disabled tags. State changes (Select, Delete, Create) are reflected back via callbacks. |
-| `showSelectedTags` | `boolean` | `true` | Shows the upper area with selected tags as chips. When `false`, the entire chip area is hidden — the autocomplete remains visible. |
-| `showSelectedTagsLabel` | `boolean` | `true` | Shows the label heading above the chip area (default: "Selected tags"). Can be hidden when the context is self-explanatory. |
-| `showAutoComplete` | `boolean` | `true` | Shows the search input field. When `false`, the user cannot add new tags — the chip area remains visible (display only). |
-| `inputSize` | `"small" \| "medium"` | `"medium"` | Size of the autocomplete input per MUI standard. Affects font size, padding, and input height. |
+| `allowCreate` | `boolean` | `false` | Enables free text input mode. When the user types text that does not match any existing tag (including no partial match), the input switches to create mode: a CheckIcon (confirm) and CloseIcon (cancel) appear in the input, and 7 theme color chips for color selection appear below. The new tag is immediately marked as selected internally. Confirmation is possible by clicking the CheckIcon **or pressing Enter**. `onTagCreate` informs the caller about the created tag. |
 | `chipSize` | `"small" \| "medium"` | `"small"` | Size of all chips — both in the selection area and in the dropdown list. Should match `inputSize` (`"small"` + `"small"` or `"medium"` + `"medium"`). |
-
-#### State & behavior
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
 | `disabled` | `boolean` | `false` | Disables the entire component. The autocomplete input is locked; selected chips are grayed out and cannot be deleted. Useful during form submissions or in read-only views. |
+| `inputSize` | `"small" \| "medium"` | `"medium"` | Size of the autocomplete input per MUI standard. Affects font size, padding, and input height. |
+| `listboxMaxHeight` | `number` | — | Maximum height of the autocomplete dropdown list in pixels. Once the list would be taller, a vertical scrollbar appears. Without this prop, MUI's internal default applies. |
 | `loading` | `boolean` | `false` | Shows a loading state in the autocomplete dropdown. Intended for async loading of tags from an API. The loading animation appears when the dropdown is open and the `tags` array is still empty. |
 | `maxTags` | `number` | — | Maximum number of simultaneously selectable tags. When the limit is reached, the autocomplete input is automatically disabled and a hint text appears. Removing a selected tag unlocks the field again. |
-| `allowCreate` | `boolean` | `false` | Enables free text input mode. When the user types text that does not match any existing tag (including no partial match), the input switches to create mode: a CheckIcon (confirm) and CloseIcon (cancel) appear in the input, and 7 theme color chips for color selection appear below. The new tag is immediately marked as selected internally. Confirmation is possible by clicking the CheckIcon **or pressing Enter**. `onTagCreate` informs the caller about the created tag. |
 | `maxVisibleChips` | `number` | — | Maximum number of visible chips in the selection area. Excess chips are hidden behind a `+N` chip. Clicking `+N` opens a popover with the hidden chips — they can also be deleted there. Without this prop, all chips are shown. |
 | `popoverPlacement` | `"top" \| "bottom"` | `"bottom"` | Opening direction of the overflow popover (relative to the `+N` chip). Only relevant when `maxVisibleChips` is set. |
-| `listboxMaxHeight` | `number` | — | Maximum height of the autocomplete dropdown list in pixels. Once the list would be taller, a vertical scrollbar appears. Without this prop, MUI's internal default applies. |
-
-#### Translation
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
+| `showAutoComplete` | `boolean` | `true` | Shows the search input field. When `false`, the user cannot add new tags — the chip area remains visible (display only). |
+| `showSelectedTags` | `boolean` | `true` | Shows the upper area with selected tags as chips. When `false`, the entire chip area is hidden — the autocomplete remains visible. |
+| `showSelectedTagsLabel` | `boolean` | `true` | Shows the label heading above the chip area (default: "Selected tags"). Can be hidden when the context is self-explanatory. |
+| `tags` | `TagSelectionItem[]` | — | **Required.** Complete tag array including selected, available, and disabled tags. State changes (Select, Delete, Create) are reflected back via callbacks. |
 | `translation` | `Partial<TagSelectionTranslation>` | English defaults | Texts for all displayed labels. Only specify deviating keys — unset keys fall back to the English defaults. See [Translations](#translations). |
 
 ---

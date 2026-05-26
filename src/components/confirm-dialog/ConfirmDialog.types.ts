@@ -13,14 +13,14 @@ export const DEFAULT_CONFIRM_DIALOG_TRANSLATION: ConfirmDialogTranslation = {
 };
 
 export type ConfirmDialogOptions = {
-  title?:            string;
-  description?:      string | React.ReactNode;
-  confirmLabel?:     string;
   cancelLabel?:      string;
-  severity?:         ConfirmDialogSeverity;
+  confirmLabel?:     string;
+  description?:      string | React.ReactNode;
   hideCancelButton?: boolean;
   maxWidth?:         "xs" | "sm" | "md" | "lg" | "xl";
+  severity?:         ConfirmDialogSeverity;
   showIcon?:         boolean;
+  title?:            string;
 };
 
 export type ConfirmDialogProviderProps = {

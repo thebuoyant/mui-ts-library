@@ -116,33 +116,21 @@ type TagSelectionItem = {
 
 ### Komponenten-Props: `TagSelectionProps`
 
-#### Darstellung & Sichtbarkeit
-
 | Prop | Typ | Standard | Beschreibung |
 |---|---|---|---|
-| `tags` | `TagSelectionItem[]` | — | **Pflichtfeld.** Vollständiges Tag-Array inklusive ausgewählter, verfügbarer und deaktivierter Tags. Zustandsänderungen (Select, Delete, Create) werden über Callbacks nach oben gespiegelt. |
-| `showSelectedTags` | `boolean` | `true` | Zeigt den oberen Bereich mit den ausgewählten Tags als Chips an. Wenn `false`, wird der gesamte Chip-Bereich ausgeblendet — die Autocomplete bleibt sichtbar. |
-| `showSelectedTagsLabel` | `boolean` | `true` | Zeigt das Label-Heading über dem Chip-Bereich an (Standard: „Selected tags"). Kann versteckt werden wenn der Kontext selbsterklärend ist. |
-| `showAutoComplete` | `boolean` | `true` | Zeigt das Such-Eingabefeld an. Wenn `false`, kann der Nutzer keine neuen Tags auswählen — der Chip-Bereich bleibt sichtbar (reine Anzeige). |
-| `inputSize` | `"small" \| "medium"` | `"medium"` | Größe der Autocomplete-Eingabe gemäß MUI-Standard. Beeinflusst Schriftgröße, Innenabstand und Höhe des Eingabefelds. |
+| `allowCreate` | `boolean` | `false` | Aktiviert den freien Texteingabe-Modus. Wenn der Nutzer einen Text eintippt, der keinem bestehenden Tag entspricht (auch keine Teilübereinstimmung), wechselt das Eingabefeld in den Create-Mode: Im Input erscheinen ein CheckIcon (bestätigen) und ein CloseIcon (abbrechen), darunter werden 7 Theme-Farb-Chips zur Farbauswahl angezeigt. Der neue Tag wird intern sofort als selektiert markiert. Bestätigen ist per Klick auf das CheckIcon **oder** per **Enter**-Taste möglich. `onTagCreate` informiert den Aufrufer über den erstellten Tag. |
 | `chipSize` | `"small" \| "medium"` | `"small"` | Größe aller Chips — sowohl im Auswahl-Bereich als auch in der Dropdown-Liste. Sollte zur `inputSize` passen (`"small"` + `"small"` oder `"medium"` + `"medium"`). |
-
-#### Zustand & Verhalten
-
-| Prop | Typ | Standard | Beschreibung |
-|---|---|---|---|
 | `disabled` | `boolean` | `false` | Deaktiviert die gesamte Komponente. Das Autocomplete-Eingabefeld wird gesperrt; ausgewählte Chips werden grau dargestellt und sind nicht löschbar. Nützlich während Formular-Submissions oder in reinen Lese-Ansichten. |
+| `inputSize` | `"small" \| "medium"` | `"medium"` | Größe der Autocomplete-Eingabe gemäß MUI-Standard. Beeinflusst Schriftgröße, Innenabstand und Höhe des Eingabefelds. |
+| `listboxMaxHeight` | `number` | — | Maximale Höhe der Autocomplete-Dropdown-Liste in Pixeln. Sobald die Liste höher wäre, erscheint eine vertikale Scrollbar. Ohne diesen Prop gilt MUI's interner Standard. |
 | `loading` | `boolean` | `false` | Zeigt einen Ladezustand im Autocomplete-Dropdown an. Gedacht für asynchrones Laden von Tags aus einer API. Die Ladeanimation erscheint wenn das Dropdown geöffnet ist und das `tags`-Array noch leer ist. |
 | `maxTags` | `number` | — | Maximale Anzahl gleichzeitig auswählbarer Tags. Wenn das Limit erreicht ist, wird das Autocomplete-Eingabefeld automatisch deaktiviert und ein Hinweistext erscheint. Das Entfernen eines ausgewählten Tags entsperrt das Feld wieder. |
-| `allowCreate` | `boolean` | `false` | Aktiviert den freien Texteingabe-Modus. Wenn der Nutzer einen Text eintippt, der keinem bestehenden Tag entspricht (auch keine Teilübereinstimmung), wechselt das Eingabefeld in den Create-Mode: Im Input erscheinen ein CheckIcon (bestätigen) und ein CloseIcon (abbrechen), darunter werden 7 Theme-Farb-Chips zur Farbauswahl angezeigt. Der neue Tag wird intern sofort als selektiert markiert. Bestätigen ist per Klick auf das CheckIcon **oder** per **Enter**-Taste möglich. `onTagCreate` informiert den Aufrufer über den erstellten Tag. |
 | `maxVisibleChips` | `number` | — | Maximale Anzahl sichtbarer Chips im Auswahl-Bereich. Überzählige Chips werden hinter einem `+N`-Chip verborgen. Ein Klick auf `+N` öffnet einen Popover mit den versteckten Chips — diese können dort auch gelöscht werden. Ohne diesen Prop werden alle Chips angezeigt. |
 | `popoverPlacement` | `"top" \| "bottom"` | `"bottom"` | Öffnungsrichtung des Overflow-Popovers (relativ zum `+N`-Chip). Nur relevant wenn `maxVisibleChips` gesetzt ist. |
-| `listboxMaxHeight` | `number` | — | Maximale Höhe der Autocomplete-Dropdown-Liste in Pixeln. Sobald die Liste höher wäre, erscheint eine vertikale Scrollbar. Ohne diesen Prop gilt MUI's interner Standard. |
-
-#### Übersetzung
-
-| Prop | Typ | Standard | Beschreibung |
-|---|---|---|---|
+| `showAutoComplete` | `boolean` | `true` | Zeigt das Such-Eingabefeld an. Wenn `false`, kann der Nutzer keine neuen Tags auswählen — der Chip-Bereich bleibt sichtbar (reine Anzeige). |
+| `showSelectedTags` | `boolean` | `true` | Zeigt den oberen Bereich mit den ausgewählten Tags als Chips an. Wenn `false`, wird der gesamte Chip-Bereich ausgeblendet — die Autocomplete bleibt sichtbar. |
+| `showSelectedTagsLabel` | `boolean` | `true` | Zeigt das Label-Heading über dem Chip-Bereich an (Standard: „Selected tags"). Kann versteckt werden wenn der Kontext selbsterklärend ist. |
+| `tags` | `TagSelectionItem[]` | — | **Pflichtfeld.** Vollständiges Tag-Array inklusive ausgewählter, verfügbarer und deaktivierter Tags. Zustandsänderungen (Select, Delete, Create) werden über Callbacks nach oben gespiegelt. |
 | `translation` | `Partial<TagSelectionTranslation>` | Englische Defaults | Texte für alle angezeigten Beschriftungen. Nur abweichende Keys angeben — nicht gesetzte Keys fallen auf die englischen Standardwerte zurück. Siehe [Texte & Übersetzungen](#texte--übersetzungen). |
 
 ---

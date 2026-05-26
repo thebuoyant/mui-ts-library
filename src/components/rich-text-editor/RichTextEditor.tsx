@@ -25,7 +25,6 @@ export function RichTextEditor({
   helperText,
   maxCharacters,
   name,
-  outputFormat = "html",
   placeholder,
   readonly = false,
   showCharacterCount = false,
@@ -77,12 +76,7 @@ export function RichTextEditor({
     content: value ?? "",
     editable: !disabled && !readonly,
     onUpdate({ editor: e }) {
-      if (!onChange) return;
-      const output =
-        outputFormat === "json"
-          ? JSON.stringify(e.getJSON())
-          : e.getHTML();
-      onChange(output);
+      onChange?.(e.getHTML());
     },
     onBlur() { onBlur?.(); },
     onFocus() { onFocus?.(); },
@@ -91,14 +85,10 @@ export function RichTextEditor({
   // Externen value-Prop synchronisieren ohne Cursor-Reset, wenn sich der Inhalt wirklich unterscheidet
   useEffect(() => {
     if (!editor || value === undefined) return;
-    const current =
-      outputFormat === "json"
-        ? JSON.stringify(editor.getJSON())
-        : editor.getHTML();
-    if (current !== value) {
+    if (editor.getHTML() !== value) {
       editor.commands.setContent(value, { emitUpdate: false });
     }
-  }, [editor, value, outputFormat]);
+  }, [editor, value]);
 
   // editable-Flag bei disabled/readonly-Änderungen aktualisieren
   useEffect(() => {
@@ -184,13 +174,7 @@ export function RichTextEditor({
         <input
           type="hidden"
           name={name}
-          value={
-            editor
-              ? outputFormat === "json"
-                ? JSON.stringify(editor.getJSON())
-                : editor.getHTML()
-              : ""
-          }
+          value={editor ? editor.getHTML() : ""}
         />
       )}
     </Box>
