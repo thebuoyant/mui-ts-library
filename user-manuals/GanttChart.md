@@ -13,8 +13,6 @@ The `GanttChart` is a fully interactive project planning component built on Reac
 - Milestone tracking in agile projects
 - Dashboards with a temporal overview of ongoing tasks
 
-![GanttChart – Component Preview](GanttChart.png)
-
 ---
 
 ## Prerequisites

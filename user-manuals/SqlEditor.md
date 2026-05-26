@@ -13,8 +13,6 @@ The `SqlEditor` is a full-featured SQL code editor built on [CodeMirror 6](https
 - BI dashboards with query input
 - Form fields for SQL configuration values
 
-![SqlEditor – Component Preview](SqlEditor.png)
-
 ---
 
 ## Prerequisites

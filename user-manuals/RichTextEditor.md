@@ -14,8 +14,6 @@ The `RichTextEditor` is a full-featured WYSIWYG text editor built on [TipTap v3]
 - Comment fields with formatting options
 - Form fields that need more than `<TextField multiline>`
 
-![RichTextEditor – Component Preview](RichTextEditor.png)
-
 ---
 
 ## Prerequisites

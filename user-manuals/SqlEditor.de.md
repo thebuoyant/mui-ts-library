@@ -13,8 +13,6 @@ Der `SqlEditor` ist ein vollwertiger SQL-Code-Editor auf Basis [CodeMirror 6](ht
 - BI-Dashboards mit Abfrage-Eingabe
 - Formularfelder für SQL-Konfigurationswerte
 
-![SqlEditor – Komponenten-Vorschau](SqlEditor.png)
-
 ---
 
 ## Voraussetzungen

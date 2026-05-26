@@ -13,8 +13,6 @@ The `PasswordStrengthMeter` is a password input component built on React and Mat
 - Onboarding flows with security hints
 - Admin areas with strict password policies
 
-![PasswordStrengthMeter – Component Preview](PasswordStrengthMeter.png)
-
 ---
 
 ## Prerequisites

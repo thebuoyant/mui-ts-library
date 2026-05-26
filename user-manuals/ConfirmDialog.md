@@ -12,8 +12,6 @@
 - Alerting users to important information with a single OK button
 - Collecting a binary yes/no decision before a side effect
 
-![ConfirmDialog – Component Preview](ConfirmDialog.png)
-
 ---
 
 ## Prerequisites

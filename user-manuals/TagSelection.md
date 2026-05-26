@@ -13,8 +13,6 @@ The `TagSelection` component is a flexible multi-tag selector built on React and
 - Filter selection in search masks and dashboard filters
 - Tag-based labeling in content management systems
 
-![TagSelection – Component Preview](TagSelection.png)
-
 ---
 
 ## Prerequisites

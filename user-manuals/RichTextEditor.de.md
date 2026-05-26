@@ -14,8 +14,6 @@ Der `RichTextEditor` ist ein vollständiger WYSIWYG-Texteditor auf Basis von [Ti
 - Kommentarfelder mit Formatierungsmöglichkeiten
 - Formularfelder die mehr als `<TextField multiline>` benötigen
 
-![RichTextEditor – Komponentenvorschau](RichTextEditor.png)
-
 ---
 
 ## Technische Voraussetzungen
