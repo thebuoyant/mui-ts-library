@@ -24,6 +24,8 @@ function TestWrapper({
       toolbarConfig={toolbarConfig}
       translation={translation}
       disabled={disabled}
+      isFullscreen={false}
+      onToggleFullscreen={() => {}}
     />
   );
 }
