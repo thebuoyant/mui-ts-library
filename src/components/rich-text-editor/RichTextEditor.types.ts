@@ -1,43 +1,44 @@
-export type RichTextEditorOutputFormat = "html" | "json";
-
 export type RichTextEditorToolbarConfig = {
-  showBold?:           boolean;
-  showItalic?:         boolean;
-  showUnderline?:      boolean;
-  showStrike?:         boolean;
-  showHeading1?:       boolean;
-  showHeading2?:       boolean;
-  showHeading3?:       boolean;
-  showBulletList?:     boolean;
-  showOrderedList?:    boolean;
-  showBlockquote?:     boolean;
-  showCodeBlock?:      boolean;
-  showLink?:           boolean;
-  showHorizontalRule?: boolean;
-  showTextColor?:      boolean;
-  showHighlight?:      boolean;
-  showUndoRedo?:       boolean;
-  showClearFormat?:    boolean;
+  showBold?:             boolean;
+  showItalic?:           boolean;
+  showUnderline?:        boolean;
+  showStrike?:           boolean;
+  showHeading1?:         boolean;
+  showHeading2?:         boolean;
+  showHeading3?:         boolean;
+  showBulletList?:       boolean;
+  showOrderedList?:      boolean;
+  showBlockquote?:       boolean;
+  showCodeBlock?:        boolean;
+  showLink?:             boolean;
+  showHorizontalRule?:   boolean;
+  showTextColor?:        boolean;
+  showHighlight?:        boolean;
+  showUndoRedo?:         boolean;
+  showClearFormat?:      boolean;
+  /** Fullscreen-Button in der Toolbar — standardmäßig deaktiviert (opt-in) */
+  showFullscreenButton?: boolean;
 };
 
 export const DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG: Required<RichTextEditorToolbarConfig> = {
-  showBold:           true,
-  showItalic:         true,
-  showUnderline:      true,
-  showStrike:         true,
-  showHeading1:       true,
-  showHeading2:       true,
-  showHeading3:       true,
-  showBulletList:     true,
-  showOrderedList:    true,
-  showBlockquote:     true,
-  showCodeBlock:      true,
-  showLink:           true,
-  showHorizontalRule: true,
-  showTextColor:      true,
-  showHighlight:      true,
-  showUndoRedo:       true,
-  showClearFormat:    true,
+  showBold:             true,
+  showItalic:           true,
+  showUnderline:        true,
+  showStrike:           true,
+  showHeading1:         true,
+  showHeading2:         true,
+  showHeading3:         true,
+  showBulletList:       true,
+  showOrderedList:      true,
+  showBlockquote:       true,
+  showCodeBlock:        true,
+  showLink:             true,
+  showHorizontalRule:   true,
+  showTextColor:        true,
+  showHighlight:        true,
+  showUndoRedo:         true,
+  showClearFormat:      true,
+  showFullscreenButton: false,
 };
 
 export type RichTextEditorTranslation = {
@@ -68,6 +69,12 @@ export type RichTextEditorTranslation = {
   linkDialogRemove:   string;
   characterCount:    string;
   characterCountMax: string;
+  /** Wörter-Zähler im Footer, z.B. "{count} words" */
+  wordCount:         string;
+  /** Tooltip für den Fullscreen-Button */
+  fullscreen:        string;
+  /** Tooltip für den Exit-Fullscreen-Button */
+  exitFullscreen:    string;
 };
 
 export const DEFAULT_RICH_TEXT_EDITOR_TRANSLATION: RichTextEditorTranslation = {
@@ -98,26 +105,33 @@ export const DEFAULT_RICH_TEXT_EDITOR_TRANSLATION: RichTextEditorTranslation = {
   linkDialogRemove:   "Remove link",
   characterCount:    "{count} characters",
   characterCountMax: "{count} / {max} characters",
+  wordCount:         "{count} words",
+  fullscreen:        "Full screen",
+  exitFullscreen:    "Exit full screen",
 };
 
 export type RichTextEditorProps = {
-  value?:        string;
-  onChange?:     (value: string) => void;
-  placeholder?:  string;
-  outputFormat?: RichTextEditorOutputFormat;
+  disabled?:           boolean;
+  error?:              boolean;
   /** Gesamthöhe des Editors (Toolbar + Inhalt). Zahlen → px. "auto" → füllt den umgebenden Flex-Container. */
-  height?: number | string;
-  /** Breite des Editors. Zahlen → px. "auto" oder leer → 100% des Elternelements. */
-  width?:  number | string;
-  showCharacterCount?: boolean;
+  height?:             number | string;
+  helperText?:         string;
   maxCharacters?:      number;
-  toolbarConfig?: RichTextEditorToolbarConfig;
-  disabled?: boolean;
-  readonly?: boolean;
-  name?:       string;
-  error?:      boolean;
-  helperText?: string;
-  translation?: Partial<RichTextEditorTranslation>;
-  onBlur?:  () => void;
-  onFocus?: () => void;
+  name?:               string;
+  placeholder?:        string;
+  readonly?:           boolean;
+  showCharacterCount?: boolean;
+  /** Blendet die Toolbar aus ohne den Editor in den readonly-Modus zu versetzen */
+  showToolbar?:        boolean;
+  /** Zeigt einen Wörter-Zähler im Footer an */
+  showWordCount?:      boolean;
+  toolbarConfig?:      RichTextEditorToolbarConfig;
+  translation?:        Partial<RichTextEditorTranslation>;
+  value?:              string;
+  /** Breite des Editors. Zahlen → px. "auto" oder leer → 100% des Elternelements. */
+  width?:              number | string;
+  // Callbacks
+  onBlur?:   () => void;
+  onChange?:  (value: string) => void;
+  onFocus?:  () => void;
 };

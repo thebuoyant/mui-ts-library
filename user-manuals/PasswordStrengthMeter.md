@@ -13,8 +13,6 @@ The `PasswordStrengthMeter` is a password input component built on React and Mat
 - Onboarding flows with security hints
 - Admin areas with strict password policies
 
-![PasswordStrengthMeter – Component Preview](PasswordStrengthMeter.png)
-
 ---
 
 ## Prerequisites
@@ -65,40 +63,24 @@ function App() {
 
 ## Props Reference
 
-### Core functionality
-
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `value` | `string` | — | Puts the component into **controlled mode**: the password is managed externally. Changes are passed up via `onPasswordChange`. When not set, the component manages its own internal state (uncontrolled). |
-| `passwordMinLength` | `number` | `8` | Minimum password length in characters. Controls the requirements checklist ("At least {n} characters") and directly influences the scoring algorithm. Passwords below this length always receive a `weak` score. |
-| `showPasswordAdornment` | `boolean` | `true` | Shows a toggle button on the right side of the input field, allowing the user to reveal the password in plain text. |
-| `showMeter` | `boolean` | `true` | Shows the animated strength bar below the input field. The bar changes color and width according to the calculated score. |
-| `showSummary` | `boolean` | `true` | Shows the requirements checklist below the strength bar. Each requirement is marked with a green checkmark (met) or a red warning symbol (not met). |
-| `inputSize` | `"small" \| "medium"` | `"medium"` | Size of the input field per MUI standard. Affects font size, padding, and height. |
-
----
-
-### Form integration
-
-These props make the component fully compatible with common form libraries and native HTML forms.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `name` | `string` | — | Native `name` attribute of the `<input>` element. Used for `<form>` submissions and required by `register()` in React Hook Form and Formik. |
-| `inputRef` | `React.Ref<HTMLInputElement>` | — | Ref pointing to the native `<input>` element. Used by React Hook Form via `register().ref` and by Formik via `innerRef`. Enables programmatic focus and validation triggering. |
-| `disabled` | `boolean` | `false` | Disables the input field and the visibility toggle. Strength bar and requirements list remain visible. |
-| `error` | `boolean` | `false` | Puts the input field into error state (red border). The `helperText` is also displayed in red. Typical for form validation after a submit attempt. |
-| `helperText` | `string` | — | Helper or error message text below the input field. Appears in red when `error={true}`. Can be used for external validation messages (e.g. "Passwords do not match"). |
-| `autoComplete` | `string` | — | Native `autocomplete` attribute of the `<input>` element. Recommended values: `"new-password"` for registration forms, `"current-password"` for login forms. Controls browser autofill behavior. |
-
----
-
-### Color customization
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `meterColors` | `Partial<MeterColors>` | Red → Green | Colors of the strength bar for each of the four strength levels. Only specify deviating keys — unset keys keep the default colors. |
+| `autoComplete` | `string` | — | Native `autocomplete` attribute. Recommended: `"new-password"` (registration) or `"current-password"` (login). |
 | `checkColors` | `CheckColors` | Red / Green | Colors of the checkmark and warning symbols in the requirements checklist. Both fields must be provided when the object is set. |
+| `disabled` | `boolean` | `false` | Disables the input field and the visibility toggle. Strength bar and requirements list remain visible. |
+| `error` | `boolean` | `false` | Puts the input field into error state (red border). The `helperText` is also displayed in red. |
+| `helperText` | `string` | — | Helper or error message text below the input field. Appears in red when `error={true}`. |
+| `inputRef` | `React.Ref<HTMLInputElement>` | — | Ref to the native `<input>` element. Used by React Hook Form (`register().ref`) and Formik (`innerRef`). |
+| `inputSize` | `"small" \| "medium"` | `"medium"` | Size of the input field per MUI standard. Affects font size, padding, and height. |
+| `meterColors` | `Partial<MeterColors>` | Red → Green | Colors of the strength bar for each of the four strength levels. Only specify deviating keys — unset keys keep the default colors. |
+| `name` | `string` | — | Native `name` attribute of the `<input>` element. Required by `register()` in React Hook Form and Formik. |
+| `passwordMinLength` | `number` | `8` | Minimum password length. Controls the requirements checklist ("At least {n} characters") and influences the scoring algorithm. Passwords below this length always receive a `weak` score. |
+| `showMeter` | `boolean` | `true` | Shows the animated strength bar below the input field. |
+| `showPasswordAdornment` | `boolean` | `true` | Shows a toggle button to reveal the password in plain text. |
+| `showSummary` | `boolean` | `true` | Shows the requirements checklist below the strength bar. |
+| `translation` | `Partial<PasswordStrengthMeterTranslation>` | — | Override UI labels — only specify deviating keys. |
+| `value` | `string` | — | Puts the component into **controlled mode**: the password is managed externally. Changes are passed up via `onPasswordChange`. |
+| `onPasswordChange` | `(password: string, strengthResult: StrengthResult) => void` | — | Called on every keystroke with the current password and strength result. |
 
 **`MeterColors` — Structure and defaults:**
 

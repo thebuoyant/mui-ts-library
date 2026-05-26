@@ -13,6 +13,22 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [1.4.0] — 2026-05-26
+
+### Hinzugefügt
+
+#### RichTextEditor — Phase 1: Quick Wins (MTL-16)
+
+- **`showWordCount`-Prop** — zeigt einen Wörter-Zähler im Footer neben dem bestehenden Zeichen-Zähler an; vollständig unabhängig (kann mit oder ohne `showCharacterCount` / `maxCharacters` verwendet werden); die `CharacterCount`-TipTap-Extension wird automatisch geladen wenn aktiviert
+- **`showToolbar`-Prop** (Standard: `true`) — blendet die Toolbar aus ohne den Editor in den readonly-Modus zu versetzen; der Editor bleibt vollständig editierbar (nützlich für minimale Editoren oder eigene Toolbar-Implementierungen)
+- **`showFullscreenButton` in `toolbarConfig`** (Standard: `false`, opt-in) — fügt einen Fullscreen-Umschalter am rechten Rand der Toolbar ein; Klick expandiert den Editor auf den gesamten Viewport (`100vw × 100vh`) via CSS `position: fixed`; keine neuen Dependencies
+- **3 neue Translation-Keys** in `RichTextEditorTranslation`: `wordCount` (Standard: `"{count} words"`), `fullscreen` (Standard: `"Full screen"`), `exitFullscreen` (Standard: `"Exit full screen"`)
+- Alle Props nun alphabetisch sortiert (A–Z) in Stories und User Manual dokumentiert
+- 2 neue Storybook-Stories: `WithWordCount`, `WithFullscreen`
+- 9 neue Vitest-Tests (4 für Word Count, 5 für Fullscreen)
+
+---
+
 ## [1.3.2] — 2026-05-25
 
 ### Intern — MTL-15: Code-Qualität & Refactoring

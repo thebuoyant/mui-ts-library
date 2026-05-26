@@ -67,25 +67,26 @@ export const DEFAULT_CHECK_COLORS: CheckColors = {
 };
 
 export type PasswordStrengthMeterProps = {
+  autoComplete?:          string;
+  checkColors?:           CheckColors;
+  disabled?:              boolean;
+  error?:                 boolean;
+  helperText?:            string;
+  inputRef?:              React.Ref<HTMLInputElement>;
+  inputSize?:             "small" | "medium";
+  // Nur abweichende Keys angeben — Rest fällt auf DEFAULT_METER_COLORS zurück.
+  meterColors?:           Partial<MeterColors>;
+  // Form-Integration: kompatibel mit React Hook Form register(), Formik und nativen Forms.
+  name?:                  string;
+  passwordMinLength?:     number;
+  showMeter?:             boolean;
+  showPasswordAdornment?: boolean;
+  showSummary?:           boolean;
+  // Nur abweichende Keys angeben — Rest fällt auf DEFAULT_PASSWORD_TRANSLATIONS zurück.
+  translation?:           Partial<PasswordStrengthMeterTranslation>;
   // Wenn gesetzt, wird die Komponente kontrolliert: das Passwort kommt von außen,
   // Änderungen werden über onPasswordChange nach oben gegeben.
-  value?: string;
-  // Form-Integration: kompatibel mit React Hook Form register(), Formik und nativen Forms.
-  name?: string;
-  inputRef?: React.Ref<HTMLInputElement>;
-  disabled?: boolean;
-  error?: boolean;
-  helperText?: string;
-  autoComplete?: string;
-  showPasswordAdornment?: boolean;
-  showMeter?: boolean;
-  showSummary?: boolean;
-  inputSize?: "small" | "medium";
-  // Nur abweichende Keys angeben — Rest fällt auf DEFAULT_PASSWORD_TRANSLATIONS zurück.
-  translation?: Partial<PasswordStrengthMeterTranslation>;
-  // Nur abweichende Keys angeben — Rest fällt auf DEFAULT_METER_COLORS zurück.
-  meterColors?: Partial<MeterColors>;
-  passwordMinLength?: number;
-  checkColors?: CheckColors;
+  value?:                 string;
+  // Callback
   onPasswordChange?: (password: string, strengthResult: StrengthResult) => void;
 };

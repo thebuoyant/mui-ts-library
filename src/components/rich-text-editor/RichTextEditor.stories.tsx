@@ -8,43 +8,47 @@ const meta: Meta<typeof RichTextEditor> = {
   title: "Components/RichTextEditor",
   component: RichTextEditor,
   argTypes: {
-    placeholder:        { control: "text" },
-    outputFormat:       { control: "radio", options: ["html", "json"] },
+    // A–Z: kontrollierbare Props
+    disabled:           { control: "boolean" },
+    error:              { control: "boolean" },
     // Zahlen ("300"), Pixel-Strings ("300px"), Prozent ("50vh") oder "auto" (füllt Container)
     height:             { control: "text" },
+    helperText:         { control: "text" },
+    maxCharacters:      { control: "number" },
+    name:               { control: "text" },
+    placeholder:        { control: "text" },
+    readonly:           { control: "boolean" },
+    showCharacterCount: { control: "boolean" },
+    showToolbar:        { control: "boolean" },
+    showWordCount:      { control: "boolean" },
     // Zahlen ("600"), Pixel-Strings ("600px"), Prozent ("50%") — leer = 100%
     width:              { control: "text" },
-    showCharacterCount: { control: "boolean" },
-    maxCharacters:      { control: "number" },
-    disabled:           { control: "boolean" },
-    readonly:           { control: "boolean" },
-    error:              { control: "boolean" },
-    helperText:         { control: "text" },
-    name:               { control: "text" },
-    // Kontrollierter Modus — über dedizierte Controlled-Story verwenden
-    value:       { control: false },
-    // Komplexe Objekte — stattdessen dedizierte Stories verwenden
+    // Komplexe Objekte / kontrollierter Modus — dedizierte Stories verwenden
     toolbarConfig: { control: false },
     translation:   { control: false },
-    onChange:      { control: false },
+    value:         { control: false },
     onBlur:        { control: false },
+    onChange:      { control: false },
     onFocus:       { control: false },
   },
   args: {
-    onChange:           fn(),
-    onBlur:             fn(),
-    onFocus:            fn(),
-    placeholder:        "Hier tippen …",
-    outputFormat:       "html",
-    height:             "",
-    width:              "",
-    showCharacterCount: false,
-    maxCharacters:      0,
+    // A–Z
     disabled:           false,
-    readonly:           false,
     error:              false,
+    height:             "",
     helperText:         "",
+    maxCharacters:      0,
     name:               "",
+    placeholder:        "Hier tippen …",
+    readonly:           false,
+    showCharacterCount: false,
+    showToolbar:        true,
+    showWordCount:      false,
+    width:              "",
+    // Callbacks
+    onBlur:             fn(),
+    onChange:           fn(),
+    onFocus:            fn(),
   },
 };
 
@@ -239,6 +243,23 @@ export const WithHighlight: Story = {
   },
 };
 
+export const WithWordCount: Story = {
+  args: {
+    showWordCount:      true,
+    showCharacterCount: true,
+    placeholder:        "Tippen — Wörter und Zeichen werden unten gezählt …",
+    value:              SAMPLE_HTML,
+  },
+};
+
+export const WithFullscreen: Story = {
+  args: {
+    toolbarConfig: { showFullscreenButton: true },
+    value:         SAMPLE_HTML,
+    placeholder:   "Fullscreen-Button in der Toolbar rechts oben …",
+  },
+};
+
 export const GermanTranslation: Story = {
   args: {
     placeholder: "Hier tippen …",
@@ -271,6 +292,9 @@ export const GermanTranslation: Story = {
       linkDialogRemove:   "Link entfernen",
       characterCount:    "{count} Zeichen",
       characterCountMax: "{count} / {max} Zeichen",
+      wordCount:         "{count} Wörter",
+      fullscreen:        "Vollbild",
+      exitFullscreen:    "Vollbild beenden",
     },
   },
 };

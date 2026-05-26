@@ -12,8 +12,6 @@
 - Informationshinweise mit einem einzelnen OK-Button
 - Binäre Ja/Nein-Entscheidung vor einem Seiteneffekt
 
-![ConfirmDialog – Komponentenvorschau](ConfirmDialog.png)
-
 ---
 
 ## Voraussetzungen
@@ -109,14 +107,14 @@ Alle Eigenschaften sind optional. Jeder `confirm()`-Aufruf kann eine beliebige T
 
 | Option | Typ | Standard | Beschreibung |
 |---|---|---|---|
-| `title` | `string` | — | Dialog-Überschrift |
-| `description` | `string \| ReactNode` | — | Body-Text oder beliebiges JSX |
-| `confirmLabel` | `string` | aus `translation` | Überschreibt das Provider-Label für diesen Aufruf |
 | `cancelLabel` | `string` | aus `translation` | Überschreibt das Provider-Label für diesen Aufruf |
-| `severity` | `ConfirmDialogSeverity` | `"info"` | Färbt den Bestätigen-Button und zeigt ein passendes Icon |
+| `confirmLabel` | `string` | aus `translation` | Überschreibt das Provider-Label für diesen Aufruf |
+| `description` | `string \| ReactNode` | — | Body-Text oder beliebiges JSX |
 | `hideCancelButton` | `boolean` | `false` | Blendet den Abbrechen-Button aus (Alert-/Hinweis-Modus) |
 | `maxWidth` | `"xs" \| "sm" \| "md" \| "lg" \| "xl"` | `"xs"` | MUI-Dialog-Maximalbreite |
+| `severity` | `ConfirmDialogSeverity` | `"info"` | Färbt den Bestätigen-Button und zeigt ein passendes Icon |
 | `showIcon` | `boolean` | `true` | Severity-Icon im Titel ein-/ausblenden |
+| `title` | `string` | — | Dialog-Überschrift |
 
 ---
 

@@ -13,8 +13,6 @@ Der `GanttChart` ist eine vollständig interaktive Projektplanungs-Komponente au
 - Visualisierung von Meilensteinen in agilen Projekten
 - Dashboards mit zeitlicher Übersicht über laufende Aufgaben
 
-![GanttChart – Komponentenvorschau](GanttChart.png)
-
 ---
 
 ## Technische Voraussetzungen
@@ -134,65 +132,33 @@ type GanttTask = {
 
 ### Komponenten-Props: `GanttChartProps`
 
-#### Kerndaten
-
 | Prop | Typ | Standard | Beschreibung |
 |---|---|---|---|
+| `cascadeDependencies` | `boolean` | `false` | Wenn `true`, werden beim Verschieben oder Resizen eines Tasks alle Finish-to-Start-Nachfolger (via `dependencies`) automatisch um den gleichen Zeitraum verschoben. Funktioniert transitiv über mehrere Ebenen. |
+| `defaultRangeEnd` | `Date` | auto | Überschreibt den automatisch berechneten rechten Rand der Zeitleiste. |
+| `defaultRangeStart` | `Date` | auto | Überschreibt den automatisch berechneten linken Rand der Zeitleiste. Nützlich um einen bestimmten Datumsbereich von Anfang an zu fixieren. |
+| `draggable` | `boolean` | `false` | Erlaubt das horizontale Verschieben von Task-Balken per Drag. Ändert `startDate` und `endDate` synchron. |
+| `enableBuiltinDialogs` | `boolean` | `true` | Wenn `true`, öffnen die Aktions-Icons (Hinzufügen, Bearbeiten, Löschen) eingebaute MUI-Dialoge. Wenn `false`, werden stattdessen nur die Callbacks `onAddTask`, `onEditTask`, `onDeleteTask` aufgerufen — für eigene Dialog-Implementierungen. |
+| `ganttTheme` | `GanttTheme` | — | Gebündeltes Theming-Objekt. Empfohlener Weg zur visuellen Anpassung. Einzelne Keys überschreiben die Defaults — nicht gesetzte Keys behalten ihr Standard-Aussehen. Siehe [GanttTheme](#ganttTheme). |
+| `height` | `number \| string` | `400` | Höhe des Gesamtcharts in Pixeln oder als CSS-Wert. `"auto"` passt sich dem Elternelement an. |
+| `initialExpandAll` | `boolean` | `false` | Startet den Chart mit allen Hierarchieebenen aufgeklappt. Standard: nur Root-Tasks sind aufgeklappt, ihre direkten Kinder sind sichtbar. |
+| `inlineEdit` | `boolean` | `false` | Aktiviert Inline-Editierung des Task-Namens per Doppelklick direkt im Panel. |
+| `maxPanelWidth` | `number` | `600` | Maximalbreite des linken Aufgaben-Panels in Pixeln. |
+| `minPanelWidth` | `number` | `200` | Mindestbreite des linken Aufgaben-Panels in Pixeln. Verhindert, dass der Nutzer das Panel zu schmal zieht. |
+| `progressDraggable` | `boolean` | `false` | Zeigt einen Fortschritts-Handle am Task-Balken an. Der Nutzer kann den Fortschritt (0–100 %) per Drag direkt im Diagramm setzen. |
+| `resizable` | `boolean` | `false` | Erlaubt das Verändern des `endDate` durch Ziehen am rechten Balkenrand. |
+| `showCriticalPath` | `boolean` | `false` | Hebt den kritischen Pfad farbig hervor — die längste Abhängigkeitskette, die die Projektlaufzeit bestimmt. |
+| `showToolbar` | `boolean` | `true` | Blendet die gesamte Toolbar (Skalenbuttons, Datumsbereich, Aktionsbuttons) ein oder aus. |
+| `statusColors` | `GanttStatusColors` | — | ⚠️ **Veraltet.** Bitte `ganttTheme.statusColors` verwenden. Überschreibt Balkenfarben je Status. |
 | `tasks` | `GanttTask[]` | — | **Pflichtfeld.** Flaches Array aller Tasks. Hierarchie wird intern über `parentId` aufgebaut. Änderungen werden über die `onTasksChange`-Callback nach oben gespiegelt. |
 | `timeScale` | `GanttTimeScale` | `"months"` | Initialer Zeitskalentyp: `"days"` · `"weeks"` · `"months"` · `"quarters"`. Der Nutzer kann die Skala über die Toolbar jederzeit wechseln. |
-
-#### Darstellung & Dimensionierung
-
-| Prop | Typ | Standard | Beschreibung |
-|---|---|---|---|
-| `height` | `number \| string` | `400` | Höhe des Gesamtcharts in Pixeln oder als CSS-Wert. `"auto"` passt sich dem Elternelement an. |
-| `width` | `number \| string` | `"100%"` | Breite des Gesamtcharts. Standard füllt den verfügbaren Platz. |
-| `minPanelWidth` | `number` | `200` | Mindestbreite des linken Aufgaben-Panels in Pixeln. Verhindert, dass der Nutzer das Panel zu schmal zieht. |
-| `maxPanelWidth` | `number` | `600` | Maximalbreite des linken Aufgaben-Panels in Pixeln. |
-| `virtualizeRows` | `boolean` | `false` | Wenn `true`, werden nur die aktuell sichtbaren Zeilen gerendert (virtuelle Liste). Empfohlen ab ca. 200 Tasks, da es die DOM-Größe drastisch reduziert. |
-
-#### Aufklappverhalten
-
-| Prop | Typ | Standard | Beschreibung |
-|---|---|---|---|
-| `initialExpandAll` | `boolean` | `false` | Startet den Chart mit allen Hierarchieebenen aufgeklappt. Standard: nur Root-Tasks sind aufgeklappt, ihre direkten Kinder sind sichtbar. |
-
-#### Zeitleiste & Bereich
-
-| Prop | Typ | Standard | Beschreibung |
-|---|---|---|---|
-| `defaultRangeStart` | `Date` | auto | Überschreibt den automatisch berechneten linken Rand der Zeitleiste. Nützlich um einen bestimmten Datumsbereich von Anfang an zu fixieren. |
-| `defaultRangeEnd` | `Date` | auto | Überschreibt den automatisch berechneten rechten Rand der Zeitleiste. |
-
-> **Hinweis:** Werden `defaultRangeStart`/`defaultRangeEnd` nicht gesetzt, berechnet der Chart den Bereich automatisch aus den frühesten und spätesten Task-Daten und fügt einen 1-Monat-Puffer an beiden Enden hinzu.
-
-#### Toolbar
-
-| Prop | Typ | Standard | Beschreibung |
-|---|---|---|---|
-| `showToolbar` | `boolean` | `true` | Blendet die gesamte Toolbar (Skalenbuttons, Datumsbereich, Aktionsbuttons) ein oder aus. |
 | `toolbarConfig` | `GanttToolbarConfig` | alle `true` | Feingranulare Steuerung einzelner Toolbar-Elemente. Nur abweichende Keys angeben — nicht gesetzte Keys bleiben sichtbar. Siehe [GanttToolbarConfig](#ganttToolbarConfig). |
-
-#### Interaktionsmodi
-
-| Prop | Typ | Standard | Beschreibung |
-|---|---|---|---|
-| `enableBuiltinDialogs` | `boolean` | `true` | Wenn `true`, öffnen die Aktions-Icons (Hinzufügen, Bearbeiten, Löschen) eingebaute MUI-Dialoge. Wenn `false`, werden stattdessen nur die Callbacks `onAddTask`, `onEditTask`, `onDeleteTask` aufgerufen — für eigene Dialog-Implementierungen. |
-| `zoomable` | `boolean` | `false` | Ermöglicht Zoom per `Strg + Mausrad`. Ändert die Zeitskala zyklisch (Tage ↔ Wochen ↔ Monate ↔ Quartale). |
-| `draggable` | `boolean` | `false` | Erlaubt das horizontale Verschieben von Task-Balken per Drag. Ändert `startDate` und `endDate` synchron. |
-| `resizable` | `boolean` | `false` | Erlaubt das Verändern des `endDate` durch Ziehen am rechten Balkenrand. |
-| `cascadeDependencies` | `boolean` | `false` | Wenn `true`, werden beim Verschieben oder Resizen eines Tasks alle Finish-to-Start-Nachfolger (via `dependencies`) automatisch um den gleichen Zeitraum verschoben. Funktioniert transitiv über mehrere Ebenen. |
-| `inlineEdit` | `boolean` | `false` | Aktiviert Inline-Editierung des Task-Namens per Doppelklick direkt im Panel. |
-| `progressDraggable` | `boolean` | `false` | Zeigt einen Fortschritts-Handle am Task-Balken an. Der Nutzer kann den Fortschritt (0–100 %) per Drag direkt im Diagramm setzen. |
-| `showCriticalPath` | `boolean` | `false` | Hebt den kritischen Pfad farbig hervor — die längste Abhängigkeitskette, die die Projektlaufzeit bestimmt. |
-
-#### Theming & Farben
-
-| Prop | Typ | Standard | Beschreibung |
-|---|---|---|---|
-| `ganttTheme` | `GanttTheme` | — | Gebündeltes Theming-Objekt. Empfohlener Weg zur visuellen Anpassung. Einzelne Keys überschreiben die Defaults — nicht gesetzte Keys behalten ihr Standard-Aussehen. Siehe [GanttTheme](#ganttTheme). |
-| `statusColors` | `GanttStatusColors` | — | ⚠️ **Veraltet.** Bitte `ganttTheme.statusColors` verwenden. Überschreibt Balkenfarben je Status. |
 | `translations` | `Partial<GanttTranslations>` | Deutsch/Englisch | Texte für alle UI-Elemente. Nur abweichende Keys angeben. Siehe [Texte & Übersetzungen](#texte--übersetzungen). |
+| `virtualizeRows` | `boolean` | `false` | Wenn `true`, werden nur die aktuell sichtbaren Zeilen gerendert (virtuelle Liste). Empfohlen ab ca. 200 Tasks, da es die DOM-Größe drastisch reduziert. |
+| `width` | `number \| string` | `"100%"` | Breite des Gesamtcharts. Standard füllt den verfügbaren Platz. |
+| `zoomable` | `boolean` | `false` | Ermöglicht Zoom per `Strg + Mausrad`. Ändert die Zeitskala zyklisch (Tage ↔ Wochen ↔ Monate ↔ Quartale). |
+
+> **Hinweis zu `defaultRangeStart`/`defaultRangeEnd`:** Werden diese nicht gesetzt, berechnet der Chart den Bereich automatisch aus den frühesten und spätesten Task-Daten und fügt einen 1-Monat-Puffer an beiden Enden hinzu.
 
 ---
 

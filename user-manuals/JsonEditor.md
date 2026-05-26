@@ -14,8 +14,6 @@
 - Request body editors in REST API explorers
 - Debug views that allow in-place JSON editing
 
-![JsonEditor – Component Preview](JsonEditor.png)
-
 ---
 
 ## Prerequisites
@@ -69,26 +67,26 @@ function App() {
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `value` | `string` | — | Controlled value — the JSON string displayed in the editor |
-| `onChange` | `(json: string) => void` | — | Called on every content change |
-| `onValidChange` | `(isValid: boolean) => void` | — | Called whenever JSON validity changes |
-| `placeholder` | `string` | — | Placeholder text shown when the editor is empty |
-| `height` | `number \| string` | `300` | Total height (toolbar + content). Numbers → px. `"auto"` → fills surrounding flex container. |
-| `width` | `number \| string` | `"100%"` | Width. Numbers → px. Empty or unset → 100% of parent. |
 | `disabled` | `boolean` | `false` | Disables editor and toolbar completely |
-| `readonly` | `boolean` | `false` | Read-only mode — no toolbar |
 | `error` | `boolean` | `false` | Red border in error state |
+| `height` | `number \| string` | `300` | Total height (toolbar + content). Numbers → px. `"auto"` → fills surrounding flex container. |
 | `helperText` | `string` | — | Helper text below the editor (like MUI TextField) |
-| `name` | `string` | — | Name for native form submission via hidden `<input type="hidden">` |
+| `highlightColors` | `JsonEditorHighlightColors` | — | Override syntax highlight colors |
 | `indent` | `number` | `2` | Number of spaces used by the Format button |
-| `showLineNumbers` | `boolean` | `true` | Show line number gutter |
+| `name` | `string` | — | Name for native form submission via hidden `<input type="hidden">` |
+| `placeholder` | `string` | — | Placeholder text shown when the editor is empty |
+| `readonly` | `boolean` | `false` | Read-only mode — no toolbar |
 | `showLineColumn` | `boolean` | `true` | Show cursor position in footer (Ln / Col) |
+| `showLineNumbers` | `boolean` | `true` | Show line number gutter |
 | `showValidation` | `boolean` | `false` | Show "Valid JSON" / "Invalid JSON" indicator in footer |
 | `toolbarConfig` | `JsonEditorToolbarConfig` | all `true` | Show/hide individual toolbar buttons |
 | `translation` | `Partial<JsonEditorTranslation>` | — | Override toolbar tooltips and footer labels |
-| `highlightColors` | `JsonEditorHighlightColors` | — | Override syntax highlight colors |
+| `value` | `string` | — | Controlled value — the JSON string displayed in the editor |
+| `width` | `number \| string` | `"100%"` | Width. Numbers → px. Empty or unset → 100% of parent. |
 | `onBlur` | `() => void` | — | Called when the editor loses focus |
+| `onChange` | `(json: string) => void` | — | Called on every content change |
 | `onFocus` | `() => void` | — | Called when the editor gains focus |
+| `onValidChange` | `(isValid: boolean) => void` | — | Called whenever JSON validity changes |
 
 ---
 

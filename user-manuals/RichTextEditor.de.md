@@ -14,8 +14,6 @@ Der `RichTextEditor` ist ein vollständiger WYSIWYG-Texteditor auf Basis von [Ti
 - Kommentarfelder mit Formatierungsmöglichkeiten
 - Formularfelder die mehr als `<TextField multiline>` benötigen
 
-![RichTextEditor – Komponentenvorschau](RichTextEditor.png)
-
 ---
 
 ## Technische Voraussetzungen
@@ -46,7 +44,6 @@ import {
 } from '@thebuoyant-tsdev/mui-ts-library';
 import type {
   RichTextEditorProps,
-  RichTextEditorOutputFormat,
   RichTextEditorToolbarConfig,
   RichTextEditorTranslation,
 } from '@thebuoyant-tsdev/mui-ts-library';
@@ -75,59 +72,56 @@ function App() {
 
 | Prop | Typ | Standard | Beschreibung |
 |---|---|---|---|
-| `value` | `string` | — | Initialwert als HTML- oder JSON-String; ermöglicht kontrollierten Modus |
-| `onChange` | `(value: string) => void` | — | Wird bei jeder Inhaltsänderung aufgerufen |
-| `placeholder` | `string` | — | Platzhaltertext wenn der Editor leer ist |
-| `outputFormat` | `RichTextEditorOutputFormat` | `"html"` | Ausgabeformat für `onChange` — `"html"` oder `"json"` |
-| `height` | `number \| string` | `200` | Gesamthöhe des Editors (Toolbar + Inhalt). Zahlen → px. `"auto"` → füllt den umgebenden Flex-Container. Überschüssiger Inhalt scrollt vertikal. |
-| `width` | `number \| string` | `"100%"` | Breite des Editors. Zahlen → px. Leer oder nicht gesetzt → 100% des Elternelements. |
-| `showCharacterCount` | `boolean` | `false` | Zeigt Zeichenzähler unten rechts |
-| `maxCharacters` | `number` | — | Maximale Zeichenanzahl — Eingabe wird bei Erreichen blockiert |
-| `toolbarConfig` | `RichTextEditorToolbarConfig` | alle `true` | Einzelne Toolbar-Buttons ein-/ausblenden |
 | `disabled` | `boolean` | `false` | Deaktiviert Editor und Toolbar vollständig |
-| `readonly` | `boolean` | `false` | Schreibgeschützter Modus — keine Toolbar |
-| `name` | `string` | — | Name für natives Form-Submit (verstecktes `<input type="hidden">`) |
 | `error` | `boolean` | `false` | Roter Rahmen im Fehlerzustand |
+| `height` | `number \| string` | `200` | Gesamthöhe des Editors (Toolbar + Inhalt). Zahlen → px. `"auto"` → füllt den umgebenden Flex-Container. Überschüssiger Inhalt scrollt vertikal. |
 | `helperText` | `string` | — | Hilfetext unter dem Editor (wie MUI TextField) |
-| `translation` | `Partial<RichTextEditorTranslation>` | — | Abweichende Texte für Tooltips, Dialog und Zeichenzähler |
+| `maxCharacters` | `number` | — | Maximale Zeichenanzahl — Eingabe wird bei Erreichen blockiert |
+| `name` | `string` | — | Name für natives Form-Submit (verstecktes `<input type="hidden">`) |
+| `placeholder` | `string` | — | Platzhaltertext wenn der Editor leer ist |
+| `readonly` | `boolean` | `false` | Schreibgeschützter Modus — keine Toolbar, Inhalt nicht editierbar |
+| `showCharacterCount` | `boolean` | `false` | Zeigt Zeichenzähler unten rechts |
+| `showToolbar` | `boolean` | `true` | Blendet die Toolbar aus ohne den Editor in den readonly-Modus zu versetzen (im Gegensatz zu `readonly`) |
+| `showWordCount` | `boolean` | `false` | Zeigt einen Wörter-Zähler unten rechts (neben dem Zeichen-Zähler wenn beide aktiv sind) |
+| `toolbarConfig` | `RichTextEditorToolbarConfig` | siehe unten | Einzelne Toolbar-Buttons ein-/ausblenden |
+| `translation` | `Partial<RichTextEditorTranslation>` | — | Abweichende Texte für Tooltips, Dialog und Zähler-Labels |
+| `value` | `string` | — | Initialer HTML-String; ermöglicht kontrollierten Modus |
+| `width` | `number \| string` | `"100%"` | Breite des Editors. Zahlen → px. Leer oder nicht gesetzt → 100% des Elternelements. |
 | `onBlur` | `() => void` | — | Wird aufgerufen wenn der Editor den Fokus verliert |
+| `onChange` | `(value: string) => void` | — | Wird bei jeder Inhaltsänderung aufgerufen |
 | `onFocus` | `() => void` | — | Wird aufgerufen wenn der Editor den Fokus erhält |
 
 ---
 
 ## TypeScript-Typen
 
-### `RichTextEditorOutputFormat`
-
-```ts
-type RichTextEditorOutputFormat = "html" | "json";
-```
-
 ### `RichTextEditorToolbarConfig`
 
 ```ts
 type RichTextEditorToolbarConfig = {
-  showBold?:           boolean;
-  showItalic?:         boolean;
-  showUnderline?:      boolean;
-  showStrike?:         boolean;
-  showHeading1?:       boolean;
-  showHeading2?:       boolean;
-  showHeading3?:       boolean;
-  showBulletList?:     boolean;
-  showOrderedList?:    boolean;
-  showBlockquote?:     boolean;
-  showCodeBlock?:      boolean;
-  showLink?:           boolean;
-  showHorizontalRule?: boolean;
-  showTextColor?:      boolean;
-  showHighlight?:      boolean;
-  showUndoRedo?:       boolean;
-  showClearFormat?:    boolean;
+  showBold?:             boolean;
+  showItalic?:           boolean;
+  showUnderline?:        boolean;
+  showStrike?:           boolean;
+  showHeading1?:         boolean;
+  showHeading2?:         boolean;
+  showHeading3?:         boolean;
+  showBulletList?:       boolean;
+  showOrderedList?:      boolean;
+  showBlockquote?:       boolean;
+  showCodeBlock?:        boolean;
+  showLink?:             boolean;
+  showHorizontalRule?:   boolean;
+  showTextColor?:        boolean;
+  showHighlight?:        boolean;
+  showUndoRedo?:         boolean;
+  showClearFormat?:      boolean;
+  /** Fullscreen-Button rechts in der Toolbar — opt-in, Standard false */
+  showFullscreenButton?: boolean;
 };
 ```
 
-Standard-Konfiguration (alle `true`):
+Standard: alle Formatierungs-Buttons `true`, `showFullscreenButton: false`.
 
 ```tsx
 import { DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG } from '@thebuoyant-tsdev/mui-ts-library';
@@ -167,6 +161,11 @@ type RichTextEditorTranslation = {
   // Zeichenzähler ({count} und {max} werden zur Laufzeit ersetzt)
   characterCount:    string;
   characterCountMax: string;
+  // Wörter-Zähler ({count} wird zur Laufzeit ersetzt)
+  wordCount:         string;
+  // Fullscreen-Button-Tooltips
+  fullscreen:        string;
+  exitFullscreen:    string;
 };
 ```
 
@@ -180,21 +179,11 @@ import { DEFAULT_RICH_TEXT_EDITOR_TRANSLATION } from '@thebuoyant-tsdev/mui-ts-l
 
 ## Ausgabeformat
 
-### HTML (Standard)
-
-`onChange` liefert einen HTML-String, z. B.:
+`onChange` liefert immer einen HTML-String, z. B.:
 
 ```html
 <h2>Titel</h2><p>Text mit <strong>Fett</strong> und <em>Kursiv</em>.</p>
 ```
-
-### JSON
-
-```tsx
-<RichTextEditor outputFormat="json" onChange={(json) => JSON.parse(json)} />
-```
-
-Der JSON-String entspricht dem TipTap/ProseMirror-Dokumentformat (kann direkt zurück an `value` übergeben werden).
 
 ---
 
@@ -271,6 +260,58 @@ import { DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG } from '@thebuoyant-tsdev/mui-t
 ```
 
 Der Zähler färbt sich rot wenn das Limit erreicht ist.
+
+---
+
+## Wörter-Zähler
+
+```tsx
+{/* Nur Wörter-Zähler */}
+<RichTextEditor showWordCount />
+
+{/* Wörter-Zähler + Zeichen-Zähler kombiniert */}
+<RichTextEditor showWordCount showCharacterCount />
+```
+
+Der Wörter-Zähler erscheint unten rechts am Editor. Wenn beide Zähler aktiv sind, steht der Wörter-Zähler links vom Zeichen-Zähler.
+
+Das Label verwendet den Translation-Key `wordCount` (Standard: `"{count} words"`):
+
+```tsx
+<RichTextEditor
+  showWordCount
+  translation={{ wordCount: "{count} Wörter" }}
+/>
+```
+
+---
+
+## Vollbild-Modus
+
+```tsx
+<RichTextEditor
+  toolbarConfig={{ showFullscreenButton: true }}
+/>
+```
+
+Der Fullscreen-Button erscheint am rechten Rand der Toolbar (getrennt von den Formatierungs-Buttons). Ein Klick expandiert den Editor auf den gesamten Viewport (`100vw × 100vh`). Ein zweiter Klick stellt die ursprüngliche Größe wieder her.
+
+- Verwendet CSS `position: fixed` — keine neuen Dependencies
+- `zIndex: 1300` (über MUI-Dialogen)
+- Der Button-Tooltip wechselt zwischen den Translation-Keys `fullscreen` und `exitFullscreen`
+- Alle Toolbar-Funktionen, Wörter-Zähler und Zeichen-Zähler bleiben im Vollbild aktiv
+
+Tooltip-Labels anpassen:
+
+```tsx
+<RichTextEditor
+  toolbarConfig={{ showFullscreenButton: true }}
+  translation={{
+    fullscreen:     "Vollbild",
+    exitFullscreen: "Vollbild beenden",
+  }}
+/>
+```
 
 ---
 
@@ -413,6 +454,9 @@ const DE_TRANSLATION = {
   linkDialogRemove:   "Link entfernen",
   characterCount:    "{count} Zeichen",
   characterCountMax: "{count} / {max} Zeichen",
+  wordCount:         "{count} Wörter",
+  fullscreen:        "Vollbild",
+  exitFullscreen:    "Vollbild beenden",
 };
 
 <RichTextEditor translation={DE_TRANSLATION} />

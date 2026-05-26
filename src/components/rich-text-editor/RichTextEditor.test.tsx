@@ -139,4 +139,77 @@ describe("RichTextEditor", () => {
     expect(screen.queryByRole("button", { name: "Italic" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Underline" })).not.toBeInTheDocument();
   });
+
+  // ── Word Count ──────────────────────────────────────────────────────────────
+
+  it("Should show word count when showWordCount is true", () => {
+    render(<RichTextEditor showWordCount />);
+    expect(screen.getByText(/words/i)).toBeInTheDocument();
+  });
+
+  it("Should show word count and character count simultaneously", () => {
+    render(<RichTextEditor showWordCount showCharacterCount />);
+    expect(screen.getByText(/words/i)).toBeInTheDocument();
+    expect(screen.getByText(/characters/i)).toBeInTheDocument();
+  });
+
+  it("Should not show word count when showWordCount is false (default)", () => {
+    render(<RichTextEditor />);
+    expect(screen.queryByText(/words/i)).not.toBeInTheDocument();
+  });
+
+  it("Should use translated word count label", () => {
+    render(
+      <RichTextEditor
+        showWordCount
+        translation={{ wordCount: "{count} Wörter" }}
+      />,
+    );
+    expect(screen.getByText(/wörter/i)).toBeInTheDocument();
+  });
+
+  // ── Fullscreen ───────────────────────────────────────────────────────────────
+
+  it("Should show fullscreen button when showFullscreenButton is true", () => {
+    render(<RichTextEditor toolbarConfig={{ showFullscreenButton: true }} />);
+    expect(screen.getByRole("button", { name: "Full screen" })).toBeInTheDocument();
+  });
+
+  it("Should not show fullscreen button by default", () => {
+    render(<RichTextEditor />);
+    expect(screen.queryByRole("button", { name: "Full screen" })).not.toBeInTheDocument();
+  });
+
+  it("Should toggle to exit fullscreen button after click", async () => {
+    render(<RichTextEditor toolbarConfig={{ showFullscreenButton: true }} />);
+    const btn = screen.getByRole("button", { name: "Full screen" });
+    await act(async () => { fireEvent.click(btn); });
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Exit full screen" })).toBeInTheDocument();
+    });
+  });
+
+  it("Should toggle back to fullscreen button after second click", async () => {
+    render(<RichTextEditor toolbarConfig={{ showFullscreenButton: true }} />);
+    const btn = screen.getByRole("button", { name: "Full screen" });
+    await act(async () => { fireEvent.click(btn); });
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Exit full screen" })).toBeInTheDocument(),
+    );
+    const exitBtn = screen.getByRole("button", { name: "Exit full screen" });
+    await act(async () => { fireEvent.click(exitBtn); });
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Full screen" })).toBeInTheDocument();
+    });
+  });
+
+  it("Should use translated fullscreen labels", () => {
+    render(
+      <RichTextEditor
+        toolbarConfig={{ showFullscreenButton: true }}
+        translation={{ fullscreen: "Vollbild", exitFullscreen: "Vollbild beenden" }}
+      />,
+    );
+    expect(screen.getByRole("button", { name: "Vollbild" })).toBeInTheDocument();
+  });
 });

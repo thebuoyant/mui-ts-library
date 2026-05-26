@@ -14,8 +14,6 @@ Der `JsonEditor` ist ein vollständiger JSON-Code-Editor auf Basis von [CodeMirr
 - Request-Body-Editoren in REST-API-Explorern
 - Debug-Ansichten mit direkter JSON-Bearbeitung
 
-![JsonEditor – Komponentenvorschau](JsonEditor.png)
-
 ---
 
 ## Technische Voraussetzungen
@@ -69,26 +67,26 @@ function App() {
 
 | Prop | Typ | Standard | Beschreibung |
 |---|---|---|---|
-| `value` | `string` | — | Kontrollierter Wert — der im Editor angezeigte JSON-String |
-| `onChange` | `(json: string) => void` | — | Wird bei jeder Inhaltsänderung aufgerufen |
-| `onValidChange` | `(isValid: boolean) => void` | — | Wird aufgerufen, wenn sich die JSON-Gültigkeit ändert |
-| `placeholder` | `string` | — | Platzhaltertext wenn der Editor leer ist |
-| `height` | `number \| string` | `300` | Gesamthöhe (Toolbar + Inhalt). Zahlen → px. `"auto"` → füllt den umgebenden Flex-Container. |
-| `width` | `number \| string` | `"100%"` | Breite. Zahlen → px. Leer oder nicht gesetzt → 100% des Elternelements. |
 | `disabled` | `boolean` | `false` | Deaktiviert Editor und Toolbar vollständig |
-| `readonly` | `boolean` | `false` | Schreibgeschützter Modus — keine Toolbar |
 | `error` | `boolean` | `false` | Roter Rahmen im Fehlerzustand |
+| `height` | `number \| string` | `300` | Gesamthöhe (Toolbar + Inhalt). Zahlen → px. `"auto"` → füllt den umgebenden Flex-Container. |
 | `helperText` | `string` | — | Hilfetext unter dem Editor (wie MUI TextField) |
-| `name` | `string` | — | Name für natives Form-Submit (verstecktes `<input type="hidden">`) |
+| `highlightColors` | `JsonEditorHighlightColors` | — | Syntax-Highlight-Farben überschreiben |
 | `indent` | `number` | `2` | Leerzeichen-Einzug für die Format-Schaltfläche |
-| `showLineNumbers` | `boolean` | `true` | Zeilennummern-Gutter anzeigen |
+| `name` | `string` | — | Name für natives Form-Submit (verstecktes `<input type="hidden">`) |
+| `placeholder` | `string` | — | Platzhaltertext wenn der Editor leer ist |
+| `readonly` | `boolean` | `false` | Schreibgeschützter Modus — keine Toolbar |
 | `showLineColumn` | `boolean` | `true` | Cursor-Position im Footer anzeigen (Ln / Sp.) |
+| `showLineNumbers` | `boolean` | `true` | Zeilennummern-Gutter anzeigen |
 | `showValidation` | `boolean` | `false` | „Gültiges JSON" / „Ungültiges JSON"-Anzeige im Footer |
 | `toolbarConfig` | `JsonEditorToolbarConfig` | alle `true` | Einzelne Toolbar-Buttons ein-/ausblenden |
 | `translation` | `Partial<JsonEditorTranslation>` | — | Abweichende Texte für Tooltips und Footer |
-| `highlightColors` | `JsonEditorHighlightColors` | — | Syntax-Highlight-Farben überschreiben |
+| `value` | `string` | — | Kontrollierter Wert — der im Editor angezeigte JSON-String |
+| `width` | `number \| string` | `"100%"` | Breite. Zahlen → px. Leer oder nicht gesetzt → 100% des Elternelements. |
 | `onBlur` | `() => void` | — | Wird aufgerufen wenn der Editor den Fokus verliert |
+| `onChange` | `(json: string) => void` | — | Wird bei jeder Inhaltsänderung aufgerufen |
 | `onFocus` | `() => void` | — | Wird aufgerufen wenn der Editor den Fokus erhält |
+| `onValidChange` | `(isValid: boolean) => void` | — | Wird aufgerufen, wenn sich die JSON-Gültigkeit ändert |
 
 ---
 

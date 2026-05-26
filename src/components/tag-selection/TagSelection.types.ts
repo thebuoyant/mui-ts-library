@@ -44,33 +44,36 @@ export const DEFAULT_TAG_SELECTION_TRANSLATION: TagSelectionTranslation = {
 };
 
 export type TagSelectionProps = {
-  tags: TagSelectionItem[];
-  showSelectedTags?: boolean;
-  showSelectedTagsLabel?: boolean;
-  showAutoComplete?: boolean;
-  // Nur abweichende Keys angeben — Rest fällt auf DEFAULT_TAG_SELECTION_TRANSLATION zurück.
-  translation?: Partial<TagSelectionTranslation>;
-  inputSize?: "small" | "medium";
+  // Ermöglicht das Erstellen neuer Tags durch freie Texteingabe.
+  allowCreate?: boolean;
   chipSize?: "small" | "medium";
   disabled?: boolean;
+  inputSize?: "small" | "medium";
+  // Maximale Höhe der Autocomplete-Dropdown-Liste in px. Standard: MUI-Default.
+  listboxMaxHeight?: number;
   loading?: boolean;
   // Maximale Anzahl auswählbarer Tags — Autocomplete wird gesperrt wenn erreicht.
   maxTags?: number;
-  // Ermöglicht das Erstellen neuer Tags durch freie Texteingabe.
-  allowCreate?: boolean;
   // Maximale Anzahl sichtbarer Chips im Auswahl-Bereich.
   // Überzählige Chips werden hinter einem "+N"-Chip versteckt, der einen Popover öffnet.
   maxVisibleChips?: number;
   // Richtung in der der Overflow-Popover aufgeht. Standard: "bottom".
   popoverPlacement?: "top" | "bottom";
-  // Maximale Höhe der Autocomplete-Dropdown-Liste in px. Standard: MUI-Default.
-  listboxMaxHeight?: number;
-  onTagSelect?: (
+  showAutoComplete?: boolean;
+  showSelectedTags?: boolean;
+  showSelectedTagsLabel?: boolean;
+  tags: TagSelectionItem[];
+  // Nur abweichende Keys angeben — Rest fällt auf DEFAULT_TAG_SELECTION_TRANSLATION zurück.
+  translation?: Partial<TagSelectionTranslation>;
+  // Callbacks
+  onSearchChange?: (searchValue: string) => void;
+  onTagCreate?: (label: string, color: TagColor) => void;
+  onTagDelete?: (
     tag: TagSelectionItem,
     selectedTags: TagSelectionItem[],
     allTags: TagSelectionItem[],
   ) => void;
-  onTagDelete?: (
+  onTagSelect?: (
     tag: TagSelectionItem,
     selectedTags: TagSelectionItem[],
     allTags: TagSelectionItem[],
@@ -79,6 +82,4 @@ export type TagSelectionProps = {
     selectedTags: TagSelectionItem[],
     allTags: TagSelectionItem[],
   ) => void;
-  onSearchChange?: (searchValue: string) => void;
-  onTagCreate?: (label: string, color: TagColor) => void;
 };

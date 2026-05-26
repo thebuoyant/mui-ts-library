@@ -12,8 +12,6 @@
 - Alerting users to important information with a single OK button
 - Collecting a binary yes/no decision before a side effect
 
-![ConfirmDialog – Component Preview](ConfirmDialog.png)
-
 ---
 
 ## Prerequisites
@@ -109,14 +107,14 @@ All properties are optional. Each call to `confirm()` can pass any subset of the
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `title` | `string` | — | Dialog heading |
-| `description` | `string \| ReactNode` | — | Body text or arbitrary JSX |
-| `confirmLabel` | `string` | from `translation` | Overrides the provider-level confirm label for this call |
 | `cancelLabel` | `string` | from `translation` | Overrides the provider-level cancel label for this call |
-| `severity` | `ConfirmDialogSeverity` | `"info"` | Colors the confirm button and shows a matching icon |
+| `confirmLabel` | `string` | from `translation` | Overrides the provider-level confirm label for this call |
+| `description` | `string \| ReactNode` | — | Body text or arbitrary JSX |
 | `hideCancelButton` | `boolean` | `false` | Hides the cancel button (alert / notice mode) |
 | `maxWidth` | `"xs" \| "sm" \| "md" \| "lg" \| "xl"` | `"xs"` | MUI Dialog max-width |
+| `severity` | `ConfirmDialogSeverity` | `"info"` | Colors the confirm button and shows a matching icon |
 | `showIcon` | `boolean` | `true` | Shows/hides the severity icon in the title |
+| `title` | `string` | — | Dialog heading |
 
 ---
 

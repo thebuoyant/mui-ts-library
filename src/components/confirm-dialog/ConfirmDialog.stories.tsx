@@ -40,7 +40,7 @@ function Demo({ options, buttonLabel = "Open Dialog", onConfirm, onCancel }: Dem
   };
 
   return (
-    <Stack spacing={2} alignItems="flex-start">
+    <Stack spacing={2} sx={{ alignItems: "flex-start" }}>
       <Button variant="outlined" onClick={handleClick}>
         {buttonLabel}
       </Button>

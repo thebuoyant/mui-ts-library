@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { type Editor } from "@tiptap/react";
 import { Box, Divider, IconButton, Tooltip } from "@mui/material";
+import FullscreenIcon from "@mui/icons-material/Fullscreen";
+import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import FormatBoldIcon from "@mui/icons-material/FormatBold";
 import FormatItalicIcon from "@mui/icons-material/FormatItalic";
 import FormatUnderlinedIcon from "@mui/icons-material/FormatUnderlined";
@@ -25,10 +27,12 @@ import { RichTextEditorColorPicker } from "./RichTextEditorColorPicker";
 import { ToolbarButton } from "../shared/ToolbarButton";
 
 type RichTextEditorToolbarProps = {
-  editor:        Editor | null;
-  toolbarConfig: Required<RichTextEditorToolbarConfig>;
-  translation:   RichTextEditorTranslation;
-  disabled?:     boolean;
+  editor:               Editor | null;
+  toolbarConfig:        Required<RichTextEditorToolbarConfig>;
+  translation:          RichTextEditorTranslation;
+  disabled?:            boolean;
+  isFullscreen:         boolean;
+  onToggleFullscreen:   () => void;
 };
 
 // Farb-Button mit farbiger Indikatorlinie unter dem Icon
@@ -82,6 +86,8 @@ export function RichTextEditorToolbar({
   toolbarConfig: tc,
   translation: t,
   disabled,
+  isFullscreen,
+  onToggleFullscreen,
 }: RichTextEditorToolbarProps) {
   const [linkDialogOpen, setLinkDialogOpen]           = useState(false);
   const [colorPickerAnchor, setColorPickerAnchor]     = useState<HTMLElement | null>(null);
@@ -329,6 +335,29 @@ export function RichTextEditorToolbar({
 
         {/* Verhindert Layout-Shift wenn activeGroupCount 0 ist */}
         {activeGroupCount === 0 && <Box sx={{ height: 32 }} />}
+
+        {/* Fullscreen-Button: ml: "auto" schiebt ihn an den rechten Rand */}
+        {tc.showFullscreenButton && (
+          <Box sx={{ ml: "auto" }}>
+            <Tooltip title={isFullscreen ? t.exitFullscreen : t.fullscreen} arrow>
+              <span>
+                <IconButton
+                  size="small"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={onToggleFullscreen}
+                  disabled={disabled || !editor}
+                  sx={{ borderRadius: 1 }}
+                  aria-label={isFullscreen ? t.exitFullscreen : t.fullscreen}
+                >
+                  {isFullscreen
+                    ? <FullscreenExitIcon fontSize="small" />
+                    : <FullscreenIcon fontSize="small" />
+                  }
+                </IconButton>
+              </span>
+            </Tooltip>
+          </Box>
+        )}
       </Box>
 
       {tc.showLink && editor && (

@@ -54,29 +54,30 @@ export type JsonEditorHighlightColors = {
 };
 
 export type JsonEditorProps = {
-  value?:           string;
-  onChange?:        (json: string) => void;
-  onValidChange?:   (isValid: boolean) => void;
-  placeholder?:     string;
+  disabled?:        boolean;
+  error?:           boolean;
   /** Total height (toolbar + content). Numbers → px. "auto" → fills surrounding flex container. */
   height?:          number | string;
-  /** Width. Numbers → px. Default → 100%. */
-  width?:           number | string;
-  disabled?:        boolean;
-  readonly?:        boolean;
-  error?:           boolean;
   helperText?:      string;
-  /** Name for native form submission via hidden input. */
-  name?:            string;
+  highlightColors?: JsonEditorHighlightColors;
   /** Indentation spaces used by the Format button. Default: 2. */
   indent?:          number;
-  showLineNumbers?: boolean;
+  /** Name for native form submission via hidden input. */
+  name?:            string;
+  placeholder?:     string;
+  readonly?:        boolean;
   showLineColumn?:  boolean;
+  showLineNumbers?: boolean;
   /** Shows a Valid / Invalid JSON indicator in the footer. */
   showValidation?:  boolean;
   toolbarConfig?:   JsonEditorToolbarConfig;
   translation?:     Partial<JsonEditorTranslation>;
-  highlightColors?: JsonEditorHighlightColors;
-  onBlur?:          () => void;
-  onFocus?:         () => void;
+  value?:           string;
+  /** Width. Numbers → px. Default → 100%. */
+  width?:           number | string;
+  // Callbacks
+  onBlur?:        () => void;
+  onChange?:      (json: string) => void;
+  onFocus?:       () => void;
+  onValidChange?: (isValid: boolean) => void;
 };

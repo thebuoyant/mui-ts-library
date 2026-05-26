@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 import { TextStyle } from "@tiptap/extension-text-style";
@@ -19,32 +19,39 @@ import { RichTextEditorFooter } from "./RichTextEditorFooter";
 import { normalizeSize } from "../shared/normalizeSize";
 
 export function RichTextEditor({
-  value,
-  onChange,
-  placeholder,
-  outputFormat = "html",
-  height,
-  width,
-  showCharacterCount = false,
-  maxCharacters,
-  toolbarConfig,
   disabled = false,
-  readonly = false,
-  name,
   error = false,
+  height,
   helperText,
+  maxCharacters,
+  name,
+  placeholder,
+  readonly = false,
+  showCharacterCount = false,
+  showToolbar = true,
+  showWordCount = false,
+  toolbarConfig,
   translation,
+  value,
+  width,
   onBlur,
+  onChange,
   onFocus,
 }: RichTextEditorProps) {
   const t = { ...DEFAULT_RICH_TEXT_EDITOR_TRANSLATION, ...translation };
   const tc = { ...DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG, ...toolbarConfig };
+
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const normH      = normalizeSize(height);
   const normW      = normalizeSize(width);
   const isAutoH    = normH === "auto";
   // undefined → 200px Standardhöhe
   const effectiveH = isAutoH ? undefined : (normH ?? 200);
+
+  // CharacterCount wird auch für showWordCount benötigt
+  const needsCharacterCount =
+    (maxCharacters !== undefined && maxCharacters > 0) || showCharacterCount || showWordCount;
 
   const editor = useEditor({
     // TipTap v3 rendert ohne dieses Flag nicht bei jedem Transaction neu → Toolbar-State wäre veraltet
@@ -60,21 +67,16 @@ export function RichTextEditor({
       // Eingefügter Markdown-Text wird automatisch in Rich-Text umgewandelt
       Markdown.configure({ transformPastedText: true, transformCopiedText: false }),
       Placeholder.configure({ placeholder: placeholder ?? "" }),
-      ...(maxCharacters !== undefined && maxCharacters > 0
-        ? [CharacterCount.configure({ limit: maxCharacters })]
-        : showCharacterCount
-          ? [CharacterCount]
-          : []),
+      ...(needsCharacterCount
+        ? maxCharacters !== undefined && maxCharacters > 0
+          ? [CharacterCount.configure({ limit: maxCharacters })]
+          : [CharacterCount]
+        : []),
     ],
     content: value ?? "",
     editable: !disabled && !readonly,
     onUpdate({ editor: e }) {
-      if (!onChange) return;
-      const output =
-        outputFormat === "json"
-          ? JSON.stringify(e.getJSON())
-          : e.getHTML();
-      onChange(output);
+      onChange?.(e.getHTML());
     },
     onBlur() { onBlur?.(); },
     onFocus() { onFocus?.(); },
@@ -83,14 +85,10 @@ export function RichTextEditor({
   // Externen value-Prop synchronisieren ohne Cursor-Reset, wenn sich der Inhalt wirklich unterscheidet
   useEffect(() => {
     if (!editor || value === undefined) return;
-    const current =
-      outputFormat === "json"
-        ? JSON.stringify(editor.getJSON())
-        : editor.getHTML();
-    if (current !== value) {
+    if (editor.getHTML() !== value) {
       editor.commands.setContent(value, { emitUpdate: false });
     }
-  }, [editor, value, outputFormat]);
+  }, [editor, value]);
 
   // editable-Flag bei disabled/readonly-Änderungen aktualisieren
   useEffect(() => {
@@ -99,16 +97,32 @@ export function RichTextEditor({
   }, [editor, disabled, readonly]);
 
   const charCount = editor?.storage.characterCount?.characters?.() ?? 0;
+  const wordCount = editor?.storage.characterCount?.words?.() ?? 0;
 
   const showFooter =
-    showCharacterCount || (maxCharacters !== undefined && maxCharacters > 0) || !!helperText;
+    showCharacterCount || (maxCharacters !== undefined && maxCharacters > 0) || showWordCount || !!helperText;
 
   return (
     <Box
-      sx={{
-        width: normW ?? "100%",
-        ...(isAutoH ? { display: "flex", flexDirection: "column", flex: 1 } : {}),
-      }}
+      sx={
+        isFullscreen
+          ? {
+              position:      "fixed",
+              top:           0,
+              left:          0,
+              width:         "100vw",
+              height:        "100vh",
+              zIndex:        1300,
+              display:       "flex",
+              flexDirection: "column",
+              bgcolor:       "background.default",
+              p:             1,
+            }
+          : {
+              width: normW ?? "100%",
+              ...(isAutoH ? { display: "flex", flexDirection: "column", flex: 1 } : {}),
+            }
+      }
     >
       <Paper
         variant="outlined"
@@ -116,7 +130,7 @@ export function RichTextEditor({
           display:       "flex",
           flexDirection: "column",
           overflow:      "hidden",
-          ...(isAutoH ? { flex: 1 } : { height: effectiveH }),
+          ...(isFullscreen ? { flex: 1 } : isAutoH ? { flex: 1 } : { height: effectiveH }),
           borderColor: error ? "error.main" : undefined,
           "&:focus-within": {
             borderColor: error ? "error.main" : "primary.main",
@@ -124,13 +138,15 @@ export function RichTextEditor({
           },
         }}
       >
-        {!readonly && (
+        {showToolbar && !readonly && (
           <>
             <RichTextEditorToolbar
               editor={editor}
               toolbarConfig={tc}
               translation={t}
               disabled={disabled}
+              isFullscreen={isFullscreen}
+              onToggleFullscreen={() => setIsFullscreen((prev) => !prev)}
             />
             <Divider />
           </>
@@ -149,6 +165,8 @@ export function RichTextEditor({
           showCharacterCount={showCharacterCount || (maxCharacters !== undefined && maxCharacters > 0)}
           charCount={charCount}
           maxCharacters={maxCharacters && maxCharacters > 0 ? maxCharacters : undefined}
+          showWordCount={showWordCount}
+          wordCount={wordCount}
           translation={t}
         />
       )}
@@ -156,13 +174,7 @@ export function RichTextEditor({
         <input
           type="hidden"
           name={name}
-          value={
-            editor
-              ? outputFormat === "json"
-                ? JSON.stringify(editor.getJSON())
-                : editor.getHTML()
-              : ""
-          }
+          value={editor ? editor.getHTML() : ""}
         />
       )}
     </Box>
