@@ -13,6 +13,7 @@ import { history, defaultKeymap, historyKeymap } from "@codemirror/commands";
 import { syntaxHighlighting, HighlightStyle } from "@codemirror/language";
 import { linter, lintGutter } from "@codemirror/lint";
 import { tags } from "@lezer/highlight";
+import { showMinimap as cmShowMinimap } from "@replit/codemirror-minimap";
 import { Box, useTheme } from "@mui/material";
 import type { JsonEditorHighlightColors } from "./JsonEditor.types";
 
@@ -23,6 +24,7 @@ type JsonEditorContentProps = {
   disabled?:        boolean;
   readonly?:        boolean;
   showLineNumbers?: boolean;
+  showMinimap?:     boolean;
   highlightColors?: JsonEditorHighlightColors;
   onViewReady:      (view: EditorView | null) => void;
   onCursorChange:   (line: number, col: number) => void;
@@ -37,6 +39,7 @@ export function JsonEditorContent({
   disabled = false,
   readonly = false,
   showLineNumbers = true,
+  showMinimap = false,
   highlightColors,
   onViewReady,
   onCursorChange,
@@ -100,7 +103,7 @@ export function JsonEditorContent({
           border:          "none",
           borderRight:     `1px solid ${muiTheme.palette.divider}`,
         },
-        ".cm-lineNumbers .cm-gutterElement": { minWidth: "36px", paddingLeft: "4px" },
+        ".cm-lineNumbers .cm-gutterElement": { paddingLeft: "4px", paddingRight: "8px" },
         ".cm-activeLineGutter": { backgroundColor: muiTheme.palette.action.selected },
         ".cm-activeLine":       { backgroundColor: muiTheme.palette.action.hover },
         "&.cm-focused .cm-selectionBackground, .cm-selectionBackground": {
@@ -123,6 +126,23 @@ export function JsonEditorContent({
       { dark: isDark },
     );
 
+    const minimapExtensions = showMinimap
+      ? [cmShowMinimap.of({
+          create: () => {
+            const dom = document.createElement("div");
+            dom.style.width           = "80px";
+            dom.style.overflow        = "hidden";
+            dom.style.borderLeft      = `1px solid ${muiTheme.palette.divider}`;
+            dom.style.backgroundColor = isDark
+              ? muiTheme.palette.grey[900]
+              : muiTheme.palette.grey[50];
+            return { dom };
+          },
+          displayText:  "blocks",
+          showOverlay:  "always" as const,
+        })]
+      : [];
+
     const extensions = [
       editorTheme,
       syntaxHighlighting(highlightStyle),
@@ -136,6 +156,7 @@ export function JsonEditorContent({
       highlightActiveLine(),
       ...(showLineNumbers ? [lineNumbers(), highlightActiveLineGutter()] : []),
       ...(placeholder ? [cmPlaceholder(placeholder)] : []),
+      ...minimapExtensions,
       EditorView.updateListener.of((update) => {
         if (update.docChanged) {
           onChangeRef.current?.(update.state.doc.toString());
@@ -164,7 +185,7 @@ export function JsonEditorContent({
       viewRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDark, propColor, strColor, numColor, boolColor, nullColor]);
+  }, [isDark, propColor, strColor, numColor, boolColor, nullColor, showMinimap]);
 
   useEffect(() => {
     const view = viewRef.current;

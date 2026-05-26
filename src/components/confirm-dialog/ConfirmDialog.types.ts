@@ -15,6 +15,8 @@ export const DEFAULT_CONFIRM_DIALOG_TRANSLATION: ConfirmDialogTranslation = {
 export type ConfirmDialogOptions = {
   cancelLabel?:      string;
   confirmLabel?:     string;
+  /** Auto-confirm after this many seconds. Shows a live countdown in the confirm button. */
+  countdown?:        number;
   description?:      string | React.ReactNode;
   hideCancelButton?: boolean;
   maxWidth?:         "xs" | "sm" | "md" | "lg" | "xl";

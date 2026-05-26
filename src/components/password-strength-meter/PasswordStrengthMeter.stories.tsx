@@ -15,6 +15,7 @@ const meta: Meta<typeof PasswordStrengthMeter> = {
     passwordMinLength:     8,
     showMeter:             true,
     showPasswordAdornment: true,
+    showSegmentedBar:      false,
     showSummary:           true,
     // Callback
     onPasswordChange: fn(),
@@ -28,16 +29,18 @@ const meta: Meta<typeof PasswordStrengthMeter> = {
     passwordMinLength:     { control: "number" },
     showMeter:             { control: "boolean" },
     showPasswordAdornment: { control: "boolean" },
+    showSegmentedBar:      { control: "boolean" },
     showSummary:           { control: "boolean" },
     // Komplexe Objekte / Form-Props — dedizierte Stories oder render verwenden
-    autoComplete:     { control: false },
-    checkColors:      { control: false },
-    inputRef:         { control: false },
-    meterColors:      { control: false },
-    name:             { control: false },
-    translation:      { control: false },
-    value:            { control: false },
-    onPasswordChange: { control: false },
+    autoComplete:         { control: false },
+    checkColors:          { control: false },
+    customRequirements:   { control: false },
+    inputRef:             { control: false },
+    meterColors:          { control: false },
+    name:                 { control: false },
+    translation:          { control: false },
+    value:                { control: false },
+    onPasswordChange:     { control: false },
   },
 };
 
@@ -193,4 +196,29 @@ function ControlledStory(args: ComponentProps<typeof PasswordStrengthMeter>) {
 // z. B. wenn die Komponente in ein bestehendes Formular eingebettet wird.
 export const Controlled: Story = {
   render: (args) => <ControlledStory {...args} />,
+};
+
+export const SegmentedBar: Story = {
+  args: {
+    showSegmentedBar: true,
+  },
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <PasswordStrengthMeter {...args} />
+    </Box>
+  ),
+};
+
+export const WithCustomRequirements: Story = {
+  args: {
+    customRequirements: [
+      { label: "No spaces allowed",      fulfilled: (pw) => !pw.includes(" ") },
+      { label: "Must start with a letter", fulfilled: (pw) => /^[a-zA-Z]/.test(pw) },
+    ],
+  },
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <PasswordStrengthMeter {...args} />
+    </Box>
+  ),
 };

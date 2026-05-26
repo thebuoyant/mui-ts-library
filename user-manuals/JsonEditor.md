@@ -78,6 +78,7 @@ function App() {
 | `readonly` | `boolean` | `false` | Read-only mode — no toolbar |
 | `showLineColumn` | `boolean` | `true` | Show cursor position in footer (Ln / Col) |
 | `showLineNumbers` | `boolean` | `true` | Show line number gutter |
+| `showMinimap` | `boolean` | `false` | Shows a scaled-down document overview (minimap) on the right side of the editor. Useful for navigating large JSON files. |
 | `showValidation` | `boolean` | `false` | Show "Valid JSON" / "Invalid JSON" indicator in footer |
 | `toolbarConfig` | `JsonEditorToolbarConfig` | all `true` | Show/hide individual toolbar buttons |
 | `translation` | `Partial<JsonEditorTranslation>` | — | Override toolbar tooltips and footer labels |

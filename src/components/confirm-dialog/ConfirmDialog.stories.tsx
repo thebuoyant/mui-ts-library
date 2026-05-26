@@ -240,6 +240,27 @@ export const GermanTranslation: Story = {
   ),
 };
 
+export const WithCountdown: Story = {
+  render: () => (
+    <Box sx={{ p: 2 }}>
+      <ConfirmDialogProvider>
+        <Demo
+          buttonLabel="Delete (auto-confirms in 5 s)"
+          options={{
+            title:        "Delete this record?",
+            description:  "This will be confirmed automatically after the countdown.",
+            confirmLabel: "Delete",
+            severity:     "error",
+            countdown:    5,
+          }}
+          onConfirm={fn()}
+          onCancel={fn()}
+        />
+      </ConfirmDialogProvider>
+    </Box>
+  ),
+};
+
 export const MultipleDialogs: Story = {
   render: () => (
     <Box sx={{ p: 2 }}>

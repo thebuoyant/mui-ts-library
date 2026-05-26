@@ -37,6 +37,7 @@ type SqlEditorContentProps = {
   stringColor?:          string;
   identifierColor?:      string;
   schema?:               SqlSchema;
+  onExecute?:            (sql: string) => void;
   onLint?:               (sql: string) => Promise<SqlLintError[]> | SqlLintError[];
   onDiagnosticsChange?:  (count: number) => void;
   onViewReady:           (view: EditorView | null) => void;
@@ -57,6 +58,7 @@ export function SqlEditorContent({
   stringColor,
   identifierColor,
   schema,
+  onExecute,
   onLint,
   onDiagnosticsChange,
   onViewReady,
@@ -71,6 +73,7 @@ export function SqlEditorContent({
   const onBlurRef             = useRef(onBlur);
   const onFocusRef            = useRef(onFocus);
   const onViewReadyRef        = useRef(onViewReady);
+  const onExecuteRef          = useRef(onExecute);
   const onLintRef             = useRef(onLint);
   const onDiagnosticsRef      = useRef(onDiagnosticsChange);
 
@@ -87,6 +90,7 @@ export function SqlEditorContent({
   useEffect(() => { onBlurRef.current        = onBlur;              }, [onBlur]);
   useEffect(() => { onFocusRef.current       = onFocus;             }, [onFocus]);
   useEffect(() => { onViewReadyRef.current   = onViewReady;         }, [onViewReady]);
+  useEffect(() => { onExecuteRef.current     = onExecute;           }, [onExecute]);
   useEffect(() => { onLintRef.current        = onLint;              }, [onLint]);
   useEffect(() => { onDiagnosticsRef.current = onDiagnosticsChange; }, [onDiagnosticsChange]);
 
@@ -128,7 +132,7 @@ export function SqlEditorContent({
           border:          "none",
           borderRight:     `1px solid ${muiTheme.palette.divider}`,
         },
-        ".cm-lineNumbers .cm-gutterElement": { minWidth: "36px", paddingLeft: "4px" },
+        ".cm-lineNumbers .cm-gutterElement": { paddingLeft: "4px", paddingRight: "8px" },
         ".cm-activeLineGutter": { backgroundColor: muiTheme.palette.action.selected },
         ".cm-activeLine":       { backgroundColor: muiTheme.palette.action.hover },
         "&.cm-focused .cm-selectionBackground, .cm-selectionBackground": {
@@ -209,12 +213,21 @@ export function SqlEditorContent({
       }
     };
 
+    const executeKeymap = keymap.of([{
+      key: "Mod-Enter",
+      run: (view) => {
+        onExecuteRef.current?.(view.state.doc.toString());
+        return true;
+      },
+    }]);
+
     const extensions = [
       editorTheme,
       syntaxHighlighting(highlightStyle),
       sql({ dialect: DIALECT_MAP[dialect], schema: cmSchema }),
       history(),
       autocompletion(),
+      executeKeymap,
       keymap.of([...defaultKeymap, ...historyKeymap, ...completionKeymap]),
       editableCompartment.current.of(EditorView.editable.of(!disabled && !readonly)),
       readOnlyCompartment.current.of(EditorState.readOnly.of(readonly)),

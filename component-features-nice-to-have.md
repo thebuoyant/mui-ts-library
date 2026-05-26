@@ -40,28 +40,28 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 
 ## SqlEditor
 
-| Feature | Beschreibung | Aufwand |
-|---|---|---|
-| Multi-Tab Queries | Mehrere SQL-Abfragen in Tabs | Hoch |
-| Ergebnis-Panel | Vorschau-Tabelle für Query-Ergebnisse direkt im Editor | Hoch |
-| Query-Verlauf | Letzte N Abfragen im Dropdown | Mittel |
-| Snippet-Bibliothek | Gespeicherte SQL-Bausteine einfügen | Mittel |
-| Hover-Doku | Spalten-/Tabellen-Kommentar als Tooltip beim Hover | Mittel |
-| Keyboard Shortcut Execute | Cmd+Enter für `onExecute` | Niedrig |
-| Zeilennummern-Gutter anpassen | Breite automatisch an max. Zeilenzahl anpassen | Niedrig |
+| Feature | Beschreibung | Aufwand | Status |
+|---|---|---|---|
+| Multi-Tab Queries | Mehrere SQL-Abfragen in Tabs | Hoch | — |
+| Ergebnis-Panel | Vorschau-Tabelle für Query-Ergebnisse direkt im Editor | Hoch | — |
+| Query-Verlauf | Letzte N Abfragen im Dropdown | Mittel | — |
+| Snippet-Bibliothek | Gespeicherte SQL-Bausteine einfügen | Mittel | — |
+| Hover-Doku | Spalten-/Tabellen-Kommentar als Tooltip beim Hover | Mittel | — |
+| ~~Keyboard Shortcut Execute~~ | ~~Cmd+Enter für `onExecute`~~ | ~~Niedrig~~ | ✅ v1.5.0 |
+| ~~Zeilennummern-Gutter anpassen~~ | ~~Breite automatisch an max. Zeilenzahl anpassen~~ | ~~Niedrig~~ | ✅ v1.5.0 |
 
 ---
 
 ## JsonEditor
 
-| Feature | Beschreibung | Aufwand |
-|---|---|---|
-| JSON Schema Validierung | Schema-Props für strukturelle Validierung | Hoch |
-| Tree View | Toggle zwischen Text- und Baumansicht | Hoch |
-| JSON Path Finder | Klick auf Wert zeigt den JSON-Path | Mittel |
-| Diff Mode | Zwei JSON-Strings vergleichen (readonly) | Hoch |
-| Folding | Collapsible Objekte und Arrays per Gutter-Klick | Mittel |
-| Minimap | Vertikale Übersicht für große JSON-Dokumente | Niedrig |
+| Feature | Beschreibung | Aufwand | Status |
+|---|---|---|---|
+| JSON Schema Validierung | Schema-Props für strukturelle Validierung | Hoch | — |
+| Tree View | Toggle zwischen Text- und Baumansicht | Hoch | — |
+| JSON Path Finder | Klick auf Wert zeigt den JSON-Path | Mittel | — |
+| Diff Mode | Zwei JSON-Strings vergleichen (readonly) | Hoch | — |
+| Folding | Collapsible Objekte und Arrays per Gutter-Klick | Mittel | — |
+| ~~Minimap~~ | ~~Vertikale Übersicht für große JSON-Dokumente~~ | ~~Niedrig~~ | ✅ v1.5.0 |
 
 ---
 
@@ -79,20 +79,20 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 
 ## PasswordStrengthMeter
 
-| Feature | Beschreibung | Aufwand |
-|---|---|---|
-| Passwort-Generator | Button generiert ein sicheres Passwort | Mittel |
-| Confirm-Feld | Zweites Eingabefeld mit Match-Validierung | Mittel |
-| Custom Requirements | Eigene Anforderungen als Array-Prop übergeben | Niedrig |
-| Animated Segments | Strength-Bar als 4 separate Segmente statt einer Bar | Niedrig |
+| Feature | Beschreibung | Aufwand | Status |
+|---|---|---|---|
+| Passwort-Generator | Button generiert ein sicheres Passwort | Mittel | — |
+| Confirm-Feld | Zweites Eingabefeld mit Match-Validierung | Mittel | — |
+| ~~Custom Requirements~~ | ~~Eigene Anforderungen als Array-Prop übergeben~~ | ~~Niedrig~~ | ✅ v1.5.0 |
+| ~~Animated Segments~~ | ~~Strength-Bar als 4 separate Segmente statt einer Bar~~ | ~~Niedrig~~ | ✅ v1.5.0 |
 
 ---
 
 ## ConfirmDialog
 
-| Feature | Beschreibung | Aufwand |
-|---|---|---|
-| Loading State | `confirm()` bleibt offen mit Spinner während async Action läuft | Mittel |
-| Countdown | Auto-Close nach n Sekunden mit Timer-Anzeige | Niedrig |
-| Keyboard Shortcut | Enter = Confirm, Escape = Cancel (bereits teilweise) | Niedrig |
-| Stacked Dialogs | Mehrere Dialoge in einer Queue statt auto-cancel | Mittel |
+| Feature | Beschreibung | Aufwand | Status |
+|---|---|---|---|
+| Loading State | `confirm()` bleibt offen mit Spinner während async Action läuft | Mittel | — |
+| ~~Countdown~~ | ~~Auto-Close nach n Sekunden mit Timer-Anzeige~~ | ~~Niedrig~~ | ✅ v1.5.0 |
+| ~~Keyboard Shortcut~~ | ~~Enter = Confirm, Escape = Cancel~~ | ~~Niedrig~~ | ✅ v1.5.0 |
+| Stacked Dialogs | Mehrere Dialoge in einer Queue statt auto-cancel | Mittel | — |

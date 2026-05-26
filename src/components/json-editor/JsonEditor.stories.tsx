@@ -19,6 +19,7 @@ const meta: Meta<typeof JsonEditor> = {
     readonly:        { control: "boolean" },
     showLineColumn:  { control: "boolean" },
     showLineNumbers: { control: "boolean" },
+    showMinimap:     { control: "boolean" },
     showValidation:  { control: "boolean" },
     width:           { control: "text" },
     // Komplexe Objekte / Callbacks — dedizierte Stories verwenden
@@ -43,6 +44,7 @@ const meta: Meta<typeof JsonEditor> = {
     readonly:        false,
     showLineColumn:  true,
     showLineNumbers: true,
+    showMinimap:     false,
     showValidation:  false,
     width:           "",
     // Callbacks
@@ -244,5 +246,13 @@ export const LargeDataset: Story = {
   args: {
     value:  LARGE_JSON,
     height: "500",
+  },
+};
+
+export const WithMinimap: Story = {
+  args: {
+    value:       LARGE_JSON,
+    height:      "500",
+    showMinimap: true,
   },
 };

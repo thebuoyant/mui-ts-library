@@ -107,6 +107,7 @@ export function SqlEditor({
           stringColor={highlightColors?.string}
           identifierColor={highlightColors?.identifier}
           schema={schema}
+          onExecute={onExecute}
           onLint={onLint}
           onDiagnosticsChange={onLint ? handleDiagnosticsChange : undefined}
           onViewReady={handleViewReady}

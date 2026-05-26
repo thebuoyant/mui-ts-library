@@ -97,7 +97,7 @@ function App() {
 | `width` | `number \| string` | `"100%"` | Breite des Editors. Zahlen → px. |
 | `onBlur` | `() => void` | — | Wird aufgerufen wenn der Editor den Fokus verliert |
 | `onChange` | `(sql: string) => void` | — | Bei jeder Inhaltsänderung aufgerufen |
-| `onExecute` | `(sql: string) => void` | — | Wird bei Klick auf Ausführen aufgerufen (benötigt `toolbarConfig.showExecute: true`) |
+| `onExecute` | `(sql: string) => void` | — | Wird bei Klick auf Ausführen aufgerufen **oder wenn `Cmd+Enter` / `Ctrl+Enter` gedrückt wird**. Der Keyboard-Shortcut funktioniert immer wenn `onExecute` gesetzt ist, unabhängig von `toolbarConfig.showExecute`. |
 | `onFocus` | `() => void` | — | Wird aufgerufen wenn der Editor den Fokus erhält |
 | `onLint` | `(sql: string) => Promise<SqlLintError[]> \| SqlLintError[]` | — | Asynchroner Lint-Callback — Fehler werden als Wellenlinien im Editor angezeigt |
 
@@ -286,7 +286,7 @@ Die Toolbar erscheint oberhalb des Editors (im Readonly-Modus ausgeblendet). Jed
 
 ---
 
-## Ausführen-Schaltfläche
+## Ausführen-Schaltfläche und Tastenkürzel
 
 ```tsx
 <SqlEditor
@@ -300,6 +300,23 @@ Die Toolbar erscheint oberhalb des Editors (im Readonly-Modus ausgeblendet). Jed
 ```
 
 Die Ausführen-Schaltfläche ist standardmäßig ausgeblendet. Sie erscheint nur wenn sowohl `toolbarConfig.showExecute: true` als auch ein `onExecute`-Handler angegeben sind.
+
+**Tastenkürzel:** Wenn `onExecute` gesetzt ist, kann die Abfrage mit `Cmd+Enter` (macOS) oder `Ctrl+Enter` (Windows/Linux) aus dem Editor heraus ausgeführt werden — unabhängig davon, ob die Toolbar-Schaltfläche sichtbar ist.
+
+```tsx
+{/* Nur Tastenkürzel — keine Ausführen-Schaltfläche in der Toolbar */}
+<SqlEditor
+  value={sql}
+  onExecute={(sql) => runQuery(sql)}
+/>
+
+{/* Toolbar-Schaltfläche und Tastenkürzel */}
+<SqlEditor
+  value={sql}
+  toolbarConfig={{ showExecute: true }}
+  onExecute={(sql) => runQuery(sql)}
+/>
+```
 
 ---
 

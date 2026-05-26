@@ -67,6 +67,7 @@ function App() {
 |---|---|---|---|
 | `autoComplete` | `string` | — | Natives `autocomplete`-Attribut. Empfohlene Werte: `"new-password"` (Registrierung) oder `"current-password"` (Login). |
 | `checkColors` | `CheckColors` | Rot / Grün | Farben der Haken- und Warnsymbole in der Anforderungscheckliste. Beide Felder müssen angegeben werden wenn das Objekt gesetzt wird. |
+| `customRequirements` | `CustomRequirement[]` | — | Zusätzliche Anforderungen, die neben den eingebauten in der Zusammenfassung angezeigt werden. Jeder Eintrag hat ein `label` und einen `fulfilled`-Wert (Boolean oder Funktion). |
 | `disabled` | `boolean` | `false` | Deaktiviert das Eingabefeld und den Sichtbarkeits-Umschalter. Stärke-Balken und Anforderungsliste bleiben sichtbar. |
 | `error` | `boolean` | `false` | Setzt das Eingabefeld in den Fehlerzustand (roter Rahmen). Der `helperText` wird ebenfalls in Rot dargestellt. |
 | `helperText` | `string` | — | Hilfs- oder Fehlermeldungstext unterhalb des Eingabefelds. Erscheint in Rot wenn `error={true}`. |
@@ -77,6 +78,7 @@ function App() {
 | `passwordMinLength` | `number` | `8` | Mindestlänge des Passworts. Steuert die Anforderungscheckliste und den Scoring-Algorithmus. Passwörter unter dieser Länge erhalten immer den Score `weak`. |
 | `showMeter` | `boolean` | `true` | Zeigt den animierten Stärke-Balken unterhalb des Eingabefelds an. |
 | `showPasswordAdornment` | `boolean` | `true` | Zeigt einen Button zum Sichtbar-Machen des Passworts im Klartext. |
+| `showSegmentedBar` | `boolean` | `false` | Zeigt den Stärke-Balken als 4 separate animierte Segmente statt als einen wachsenden Balken. |
 | `showSummary` | `boolean` | `true` | Zeigt die Anforderungscheckliste unterhalb des Stärke-Balkens an. |
 | `translation` | `Partial<PasswordStrengthMeterTranslation>` | — | UI-Texte überschreiben — nur abweichende Keys angeben. |
 | `value` | `string` | — | Setzt die Komponente in den **kontrollierten Modus**: Das Passwort wird von außen gesteuert. Änderungen werden über `onPasswordChange` nach oben gegeben. |

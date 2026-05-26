@@ -78,6 +78,7 @@ function App() {
 | `readonly` | `boolean` | `false` | Schreibgeschützter Modus — keine Toolbar |
 | `showLineColumn` | `boolean` | `true` | Cursor-Position im Footer anzeigen (Ln / Sp.) |
 | `showLineNumbers` | `boolean` | `true` | Zeilennummern-Gutter anzeigen |
+| `showMinimap` | `boolean` | `false` | Zeigt eine verkleinerte Dokumentenübersicht (Minimap) auf der rechten Seite des Editors an. Nützlich für die Navigation in großen JSON-Dateien. |
 | `showValidation` | `boolean` | `false` | „Gültiges JSON" / „Ungültiges JSON"-Anzeige im Footer |
 | `toolbarConfig` | `JsonEditorToolbarConfig` | alle `true` | Einzelne Toolbar-Buttons ein-/ausblenden |
 | `translation` | `Partial<JsonEditorTranslation>` | — | Abweichende Texte für Tooltips und Footer |
