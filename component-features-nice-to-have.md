@@ -7,18 +7,18 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 
 ## GanttChart
 
-| Feature | Beschreibung | Aufwand |
-|---|---|---|
-| Touch / Mobile Drag | Drag & Drop auf Touch-Geräten (Pointer Events API) | Hoch |
-| Export PNG/PDF | Timeline als Bild oder PDF exportieren | Hoch |
-| Keyboard Navigation | Pfeiltasten für Task-Auswahl, Enter zum Öffnen | Mittel |
-| Spalte: Assignee | Zusätzliche Spalte im Task-Panel für Verantwortliche | Mittel |
-| Resource View | Horizontale Ansicht: eine Zeile pro Person | Hoch |
-| Baseline-Vergleich | Ursprungsplanung vs. Ist-Stand visuell überlagern | Hoch |
-| Zoom per Scroll | Ctrl+Scroll ändert TimeScale (days/weeks/months) | Mittel |
-| Multi-Select | Mehrere Tasks gleichzeitig verschieben | Hoch |
-| Today-Button | Toolbar-Button scrollt automatisch zum heutigen Tag | Niedrig |
-| Mini-Map | Kleine Übersichts-Timeline zum schnellen Navigieren | Hoch |
+| Feature | Beschreibung | Aufwand | Status |
+|---|---|---|---|
+| Touch / Mobile Drag | Drag & Drop auf Touch-Geräten (Pointer Events API) | Hoch | — |
+| Export PNG/PDF | Timeline als Bild oder PDF exportieren | Hoch | — |
+| Keyboard Navigation | Pfeiltasten für Task-Auswahl, Enter zum Öffnen | Mittel | — |
+| Spalte: Assignee | Zusätzliche Spalte im Task-Panel für Verantwortliche | Mittel | — |
+| Resource View | Horizontale Ansicht: eine Zeile pro Person | Hoch | — |
+| Baseline-Vergleich | Ursprungsplanung vs. Ist-Stand visuell überlagern | Hoch | — |
+| Zoom per Scroll | Ctrl+Scroll ändert TimeScale (days/weeks/months) | Mittel | — |
+| Multi-Select | Mehrere Tasks gleichzeitig verschieben | Hoch | — |
+| ~~Today-Button~~ | ~~Toolbar-Button scrollt automatisch zum heutigen Tag~~ | ~~Niedrig~~ | ✅ bereits implementiert |
+| Mini-Map | Kleine Übersichts-Timeline zum schnellen Navigieren | Hoch | — |
 
 ---
 
@@ -67,13 +67,13 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 
 ## TagSelection
 
-| Feature | Beschreibung | Aufwand |
-|---|---|---|
-| Drag to Reorder | Selected Tags per Drag umsortieren | Mittel |
-| Tag Groups | Tags in Kategorien einteilen (Group-Header im Dropdown) | Mittel |
-| Tag Colors | `color`-Prop pro Tag für farbige Chips | Niedrig |
-| Max-Tags-Limit | Verhindert Auswahl über n Tags hinaus | Niedrig |
-| Async Search | `onSearch`-Callback mit Debounce für Server-seitige Tags | Mittel |
+| Feature | Beschreibung | Aufwand | Status |
+|---|---|---|---|
+| Drag to Reorder | Selected Tags per Drag umsortieren | Mittel | — |
+| Tag Groups | Tags in Kategorien einteilen (Group-Header im Dropdown) | Mittel | — |
+| ~~Tag Colors~~ | ~~`color`-Prop pro Tag für farbige Chips~~ | ~~Niedrig~~ | ✅ bereits implementiert |
+| ~~Max-Tags-Limit~~ | ~~Verhindert Auswahl über n Tags hinaus~~ | ~~Niedrig~~ | ✅ bereits implementiert |
+| Async Search | `onSearch`-Callback mit Debounce für Server-seitige Tags | Mittel | — |
 
 ---
 
