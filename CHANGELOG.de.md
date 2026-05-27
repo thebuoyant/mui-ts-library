@@ -13,6 +13,17 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [2.0.1] — 2026-05-27
+
+### Geändert
+
+- GitHub Pages Storybook-Deployment-Workflow entfernt (Infrastruktur zu fragil für öffentliche Repos ohne Enterprise-Plan)
+- `preview-storybook` npm-Script und `http-server` devDependency entfernt
+- `README.md` aktualisiert — toten Live-Storybook-Link entfernt
+- Storybook bleibt lokal via `npm run storybook` und als Docker-Distribution via `npm run build-storybook-docker` verfügbar
+
+---
+
 ## [2.0.0] — 2026-05-27
 
 ### Hinzugefügt
