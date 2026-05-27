@@ -98,6 +98,38 @@ npm install /path/to/thebuoyant-tsdev-mui-ts-library-1.3.0.tgz
 
 ---
 
+## Pre-Merge Checklist
+
+Before merging a feature branch into `main`, verify **every item** in this list. The goal: `main` is always release-ready — documentation complete, tests green, no dead code.
+
+### Code quality
+
+- [ ] `npx tsc --noEmit` — zero TypeScript errors
+- [ ] `npx vitest run` — all tests pass
+- [ ] No `console.log`, `TODO`, or `FIXME` left in source files
+
+### Version
+
+- [ ] `package.json` version bumped (SemVer — patch/minor/major)
+
+### Documentation — *.md files
+
+- [ ] **`CHANGELOG.md`** — new version entry with all `### Added` / `### Fixed` / `### Changed` items
+- [ ] **`CHANGELOG.de.md`** — German translation of the same entry
+- [ ] **`README.md`** — component table descriptions and Quick Start snippets reflect new features/props
+- [ ] **`README.de.md`** — German counterpart up to date
+- [ ] **`user-manuals/<Component>.md`** — all new props documented (prop table + type block + example)
+- [ ] **`user-manuals/<Component>.de.md`** — German counterpart up to date
+- [ ] **`component-features-nice-to-have.md`** — implemented features marked ✅ with version; newly discovered ideas added
+- [ ] **`DEVELOPMENT.md`** — any new npm scripts, tooling steps, or conventions documented
+
+### Stories & tests
+
+- [ ] New props covered by at least one Storybook story (`argTypes` + `args` + named story)
+- [ ] New behavior covered by at least one Vitest test
+
+---
+
 ## Publishing to npm
 
 ### Deploy Script

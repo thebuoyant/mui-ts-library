@@ -13,6 +13,38 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [1.5.0] — 2026-05-27
+
+### Hinzugefügt
+
+#### SqlEditor — Quick Wins (MTL-17)
+
+- **`Cmd+Enter` / `Ctrl+Enter`-Tastaturkürzel** — löst `onExecute` direkt aus dem Editor heraus aus ohne den Execute-Toolbar-Button zu klicken; implementiert via CodeMirror `keymap.of([{ key: "Mod-Enter" }])`; funktioniert unabhängig von der Toolbar-Sichtbarkeit
+- **Auto-Sizing-Gutter** — die Zeilennummern-Spalte passt ihre Breite nun automatisch an die Anzahl der Stellen an; bisher war eine feste `minWidth: 36px` hartkodiert, die bei kurzen Dateien unnötigen Leerraum erzeugte
+
+#### ConfirmDialog — Quick Wins (MTL-17)
+
+- **`countdown?: number`-Prop** — bestätigt den Dialog automatisch nach n Sekunden; der Bestätigen-Button zeigt einen Live-Countdown (`"Löschen (5)"`, `"Löschen (4)"`, …) und löst `onConfirm` bei 0 aus; der Countdown setzt sich zurück wenn der Dialog geschlossen wird
+- **`Enter`-Tastaturkürzel** — Enter in einem offenen Dialog löst Bestätigen aus; implementiert via `onKeyDown` am Dialog-Element; Escape bricht weiterhin ab
+
+#### PasswordStrengthMeter — Quick Wins (MTL-17)
+
+- **`showSegmentedBar?: boolean`-Prop** (Standard: `false`) — ersetzt den einzelnen animierten Stärkebalken durch 4 einzeln animierte Segmente; die Anzahl gefüllter Segmente entspricht direkt dem Stärke-Score (0–4)
+- **`customRequirements?: CustomRequirement[]`-Prop** — zusätzliche Passwort-Anforderungen über die eingebauten 5 hinaus; jeder Eintrag hat `label: string` und `fulfilled: boolean | ((password: string) => boolean)`; die Funktionsform wird bei jedem Tastenanschlag live ausgewertet
+- Neuer exportierter Typ: `CustomRequirement`
+
+#### JsonEditor — Quick Wins (MTL-17)
+
+- **`showMinimap?: boolean`-Prop** (Standard: `false`) — fügt ein 80 px breites Minimap-Panel auf der rechten Seite des Editors für schnelle Navigation in großen Dokumenten hinzu; basiert auf `@replit/codemirror-minimap` (MIT, 1 transitive Abhängigkeit)
+- Neue Abhängigkeit: `@replit/codemirror-minimap`
+
+#### GanttChart — Quick Wins (MTL-17)
+
+- **Heute-Chip** — ein kleiner beschrifteter Chip schwebt am oberen Ende der gestrichelten Heute-Linie, genau auf der Grenze zwischen Timeline-Header und Task-Zeilen; Farbe entspricht `ganttTheme.todayLineColor` (Fallback: MUI `primary.main`), Textkontrasst wird automatisch via `theme.palette.getContrastText` berechnet; ein Tooltip beim Hover zeigt das aktuelle Datum als lokalisiertes Langformat (z. B. „Mittwoch, 27. Mai 2026") gemäß `translations.dateLocale`
+- Neuer Translation-Key **`todayLabel`** in `GanttTranslations` — Standard `"Heute"`, Englisch: `"Today"`, auf `""` setzen um den Chip vollständig auszublenden
+
+---
+
 ## [1.4.0] — 2026-05-26
 
 ### Hinzugefügt
