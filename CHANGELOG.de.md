@@ -13,7 +13,7 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
-## [1.5.0] — 2026-05-27
+## [2.0.0] — 2026-05-27
 
 ### Hinzugefügt
 
