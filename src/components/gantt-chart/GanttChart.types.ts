@@ -49,6 +49,8 @@ export type GanttTranslations = {
   statusBlocked: string;
   // Timeline — Wochen-Prefix (z. B. "KW" → "W" für Englisch)
   weekColumnPrefix: string;
+  // Timeline — Heute-Chip über der gestrichelten Linie (leer = kein Chip)
+  todayLabel: string;
   // Locale für die Datums-Formatierung im Timeline-Header
   dateLocale: string;
   // Dialoge — Titel und Buttons
@@ -100,6 +102,7 @@ export const DEFAULT_GANTT_TRANSLATIONS: GanttTranslations = {
   statusDone: "Done",
   statusBlocked: "Blocked",
   weekColumnPrefix: "KW",
+  todayLabel: "Heute",
   dateLocale: "de-DE",
   dialogAddTitle: "Aufgabe hinzufügen",
   dialogEditTitle: "Aufgabe bearbeiten",

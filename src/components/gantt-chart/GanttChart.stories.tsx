@@ -19,6 +19,7 @@ const EN_TRANSLATIONS: GanttTranslations = {
   statusDone: "Done",
   statusBlocked: "Blocked",
   weekColumnPrefix: "W",
+  todayLabel: "Today",
   dateLocale: "en-US",
   dialogAddTitle: "Add Task",
   dialogEditTitle: "Edit Task",

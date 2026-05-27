@@ -2,8 +2,8 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { type RefObject, type UIEventHandler } from "react";
-import { Box } from "@mui/material";
-import { useGanttChartStore, useGanttTranslations, useRawGanttChartStore } from "./GanttChart";
+import { Box, useTheme } from "@mui/material";
+import { useGanttChartStore, useGanttTheme, useGanttTranslations, useRawGanttChartStore } from "./GanttChart";
 import type { GanttTask, GanttTaskStatus } from "./GanttChart.types";
 import type { GanttTaskNode } from "./GanttChart.types";
 import { useGanttDrag } from "./hooks/useGanttDrag";
@@ -147,7 +147,9 @@ export function GanttTimeline({
   const timeScale   = useGanttChartStore((s) => s.timeScale);
   const updateTask  = useGanttChartStore((s) => s.updateTask);
   const rawStore    = useRawGanttChartStore();
-  const t = useGanttTranslations();
+  const t           = useGanttTranslations();
+  const muiTheme    = useTheme();
+  const { todayLineColor } = useGanttTheme();
   // Jede Instanz braucht eine eigene Marker-ID damit mehrere GanttCharts auf einer Seite
   // nicht dieselbe SVG-defs-Referenz teilen.
   const instanceId = useId().replace(/:/g, "");
@@ -256,6 +258,21 @@ export function GanttTimeline({
     return ((now - start) / (end - start)) * totalWidth;
   }, [displayRange, totalWidth]);
 
+  // Tooltip-Text für den Heute-Chip: lokalisiertes Langdatum, z. B. "Mittwoch, 28. Mai 2026".
+  const todayTooltip = useMemo(
+    () =>
+      new Date().toLocaleDateString(t.dateLocale, {
+        weekday: "long",
+        day:     "numeric",
+        month:   "long",
+        year:    "numeric",
+      }),
+    [t.dateLocale],
+  );
+
+  // Farbe der Heute-Linie und des Chips — aus ganttTheme oder MUI primary.
+  const resolvedTodayColor = todayLineColor ?? muiTheme.palette.primary.main;
+
   // Beim ersten Rendern den heutigen Tag horizontal in die Mitte scrollen.
   useEffect(() => {
     if (todayX === null || !scrollRef.current) return;
@@ -298,7 +315,14 @@ export function GanttTimeline({
     <Box ref={scrollRef} onScroll={onScroll} data-testid="gantt-timeline-scroll" sx={{ flex: 1, overflow: "auto" }}>
       {/* position: relative ist Pflicht damit der SVG-Layer korrekt absolut positioniert wird. */}
       <Box sx={{ minWidth: totalWidth, position: "relative" }}>
-        <GanttTimelineHeader columns={columns} groups={groups} />
+        <GanttTimelineHeader
+          columns={columns}
+          groups={groups}
+          todayX={todayX}
+          todayLabel={t.todayLabel}
+          todayTooltip={todayTooltip}
+          todayColor={resolvedTodayColor}
+        />
 
         <GanttWeekendStrips
           strips={weekendStrips}

@@ -15,9 +15,10 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 | Spalte: Assignee | Zusätzliche Spalte im Task-Panel für Verantwortliche | Mittel | — |
 | Resource View | Horizontale Ansicht: eine Zeile pro Person | Hoch | — |
 | Baseline-Vergleich | Ursprungsplanung vs. Ist-Stand visuell überlagern | Hoch | — |
-| Zoom per Scroll | Ctrl+Scroll ändert TimeScale (days/weeks/months) | Mittel | — |
+| ~~Zoom per Scroll~~ | ~~Ctrl+Scroll ändert TimeScale (days/weeks/months/quarters)~~ | ~~Mittel~~ | ✅ bereits implementiert (`zoomable={true}`) |
 | Multi-Select | Mehrere Tasks gleichzeitig verschieben | Hoch | — |
 | ~~Today-Button~~ | ~~Toolbar-Button scrollt automatisch zum heutigen Tag~~ | ~~Niedrig~~ | ✅ bereits implementiert |
+| ~~Heute-Chip~~ | ~~Kleiner Chip oben an der gestrichelten Heute-Linie, Tooltip = aktuelles Datum, `todayLabel`-Translation~~ | ~~Niedrig~~ | ✅ v1.5.0 |
 | Mini-Map | Kleine Übersichts-Timeline zum schnellen Navigieren | Hoch | — |
 
 ---

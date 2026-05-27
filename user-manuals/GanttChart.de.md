@@ -305,6 +305,7 @@ type GanttTranslations = {
   collapseAllTooltip: string;
   resetViewTooltip: string;
   weekColumnPrefix: string;
+  todayLabel: string;       // "" = Chip ausblenden
   dateLocale: string;
   columnName: string;
   columnStatus: string;
@@ -349,6 +350,7 @@ type GanttTranslations = {
 | `collapseAllTooltip` | `"Alle zuklappen"` | Tooltip des Zuklappen-Buttons |
 | `resetViewTooltip` | `"Ansicht zurücksetzen"` | Tooltip des Ansicht-Reset-Buttons |
 | `weekColumnPrefix` | `"KW"` | Prefix für Kalenderwochen-Spalten (z. B. „KW 12"). Englisch: `"W"` |
+| `todayLabel` | `"Heute"` | Beschriftung des Chips, der am oberen Ende der gestrichelten Heute-Linie schwebt. `""` blendet den Chip vollständig aus. |
 | `dateLocale` | `"de-DE"` | BCP-47-Locale für die Datumsformatierung im Timeline-Header (z. B. `"en-US"`, `"fr-FR"`) |
 | `columnName` | `"Name"` | Spaltenheader des linken Panels |
 | `columnStatus` | `"Status"` | Spaltenheader des Status-Chips |
@@ -395,6 +397,7 @@ type GanttTranslations = {
     collapseAllTooltip: 'Collapse all',
     resetViewTooltip: 'Reset view',
     weekColumnPrefix: 'W',
+    todayLabel: 'Today',
     dateLocale: 'en-US',
     columnName: 'Name',
     columnStatus: 'Status',
