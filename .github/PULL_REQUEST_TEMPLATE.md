@@ -29,6 +29,6 @@
 - [ ] New feature stories have a `parameters.docs.description.story` explanation
 - [ ] New behavior covered by at least one Vitest test
 
-### Storybook static
+### Storybook
 - [ ] `npm run build-storybook` runs without errors
-- [ ] `npm run preview-storybook` → `http://localhost:6007` — all new stories visible and self-explanatory without manual prop changes
+- [ ] `npm run storybook` — all new stories visible and self-explanatory without manual prop changes
