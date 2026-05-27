@@ -15,6 +15,15 @@ The `PasswordStrengthMeter` is a password input component built on React and Mat
 
 ---
 
+> ### ✨ New in v1.5.0
+>
+> | Feature | Description | Jump to |
+> |---|---|---|
+> | **`showSegmentedBar`** | Renders the strength bar as 4 individual animated segments instead of a single growing bar | [→ Segmented strength bar](#segmented-strength-bar) |
+> | **`customRequirements`** | Add your own password rules with live evaluation via `(password) => boolean` | [→ Custom requirements](#custom-requirements) |
+
+---
+
 ## Prerequisites
 
 | Dependency | Minimum version |
@@ -32,6 +41,7 @@ import { PasswordStrengthMeter } from '@thebuoyant-tsdev/mui-ts-library';
 import type {
   PasswordStrengthMeterProps,
   PasswordStrengthMeterTranslation,
+  CustomRequirement,
   StrengthResult,
   StrengthScore,
   MeterStatus,
@@ -67,6 +77,7 @@ function App() {
 |---|---|---|---|
 | `autoComplete` | `string` | — | Native `autocomplete` attribute. Recommended: `"new-password"` (registration) or `"current-password"` (login). |
 | `checkColors` | `CheckColors` | Red / Green | Colors of the checkmark and warning symbols in the requirements checklist. Both fields must be provided when the object is set. |
+| `customRequirements` | `CustomRequirement[]` | — | Additional requirements shown in the summary alongside the built-in ones. Each entry has a `label` and a `fulfilled` value (boolean or function). |
 | `disabled` | `boolean` | `false` | Disables the input field and the visibility toggle. Strength bar and requirements list remain visible. |
 | `error` | `boolean` | `false` | Puts the input field into error state (red border). The `helperText` is also displayed in red. |
 | `helperText` | `string` | — | Helper or error message text below the input field. Appears in red when `error={true}`. |
@@ -77,6 +88,7 @@ function App() {
 | `passwordMinLength` | `number` | `8` | Minimum password length. Controls the requirements checklist ("At least {n} characters") and influences the scoring algorithm. Passwords below this length always receive a `weak` score. |
 | `showMeter` | `boolean` | `true` | Shows the animated strength bar below the input field. |
 | `showPasswordAdornment` | `boolean` | `true` | Shows a toggle button to reveal the password in plain text. |
+| `showSegmentedBar` | `boolean` | `false` | Renders the strength bar as 4 separate animated segments instead of a single growing bar. Each segment fills with color as strength increases. |
 | `showSummary` | `boolean` | `true` | Shows the requirements checklist below the strength bar. |
 | `translation` | `Partial<PasswordStrengthMeterTranslation>` | — | Override UI labels — only specify deviating keys. |
 | `value` | `string` | — | Puts the component into **controlled mode**: the password is managed externally. Changes are passed up via `onPasswordChange`. |
@@ -275,7 +287,9 @@ The following stable test IDs are available for automated tests:
 |---|---|---|
 | `psm-input` | Native `<input>` | The text input field. Use for `userEvent.type()` or `.value` queries. |
 | `psm-toggle` | `<button>` (IconButton) | Visibility toggle. Only present when `showPasswordAdornment={true}`. |
-| `psm-meter` | `<div>` (inner bar) | The colored strength bar. Has `style.width` and `style.backgroundColor` as measurable values. |
+| `psm-meter` | `<div>` (inner bar) | The colored strength bar (single-bar mode). Has `style.width` and `style.backgroundColor` as measurable values. |
+| `psm-meter-segment-active` | `<div>` | A filled segment (segmented bar mode, `showSegmentedBar`). One per active segment. |
+| `psm-meter-segment` | `<div>` | An empty segment (segmented bar mode). |
 | `psm-summary` | `<div>` (outer box) | Container of the requirements checklist. Only present when `showSummary={true}`. |
 | `psm-req-success` | `<svg>` (CheckCircle icon) | Green checkmark for a met requirement. Present multiple times. |
 | `psm-req-failure` | `<svg>` (ErrorOutline icon) | Red warning symbol for an unmet requirement. Present multiple times. |
@@ -406,6 +420,53 @@ const [isStrong, setIsStrong] = useState(false);
   disabled={true}
   value="••••••••"
 />
+```
+
+### Segmented strength bar
+
+```tsx
+{/* 4 separate animated segments instead of a single growing bar */}
+<PasswordStrengthMeter
+  showSegmentedBar
+  passwordMinLength={8}
+/>
+```
+
+### Custom requirements
+
+```tsx
+import type { CustomRequirement } from '@thebuoyant-tsdev/mui-ts-library';
+
+const requirements: CustomRequirement[] = [
+  {
+    label:     'No spaces allowed',
+    fulfilled: (pw) => !pw.includes(' '),
+  },
+  {
+    label:     'Must start with a letter',
+    fulfilled: (pw) => /^[a-zA-Z]/.test(pw),
+  },
+];
+
+<PasswordStrengthMeter
+  customRequirements={requirements}
+  passwordMinLength={10}
+/>
+```
+
+Each `CustomRequirement` has:
+- `label: string` — Requirement text shown in the checklist
+- `fulfilled: boolean | ((password: string) => boolean)` — Static boolean or a function evaluated on the current password
+
+---
+
+## `CustomRequirement` Type
+
+```ts
+type CustomRequirement = {
+  label:     string;
+  fulfilled: boolean | ((password: string) => boolean);
+};
 ```
 
 ---

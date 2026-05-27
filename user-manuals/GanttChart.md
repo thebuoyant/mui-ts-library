@@ -15,6 +15,15 @@ The `GanttChart` is a fully interactive project planning component built on Reac
 
 ---
 
+> ### ✨ New in v1.5.0
+>
+> | Feature | Description | Jump to |
+> |---|---|---|
+> | **Today chip** | Labeled chip at the top of the dashed today line — label via `translations.todayLabel`, color via `ganttTheme.todayLineColor` | [→ Today Line & Chip](#today-line--chip) |
+> | **`zoomable`** | `Ctrl+Scroll` cycles through days / weeks / months / quarters directly in the timeline | [→ Ctrl+Scroll Zoom](#ctrlscroll-zoom) |
+
+---
+
 ## Prerequisites
 
 | Dependency | Minimum version |
@@ -305,6 +314,7 @@ type GanttTranslations = {
   collapseAllTooltip: string;
   resetViewTooltip: string;
   weekColumnPrefix: string;
+  todayLabel: string;       // Set to "" to hide the chip
   dateLocale: string;
   columnName: string;
   columnStatus: string;
@@ -349,6 +359,7 @@ type GanttTranslations = {
 | `collapseAllTooltip` | `"Alle zuklappen"` | Tooltip for the collapse all button |
 | `resetViewTooltip` | `"Ansicht zurücksetzen"` | Tooltip for the reset view button |
 | `weekColumnPrefix` | `"KW"` | Prefix for calendar week columns (e.g. "KW 12"). English: `"W"` |
+| `todayLabel` | `"Heute"` | Label on the chip that floats above the dashed today line. Set to `""` to hide the chip entirely. |
 | `dateLocale` | `"de-DE"` | BCP-47 locale for date formatting in the timeline header (e.g. `"en-US"`, `"fr-FR"`) |
 | `columnName` | `"Name"` | Column header of the left panel |
 | `columnStatus` | `"Status"` | Column header for the status chip |
@@ -395,6 +406,7 @@ type GanttTranslations = {
     collapseAllTooltip: 'Collapse all',
     resetViewTooltip: 'Reset view',
     weekColumnPrefix: 'W',
+    todayLabel: 'Today',
     dateLocale: 'en-US',
     columnName: 'Name',
     columnStatus: 'Status',
@@ -503,6 +515,50 @@ const tasks: GanttTask[] = [
   height={600}
 />
 ```
+
+---
+
+## Today Line & Chip
+
+The dashed today line marks the current date in the timeline. A small labeled **chip** floats at the very top of this line, straddling the header and the task rows.
+
+```tsx
+{/* Default: shows "Heute" chip */}
+<GanttChart tasks={tasks} />
+
+{/* English label */}
+<GanttChart tasks={tasks} translations={{ todayLabel: 'Today' }} />
+
+{/* Hide the chip entirely */}
+<GanttChart tasks={tasks} translations={{ todayLabel: '' }} />
+```
+
+**Customization points:**
+
+| Aspect | How to control |
+|---|---|
+| Chip label | `translations.todayLabel` (default: `"Heute"`, set to `""` to hide) |
+| Chip & line color | `ganttTheme.todayLineColor` (default: MUI `primary.main`) |
+| Date format in Tooltip | `translations.dateLocale` (BCP-47, e.g. `"en-US"`) |
+
+Hovering the chip shows a Tooltip with the full localized date (e.g. "Wednesday, 27 May 2026").
+
+---
+
+## Ctrl+Scroll Zoom
+
+When `zoomable={true}`, the user can cycle through zoom levels directly in the timeline:
+
+| Action | Result |
+|---|---|
+| `Ctrl + Scroll up` (or `Cmd + Scroll up` on macOS) | Zoom in — cycles `quarters` → `months` → `weeks` → `days` |
+| `Ctrl + Scroll down` | Zoom out — cycles `days` → `weeks` → `months` → `quarters` |
+
+```tsx
+<GanttChart tasks={tasks} zoomable />
+```
+
+`zoomable` is `false` by default to avoid accidental zoom while scrolling the page.
 
 ---
 

@@ -68,6 +68,8 @@ export type JsonEditorProps = {
   readonly?:        boolean;
   showLineColumn?:  boolean;
   showLineNumbers?: boolean;
+  /** Shows a scaled-down document overview (minimap) on the right side of the editor. */
+  showMinimap?:     boolean;
   /** Shows a Valid / Invalid JSON indicator in the footer. */
   showValidation?:  boolean;
   toolbarConfig?:   JsonEditorToolbarConfig;

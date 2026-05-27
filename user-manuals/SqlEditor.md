@@ -15,6 +15,15 @@ The `SqlEditor` is a full-featured SQL code editor built on [CodeMirror 6](https
 
 ---
 
+> ### ✨ New in v1.5.0
+>
+> | Feature | Description | Jump to |
+> |---|---|---|
+> | **`Cmd+Enter` / `Ctrl+Enter`** | Execute query with keyboard shortcut — works even without the toolbar button | [→ Execute & Shortcut](#execute-button-and-keyboard-shortcut) |
+> | **Auto-sizing gutter** | Line-number column adjusts its width automatically to the digit count | [→ Props](#props) |
+
+---
+
 ## Prerequisites
 
 | Dependency | Minimum version |
@@ -97,7 +106,7 @@ function App() {
 | `width` | `number \| string` | `"100%"` | Width of the editor. Numbers → px. |
 | `onBlur` | `() => void` | — | Called when the editor loses focus |
 | `onChange` | `(sql: string) => void` | — | Called on every content change |
-| `onExecute` | `(sql: string) => void` | — | Called when the Execute button is clicked (requires `toolbarConfig.showExecute: true`) |
+| `onExecute` | `(sql: string) => void` | — | Called when the Execute button is clicked **or `Cmd+Enter` / `Ctrl+Enter` is pressed**. The keyboard shortcut works whenever `onExecute` is provided, even without `toolbarConfig.showExecute`. |
 | `onFocus` | `() => void` | — | Called when the editor gains focus |
 | `onLint` | `(sql: string) => Promise<SqlLintError[]> \| SqlLintError[]` | — | Async linting callback — errors are shown as wavy underlines in the editor |
 
@@ -286,7 +295,7 @@ The toolbar appears above the editor (hidden in readonly mode). Each button can 
 
 ---
 
-## Execute Button
+## Execute Button and Keyboard Shortcut
 
 ```tsx
 <SqlEditor
@@ -300,6 +309,23 @@ The toolbar appears above the editor (hidden in readonly mode). Each button can 
 ```
 
 The Execute button is hidden by default. It only appears when both `toolbarConfig.showExecute: true` and an `onExecute` handler are provided.
+
+**Keyboard shortcut:** Whenever `onExecute` is provided, pressing `Cmd+Enter` (macOS) or `Ctrl+Enter` (Windows/Linux) inside the editor calls `onExecute(sql)` — regardless of whether the toolbar button is visible.
+
+```tsx
+{/* Keyboard shortcut only — no Execute button in toolbar */}
+<SqlEditor
+  value={sql}
+  onExecute={(sql) => runQuery(sql)}
+/>
+
+{/* Both toolbar button and keyboard shortcut */}
+<SqlEditor
+  value={sql}
+  toolbarConfig={{ showExecute: true }}
+  onExecute={(sql) => runQuery(sql)}
+/>
+```
 
 ---
 

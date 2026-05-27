@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import {
   Button,
   Dialog,
@@ -56,21 +56,63 @@ function ConfirmDialogUI({
     description,
     confirmLabel,
     cancelLabel,
-    severity      = "info",
+    countdown,
+    severity         = "info",
     hideCancelButton = false,
-    maxWidth      = "xs",
-    showIcon      = true,
+    maxWidth         = "xs",
+    showIcon         = true,
   } = options;
 
-  const SeverityIcon   = showIcon ? SEVERITY_ICON[severity] : null;
-  const confirmColor   = SEVERITY_COLOR[severity];
+  const SeverityIcon    = showIcon ? SEVERITY_ICON[severity] : null;
+  const confirmColor    = SEVERITY_COLOR[severity];
   const resolvedConfirm = confirmLabel ?? translation.confirmLabel;
   const resolvedCancel  = cancelLabel  ?? translation.cancelLabel;
+
+  // Countdown timer — auto-confirms when it reaches 0
+  const [remaining, setRemaining] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!open || !countdown || countdown <= 0) {
+      setRemaining(null);
+      return;
+    }
+    setRemaining(countdown);
+    const id = setInterval(() => {
+      setRemaining((prev) => {
+        if (prev === null || prev <= 1) {
+          clearInterval(id);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [open, countdown]);
+
+  // When remaining hits 0 trigger confirm
+  useEffect(() => {
+    if (remaining === 0) onConfirm();
+  // onConfirm is stable (wrapped in handleConfirm below)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [remaining]);
+
+  // Keyboard: Enter = Confirm, Escape handled by Dialog onClose
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      onConfirm();
+    }
+  }
+
+  const confirmButtonLabel = remaining !== null && remaining > 0
+    ? `${resolvedConfirm} (${remaining})`
+    : resolvedConfirm;
 
   return (
     <Dialog
       open={open}
       onClose={onCancel}
+      onKeyDown={handleKeyDown}
       maxWidth={maxWidth}
       fullWidth
       aria-labelledby={title ? "confirm-dialog-title" : undefined}
@@ -137,7 +179,7 @@ function ConfirmDialogUI({
           variant="contained"
           autoFocus
         >
-          {resolvedConfirm}
+          {confirmButtonLabel}
         </Button>
       </DialogActions>
     </Dialog>

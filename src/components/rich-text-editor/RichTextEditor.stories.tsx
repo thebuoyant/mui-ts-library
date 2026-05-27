@@ -252,6 +252,24 @@ export const WithWordCount: Story = {
   },
 };
 
+export const NoToolbar: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`showToolbar={false}` hides the entire toolbar while keeping the editor **fully editable**. ' +
+          'Unlike `readonly`, the user can still type, paste, and format text. ' +
+          'This mode is useful for minimal inline editors, comment boxes, or when you provide a completely custom toolbar.',
+      },
+    },
+  },
+  args: {
+    showToolbar: false,
+    value:       SAMPLE_HTML,
+    placeholder: "No toolbar — still fully editable …",
+  },
+};
+
 export const WithFullscreen: Story = {
   args: {
     toolbarConfig: { showFullscreenButton: true },

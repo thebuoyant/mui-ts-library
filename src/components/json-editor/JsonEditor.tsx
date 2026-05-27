@@ -31,6 +31,7 @@ export function JsonEditor({
   indent          = 2,
   showLineNumbers = true,
   showLineColumn  = true,
+  showMinimap     = false,
   showValidation  = false,
   toolbarConfig,
   translation,
@@ -107,6 +108,7 @@ export function JsonEditor({
           disabled={disabled}
           readonly={readonly}
           showLineNumbers={showLineNumbers}
+          showMinimap={showMinimap}
           highlightColors={highlightColors}
           onViewReady={handleViewReady}
           onCursorChange={handleCursorChange}

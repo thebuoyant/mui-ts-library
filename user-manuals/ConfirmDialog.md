@@ -14,6 +14,15 @@
 
 ---
 
+> ### ✨ New in v1.5.0
+>
+> | Feature | Description | Jump to |
+> |---|---|---|
+> | **`countdown`** | Auto-confirms after n seconds with a live countdown in the button label | [→ Countdown Auto-Confirm](#countdown-auto-confirm) |
+> | **`Enter` key** | Pressing Enter in an open dialog triggers Confirm | [→ Keyboard Shortcuts](#keyboard-shortcuts) |
+
+---
+
 ## Prerequisites
 
 | Dependency | Minimum version |
@@ -109,6 +118,7 @@ All properties are optional. Each call to `confirm()` can pass any subset of the
 |---|---|---|---|
 | `cancelLabel` | `string` | from `translation` | Overrides the provider-level cancel label for this call |
 | `confirmLabel` | `string` | from `translation` | Overrides the provider-level confirm label for this call |
+| `countdown` | `number` | — | Auto-confirms after this many seconds. A live countdown is displayed in the confirm button label (e.g. "Delete (5)"). |
 | `description` | `string \| ReactNode` | — | Body text or arbitrary JSX |
 | `hideCancelButton` | `boolean` | `false` | Hides the cancel button (alert / notice mode) |
 | `maxWidth` | `"xs" \| "sm" \| "md" \| "lg" \| "xl"` | `"xs"` | MUI Dialog max-width |
@@ -236,14 +246,44 @@ DEFAULT_CONFIRM_DIALOG_TRANSLATION ("Confirm" / "Cancel")
 
 ---
 
+## Countdown Auto-Confirm
+
+```tsx
+// Auto-confirms after 5 seconds — button shows "Delete (5)", "Delete (4)", ...
+const confirmed = await confirm({
+  title:        'Delete this record?',
+  description:  'This action will happen automatically in 5 seconds.',
+  confirmLabel: 'Delete',
+  severity:     'error',
+  countdown:    5,
+});
+```
+
+The countdown starts as soon as the dialog opens. The confirm button label updates every second (e.g. `"Delete (5)"`, `"Delete (4)"`, …). When it reaches zero, `confirm()` resolves `true` automatically.
+
+---
+
+## Keyboard Shortcuts
+
+| Key | Action |
+|---|---|
+| `Enter` | Confirms the dialog (calls `onConfirm`) |
+| `Escape` | Cancels the dialog (resolves `false`) |
+
+Both shortcuts work regardless of where focus is within the dialog.
+
+---
+
 ## Behavior Details
 
 | Scenario | Result |
 |---|---|
 | User clicks Confirm | `Promise<true>` |
 | User clicks Cancel | `Promise<false>` |
-| User presses Escape | `Promise<false>` |
+| User presses `Enter` | `Promise<true>` |
+| User presses `Escape` | `Promise<false>` |
 | User clicks backdrop | `Promise<false>` |
+| `countdown` reaches 0 | `Promise<true>` (auto-confirm) |
 | Second `confirm()` while dialog is open | First promise resolves `false`; second dialog opens |
 
 ---

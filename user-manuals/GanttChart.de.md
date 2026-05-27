@@ -15,6 +15,15 @@ Der `GanttChart` ist eine vollständig interaktive Projektplanungs-Komponente au
 
 ---
 
+> ### ✨ Neu in v1.5.0
+>
+> | Feature | Beschreibung | Springe zu |
+> |---|---|---|
+> | **Heute-Chip** | Beschrifteter Chip am oberen Ende der gestrichelten Heute-Linie — Label via `translations.todayLabel`, Farbe via `ganttTheme.todayLineColor` | [→ Heute-Linie & Chip](#heute-linie--chip) |
+> | **`zoomable`** | `Ctrl+Scroll` wechselt zwischen Tage / Wochen / Monate / Quartale direkt in der Timeline | [→ Ctrl+Scroll-Zoom](#ctrlscroll-zoom) |
+
+---
+
 ## Technische Voraussetzungen
 
 | Abhängigkeit | Mindestversion |
@@ -305,6 +314,7 @@ type GanttTranslations = {
   collapseAllTooltip: string;
   resetViewTooltip: string;
   weekColumnPrefix: string;
+  todayLabel: string;       // "" = Chip ausblenden
   dateLocale: string;
   columnName: string;
   columnStatus: string;
@@ -349,6 +359,7 @@ type GanttTranslations = {
 | `collapseAllTooltip` | `"Alle zuklappen"` | Tooltip des Zuklappen-Buttons |
 | `resetViewTooltip` | `"Ansicht zurücksetzen"` | Tooltip des Ansicht-Reset-Buttons |
 | `weekColumnPrefix` | `"KW"` | Prefix für Kalenderwochen-Spalten (z. B. „KW 12"). Englisch: `"W"` |
+| `todayLabel` | `"Heute"` | Beschriftung des Chips, der am oberen Ende der gestrichelten Heute-Linie schwebt. `""` blendet den Chip vollständig aus. |
 | `dateLocale` | `"de-DE"` | BCP-47-Locale für die Datumsformatierung im Timeline-Header (z. B. `"en-US"`, `"fr-FR"`) |
 | `columnName` | `"Name"` | Spaltenheader des linken Panels |
 | `columnStatus` | `"Status"` | Spaltenheader des Status-Chips |
@@ -395,6 +406,7 @@ type GanttTranslations = {
     collapseAllTooltip: 'Collapse all',
     resetViewTooltip: 'Reset view',
     weekColumnPrefix: 'W',
+    todayLabel: 'Today',
     dateLocale: 'en-US',
     columnName: 'Name',
     columnStatus: 'Status',
@@ -503,6 +515,50 @@ const tasks: GanttTask[] = [
   height={600}
 />
 ```
+
+---
+
+## Heute-Linie & Chip
+
+Die gestrichelte Heute-Linie markiert das aktuelle Datum in der Timeline. Am oberen Ende dieser Linie schwebt ein kleiner beschrifteter **Chip**, der genau auf der Grenze zwischen Header und Task-Zeilen sitzt.
+
+```tsx
+{/* Standard: zeigt "Heute"-Chip */}
+<GanttChart tasks={tasks} />
+
+{/* Englisches Label */}
+<GanttChart tasks={tasks} translations={{ todayLabel: 'Today' }} />
+
+{/* Chip vollständig ausblenden */}
+<GanttChart tasks={tasks} translations={{ todayLabel: '' }} />
+```
+
+**Anpassungsmöglichkeiten:**
+
+| Aspekt | Steuerung |
+|---|---|
+| Chip-Label | `translations.todayLabel` (Standard: `"Heute"`, `""` = kein Chip) |
+| Chip- & Linienfarbe | `ganttTheme.todayLineColor` (Standard: MUI `primary.main`) |
+| Datumsformat im Tooltip | `translations.dateLocale` (BCP-47, z. B. `"de-DE"`) |
+
+Beim Hover auf den Chip erscheint ein Tooltip mit dem vollständigen lokalisierten Datum (z. B. „Mittwoch, 27. Mai 2026").
+
+---
+
+## Ctrl+Scroll-Zoom
+
+Bei `zoomable={true}` kann der Nutzer direkt in der Timeline durch die Zoom-Stufen wechseln:
+
+| Aktion | Ergebnis |
+|---|---|
+| `Strg + Scroll hoch` (bzw. `Cmd + Scroll hoch` auf macOS) | Hereinzoomen — wechselt `Quartale` → `Monate` → `Wochen` → `Tage` |
+| `Strg + Scroll runter` | Herauszoomen — wechselt `Tage` → `Wochen` → `Monate` → `Quartale` |
+
+```tsx
+<GanttChart tasks={tasks} zoomable />
+```
+
+`zoomable` ist standardmäßig `false`, um unbeabsichtigtes Zoomen beim Scrollen der Seite zu vermeiden.
 
 ---
 

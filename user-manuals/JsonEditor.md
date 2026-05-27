@@ -16,6 +16,14 @@
 
 ---
 
+> ### ✨ New in v1.5.0
+>
+> | Feature | Description | Jump to |
+> |---|---|---|
+> | **`showMinimap`** | Bird's-eye minimap panel for fast navigation in large documents | [→ Minimap](#minimap) |
+
+---
+
 ## Prerequisites
 
 | Dependency | Minimum version |
@@ -78,6 +86,7 @@ function App() {
 | `readonly` | `boolean` | `false` | Read-only mode — no toolbar |
 | `showLineColumn` | `boolean` | `true` | Show cursor position in footer (Ln / Col) |
 | `showLineNumbers` | `boolean` | `true` | Show line number gutter |
+| `showMinimap` | `boolean` | `false` | Shows a scaled-down document overview (minimap) on the right side of the editor. Useful for navigating large JSON files. |
 | `showValidation` | `boolean` | `false` | Show "Valid JSON" / "Invalid JSON" indicator in footer |
 | `toolbarConfig` | `JsonEditorToolbarConfig` | all `true` | Show/hide individual toolbar buttons |
 | `translation` | `Partial<JsonEditorTranslation>` | — | Override toolbar tooltips and footer labels |
@@ -389,6 +398,23 @@ const colors: JsonEditorHighlightColors = {
 | `CustomHighlightColors` | One Dark–inspired color scheme |
 | `GermanTranslation` | Fully translated toolbar and validation labels |
 | `LargeDataset` | 20-item array, 500px height |
+| `WithMinimap` | Large dataset with minimap panel enabled |
+
+---
+
+## Minimap
+
+The `showMinimap` prop adds an **80 px wide minimap panel** on the right side of the editor. It renders a condensed bird's-eye view of the entire document and lets users click or drag directly inside the minimap to jump to any position — particularly useful for large JSON files with hundreds of lines.
+
+```tsx
+<JsonEditor
+  value={largeJson}
+  height="500"
+  showMinimap
+/>
+```
+
+The minimap is rendered by [`@replit/codemirror-minimap`](https://www.npmjs.com/package/@replit/codemirror-minimap) (MIT license, 1 transitive dependency). It is opt-in (`showMinimap={false}` by default) — no bundle impact when not used.
 
 ---
 

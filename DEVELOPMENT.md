@@ -28,9 +28,25 @@ Every component includes Storybook stories covering all major use cases and prop
 # Start Storybook dev server (http://localhost:6006)
 npm run storybook
 
-# Build a static Storybook for deployment
+# Build a static Storybook
 npm run build-storybook
+
+# Preview the static build in the browser (http://localhost:6007)
+# Always use this — never open storybook-static/index.html directly via file://
+npm run preview-storybook
 ```
+
+### Storybook on GitHub Pages (Live URL)
+
+Every push to `main` automatically triggers the **Deploy Storybook** GitHub Actions workflow (`.github/workflows/deploy-storybook.yml`). It builds the static Storybook and deploys it to GitHub Pages:
+
+**→ [https://thebuoyant.github.io/mui-ts-library/](https://thebuoyant.github.io/mui-ts-library/)**
+
+> **One-time setup required:** GitHub Pages must be enabled once in the repository settings.  
+> Go to **Settings → Pages → Source → GitHub Actions**, then push to `main`.  
+> The workflow handles everything else automatically on every subsequent push.
+
+---
 
 ### Storybook Docker Distribution
 
@@ -95,6 +111,47 @@ Install in a target project:
 ```bash
 npm install /path/to/thebuoyant-tsdev-mui-ts-library-1.3.0.tgz
 ```
+
+---
+
+## Pre-Merge Checklist
+
+Before merging a feature branch into `main`, verify **every item** in this list. The goal: `main` is always release-ready — documentation complete, tests green, no dead code.
+
+### Code quality
+
+- [ ] `npx tsc --noEmit` — zero TypeScript errors
+- [ ] `npx vitest run` — all tests pass
+- [ ] No `console.log`, `TODO`, or `FIXME` left in source files
+
+### Version
+
+- [ ] `package.json` version bumped (SemVer — patch/minor/major)
+
+### Documentation — *.md files
+
+- [ ] **`CHANGELOG.md`** — new version entry with all `### Added` / `### Fixed` / `### Changed` items
+- [ ] **`CHANGELOG.de.md`** — German translation of the same entry
+- [ ] **`README.md`** — component table descriptions and Quick Start snippets reflect new features/props
+- [ ] **`README.de.md`** — German counterpart up to date
+- [ ] **`user-manuals/<Component>.md`** — all new props documented (prop table + type block + example)
+- [ ] **`user-manuals/<Component>.de.md`** — German counterpart up to date
+- [ ] **`component-features-nice-to-have.md`** — implemented features marked ✅ with version; newly discovered ideas added
+- [ ] **`DEVELOPMENT.md`** — any new npm scripts, tooling steps, or conventions documented
+
+### Stories & tests
+
+- [ ] New props covered by at least one Storybook story (`argTypes` + `args` + named story)
+- [ ] New feature stories have a `parameters.docs.description.story` explaining what to interact with
+- [ ] Feature stories with visual output use pre-filled `value`/`args` — no manual "Set prop" required
+- [ ] New behavior covered by at least one Vitest test
+
+### Storybook static
+
+- [ ] `npm run build-storybook` runs without errors
+- [ ] `npm run preview-storybook` opens the browser at `http://localhost:6007` — all new stories are visible and self-explanatory without manual prop changes
+
+> **Note:** `storybook-static/` is in `.gitignore` (local build artifact). Never open `index.html` directly via `file://` — browsers block ES module imports for local files. Always use `npm run preview-storybook`.
 
 ---
 

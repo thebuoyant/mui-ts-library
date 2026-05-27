@@ -157,6 +157,17 @@ export const PostgreSQLDialect: Story = {
 };
 
 export const WithExecute: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'The `onExecute` prop enables two ways to run the query: the **Execute toolbar button** ' +
+          '(`toolbarConfig.showExecute: true`) and the **`Cmd+Enter` / `Ctrl+Enter` keyboard shortcut**. ' +
+          'The keyboard shortcut works whenever `onExecute` is provided — regardless of whether the button is visible. ' +
+          'Try pressing **`Cmd+Enter`** (macOS) or **`Ctrl+Enter`** (Windows/Linux) while the editor is focused.',
+      },
+    },
+  },
   args: {
     value:        SAMPLE_SQL,
     toolbarConfig: { showExecute: true },

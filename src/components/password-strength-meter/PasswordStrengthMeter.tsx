@@ -18,6 +18,7 @@ import { scorePassword } from "./util/password-strength.util";
 import { PasswordStrengthBar } from "./PasswordStrengthBar";
 import type {
   CheckColors,
+  CustomRequirement,
   MeterColors,
   PasswordStrengthMeterProps,
   PasswordStrengthMeterTranslation,
@@ -66,8 +67,10 @@ export function PasswordStrengthMeter({
   error = false,
   helperText,
   autoComplete,
+  customRequirements,
   showPasswordAdornment = true,
   showMeter = true,
+  showSegmentedBar = false,
   showSummary = true,
   inputSize = "medium",
   translation,
@@ -181,6 +184,7 @@ export function PasswordStrengthMeter({
           percent={strengthResult.percent}
           color={calculateStrengthColor(strengthResult)}
           ariaLabel={t.meterAriaLabel}
+          segments={showSegmentedBar}
         />
       )}
 
@@ -224,6 +228,14 @@ export function PasswordStrengthMeter({
                 fulfilled={strengthResult.hasSymbol}
                 checkColors={checkColors}
               />
+              {customRequirements?.map((req: CustomRequirement, idx: number) => (
+                <RequirementItem
+                  key={idx}
+                  label={req.label}
+                  fulfilled={typeof req.fulfilled === "function" ? req.fulfilled(password) : req.fulfilled}
+                  checkColors={checkColors}
+                />
+              ))}
             </Stack>
           </Stack>
         </Box>

@@ -66,9 +66,20 @@ export const DEFAULT_CHECK_COLORS: CheckColors = {
   success: "#43a047",
 };
 
+/**
+ * A single custom password requirement.
+ * `fulfilled` can be a static boolean or a function evaluated on the current password.
+ */
+export type CustomRequirement = {
+  label:     string;
+  fulfilled: boolean | ((password: string) => boolean);
+};
+
 export type PasswordStrengthMeterProps = {
   autoComplete?:          string;
   checkColors?:           CheckColors;
+  /** Additional custom requirements shown alongside the built-in ones. */
+  customRequirements?:    CustomRequirement[];
   disabled?:              boolean;
   error?:                 boolean;
   helperText?:            string;
@@ -82,6 +93,8 @@ export type PasswordStrengthMeterProps = {
   showMeter?:             boolean;
   showPasswordAdornment?: boolean;
   showSummary?:           boolean;
+  /** Render the strength bar as 4 animated segments instead of a single growing bar. */
+  showSegmentedBar?:      boolean;
   // Nur abweichende Keys angeben — Rest fällt auf DEFAULT_PASSWORD_TRANSLATIONS zurück.
   translation?:           Partial<PasswordStrengthMeterTranslation>;
   // Wenn gesetzt, wird die Komponente kontrolliert: das Passwort kommt von außen,

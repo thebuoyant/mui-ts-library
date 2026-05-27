@@ -19,6 +19,7 @@ const meta: Meta<typeof JsonEditor> = {
     readonly:        { control: "boolean" },
     showLineColumn:  { control: "boolean" },
     showLineNumbers: { control: "boolean" },
+    showMinimap:     { control: "boolean" },
     showValidation:  { control: "boolean" },
     width:           { control: "text" },
     // Komplexe Objekte / Callbacks — dedizierte Stories verwenden
@@ -43,6 +44,7 @@ const meta: Meta<typeof JsonEditor> = {
     readonly:        false,
     showLineColumn:  true,
     showLineNumbers: true,
+    showMinimap:     false,
     showValidation:  false,
     width:           "",
     // Callbacks
@@ -244,5 +246,24 @@ export const LargeDataset: Story = {
   args: {
     value:  LARGE_JSON,
     height: "500",
+  },
+};
+
+export const WithMinimap: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`showMinimap` adds a **vertical minimap panel** (80 px wide) on the right side of the editor. ' +
+          'The minimap renders a condensed overview of the entire document and lets you **click or drag** to jump ' +
+          'to any position instantly — especially useful for large JSON files with hundreds of lines. ' +
+          'Powered by `@replit/codemirror-minimap` (MIT). Try scrolling inside the minimap.',
+      },
+    },
+  },
+  args: {
+    value:       LARGE_JSON,
+    height:      "500",
+    showMinimap: true,
   },
 };

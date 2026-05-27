@@ -14,6 +14,15 @@
 
 ---
 
+> ### ✨ Neu in v1.5.0
+>
+> | Feature | Beschreibung | Springe zu |
+> |---|---|---|
+> | **`countdown`** | Bestätigt automatisch nach n Sekunden mit Live-Countdown im Button-Label | [→ Countdown Auto-Bestätigung](#countdown-auto-bestätigung) |
+> | **`Enter`-Taste** | Enter in einem offenen Dialog löst Bestätigen aus | [→ Tastaturkürzel](#tastaturkürzel) |
+
+---
+
 ## Voraussetzungen
 
 | Abhängigkeit | Mindestversion |
@@ -109,6 +118,7 @@ Alle Eigenschaften sind optional. Jeder `confirm()`-Aufruf kann eine beliebige T
 |---|---|---|---|
 | `cancelLabel` | `string` | aus `translation` | Überschreibt das Provider-Label für diesen Aufruf |
 | `confirmLabel` | `string` | aus `translation` | Überschreibt das Provider-Label für diesen Aufruf |
+| `countdown` | `number` | — | Bestätigt automatisch nach dieser Anzahl Sekunden. Ein Live-Countdown wird im Button-Label angezeigt (z. B. „Löschen (5)"). |
 | `description` | `string \| ReactNode` | — | Body-Text oder beliebiges JSX |
 | `hideCancelButton` | `boolean` | `false` | Blendet den Abbrechen-Button aus (Alert-/Hinweis-Modus) |
 | `maxWidth` | `"xs" \| "sm" \| "md" \| "lg" \| "xl"` | `"xs"` | MUI-Dialog-Maximalbreite |
@@ -236,14 +246,44 @@ DEFAULT_CONFIRM_DIALOG_TRANSLATION ("Confirm" / "Cancel")
 
 ---
 
+## Countdown-Autobestätigung
+
+```tsx
+// Bestätigt automatisch nach 5 Sekunden — Button zeigt „Löschen (5)", „Löschen (4)", …
+const confirmed = await confirm({
+  title:        'Diesen Eintrag löschen?',
+  description:  'Diese Aktion wird in 5 Sekunden automatisch ausgeführt.',
+  confirmLabel: 'Löschen',
+  severity:     'error',
+  countdown:    5,
+});
+```
+
+Der Countdown startet sobald der Dialog öffnet. Das Button-Label aktualisiert sich jede Sekunde. Bei Null löst `confirm()` automatisch `true` auf.
+
+---
+
+## Tastatur-Shortcuts
+
+| Taste | Aktion |
+|---|---|
+| `Enter` | Bestätigt den Dialog |
+| `Escape` | Bricht den Dialog ab (`false`) |
+
+Beide Shortcuts funktionieren unabhängig davon, wo im Dialog der Fokus liegt.
+
+---
+
 ## Verhalten im Detail
 
 | Szenario | Ergebnis |
 |---|---|
 | Nutzer klickt Bestätigen | `Promise<true>` |
 | Nutzer klickt Abbrechen | `Promise<false>` |
-| Nutzer drückt Escape | `Promise<false>` |
+| Nutzer drückt `Enter` | `Promise<true>` |
+| Nutzer drückt `Escape` | `Promise<false>` |
 | Nutzer klickt Backdrop | `Promise<false>` |
+| `countdown` erreicht 0 | `Promise<true>` (Autobestätigung) |
 | Zweites `confirm()` während Dialog offen ist | Erstes Promise löst `false` auf; zweiter Dialog öffnet sich |
 
 ---

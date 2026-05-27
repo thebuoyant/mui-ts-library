@@ -13,6 +13,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.5.0] — 2026-05-27
+
+### Added
+
+#### SqlEditor — Quick Wins (MTL-17)
+
+- **`Cmd+Enter` / `Ctrl+Enter` keyboard shortcut** — triggers `onExecute` directly from the editor without clicking the Execute toolbar button; implemented via CodeMirror `keymap.of([{ key: "Mod-Enter" }])`; works regardless of toolbar visibility
+- **Auto-sizing line-number gutter** — gutter width now adjusts automatically to the number of digits; previously had a hardcoded `minWidth: 36px` that caused unnecessary padding on short files
+
+#### ConfirmDialog — Quick Wins (MTL-17)
+
+- **`countdown?: number` prop** — auto-confirms the dialog after n seconds; the confirm button label shows a live countdown (`"Delete (5)"`, `"Delete (4)"`, …) and fires `onConfirm` when it reaches 0; countdown resets whenever the dialog closes
+- **`Enter` keyboard shortcut** — pressing Enter in an open dialog triggers Confirm; implemented via `onKeyDown` on the Dialog element; Escape still cancels as before
+
+#### PasswordStrengthMeter — Quick Wins (MTL-17)
+
+- **`showSegmentedBar?: boolean` prop** (default: `false`) — replaces the single animated strength bar with 4 individually animated segments; filled segment count maps directly to strength score (0–4)
+- **`customRequirements?: CustomRequirement[]` prop** — additional password requirements beyond the built-in 5; each entry has a `label: string` and `fulfilled: boolean | ((password: string) => boolean)`; the function form is evaluated live on every keystroke
+- New exported type: `CustomRequirement`
+
+#### JsonEditor — Quick Wins (MTL-17)
+
+- **`showMinimap?: boolean` prop** (default: `false`) — adds an 80 px wide minimap panel on the right side of the editor for fast navigation in large documents; powered by `@replit/codemirror-minimap` (MIT, 1 transitive dependency)
+- New dependency: `@replit/codemirror-minimap`
+
+#### GanttChart — Quick Wins (MTL-17)
+
+- **Today chip** — a small labeled chip floats at the very top of the dashed today line, straddling the timeline header and the task rows; the chip color matches `ganttTheme.todayLineColor` (fallback: MUI `primary.main`), text contrast is computed automatically via `theme.palette.getContrastText`; hovering shows a Tooltip with the current date as a localized long-form string (e.g. "Wednesday, 27 May 2026") using `translations.dateLocale`
+- New translation key **`todayLabel`** in `GanttTranslations` — default `"Heute"`, English: `"Today"`, set to `""` to hide the chip entirely
+
+---
+
 ## [1.4.0] — 2026-05-26
 
 ### Added

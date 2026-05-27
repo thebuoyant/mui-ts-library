@@ -15,6 +15,7 @@ const meta: Meta<typeof PasswordStrengthMeter> = {
     passwordMinLength:     8,
     showMeter:             true,
     showPasswordAdornment: true,
+    showSegmentedBar:      false,
     showSummary:           true,
     // Callback
     onPasswordChange: fn(),
@@ -28,16 +29,18 @@ const meta: Meta<typeof PasswordStrengthMeter> = {
     passwordMinLength:     { control: "number" },
     showMeter:             { control: "boolean" },
     showPasswordAdornment: { control: "boolean" },
+    showSegmentedBar:      { control: "boolean" },
     showSummary:           { control: "boolean" },
     // Komplexe Objekte / Form-Props — dedizierte Stories oder render verwenden
-    autoComplete:     { control: false },
-    checkColors:      { control: false },
-    inputRef:         { control: false },
-    meterColors:      { control: false },
-    name:             { control: false },
-    translation:      { control: false },
-    value:            { control: false },
-    onPasswordChange: { control: false },
+    autoComplete:         { control: false },
+    checkColors:          { control: false },
+    customRequirements:   { control: false },
+    inputRef:             { control: false },
+    meterColors:          { control: false },
+    name:                 { control: false },
+    translation:          { control: false },
+    value:                { control: false },
+    onPasswordChange:     { control: false },
   },
 };
 
@@ -193,4 +196,55 @@ function ControlledStory(args: ComponentProps<typeof PasswordStrengthMeter>) {
 // z. B. wenn die Komponente in ein bestehendes Formular eingebettet wird.
 export const Controlled: Story = {
   render: (args) => <ControlledStory {...args} />,
+};
+
+export const SegmentedBar: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`showSegmentedBar` replaces the single growing strength bar with **4 individually animated segments**. ' +
+          'Each segment lights up as the password strength increases. ' +
+          'The pre-filled password already shows 3 active segments — try changing it to see the segments animate.',
+      },
+    },
+  },
+  args: {
+    // Pre-filled so the segmented bar effect is immediately visible without typing.
+    value:           "MyP@ssw0rd",
+    showSegmentedBar: true,
+  },
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <PasswordStrengthMeter {...args} />
+    </Box>
+  ),
+};
+
+export const WithCustomRequirements: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`customRequirements` adds your own password rules below the built-in 5. ' +
+          'Each entry has a `label` and a `fulfilled` value — either a static `boolean` or a **live function** ' +
+          '`(password: string) => boolean` that is re-evaluated on every keystroke. ' +
+          'The pre-filled password intentionally violates the "no spaces" rule so you can see both ✅ and ❌ states. ' +
+          'Try removing the space to watch both custom requirements turn green.',
+      },
+    },
+  },
+  args: {
+    // "hello world" → "No spaces allowed" ❌, "Must start with a letter" ✅ — shows mixed state immediately.
+    value: "hello world",
+    customRequirements: [
+      { label: "No spaces allowed",        fulfilled: (pw) => !pw.includes(" ") },
+      { label: "Must start with a letter", fulfilled: (pw) => /^[a-zA-Z]/.test(pw) },
+    ],
+  },
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <PasswordStrengthMeter {...args} />
+    </Box>
+  ),
 };

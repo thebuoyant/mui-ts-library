@@ -4,19 +4,21 @@
 
 A type-safe React component library built on **TypeScript** and **MUI (Material UI v9)**. Components follow MUI's design language, support dark mode and theming out of the box, and ship with complete TypeScript types, Storybook stories, and unit tests.
 
+**[→ Live Storybook](https://thebuoyant.github.io/mui-ts-library/)** — interactive demos for every component and feature, always up to date with `main`.
+
 ---
 
 ## Components
 
 | Component | Description | Docs |
 |---|---|---|
-| [`ConfirmDialog`](#confirmdialog) | Declarative async confirmation dialog — `await confirm({ title, severity })` from anywhere in the app | [Full Manual →](user-manuals/ConfirmDialog.md) |
-| [`GanttChart`](#ganttchart) | Project timeline with hierarchical tasks, milestones, drag & drop, zoom, and built-in CRUD dialogs | [Full Manual →](user-manuals/GanttChart.md) |
+| [`ConfirmDialog`](#confirmdialog) | Declarative async confirmation dialog — `await confirm({ title, severity })` from anywhere in the app. Supports countdown auto-confirm and `Enter` = confirm shortcut. | [Full Manual →](user-manuals/ConfirmDialog.md) |
+| [`GanttChart`](#ganttchart) | Project timeline with hierarchical tasks, milestones, drag & drop, Ctrl+Scroll zoom, today chip, and built-in CRUD dialogs | [Full Manual →](user-manuals/GanttChart.md) |
 | [`TagSelection`](#tagselection) | Multi-tag selector with autocomplete, free tag creation, overflow chips, and MUI theme colors | [Full Manual →](user-manuals/TagSelection.md) |
-| [`PasswordStrengthMeter`](#passwordstrengthmeter) | Password input with animated strength meter and requirements checklist | [Full Manual →](user-manuals/PasswordStrengthMeter.md) |
+| [`PasswordStrengthMeter`](#passwordstrengthmeter) | Password input with animated strength meter, segmented bar, custom requirements, and requirements checklist | [Full Manual →](user-manuals/PasswordStrengthMeter.md) |
 | [`RichTextEditor`](#richtexteditor) | WYSIWYG editor (TipTap v3) with toolbar, link dialog, text color, highlight, word count, fullscreen mode, and Markdown paste | [Full Manual →](user-manuals/RichTextEditor.md) |
-| [`SqlEditor`](#sqleditor) | SQL code editor (CodeMirror 6) with syntax highlighting, multi-dialect, autocomplete, and linting | [Full Manual →](user-manuals/SqlEditor.md) |
-| [`JsonEditor`](#jsoneditor) | JSON code editor (CodeMirror 6) with real-time validation, Format, and Compact buttons | [Full Manual →](user-manuals/JsonEditor.md) |
+| [`SqlEditor`](#sqleditor) | SQL code editor (CodeMirror 6) with syntax highlighting, multi-dialect, autocomplete, linting, and `Cmd+Enter` execute shortcut | [Full Manual →](user-manuals/SqlEditor.md) |
+| [`JsonEditor`](#jsoneditor) | JSON code editor (CodeMirror 6) with real-time validation, Format, Compact buttons, and optional minimap | [Full Manual →](user-manuals/JsonEditor.md) |
 
 ---
 
@@ -62,7 +64,7 @@ import { ConfirmDialogProvider, useConfirm } from '@thebuoyant-tsdev/mui-ts-libr
 
 // Anywhere inside
 const confirm = useConfirm();
-const ok = await confirm({ title: 'Delete entry?', severity: 'error', confirmLabel: 'Delete' });
+const ok = await confirm({ title: 'Delete entry?', severity: 'error', confirmLabel: 'Delete', countdown: 10 });
 if (ok) handleDelete();
 ```
 
@@ -81,7 +83,7 @@ const tasks: GanttTask[] = [
   { id: '2', name: 'Go-Live', status: 'planned', startDate: new Date('2026-03-31'), endDate: new Date('2026-03-31'), isMilestone: true },
 ];
 
-<GanttChart tasks={tasks} timeScale="months" height={500} draggable resizable onTasksChange={save} />
+<GanttChart tasks={tasks} timeScale="months" height={500} draggable resizable zoomable onTasksChange={save} />
 ```
 
 → [Full documentation](user-manuals/GanttChart.md)
@@ -113,6 +115,7 @@ import { PasswordStrengthMeter } from '@thebuoyant-tsdev/mui-ts-library';
 
 <PasswordStrengthMeter
   passwordMinLength={10}
+  showSegmentedBar
   onPasswordChange={(password, result) => console.log(result.score)}
 />
 ```
@@ -145,6 +148,7 @@ import { SqlEditor } from '@thebuoyant-tsdev/mui-ts-library';
   placeholder="Enter SQL query…"
   dialect="postgresql"
   onChange={(sql) => console.log(sql)}
+  onExecute={(sql) => runQuery(sql)}
 />
 ```
 
@@ -160,6 +164,7 @@ import { JsonEditor } from '@thebuoyant-tsdev/mui-ts-library';
 <JsonEditor
   placeholder="Enter JSON…"
   showValidation
+  showMinimap
   onChange={(json) => console.log(json)}
 />
 ```

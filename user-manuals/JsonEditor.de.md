@@ -16,6 +16,14 @@ Der `JsonEditor` ist ein vollständiger JSON-Code-Editor auf Basis von [CodeMirr
 
 ---
 
+> ### ✨ Neu in v1.5.0
+>
+> | Feature | Beschreibung | Springe zu |
+> |---|---|---|
+> | **`showMinimap`** | Minimap-Panel für schnelle Navigation in großen Dokumenten | [→ Minimap](#minimap) |
+
+---
+
 ## Technische Voraussetzungen
 
 | Abhängigkeit | Mindestversion |
@@ -78,6 +86,7 @@ function App() {
 | `readonly` | `boolean` | `false` | Schreibgeschützter Modus — keine Toolbar |
 | `showLineColumn` | `boolean` | `true` | Cursor-Position im Footer anzeigen (Ln / Sp.) |
 | `showLineNumbers` | `boolean` | `true` | Zeilennummern-Gutter anzeigen |
+| `showMinimap` | `boolean` | `false` | Zeigt eine verkleinerte Dokumentenübersicht (Minimap) auf der rechten Seite des Editors an. Nützlich für die Navigation in großen JSON-Dateien. |
 | `showValidation` | `boolean` | `false` | „Gültiges JSON" / „Ungültiges JSON"-Anzeige im Footer |
 | `toolbarConfig` | `JsonEditorToolbarConfig` | alle `true` | Einzelne Toolbar-Buttons ein-/ausblenden |
 | `translation` | `Partial<JsonEditorTranslation>` | — | Abweichende Texte für Tooltips und Footer |
@@ -389,6 +398,23 @@ const colors: JsonEditorHighlightColors = {
 | `CustomHighlightColors` | One-Dark-inspiriertes Farbschema |
 | `GermanTranslation` | Vollständig übersetzte Toolbar und Validierungslabels |
 | `LargeDataset` | 20-Element-Array, 500px Höhe |
+| `WithMinimap` | Großer Datensatz mit aktiviertem Minimap-Panel |
+
+---
+
+## Minimap
+
+Die `showMinimap`-Prop fügt ein **80 px breites Minimap-Panel** auf der rechten Seite des Editors hinzu. Es rendert eine komprimierte Vogelperspektive des gesamten Dokuments und ermöglicht per Klick oder Drag direktes Springen zu beliebigen Positionen — besonders nützlich bei großen JSON-Dateien mit Hunderten von Zeilen.
+
+```tsx
+<JsonEditor
+  value={largesJSON}
+  height="500"
+  showMinimap
+/>
+```
+
+Die Minimap wird von [`@replit/codemirror-minimap`](https://www.npmjs.com/package/@replit/codemirror-minimap) (MIT-Lizenz, 1 transitive Abhängigkeit) gerendert. Sie ist opt-in (`showMinimap={false}` standardmäßig) — kein Bundle-Einfluss wenn nicht verwendet.
 
 ---
 
