@@ -14,6 +14,15 @@
 
 ---
 
+> ### ✨ Neu in v1.5.0
+>
+> | Feature | Beschreibung | Springe zu |
+> |---|---|---|
+> | **`countdown`** | Bestätigt automatisch nach n Sekunden mit Live-Countdown im Button-Label | [→ Countdown Auto-Bestätigung](#countdown-auto-bestätigung) |
+> | **`Enter`-Taste** | Enter in einem offenen Dialog löst Bestätigen aus | [→ Tastaturkürzel](#tastaturkürzel) |
+
+---
+
 ## Voraussetzungen
 
 | Abhängigkeit | Mindestversion |

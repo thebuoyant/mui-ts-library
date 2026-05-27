@@ -15,6 +15,15 @@ The `PasswordStrengthMeter` is a password input component built on React and Mat
 
 ---
 
+> ### ✨ New in v1.5.0
+>
+> | Feature | Description | Jump to |
+> |---|---|---|
+> | **`showSegmentedBar`** | Renders the strength bar as 4 individual animated segments instead of a single growing bar | [→ Segmented strength bar](#segmented-strength-bar) |
+> | **`customRequirements`** | Add your own password rules with live evaluation via `(password) => boolean` | [→ Custom requirements](#custom-requirements) |
+
+---
+
 ## Prerequisites
 
 | Dependency | Minimum version |

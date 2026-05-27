@@ -529,12 +529,27 @@ export const WithBuiltinDialogs: Story = {
 };
 
 export const ZoomAndToday: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Demonstrates two timeline navigation features:\n\n' +
+          '**Ctrl+Scroll zoom** (`zoomable`): Hold `Ctrl` (Windows/Linux) or `Cmd` (macOS) and scroll ' +
+          'with the mouse wheel inside the timeline to cycle through zoom levels — ' +
+          '`days` → `weeks` → `months` → `quarters` and back.\n\n' +
+          '**Today chip**: The small labeled chip at the top of the dashed today line. ' +
+          'Its label is configurable via `translations.todayLabel` (default: `"Heute"`, English: `"Today"`). ' +
+          'Set `todayLabel: ""` to hide it. Hover the chip for a tooltip with the full localized date.',
+      },
+    },
+  },
   args: {
-    tasks: sampleTasks,
-    timeScale: "months",
-    zoomable: true,
+    tasks:               sampleTasks,
+    timeScale:           "months",
+    zoomable:            true,
     enableBuiltinDialogs: true,
-    height: 500,
+    height:              500,
+    translations:        EN_TRANSLATIONS,
   },
   render: (args) => (
     <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
@@ -544,6 +559,20 @@ export const ZoomAndToday: Story = {
 };
 
 export const DragAndResize: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '**Drag** (`draggable`): Grab any task bar and drag it horizontally to shift its start and end date in sync. ' +
+          'A tooltip shows the current dates while dragging.\n\n' +
+          '**Resize** (`resizable`): Drag the right edge of a bar to extend or shorten the end date. ' +
+          'A tooltip shows the new end date while dragging.\n\n' +
+          'Both interactions fire the `onTaskMoved` / `onTaskResized` callbacks and update the task list ' +
+          'via `onTasksChange`. Use `cascadeDependencies` (default: `true`) to automatically shift all ' +
+          'downstream tasks when a predecessor moves.',
+      },
+    },
+  },
   args: {
     tasks: sampleTasks,
     timeScale: "months",
@@ -668,6 +697,65 @@ export const PerTaskColor: Story = {
   },
   render: (args) => (
     <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
+      <GanttChart {...args} />
+    </Box>
+  ),
+};
+
+export const CriticalPath: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`showCriticalPath` highlights the **longest dependency chain** in the project — ' +
+          'the sequence of tasks that directly determines the earliest possible finish date. ' +
+          'Critical tasks and their dependency arrows are rendered in `ganttTheme.criticalPathColor` ' +
+          '(default: MUI `error.main`). Hover a task bar to see its status.',
+      },
+    },
+  },
+  args: {
+    tasks:           dependencyTasks,
+    timeScale:       "months",
+    showCriticalPath: true,
+    initialExpandAll: true,
+    height:          450,
+  },
+  render: (args) => (
+    <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
+      <GanttChart {...args} />
+    </Box>
+  ),
+};
+
+export const WithProgressAndInlineEdit: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Two interactive editing features in one story:\n\n' +
+          '**Progress drag** (`progressDraggable`): Drag the small triangular handle on the right side ' +
+          'of a task bar to adjust the progress percentage (0–100 %) directly in the timeline. ' +
+          'The semi-transparent overlay expands as you drag right.\n\n' +
+          '**Inline edit** (`inlineEdit`): **Double-click a task name** in the left panel to edit it ' +
+          'in-place. Press Enter or click outside to confirm, Escape to cancel.',
+      },
+    },
+  },
+  args: {
+    tasks:            sampleTasks,
+    timeScale:        "months",
+    draggable:        true,
+    progressDraggable: true,
+    inlineEdit:       true,
+    initialExpandAll: true,
+    height:           550,
+    enableBuiltinDialogs: true,
+    onTaskMoved:      fn(),
+    onTasksChange:    fn(),
+  },
+  render: (args) => (
+    <Box sx={{ width: "100%", maxWidth: 1100, height: args.height }}>
       <GanttChart {...args} />
     </Box>
   ),

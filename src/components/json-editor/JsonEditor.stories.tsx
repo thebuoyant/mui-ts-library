@@ -250,6 +250,17 @@ export const LargeDataset: Story = {
 };
 
 export const WithMinimap: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`showMinimap` adds a **vertical minimap panel** (80 px wide) on the right side of the editor. ' +
+          'The minimap renders a condensed overview of the entire document and lets you **click or drag** to jump ' +
+          'to any position instantly — especially useful for large JSON files with hundreds of lines. ' +
+          'Powered by `@replit/codemirror-minimap` (MIT). Try scrolling inside the minimap.',
+      },
+    },
+  },
   args: {
     value:       LARGE_JSON,
     height:      "500",

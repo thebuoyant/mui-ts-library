@@ -25,4 +25,10 @@
 
 ### Stories & tests
 - [ ] New props covered by at least one Storybook story
+- [ ] Feature stories use pre-filled args (no manual "Set prop" needed)
+- [ ] New feature stories have a `parameters.docs.description.story` explanation
 - [ ] New behavior covered by at least one Vitest test
+
+### Storybook static
+- [ ] `npm run build-storybook` runs without errors
+- [ ] `npm run preview-storybook` → `http://localhost:6007` — all new stories visible and self-explanatory without manual prop changes

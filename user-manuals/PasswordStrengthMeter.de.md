@@ -15,6 +15,15 @@ Der `PasswordStrengthMeter` ist eine Passwort-Eingabe-Komponente auf Basis von R
 
 ---
 
+> ### ✨ Neu in v1.5.0
+>
+> | Feature | Beschreibung | Springe zu |
+> |---|---|---|
+> | **`showSegmentedBar`** | Stärkebalken als 4 einzeln animierte Segmente statt einem wachsenden Balken | [→ Segmentierter Stärkebalken](#segmentierter-stärkebalken) |
+> | **`customRequirements`** | Eigene Passwort-Anforderungen mit Live-Auswertung via `(password) => boolean` | [→ Eigene Anforderungen](#eigene-anforderungen) |
+
+---
+
 ## Technische Voraussetzungen
 
 | Abhängigkeit | Mindestversion |

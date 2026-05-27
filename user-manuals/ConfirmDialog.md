@@ -14,6 +14,15 @@
 
 ---
 
+> ### ✨ New in v1.5.0
+>
+> | Feature | Description | Jump to |
+> |---|---|---|
+> | **`countdown`** | Auto-confirms after n seconds with a live countdown in the button label | [→ Countdown Auto-Confirm](#countdown-auto-confirm) |
+> | **`Enter` key** | Pressing Enter in an open dialog triggers Confirm | [→ Keyboard Shortcuts](#keyboard-shortcuts) |
+
+---
+
 ## Prerequisites
 
 | Dependency | Minimum version |

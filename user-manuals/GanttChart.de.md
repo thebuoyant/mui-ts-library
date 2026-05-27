@@ -15,6 +15,15 @@ Der `GanttChart` ist eine vollständig interaktive Projektplanungs-Komponente au
 
 ---
 
+> ### ✨ Neu in v1.5.0
+>
+> | Feature | Beschreibung | Springe zu |
+> |---|---|---|
+> | **Heute-Chip** | Beschrifteter Chip am oberen Ende der gestrichelten Heute-Linie — Label via `translations.todayLabel`, Farbe via `ganttTheme.todayLineColor` | [→ Heute-Linie & Chip](#heute-linie--chip) |
+> | **`zoomable`** | `Ctrl+Scroll` wechselt zwischen Tage / Wochen / Monate / Quartale direkt in der Timeline | [→ Ctrl+Scroll-Zoom](#ctrlscroll-zoom) |
+
+---
+
 ## Technische Voraussetzungen
 
 | Abhängigkeit | Mindestversion |
@@ -506,6 +515,50 @@ const tasks: GanttTask[] = [
   height={600}
 />
 ```
+
+---
+
+## Heute-Linie & Chip
+
+Die gestrichelte Heute-Linie markiert das aktuelle Datum in der Timeline. Am oberen Ende dieser Linie schwebt ein kleiner beschrifteter **Chip**, der genau auf der Grenze zwischen Header und Task-Zeilen sitzt.
+
+```tsx
+{/* Standard: zeigt "Heute"-Chip */}
+<GanttChart tasks={tasks} />
+
+{/* Englisches Label */}
+<GanttChart tasks={tasks} translations={{ todayLabel: 'Today' }} />
+
+{/* Chip vollständig ausblenden */}
+<GanttChart tasks={tasks} translations={{ todayLabel: '' }} />
+```
+
+**Anpassungsmöglichkeiten:**
+
+| Aspekt | Steuerung |
+|---|---|
+| Chip-Label | `translations.todayLabel` (Standard: `"Heute"`, `""` = kein Chip) |
+| Chip- & Linienfarbe | `ganttTheme.todayLineColor` (Standard: MUI `primary.main`) |
+| Datumsformat im Tooltip | `translations.dateLocale` (BCP-47, z. B. `"de-DE"`) |
+
+Beim Hover auf den Chip erscheint ein Tooltip mit dem vollständigen lokalisierten Datum (z. B. „Mittwoch, 27. Mai 2026").
+
+---
+
+## Ctrl+Scroll-Zoom
+
+Bei `zoomable={true}` kann der Nutzer direkt in der Timeline durch die Zoom-Stufen wechseln:
+
+| Aktion | Ergebnis |
+|---|---|
+| `Strg + Scroll hoch` (bzw. `Cmd + Scroll hoch` auf macOS) | Hereinzoomen — wechselt `Quartale` → `Monate` → `Wochen` → `Tage` |
+| `Strg + Scroll runter` | Herauszoomen — wechselt `Tage` → `Wochen` → `Monate` → `Quartale` |
+
+```tsx
+<GanttChart tasks={tasks} zoomable />
+```
+
+`zoomable` ist standardmäßig `false`, um unbeabsichtigtes Zoomen beim Scrollen der Seite zu vermeiden.
 
 ---
 

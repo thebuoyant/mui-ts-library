@@ -199,7 +199,19 @@ export const Controlled: Story = {
 };
 
 export const SegmentedBar: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`showSegmentedBar` replaces the single growing strength bar with **4 individually animated segments**. ' +
+          'Each segment lights up as the password strength increases. ' +
+          'The pre-filled password already shows 3 active segments — try changing it to see the segments animate.',
+      },
+    },
+  },
   args: {
+    // Pre-filled so the segmented bar effect is immediately visible without typing.
+    value:           "MyP@ssw0rd",
     showSegmentedBar: true,
   },
   render: (args) => (
@@ -210,9 +222,23 @@ export const SegmentedBar: Story = {
 };
 
 export const WithCustomRequirements: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`customRequirements` adds your own password rules below the built-in 5. ' +
+          'Each entry has a `label` and a `fulfilled` value — either a static `boolean` or a **live function** ' +
+          '`(password: string) => boolean` that is re-evaluated on every keystroke. ' +
+          'The pre-filled password intentionally violates the "no spaces" rule so you can see both ✅ and ❌ states. ' +
+          'Try removing the space to watch both custom requirements turn green.',
+      },
+    },
+  },
   args: {
+    // "hello world" → "No spaces allowed" ❌, "Must start with a letter" ✅ — shows mixed state immediately.
+    value: "hello world",
     customRequirements: [
-      { label: "No spaces allowed",      fulfilled: (pw) => !pw.includes(" ") },
+      { label: "No spaces allowed",        fulfilled: (pw) => !pw.includes(" ") },
       { label: "Must start with a letter", fulfilled: (pw) => /^[a-zA-Z]/.test(pw) },
     ],
   },

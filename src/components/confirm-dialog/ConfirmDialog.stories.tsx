@@ -241,6 +241,18 @@ export const GermanTranslation: Story = {
 };
 
 export const WithCountdown: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'The `countdown` option auto-confirms the dialog after n seconds. ' +
+          'The confirm button label shows a **live countdown** — e.g. `"Delete (5)"`, `"Delete (4)"`, … — ' +
+          'and fires `confirm()` automatically when it reaches zero. ' +
+          'Click the button and watch the countdown run. ' +
+          '**Bonus:** while the dialog is open, pressing **`Enter`** confirms immediately (keyboard shortcut built-in).',
+      },
+    },
+  },
   render: () => (
     <Box sx={{ p: 2 }}>
       <ConfirmDialogProvider>

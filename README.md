@@ -4,6 +4,8 @@
 
 A type-safe React component library built on **TypeScript** and **MUI (Material UI v9)**. Components follow MUI's design language, support dark mode and theming out of the box, and ship with complete TypeScript types, Storybook stories, and unit tests.
 
+**[→ Live Storybook](https://thebuoyant.github.io/mui-ts-library/)** — interactive demos for every component and feature, always up to date with `main`.
+
 ---
 
 ## Components
