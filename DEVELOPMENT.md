@@ -30,23 +30,7 @@ npm run storybook
 
 # Build a static Storybook
 npm run build-storybook
-
-# Preview the static build in the browser (http://localhost:6007)
-# Always use this — never open storybook-static/index.html directly via file://
-npm run preview-storybook
 ```
-
-### Storybook on GitHub Pages (Live URL)
-
-Every push to `main` automatically triggers the **Deploy Storybook** GitHub Actions workflow (`.github/workflows/deploy-storybook.yml`). It builds the static Storybook and deploys it to GitHub Pages:
-
-**→ [https://thebuoyant.github.io/mui-ts-library/](https://thebuoyant.github.io/mui-ts-library/)**
-
-> **One-time setup required:** GitHub Pages must be enabled once in the repository settings.  
-> Go to **Settings → Pages → Source → GitHub Actions**, then push to `main`.  
-> The workflow handles everything else automatically on every subsequent push.
-
----
 
 ### Storybook Docker Distribution
 
@@ -149,9 +133,7 @@ Before merging a feature branch into `main`, verify **every item** in this list.
 ### Storybook static
 
 - [ ] `npm run build-storybook` runs without errors
-- [ ] `npm run preview-storybook` opens the browser at `http://localhost:6007` — all new stories are visible and self-explanatory without manual prop changes
-
-> **Note:** `storybook-static/` is in `.gitignore` (local build artifact). Never open `index.html` directly via `file://` — browsers block ES module imports for local files. Always use `npm run preview-storybook`.
+- [ ] `npm run storybook` — all new stories visible and self-explanatory without manual prop changes
 
 ---
 

@@ -4,8 +4,6 @@
 
 Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **MUI (Material UI v9)**. Die Komponenten folgen MUI's Design-Sprache, unterstützen Dark Mode und Theming von Haus aus und werden mit vollständigen TypeScript-Typen, Storybook-Stories und Unit-Tests ausgeliefert.
 
-**[→ Live-Storybook](https://thebuoyant.github.io/mui-ts-library/)** — interaktive Demos für jede Komponente und jedes Feature, immer aktuell mit `main`.
-
 ---
 
 ## Komponenten
