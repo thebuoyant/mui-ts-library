@@ -5,7 +5,6 @@ import {
   type SunburstChartProps,
   type SunburstSegmentInfo,
   type SunburstZoomInfo,
-  DEFAULT_SUNBURST_CHART_TRANSLATION,
 } from "./SunburstChart.types";
 import type { SunburstChartData } from "./SunburstChart.types";
 
@@ -37,13 +36,10 @@ function truncateLabel(name: string, availPx: number): string {
 // ── Tooltip content — rendered inside MUI Tooltip (dark background) ──────────
 
 type SegmentTooltipTitleProps = {
-  node:               d3.HierarchyRectangularNode<SunburstChartData>;
-  valueDecimalCount:  number;
-  valueDecimalSep:    string;
-  valueThousandsSep:  string;
-  ctrlClickToZoomIn:  string;
-  ctrlDblClickZoomOut: string;
-  disabled:           boolean;
+  node:              d3.HierarchyRectangularNode<SunburstChartData>;
+  valueDecimalCount: number;
+  valueDecimalSep:   string;
+  valueThousandsSep: string;
 };
 
 function SegmentTooltipTitle({
@@ -51,13 +47,9 @@ function SegmentTooltipTitle({
   valueDecimalCount,
   valueDecimalSep,
   valueThousandsSep,
-  ctrlClickToZoomIn,
-  ctrlDblClickZoomOut,
-  disabled,
 }: SegmentTooltipTitleProps) {
-  const hasValue    = (node.value ?? 0) > 0;
-  const hasChildren = !!node.children;
-  const breadcrumb  = node.ancestors().map((a) => a.data.name).reverse().join(" › ");
+  const hasValue   = (node.value ?? 0) > 0;
+  const breadcrumb = node.ancestors().map((a) => a.data.name).reverse().join(" › ");
 
   return (
     <Box sx={{ py: 0.25 }}>
@@ -72,22 +64,6 @@ function SegmentTooltipTitle({
       {node.depth > 0 && (
         <Typography variant="caption" sx={{ display: "block", opacity: 0.65, mt: 0.25 }}>
           {breadcrumb}
-        </Typography>
-      )}
-      {hasChildren && !disabled && (
-        <Typography
-          variant="caption"
-          sx={{
-            display:    "block",
-            opacity:    0.55,
-            mt:         0.5,
-            borderTop:  "1px solid rgba(255,255,255,0.18)",
-            pt:         0.5,
-          }}
-        >
-          {ctrlClickToZoomIn}
-          <br />
-          {ctrlDblClickZoomOut}
         </Typography>
       )}
     </Box>
@@ -110,10 +86,8 @@ export function SunburstChart({
   valueDecimalSeparator = ".",
   valueThousandsSeparator = ",",
   disabled = false,
-  translation,
 }: SunburstChartProps) {
   const theme = useTheme();
-  const t = { ...DEFAULT_SUNBURST_CHART_TRANSLATION, ...translation };
 
   const contentRef = useRef<SVGGElement>(null);
   const [viewBox, setViewBox] = useState(`-${size / 2} -${size / 2} ${size} ${size}`);
@@ -354,11 +328,7 @@ export function SunburstChart({
           {clampedInner > 0 && (
             <Tooltip
               {...tooltipProps}
-              title={
-                focusNode !== root
-                  ? `${t.ctrlDblClickToZoomOut} · ${t.escToResetZoom}`
-                  : t.ctrlClickToZoomIn
-              }
+              title={focusNode.data.name}
               placement="top"
             >
               <circle
@@ -390,9 +360,6 @@ export function SunburstChart({
                         valueDecimalCount={valueDecimalCount}
                         valueDecimalSep={valueDecimalSeparator}
                         valueThousandsSep={valueThousandsSeparator}
-                        ctrlClickToZoomIn={t.ctrlClickToZoomIn}
-                        ctrlDblClickZoomOut={t.ctrlDblClickToZoomOut}
-                        disabled={disabled}
                       />
                     ) : ""
                   }
@@ -445,9 +412,7 @@ export function SunburstChart({
             <Tooltip
               {...tooltipProps}
               placement="top"
-              title={focusNode !== root && !disabled
-                ? `${t.ctrlDblClickToZoomOut} · ${t.escToResetZoom}`
-                : ""}
+              title=""
             >
               <g
                 textAnchor="middle"

@@ -34,20 +34,11 @@ export type SunburstZoomInfo = {
 
 export type SunburstChartTranslation = {
   /** Shown when data has no children and no value */
-  noData:                string;
-  /** SVG tooltip hint on segments with children */
-  ctrlClickToZoomIn:     string;
-  /** SVG tooltip hint on center label / root area */
-  ctrlDblClickToZoomOut: string;
-  /** Tooltip hint shown on center when zoomed in */
-  escToResetZoom:        string;
+  noData: string;
 };
 
 export const DEFAULT_SUNBURST_CHART_TRANSLATION: SunburstChartTranslation = {
-  noData:                'No data',
-  ctrlClickToZoomIn:     'Ctrl+Click to zoom in',
-  ctrlDblClickToZoomOut: 'Ctrl+Double-click to zoom out',
-  escToResetZoom:        'Esc to reset zoom',
+  noData: 'No data',
 };
 
 export type SunburstChartProps = {
