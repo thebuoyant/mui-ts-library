@@ -260,7 +260,7 @@ Alle Interaktionen sind deaktiviert. Das Chart wird mit reduzierter Opacity (`0.
 />
 ```
 
-Die Translation-Strings erscheinen im **Custom MUI-Tooltip**, der beim Hover sofort erscheint (kein Browser-Delay). Der Tooltip zeigt Knotenname, formatierten Wert, Breadcrumb-Pfad und Zoom-Shortcut-Hinweise. Alle Keys sind optional — nicht gesetzte Keys verwenden die englischen Standardwerte.
+Die Translation-Strings erscheinen in der **MUI `<Tooltip>`-Komponente** (dunkler Hintergrund, Pfeil, `enterDelay={50}ms`), die jedes Segment umschließt. Der Tooltip zeigt Knotenname, formatierten Wert, Breadcrumb-Pfad und Zoom-Shortcut-Hinweise. Alle Keys sind optional — nicht gesetzte Keys verwenden die englischen Standardwerte.
 
 ---
 

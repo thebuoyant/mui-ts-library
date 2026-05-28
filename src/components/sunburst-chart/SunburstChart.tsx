@@ -1,6 +1,6 @@
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import * as d3 from "d3";
-import { Box, Paper, Typography, useTheme } from "@mui/material";
+import { Box, Tooltip, Typography, useTheme } from "@mui/material";
 import {
   type SunburstChartProps,
   type SunburstSegmentInfo,
@@ -9,9 +9,9 @@ import {
 } from "./SunburstChart.types";
 import type { SunburstChartData } from "./SunburstChart.types";
 
-const TWO_PI       = 2 * Math.PI;
-const LABEL_SIZE   = 11;          // px — font-size of arc labels
-const AVG_CHAR_W   = LABEL_SIZE * 0.58; // rough average char width for sans-serif
+const TWO_PI     = 2 * Math.PI;
+const LABEL_SIZE = 11;
+const AVG_CHAR_W = LABEL_SIZE * 0.58;
 
 function formatNumber(
   value: number | null | undefined,
@@ -26,7 +26,6 @@ function formatNumber(
   return decPart ? `${withThousands}${decimalSep}${decPart}` : withThousands;
 }
 
-// Truncate label to fit available arc width — adds "…" when clipped
 function truncateLabel(name: string, availPx: number): string {
   const maxChars = Math.floor(availPx / AVG_CHAR_W);
   if (maxChars <= 0) return "";
@@ -35,11 +34,67 @@ function truncateLabel(name: string, availPx: number): string {
   return name.slice(0, maxChars - 1) + "…";
 }
 
-type TooltipState = {
-  node: d3.HierarchyRectangularNode<SunburstChartData>;
-  x: number;  // px relative to container
-  y: number;
+// ── Tooltip content — rendered inside MUI Tooltip (dark background) ──────────
+
+type SegmentTooltipTitleProps = {
+  node:               d3.HierarchyRectangularNode<SunburstChartData>;
+  valueDecimalCount:  number;
+  valueDecimalSep:    string;
+  valueThousandsSep:  string;
+  ctrlClickToZoomIn:  string;
+  ctrlDblClickZoomOut: string;
+  disabled:           boolean;
 };
+
+function SegmentTooltipTitle({
+  node,
+  valueDecimalCount,
+  valueDecimalSep,
+  valueThousandsSep,
+  ctrlClickToZoomIn,
+  ctrlDblClickZoomOut,
+  disabled,
+}: SegmentTooltipTitleProps) {
+  const hasValue    = (node.value ?? 0) > 0;
+  const hasChildren = !!node.children;
+  const breadcrumb  = node.ancestors().map((a) => a.data.name).reverse().join(" › ");
+
+  return (
+    <Box sx={{ py: 0.25 }}>
+      <Typography variant="caption" sx={{ fontWeight: "bold", display: "block" }}>
+        {node.data.name}
+      </Typography>
+      {hasValue && (
+        <Typography variant="caption" sx={{ display: "block", opacity: 0.85 }}>
+          {formatNumber(node.value ?? 0, valueDecimalCount, valueDecimalSep, valueThousandsSep)}
+        </Typography>
+      )}
+      {node.depth > 0 && (
+        <Typography variant="caption" sx={{ display: "block", opacity: 0.65, mt: 0.25 }}>
+          {breadcrumb}
+        </Typography>
+      )}
+      {hasChildren && !disabled && (
+        <Typography
+          variant="caption"
+          sx={{
+            display:    "block",
+            opacity:    0.55,
+            mt:         0.5,
+            borderTop:  "1px solid rgba(255,255,255,0.18)",
+            pt:         0.5,
+          }}
+        >
+          {ctrlClickToZoomIn}
+          <br />
+          {ctrlDblClickZoomOut}
+        </Typography>
+      )}
+    </Box>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 export function SunburstChart({
   data,
@@ -60,14 +115,12 @@ export function SunburstChart({
   const theme = useTheme();
   const t = { ...DEFAULT_SUNBURST_CHART_TRANSLATION, ...translation };
 
-  const containerRef = useRef<HTMLDivElement>(null);
-  const contentRef   = useRef<SVGGElement>(null);
-  const [viewBox,      setViewBox]      = useState(`-${size / 2} -${size / 2} ${size} ${size}`);
-  const [tooltipState, setTooltipState] = useState<TooltipState | null>(null);
+  const contentRef = useRef<SVGGElement>(null);
+  const [viewBox, setViewBox] = useState(`-${size / 2} -${size / 2} ${size} ${size}`);
 
-  const radius      = size / 2;
+  const radius       = size / 2;
   const clampedInner = Math.max(0, Math.min(innerRadius, Math.max(0, radius - 1)));
-  const radialSpan  = Math.max(1, radius - clampedInner);
+  const radialSpan   = Math.max(1, radius - clampedInner);
 
   const defaultColors = [
     theme.palette.primary.main,
@@ -86,8 +139,7 @@ export function SunburstChart({
     } else {
       h.sort((a, b) =>
         String(a.data.name).localeCompare(String(b.data.name), undefined, {
-          numeric: true,
-          sensitivity: "base",
+          numeric: true, sensitivity: "base",
         }),
       );
     }
@@ -201,7 +253,6 @@ export function SunburstChart({
     [root, serialize, onZoomChange],
   );
 
-  // Auto-fit viewBox
   useLayoutEffect(() => {
     const g = contentRef.current;
     if (!g) return;
@@ -217,7 +268,6 @@ export function SunburstChart({
     return () => cancelAnimationFrame(id);
   }, [size, root, focusNode, clampedInner, ringThickness, showRootLabel]);
 
-  // Ctrl+Click zoom-in timer (distinguishes from Ctrl+DblClick)
   const zoomTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scheduleZoomIn = (fn: () => void) => {
     if (zoomTimerRef.current) { clearTimeout(zoomTimerRef.current); zoomTimerRef.current = null; }
@@ -227,7 +277,6 @@ export function SunburstChart({
     if (zoomTimerRef.current) { clearTimeout(zoomTimerRef.current); zoomTimerRef.current = null; }
   };
 
-  // Escape → reset zoom
   useLayoutEffect(() => {
     if (disabled) return;
     const onKey = (e: KeyboardEvent) => {
@@ -236,14 +285,6 @@ export function SunburstChart({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [disabled, root, zoom]);
-
-  // Tooltip helpers — relative to container Box
-  const getRelativePos = (e: React.MouseEvent) => {
-    const rect = containerRef.current?.getBoundingClientRect();
-    return rect
-      ? { x: e.clientX - rect.left, y: e.clientY - rect.top }
-      : { x: e.clientX, y: e.clientY };
-  };
 
   const renderNodes = root.descendants().filter((n) => n.depth > 0);
 
@@ -277,22 +318,24 @@ export function SunburstChart({
     onSegmentClick?.(serialize(focusNode.parent ?? root), e as React.MouseEvent<SVGCircleElement>);
   };
 
-  // Tooltip position — 14px right + auto-flip if near right edge
-  const tooltipOffset = 14;
-  const tooltipWidth  = 220;
-  let tooltipLeft = (tooltipState?.x ?? 0) + tooltipOffset;
-  const tooltipTop  = (tooltipState?.y ?? 0) - 10;
-  if (tooltipLeft + tooltipWidth > size) tooltipLeft = (tooltipState?.x ?? 0) - tooltipWidth - tooltipOffset + 10;
+  // Shared tooltip props — 50ms delay for snappy feel, MUI standard arrow
+  const tooltipProps = {
+    arrow:           true,
+    enterDelay:      50,
+    enterNextDelay:  0,
+    disableHoverListener: disabled,
+    slotProps: {
+      tooltip: { sx: { maxWidth: 260 } },
+    },
+  } as const;
 
   const textColor  = theme.palette.text.primary;
   const fontFamily = theme.typography.fontFamily;
 
   return (
     <Box
-      ref={containerRef}
       sx={{
         display:   "inline-flex",
-        position:  "relative",
         opacity:   disabled ? 0.5 : 1,
         cursor:    disabled ? "not-allowed" : "default",
         userSelect: "none",
@@ -305,24 +348,28 @@ export function SunburstChart({
         style={{ fontFamily: fontFamily ?? "sans-serif", overflow: "visible" }}
         role="img"
         aria-label={data.name}
-        onMouseLeave={() => setTooltipState(null)}
       >
         <g ref={contentRef}>
           {/* Center hole hit area (donut mode) */}
           {clampedInner > 0 && (
-            <circle
-              cx={0} cy={0}
-              r={clampedInner}
-              fill="transparent"
-              pointerEvents={disabled ? "none" : "auto"}
-              onClick={handleCenterClick}
-              onMouseEnter={(e) => {
-                const node = focusNode.parent ?? root;
-                setTooltipState({ node, ...getRelativePos(e) });
-              }}
-              onMouseMove={(e) => setTooltipState((s) => s ? { ...s, ...getRelativePos(e) } : null)}
-              style={{ cursor: disabled ? "not-allowed" : "pointer" }}
-            />
+            <Tooltip
+              {...tooltipProps}
+              title={
+                focusNode !== root
+                  ? `${t.ctrlDblClickToZoomOut} · ${t.escToResetZoom}`
+                  : t.ctrlClickToZoomIn
+              }
+              placement="top"
+            >
+              <circle
+                cx={0} cy={0}
+                r={clampedInner}
+                fill="transparent"
+                pointerEvents={disabled ? "none" : "auto"}
+                onClick={handleCenterClick}
+                style={{ cursor: disabled ? "not-allowed" : "pointer" }}
+              />
+            </Tooltip>
           )}
 
           {/* Segments */}
@@ -332,37 +379,52 @@ export function SunburstChart({
               const visible     = arcVisible(local);
               const hasChildren = !!node.children;
               return (
-                <path
-                  key={`seg-${node.data.id}-${idx}`}
-                  data-idx={idx}
-                  d={arc(local) || ""}
-                  fill={fillFor(node)}
-                  fillOpacity={visible ? (hasChildren ? 0.75 : 0.5) : 0}
-                  style={{
-                    pointerEvents: visible && !disabled ? "auto" : "none",
-                    cursor:        hasChildren && !disabled ? "pointer" : "default",
-                    transition:    "fill-opacity 0.15s",
-                  }}
-                  onClick={handlePathClick}
-                  onDoubleClick={handlePathDblClick}
-                  onMouseEnter={(e) => visible && setTooltipState({ node, ...getRelativePos(e) })}
-                  onMouseMove={(e) =>  visible && setTooltipState((s) => s ? { ...s, ...getRelativePos(e) } : null)}
-                  onMouseLeave={() => setTooltipState(null)}
-                />
+                <Tooltip
+                  key={`tt-${node.data.id}-${idx}`}
+                  {...tooltipProps}
+                  placement="top"
+                  title={
+                    visible ? (
+                      <SegmentTooltipTitle
+                        node={node}
+                        valueDecimalCount={valueDecimalCount}
+                        valueDecimalSep={valueDecimalSeparator}
+                        valueThousandsSep={valueThousandsSeparator}
+                        ctrlClickToZoomIn={t.ctrlClickToZoomIn}
+                        ctrlDblClickZoomOut={t.ctrlDblClickToZoomOut}
+                        disabled={disabled}
+                      />
+                    ) : ""
+                  }
+                >
+                  <path
+                    data-idx={idx}
+                    d={arc(local) || ""}
+                    fill={fillFor(node)}
+                    fillOpacity={visible ? (hasChildren ? 0.75 : 0.5) : 0}
+                    style={{
+                      pointerEvents: visible && !disabled ? "auto" : "none",
+                      cursor:        hasChildren && !disabled ? "pointer" : "default",
+                      transition:    "fill-opacity 0.15s",
+                    }}
+                    onClick={handlePathClick}
+                    onDoubleClick={handlePathDblClick}
+                  />
+                </Tooltip>
               );
             })}
           </g>
 
-          {/* Arc labels — truncated to fit, full name shown in tooltip */}
+          {/* Arc labels — truncated to fit, full name in tooltip */}
           {showSegmentLabels && (
             <g pointerEvents="none" textAnchor="middle" fill={textColor}>
               {renderNodes.map((node, idx) => {
                 if (!isInFocus(node)) return null;
-                const local = toLocal(node);
+                const local   = toLocal(node);
                 if (!labelVisible(local)) return null;
-                const midR      = clampedInner + (local.y0 + local.y1) / 2;
-                const availPx   = midR * (local.x1 - local.x0) * 0.82;
-                const label     = truncateLabel(node.data.name, availPx);
+                const midR    = clampedInner + (local.y0 + local.y1) / 2;
+                const availPx = midR * (local.x1 - local.x0) * 0.82;
+                const label   = truncateLabel(node.data.name, availPx);
                 if (!label) return null;
                 return (
                   <text
@@ -380,82 +442,28 @@ export function SunburstChart({
 
           {/* Center label — current focus node name */}
           {showRootLabel && (
-            <g
-              textAnchor="middle"
-              fill={textColor}
-              pointerEvents={disabled ? "none" : "auto"}
-              onClick={handleCenterClick}
-              style={{ cursor: focusNode !== root && !disabled ? "pointer" : "default" }}
+            <Tooltip
+              {...tooltipProps}
+              placement="top"
+              title={focusNode !== root && !disabled
+                ? `${t.ctrlDblClickToZoomOut} · ${t.escToResetZoom}`
+                : ""}
             >
-              <text fontSize={13} dy="0.35em" fontWeight="bold">
-                {focusNode.data.name}
-              </text>
-            </g>
+              <g
+                textAnchor="middle"
+                fill={textColor}
+                pointerEvents={disabled ? "none" : "auto"}
+                onClick={handleCenterClick}
+                style={{ cursor: focusNode !== root && !disabled ? "pointer" : "default" }}
+              >
+                <text fontSize={13} dy="0.35em" fontWeight="bold">
+                  {focusNode.data.name}
+                </text>
+              </g>
+            </Tooltip>
           )}
         </g>
       </svg>
-
-      {/* Custom tooltip — instant appear, no browser delay */}
-      {tooltipState && (
-        <Paper
-          elevation={4}
-          sx={{
-            position:      "absolute",
-            left:          tooltipLeft,
-            top:           tooltipTop,
-            width:         tooltipWidth,
-            pointerEvents: "none",
-            zIndex:        1500,
-            px:            1.5,
-            py:            1,
-            borderRadius:  1.5,
-            border:        "1px solid",
-            borderColor:   "divider",
-          }}
-        >
-          {/* Node name */}
-          <Typography variant="body2" sx={{ fontWeight: "bold" }} noWrap>
-            {tooltipState.node.data.name}
-          </Typography>
-
-          {/* Value */}
-          {(tooltipState.node.value ?? 0) > 0 && (
-            <Typography variant="body2" color="text.secondary">
-              {formatNumber(
-                tooltipState.node.value ?? 0,
-                valueDecimalCount,
-                valueDecimalSeparator,
-                valueThousandsSeparator,
-              )}
-            </Typography>
-          )}
-
-          {/* Breadcrumb path */}
-          {tooltipState.node.depth > 0 && (
-            <Typography
-              variant="caption"
-              color="text.disabled"
-              sx={{ display: "block", mt: 0.5 }}
-              noWrap
-            >
-              {tooltipState.node.ancestors().map((a) => a.data.name).reverse().join(" › ")}
-            </Typography>
-          )}
-
-          {/* Zoom hints for parent nodes */}
-          {tooltipState.node.children && !disabled && (
-            <Typography
-              variant="caption"
-              color="text.disabled"
-              sx={{ display: "block", mt: 0.75, borderTop: "1px solid", borderColor: "divider", pt: 0.75 }}
-            >
-              {t.ctrlClickToZoomIn}
-              <br />
-              {t.ctrlDblClickToZoomOut}
-            </Typography>
-          )}
-        </Paper>
-      )}
     </Box>
   );
 }

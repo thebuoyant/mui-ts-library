@@ -260,7 +260,7 @@ All interactions are muted. The chart renders at reduced opacity (`0.5`). Useful
 />
 ```
 
-Translation strings appear in the **custom MUI tooltip** that pops up instantly on hover (no browser delay). The tooltip shows the node name, formatted value, breadcrumb path, and zoom shortcut hints. All keys are optional — unset keys fall back to the English defaults.
+Translation strings appear in the **MUI `<Tooltip>` component** (dark background, arrow, `enterDelay={50}ms`) that wraps each segment. The tooltip shows the node name, formatted value, breadcrumb path, and zoom shortcut hints. All keys are optional — unset keys fall back to the English defaults.
 
 ---
 
