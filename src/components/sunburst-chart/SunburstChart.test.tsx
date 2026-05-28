@@ -58,32 +58,35 @@ describe("SunburstChart", () => {
     expect(document.querySelector("text")).toBeInTheDocument();
   });
 
-  it("Should call onSegmentClick with correct info on single click", async () => {
-    vi.useFakeTimers();
+  it("Should call onSegmentClick immediately on regular click (no delay)", () => {
     const handler = vi.fn();
     render(<SunburstChart data={SIMPLE_DATA} onSegmentClick={handler} />);
     const firstPath = document.querySelector<SVGPathElement>("path[data-idx='0']");
     expect(firstPath).toBeTruthy();
     fireEvent.click(firstPath!);
-    vi.runAllTimers();
+    // No timer needed — callback fires immediately
     expect(handler).toHaveBeenCalledTimes(1);
     const [info] = handler.mock.calls[0];
     expect(info).toHaveProperty("name");
     expect(info).toHaveProperty("depth");
     expect(info).toHaveProperty("path");
     expect(info).toHaveProperty("childrenCount");
-    vi.useRealTimers();
   });
 
   it("Should not fire onSegmentClick when disabled", () => {
-    vi.useFakeTimers();
     const handler = vi.fn();
     render(<SunburstChart data={SIMPLE_DATA} onSegmentClick={handler} disabled />);
     const firstPath = document.querySelector<SVGPathElement>("path[data-idx='0']");
     fireEvent.click(firstPath!);
-    vi.runAllTimers();
     expect(handler).not.toHaveBeenCalled();
-    vi.useRealTimers();
+  });
+
+  it("Should not fire onSegmentClick on Ctrl+Click (reserved for zoom)", () => {
+    const handler = vi.fn();
+    render(<SunburstChart data={SIMPLE_DATA} onSegmentClick={handler} />);
+    const firstPath = document.querySelector<SVGPathElement>("path[data-idx='0']");
+    fireEvent.click(firstPath!, { ctrlKey: true });
+    expect(handler).not.toHaveBeenCalled();
   });
 
   it("Should render a center circle when innerRadius > 0", () => {

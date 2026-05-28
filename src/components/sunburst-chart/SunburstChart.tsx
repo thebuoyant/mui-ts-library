@@ -179,15 +179,25 @@ export function SunburstChart({
     return () => cancelAnimationFrame(id);
   }, [size, root, focusNode, clampedInner, ringThickness, showRootLabel]);
 
-  // Single vs double click disambiguation
-  const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const scheduleClick = (fn: () => void) => {
-    if (clickTimerRef.current) { clearTimeout(clickTimerRef.current); clickTimerRef.current = null; }
-    clickTimerRef.current = setTimeout(() => { fn(); clickTimerRef.current = null; }, 220);
+  // Ctrl+Click → zoom in (waits 250ms to distinguish from Ctrl+DblClick)
+  const zoomTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const scheduleZoomIn = (fn: () => void) => {
+    if (zoomTimerRef.current) { clearTimeout(zoomTimerRef.current); zoomTimerRef.current = null; }
+    zoomTimerRef.current = setTimeout(() => { fn(); zoomTimerRef.current = null; }, 250);
   };
-  const cancelClick = () => {
-    if (clickTimerRef.current) { clearTimeout(clickTimerRef.current); clickTimerRef.current = null; }
+  const cancelZoomIn = () => {
+    if (zoomTimerRef.current) { clearTimeout(zoomTimerRef.current); zoomTimerRef.current = null; }
   };
+
+  // Escape → reset zoom to root
+  useLayoutEffect(() => {
+    if (disabled) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { cancelZoomIn(); setFocusNode(root); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [disabled, root]);
 
   const renderNodes = root.descendants().filter((n) => n.depth > 0);
 
@@ -196,36 +206,35 @@ export function SunburstChart({
     const idx = Number(e.currentTarget.getAttribute("data-idx"));
     const node = renderNodes[idx];
     if (!node) return;
-    scheduleClick(() => onSegmentClick?.(serialize(node), e));
+
+    if (e.ctrlKey || e.metaKey) {
+      // Ctrl+Click: schedule zoom in — may be cancelled by Ctrl+DblClick
+      if (node.children) scheduleZoomIn(() => setFocusNode(node));
+      return;
+    }
+    // Regular click: fire callback immediately, no delay
+    onSegmentClick?.(serialize(node), e);
   };
 
   const handlePathDblClick: React.MouseEventHandler<SVGPathElement> = (e) => {
     if (disabled) return;
-    cancelClick();
-    const idx = Number(e.currentTarget.getAttribute("data-idx"));
-    const node = renderNodes[idx];
-    if (!node) return;
-    if (e.ctrlKey || e.metaKey) setFocusNode((f) => f.parent ?? root);
-    else setFocusNode(node);
+    if (e.ctrlKey || e.metaKey) {
+      // Ctrl+DblClick: cancel pending zoom-in, zoom out one level
+      cancelZoomIn();
+      setFocusNode((f) => f.parent ?? root);
+    }
+    // Regular double-click: no action (click already fired onSegmentClick)
   };
 
   const handleCenterClick: React.MouseEventHandler<SVGCircleElement> = (e) => {
     if (disabled) return;
-    scheduleClick(() => {
-      const node = focusNode.parent ?? root;
-      onSegmentClick?.(serialize(node), e);
-    });
-  };
-
-  const handleCenterDblClick: React.MouseEventHandler<SVGCircleElement> = () => {
-    if (disabled) return;
-    cancelClick();
-    setFocusNode((f) => f.parent ?? root);
-  };
-
-  const handleSvgDblClick: React.MouseEventHandler<SVGSVGElement> = (e) => {
-    if (disabled) return;
-    if (e.ctrlKey || e.metaKey) { cancelClick(); setFocusNode((f) => f.parent ?? root); }
+    if (e.ctrlKey || e.metaKey) {
+      // Ctrl+Click on center: zoom out one level
+      cancelZoomIn();
+      setFocusNode((f) => f.parent ?? root);
+      return;
+    }
+    onSegmentClick?.(serialize(focusNode.parent ?? root), e);
   };
 
   const textColor = theme.palette.text.primary;
@@ -244,7 +253,6 @@ export function SunburstChart({
         width={size}
         height={size}
         viewBox={viewBox}
-        onDoubleClick={handleSvgDblClick}
         style={{ fontFamily: fontFamily ?? "sans-serif", overflow: "visible" }}
         role="img"
         aria-label={data.name}
@@ -258,10 +266,13 @@ export function SunburstChart({
               fill="transparent"
               pointerEvents={disabled ? "none" : "auto"}
               onClick={handleCenterClick}
-              onDoubleClick={handleCenterDblClick}
               style={{ cursor: disabled ? "not-allowed" : "pointer" }}
             >
-              <title>{t.doubleClickToZoomOut}</title>
+              <title>
+                {focusNode !== root
+                  ? `${t.ctrlDblClickToZoomOut} · ${t.escToResetZoom}`
+                  : t.ctrlClickToZoomIn}
+              </title>
             </circle>
           )}
 
@@ -290,7 +301,7 @@ export function SunburstChart({
                     {node.ancestors().map((a) => a.data.name).reverse().join(" / ")}
                     {"\n"}
                     {formatNumber(node.value ?? 0, valueDecimalCount, valueDecimalSeparator, valueThousandsSeparator)}
-                    {hasChildren && !disabled ? `\n${t.doubleClickToZoomIn}` : ""}
+                    {hasChildren && !disabled ? `\n${t.ctrlClickToZoomIn} · ${t.ctrlDblClickToZoomOut}` : ""}
                   </title>
                 </path>
               );
@@ -318,12 +329,19 @@ export function SunburstChart({
             </g>
           )}
 
-          {/* Root label in center */}
+          {/* Center label — shows current focus node name */}
           {showRootLabel && (
-            <g pointerEvents="none" textAnchor="middle" fill={textColor}>
+            <g textAnchor="middle" fill={textColor}
+               pointerEvents={disabled ? "none" : "auto"}
+               onClick={handleCenterClick}
+               style={{ cursor: focusNode !== root && !disabled ? "pointer" : "default" }}
+            >
               <text fontSize={13} dy="0.35em" fontWeight="bold">
                 {focusNode.data.name}
               </text>
+              {focusNode !== root && !disabled && (
+                <title>{t.ctrlDblClickToZoomOut} · {t.escToResetZoom}</title>
+              )}
             </g>
           )}
         </g>

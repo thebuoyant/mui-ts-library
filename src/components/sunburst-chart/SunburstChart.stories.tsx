@@ -95,8 +95,11 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          'Full sunburst chart with company budget data. **Double-click** any segment to zoom in; ' +
-          '**double-click** the center label to zoom back out. Single-click fires `onSegmentClick`.',
+          'Full sunburst chart with company budget data. ' +
+          '**Click** any segment → fires `onSegmentClick` immediately (no delay). ' +
+          '**Ctrl+Click** a segment with children → zoom in. ' +
+          '**Ctrl+Double-click** any segment → zoom out one level. ' +
+          '**Escape** → reset zoom to root.',
       },
     },
   },

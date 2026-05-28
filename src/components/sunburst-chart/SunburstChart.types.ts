@@ -18,17 +18,20 @@ export type SunburstSegmentInfo = {
 
 export type SunburstChartTranslation = {
   /** Shown when data has no children and no value */
-  noData:               string;
-  /** SVG title suffix on segments with children — prompts zoom interaction */
-  doubleClickToZoomIn:  string;
-  /** SVG title on center area — prompts zoom-out interaction */
-  doubleClickToZoomOut: string;
+  noData:                string;
+  /** SVG tooltip hint on segments with children */
+  ctrlClickToZoomIn:     string;
+  /** SVG tooltip hint on center label / root area */
+  ctrlDblClickToZoomOut: string;
+  /** Tooltip hint shown on center when zoomed in */
+  escToResetZoom:        string;
 };
 
 export const DEFAULT_SUNBURST_CHART_TRANSLATION: SunburstChartTranslation = {
-  noData:               'No data',
-  doubleClickToZoomIn:  'Double-click to zoom in',
-  doubleClickToZoomOut: 'Double-click to zoom out',
+  noData:                'No data',
+  ctrlClickToZoomIn:     'Ctrl+Click to zoom in',
+  ctrlDblClickToZoomOut: 'Ctrl+Double-click to zoom out',
+  escToResetZoom:        'Esc to reset zoom',
 };
 
 export type SunburstChartProps = {
