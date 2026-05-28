@@ -8,9 +8,10 @@ import {
 } from "./SunburstChart.types";
 import type { SunburstChartData } from "./SunburstChart.types";
 
-const TWO_PI     = 2 * Math.PI;
-const LABEL_SIZE = 11;
-const AVG_CHAR_W = LABEL_SIZE * 0.58;
+const TWO_PI      = 2 * Math.PI;
+const LABEL_SIZE  = 11;
+const AVG_CHAR_W  = LABEL_SIZE * 0.50; // 0.50em ≈ realistic sans-serif average
+const MIN_LABEL_L = 5;                 // hide truncated labels shorter than this
 
 function formatNumber(
   value: number | null | undefined,
@@ -29,7 +30,8 @@ function truncateLabel(name: string, availPx: number): string {
   const maxChars = Math.floor(availPx / AVG_CHAR_W);
   if (maxChars <= 0) return "";
   if (name.length <= maxChars) return name;
-  if (maxChars <= 2) return "…";
+  // hide if the result would be shorter than MIN_LABEL_L chars total (incl. "…")
+  if (maxChars < MIN_LABEL_L) return "";
   return name.slice(0, maxChars - 1) + "…";
 }
 
@@ -390,7 +392,7 @@ export function SunburstChart({
                 const local   = toLocal(node);
                 if (!labelVisible(local)) return null;
                 const midR    = clampedInner + (local.y0 + local.y1) / 2;
-                const availPx = midR * (local.x1 - local.x0) * 0.82;
+                const availPx = midR * (local.x1 - local.x0) * 0.88;
                 const label   = truncateLabel(node.data.name, availPx);
                 if (!label) return null;
                 return (
