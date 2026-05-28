@@ -48,11 +48,13 @@ export function JsonEditor({
   const effectH = isAutoH ? undefined : (normH ?? 300);
 
   const viewRef = useRef<EditorView | null>(null);
+  const [editorView, setEditorView] = useState<EditorView | null>(null);
   const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 });
   const [isValid,   setIsValid]   = useState(() => isValidJson(value ?? ""));
 
   const handleViewReady = useCallback((view: EditorView | null) => {
     viewRef.current = view;
+    setEditorView(view);
   }, []);
 
   const handleCursorChange = useCallback((line: number, col: number) => {
@@ -92,7 +94,7 @@ export function JsonEditor({
         {!readonly && (
           <>
             <JsonEditorToolbar
-              viewRef={viewRef}
+              editorView={editorView}
               toolbarConfig={tc}
               translation={t}
               indent={indent}

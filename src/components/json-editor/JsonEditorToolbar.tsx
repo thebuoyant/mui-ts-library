@@ -13,7 +13,7 @@ import type { JsonEditorToolbarConfig, JsonEditorTranslation } from "./JsonEdito
 import { ToolbarButton } from "../shared/ToolbarButton";
 
 type JsonEditorToolbarProps = {
-  viewRef:       React.MutableRefObject<EditorView | null>;
+  editorView:    EditorView | null;
   toolbarConfig: Required<JsonEditorToolbarConfig>;
   translation:   JsonEditorTranslation;
   indent:        number;
@@ -21,17 +21,17 @@ type JsonEditorToolbarProps = {
 };
 
 export function JsonEditorToolbar({
-  viewRef,
+  editorView,
   toolbarConfig: tc,
   translation: t,
   indent,
   disabled,
 }: JsonEditorToolbarProps) {
   const [copied, setCopied] = useState(false);
-  const isDisabled = disabled || !viewRef.current;
+  const isDisabled = disabled || !editorView;
 
   function handleFormat() {
-    const view = viewRef.current;
+    const view = editorView;
     if (!view) return;
     const raw = view.state.doc.toString();
     try {
@@ -44,7 +44,7 @@ export function JsonEditorToolbar({
   }
 
   function handleCompact() {
-    const view = viewRef.current;
+    const view = editorView;
     if (!view) return;
     const raw = view.state.doc.toString();
     try {
@@ -57,7 +57,7 @@ export function JsonEditorToolbar({
   }
 
   function handleCopy() {
-    const text = viewRef.current?.state.doc.toString() ?? "";
+    const text = editorView?.state.doc.toString() ?? "";
     navigator.clipboard.writeText(text).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -65,21 +65,21 @@ export function JsonEditorToolbar({
   }
 
   function handleClear() {
-    const view = viewRef.current;
+    const view = editorView;
     if (!view) return;
     view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: "" } });
     view.focus();
   }
 
   function handleUndo() {
-    const view = viewRef.current;
+    const view = editorView;
     if (!view) return;
     undo(view);
     view.focus();
   }
 
   function handleRedo() {
-    const view = viewRef.current;
+    const view = editorView;
     if (!view) return;
     redo(view);
     view.focus();

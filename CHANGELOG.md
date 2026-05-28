@@ -13,6 +13,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.1.0] — 2026-05-28
+
+### Added
+
+#### RichTextEditor — Phase 2: Content Enrichment (MTL-18)
+
+- **`showTableButton?: boolean`** (default `false`) — table toolbar button; opens a dropdown menu to insert a 3×3 table with header row; when cursor is inside a table the menu also offers: Add Row Before/After, Delete Row, Add Column Before/After, Delete Column, Delete Table; powered by `@tiptap/extension-table` (TableKit)
+- **`showImageButton?: boolean`** (default `false`) — image toolbar button; opens a dialog with Image URL and optional Alt text fields; images are displayed inline with `max-width: 100%`; supports Base64 URLs; powered by `@tiptap/extension-image`
+- **`showEmojiButton?: boolean`** (default `false`) — emoji picker toolbar button; opens a MUI Popover with ~200 curated emojis across 6 categories (Smileys, Gestures, Hearts & Symbols, Nature, Food, Objects & Travel); live search by emoji name; no external dependency
+- New translation keys: `table`, `insertTable`, `addRowBefore`, `addRowAfter`, `deleteRow`, `addColumnBefore`, `addColumnAfter`, `deleteColumn`, `deleteTable`, `image`, `imageDialogTitle`, `imageDialogUrlLabel`, `imageDialogAltLabel`, `imageDialogSave`, `imageDialogCancel`, `emoji`, `emojiSearchPlaceholder`
+- New dependencies: `@tiptap/extension-table@^3.23.6`, `@tiptap/extension-image@^3.23.6`; all other `@tiptap/*` packages updated to `^3.23.6` for consistency
+
+---
+
 ## [2.0.1] — 2026-05-27
 
 ### Changed

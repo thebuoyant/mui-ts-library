@@ -1,4 +1,5 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
+import { useEffect } from "react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { ConfirmDialogProvider, useConfirm } from "./ConfirmDialogProvider";
@@ -200,14 +201,13 @@ describe("ConfirmDialogProvider / useConfirm", () => {
   it("Should close and reopen correctly for sequential calls", async () => {
     const user = userEvent.setup();
     const onResult = vi.fn();
-    let triggerSecond: () => void;
+    const triggerSecondRef = { current: () => {} };
 
     function SequentialTrigger() {
       const confirm = useConfirm();
-      // Store a direct reference so we can trigger the second call
-      // without clicking a button (the button is aria-hidden while dialog animates out).
-      triggerSecond = () => confirm({ title: "Confirm?" }).then(onResult);
-      return <button onClick={triggerSecond}>open</button>;
+      const handleClick = () => confirm({ title: "Confirm?" }).then(onResult);
+      useEffect(() => { triggerSecondRef.current = handleClick; });
+      return <button onClick={handleClick}>open</button>;
     }
 
     render(
@@ -222,7 +222,7 @@ describe("ConfirmDialogProvider / useConfirm", () => {
     await waitFor(() => expect(onResult).toHaveBeenCalledWith(true));
 
     // Second confirm — triggered directly to bypass aria-hidden during exit animation
-    act(() => { triggerSecond(); });
+    act(() => { triggerSecondRef.current(); });
     await waitFor(() => screen.getByTestId("confirm-dialog-confirm-btn"));
     await user.click(screen.getByTestId("confirm-dialog-cancel-btn"));
     await waitFor(() => expect(onResult).toHaveBeenCalledWith(false));

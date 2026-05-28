@@ -22,7 +22,7 @@ const DIALECT_MAP: Record<SqlEditorDialect, SqlLanguage> = {
 };
 
 type SqlEditorToolbarProps = {
-  viewRef:       React.MutableRefObject<EditorView | null>;
+  editorView:    EditorView | null;
   toolbarConfig: Required<SqlEditorToolbarConfig>;
   translation:   SqlEditorTranslation;
   dialect:       SqlEditorDialect;
@@ -31,7 +31,7 @@ type SqlEditorToolbarProps = {
 };
 
 export function SqlEditorToolbar({
-  viewRef,
+  editorView,
   toolbarConfig: tc,
   translation: t,
   dialect,
@@ -39,10 +39,10 @@ export function SqlEditorToolbar({
   onExecute,
 }: SqlEditorToolbarProps) {
   const [copied, setCopied] = useState(false);
-  const isDisabled = disabled || !viewRef.current;
+  const isDisabled = disabled || !editorView;
 
   function handleCopy() {
-    const text = viewRef.current?.state.doc.toString() ?? "";
+    const text = editorView?.state.doc.toString() ?? "";
     navigator.clipboard.writeText(text).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -50,28 +50,28 @@ export function SqlEditorToolbar({
   }
 
   function handleClear() {
-    const view = viewRef.current;
+    const view = editorView;
     if (!view) return;
     view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: "" } });
     view.focus();
   }
 
   function handleUndo() {
-    const view = viewRef.current;
+    const view = editorView;
     if (!view) return;
     undo(view);
     view.focus();
   }
 
   function handleRedo() {
-    const view = viewRef.current;
+    const view = editorView;
     if (!view) return;
     redo(view);
     view.focus();
   }
 
   function handleFormat() {
-    const view = viewRef.current;
+    const view = editorView;
     if (!view) return;
     const sql = view.state.doc.toString();
     try {
@@ -84,7 +84,7 @@ export function SqlEditorToolbar({
   }
 
   function handleExecute() {
-    const view = viewRef.current;
+    const view = editorView;
     if (!view || !onExecute) return;
     onExecute(view.state.doc.toString());
   }

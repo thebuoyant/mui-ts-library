@@ -212,4 +212,71 @@ describe("RichTextEditor", () => {
     );
     expect(screen.getByRole("button", { name: "Vollbild" })).toBeInTheDocument();
   });
+
+  // ── Table ────────────────────────────────────────────────────────────────────
+
+  it("Should render the table button when showTableButton is true", () => {
+    render(<RichTextEditor toolbarConfig={{ showTableButton: true }} />);
+    expect(screen.getByRole("button", { name: "Table" })).toBeInTheDocument();
+  });
+
+  it("Should not render the table button by default", () => {
+    render(<RichTextEditor />);
+    expect(screen.queryByRole("button", { name: "Table" })).not.toBeInTheDocument();
+  });
+
+  it("Should open the table dropdown menu when table button is clicked", async () => {
+    render(<RichTextEditor toolbarConfig={{ showTableButton: true }} />);
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Table" }));
+    });
+    await waitFor(() => {
+      expect(screen.getByText("Insert 3×3 table")).toBeInTheDocument();
+    });
+  });
+
+  // ── Image ────────────────────────────────────────────────────────────────────
+
+  it("Should render the image button when showImageButton is true", () => {
+    render(<RichTextEditor toolbarConfig={{ showImageButton: true }} />);
+    expect(screen.getByRole("button", { name: "Insert image" })).toBeInTheDocument();
+  });
+
+  it("Should not render the image button by default", () => {
+    render(<RichTextEditor />);
+    expect(screen.queryByRole("button", { name: "Insert image" })).not.toBeInTheDocument();
+  });
+
+  it("Should open the image dialog when image button is clicked", async () => {
+    render(<RichTextEditor toolbarConfig={{ showImageButton: true }} />);
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Insert image" }));
+    });
+    await waitFor(() => {
+      expect(screen.getByText("Insert image")).toBeInTheDocument();
+      expect(screen.getByLabelText("Image URL")).toBeInTheDocument();
+    });
+  });
+
+  // ── Emoji ────────────────────────────────────────────────────────────────────
+
+  it("Should render the emoji button when showEmojiButton is true", () => {
+    render(<RichTextEditor toolbarConfig={{ showEmojiButton: true }} />);
+    expect(screen.getByRole("button", { name: "Emoji" })).toBeInTheDocument();
+  });
+
+  it("Should not render the emoji button by default", () => {
+    render(<RichTextEditor />);
+    expect(screen.queryByRole("button", { name: "Emoji" })).not.toBeInTheDocument();
+  });
+
+  it("Should open the emoji picker when emoji button is clicked", async () => {
+    render(<RichTextEditor toolbarConfig={{ showEmojiButton: true }} />);
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Emoji" }));
+    });
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText("Search emoji…")).toBeInTheDocument();
+    });
+  });
 });

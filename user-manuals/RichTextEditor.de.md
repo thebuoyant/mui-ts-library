@@ -6,6 +6,12 @@
 
 Der `RichTextEditor` ist ein vollständiger WYSIWYG-Texteditor auf Basis von [TipTap v3](https://tiptap.dev) und Material UI. Er bietet eine formatreiche Eingabeoberfläche für Inhalte wie CMS-Texte, E-Mail-Templates, Kommentare und Beschreibungsfelder — vollständig in das MUI-Theme integriert, ohne externe CSS-Abhängigkeiten.
 
+| ✨ Neu in v2.1.0 | |
+|---|---|
+| **Tabellen-Bearbeitung** | Tabellen einfügen, Zeilen/Spalten per Toolbar-Dropdown verwalten (`showTableButton`) |
+| **Bild-Embed** | Bilder per URL oder Base64 einfügen (`showImageButton`) |
+| **Emoji-Picker** | ~200 kuratierte Emojis, Live-Suche, keine externe Abhängigkeit (`showEmojiButton`) |
+
 **Typische Einsatzgebiete:**
 
 - CMS-Formulare und Content-Management
@@ -342,6 +348,57 @@ Die Gesamtgröße des Editors (Toolbar + Inhaltsbereich) wird über `height` und
 ```
 
 **Hinweis zu `height="auto"`:** Der umgebende Container muss `display: flex` und `flex-direction: column` haben, damit sich der Editor daran orientieren kann.
+
+---
+
+## Tabellen
+
+Den Tabellen-Toolbar-Button über `showTableButton` aktivieren:
+
+```tsx
+<RichTextEditor
+  toolbarConfig={{ showTableButton: true }}
+/>
+```
+
+Klick auf das Tabellen-Symbol → **„3×3-Tabelle einfügen"** fügt eine Tabelle mit Kopfzeile ein. Wenn der Cursor in der Tabelle steht und das Menü erneut geöffnet wird, stehen Verwaltungsoptionen zur Verfügung:
+
+| Menü-Aktion | Beschreibung |
+|---|---|
+| 3×3-Tabelle einfügen | Immer verfügbar — fügt eine neue Tabelle ein |
+| Zeile davor / danach einfügen | Fügt eine Zeile relativ zur aktuellen Cursorzeile ein |
+| Zeile löschen | Entfernt die aktuelle Zeile |
+| Spalte davor / danach einfügen | Fügt eine Spalte relativ zur aktuellen Cursorspalte ein |
+| Spalte löschen | Entfernt die aktuelle Spalte |
+| Tabelle löschen | Entfernt die gesamte Tabelle |
+
+---
+
+## Bild einfügen
+
+Den Bild-Toolbar-Button über `showImageButton` aktivieren:
+
+```tsx
+<RichTextEditor
+  toolbarConfig={{ showImageButton: true }}
+/>
+```
+
+Klick auf das Bild-Symbol öffnet einen Dialog. Eine **Bild-URL** (beliebige öffentliche `https://`-URL oder Base64-Data-URL) und ein optionaler **Alternativtext** werden eingegeben. Das Bild wird inline mit `max-width: 100%` dargestellt.
+
+---
+
+## Emoji-Picker
+
+Den Emoji-Picker über `showEmojiButton` aktivieren:
+
+```tsx
+<RichTextEditor
+  toolbarConfig={{ showEmojiButton: true }}
+/>
+```
+
+Klick auf das Smiley-Symbol öffnet ein Popover mit ca. 200 kuratierten Emojis in 6 Kategorien: Smileys, Gesten, Herzen & Symbole, Natur, Essen, Objekte & Reisen. Das Suchfeld filtert nach Namen. Ein Klick auf ein Emoji fügt es an der aktuellen Cursorposition ein. Keine externe Abhängigkeit.
 
 ---
 
