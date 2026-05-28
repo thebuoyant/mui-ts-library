@@ -1,0 +1,335 @@
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
+
+const TWO_PI = 2 * Math.PI;
+import * as d3 from "d3";
+import { Box, useTheme } from "@mui/material";
+import {
+  type SunburstChartProps,
+  type SunburstSegmentInfo,
+  DEFAULT_SUNBURST_CHART_TRANSLATION,
+} from "./SunburstChart.types";
+import type { SunburstChartData } from "./SunburstChart.types";
+
+function formatNumber(
+  value: number | null | undefined,
+  decimals = 0,
+  decimalSep = ".",
+  thousandSep = ",",
+): string {
+  if (value == null || !isFinite(value)) return "0";
+  const fixed = value.toFixed(Math.max(0, decimals));
+  const [intPart, decPart] = fixed.split(".");
+  const withThousands = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousandSep);
+  return decPart ? `${withThousands}${decimalSep}${decPart}` : withThousands;
+}
+
+export function SunburstChart({
+  data,
+  size = 500,
+  showSegmentLabels = true,
+  innerRadius = 0,
+  sortBy = "value",
+  chartColors,
+  showRootLabel = true,
+  onSegmentClick,
+  valueDecimalCount = 0,
+  valueDecimalSeparator = ".",
+  valueThousandsSeparator = ",",
+  disabled = false,
+  translation,
+}: SunburstChartProps) {
+  const theme = useTheme();
+  const t = { ...DEFAULT_SUNBURST_CHART_TRANSLATION, ...translation };
+
+  const contentRef = useRef<SVGGElement>(null);
+  const [viewBox, setViewBox] = useState(`-${size / 2} -${size / 2} ${size} ${size}`);
+
+  const radius = size / 2;
+  const clampedInner = Math.max(0, Math.min(innerRadius, Math.max(0, radius - 1)));
+  const radialSpan = Math.max(1, radius - clampedInner);
+
+  // MUI theme palette as default color sequence
+  const defaultColors = [
+    theme.palette.primary.main,
+    theme.palette.secondary.main,
+    theme.palette.error.main,
+    theme.palette.warning.main,
+    theme.palette.success.main,
+    theme.palette.info.main,
+  ];
+  const palette = chartColors && chartColors.length > 0 ? chartColors : defaultColors;
+
+  const { root, ringThickness } = useMemo(() => {
+    const h = d3.hierarchy<SunburstChartData>(data).sum((d) => d.value ?? 0);
+    if (sortBy === "value") {
+      h.sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
+    } else {
+      h.sort((a, b) =>
+        String(a.data.name).localeCompare(String(b.data.name), undefined, {
+          numeric: true,
+          sensitivity: "base",
+        }),
+      );
+    }
+    const rootLayout = d3.partition<SunburstChartData>().size([2 * Math.PI, radialSpan])(h);
+    const maxDepth = d3.max(rootLayout.descendants(), (d) => d.depth) ?? 0;
+    const thick = maxDepth > 0 ? radialSpan / maxDepth : radialSpan;
+    if (maxDepth > 0) {
+      rootLayout.descendants().forEach((node) => {
+        if (node.depth === 0) { node.y0 = 0; node.y1 = 0; }
+        else { node.y0 = (node.depth - 1) * thick; node.y1 = node.depth * thick; }
+      });
+    }
+    return { root: rootLayout, ringThickness: thick };
+  }, [data, radialSpan, sortBy]);
+
+  const [focusNode, setFocusNode] = useState(root);
+  const [prevRoot, setPrevRoot]   = useState(root);
+  if (prevRoot !== root) {
+    setPrevRoot(root);
+    setFocusNode(root);
+  }
+
+  const topLevelNames = useMemo(
+    () => root.children?.map((c) => c.data.name) ?? [root.data.name],
+    [root],
+  );
+
+  const colorScale = useMemo(
+    () => d3.scaleOrdinal<string, string>().domain(topLevelNames).range(palette),
+    [palette, topLevelNames],
+  );
+
+  const fillFor = (node: d3.HierarchyRectangularNode<SunburstChartData>) => {
+    let top = node;
+    while (top.depth > 1) top = top.parent!;
+    return colorScale(top.data.name);
+  };
+
+  const arc = useMemo(
+    () =>
+      d3
+        .arc<{ x0: number; x1: number; y0: number; y1: number }>()
+        .startAngle((d) => d.x0)
+        .endAngle((d) => d.x1)
+        .padAngle((d) => Math.min((d.x1 - d.x0) / 2, 0.005))
+        .padRadius(radius / 2)
+        .innerRadius((d) => clampedInner + d.y0)
+        .outerRadius((d) => clampedInner + d.y1 - 1),
+    [radius, clampedInner],
+  );
+
+  const toLocal = useCallback(
+    (node: d3.HierarchyRectangularNode<SunburstChartData>) => {
+      const angleScale = TWO_PI / (focusNode.x1 - focusNode.x0);
+      const x0 = Math.max(0, Math.min(TWO_PI, (node.x0 - focusNode.x0) * angleScale));
+      const x1 = Math.max(0, Math.min(TWO_PI, (node.x1 - focusNode.x0) * angleScale));
+      const yShift = focusNode.depth === 0 ? 0 : (focusNode.depth - 1) * ringThickness;
+      return { x0, x1, y0: Math.max(0, node.y0 - yShift), y1: Math.max(0, node.y1 - yShift) };
+    },
+    [focusNode, ringThickness],
+  );
+
+  const arcVisible = (d: { x0: number; x1: number; y0: number; y1: number }) =>
+    d.x1 > d.x0 && d.y1 > d.y0;
+
+  const labelVisible = (d: { x0: number; x1: number; y0: number; y1: number }) => {
+    const midR = clampedInner + (d.y0 + d.y1) / 2;
+    return midR * (d.x1 - d.x0) > 10;
+  };
+
+  const labelTransform = (d: { x0: number; x1: number; y0: number; y1: number }) => {
+    const midDeg = (((d.x0 + d.x1) / 2) * 180) / Math.PI;
+    const midR = clampedInner + (d.y0 + d.y1) / 2;
+    const flip = midDeg < 180 ? 0 : 180;
+    return `rotate(${midDeg - 90}) translate(${midR},0) rotate(${flip})`;
+  };
+
+  const isInFocus = useCallback(
+    (node: d3.HierarchyRectangularNode<SunburstChartData>) =>
+      node.ancestors().includes(focusNode),
+    [focusNode],
+  );
+
+  const serialize = useCallback(
+    (node: d3.HierarchyRectangularNode<SunburstChartData>): SunburstSegmentInfo => ({
+      name:          node.data.name,
+      value:         node.value ?? null,
+      depth:         node.depth,
+      path:          node.ancestors().map((a) => a.data.name).reverse(),
+      childrenCount: node.children?.length ?? 0,
+      data:          node.data,
+    }),
+    [],
+  );
+
+  // Auto-fit viewBox after render
+  useLayoutEffect(() => {
+    const g = contentRef.current;
+    if (!g) return;
+    const id = requestAnimationFrame(() => {
+      try {
+        const box = g.getBBox();
+        const pad = 8;
+        setViewBox(`${box.x - pad} ${box.y - pad} ${box.width + 2 * pad} ${box.height + 2 * pad}`);
+      } catch {
+        setViewBox(`-${size / 2} -${size / 2} ${size} ${size}`);
+      }
+    });
+    return () => cancelAnimationFrame(id);
+  }, [size, root, focusNode, clampedInner, ringThickness, showRootLabel]);
+
+  // Single vs double click disambiguation
+  const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const scheduleClick = (fn: () => void) => {
+    if (clickTimerRef.current) { clearTimeout(clickTimerRef.current); clickTimerRef.current = null; }
+    clickTimerRef.current = setTimeout(() => { fn(); clickTimerRef.current = null; }, 220);
+  };
+  const cancelClick = () => {
+    if (clickTimerRef.current) { clearTimeout(clickTimerRef.current); clickTimerRef.current = null; }
+  };
+
+  const renderNodes = root.descendants().filter((n) => n.depth > 0);
+
+  const handlePathClick: React.MouseEventHandler<SVGPathElement> = (e) => {
+    if (disabled) return;
+    const idx = Number(e.currentTarget.getAttribute("data-idx"));
+    const node = renderNodes[idx];
+    if (!node) return;
+    scheduleClick(() => onSegmentClick?.(serialize(node), e));
+  };
+
+  const handlePathDblClick: React.MouseEventHandler<SVGPathElement> = (e) => {
+    if (disabled) return;
+    cancelClick();
+    const idx = Number(e.currentTarget.getAttribute("data-idx"));
+    const node = renderNodes[idx];
+    if (!node) return;
+    if (e.ctrlKey || e.metaKey) setFocusNode((f) => f.parent ?? root);
+    else setFocusNode(node);
+  };
+
+  const handleCenterClick: React.MouseEventHandler<SVGCircleElement> = (e) => {
+    if (disabled) return;
+    scheduleClick(() => {
+      const node = focusNode.parent ?? root;
+      onSegmentClick?.(serialize(node), e);
+    });
+  };
+
+  const handleCenterDblClick: React.MouseEventHandler<SVGCircleElement> = () => {
+    if (disabled) return;
+    cancelClick();
+    setFocusNode((f) => f.parent ?? root);
+  };
+
+  const handleSvgDblClick: React.MouseEventHandler<SVGSVGElement> = (e) => {
+    if (disabled) return;
+    if (e.ctrlKey || e.metaKey) { cancelClick(); setFocusNode((f) => f.parent ?? root); }
+  };
+
+  const textColor = theme.palette.text.primary;
+  const fontFamily = theme.typography.fontFamily;
+
+  return (
+    <Box
+      sx={{
+        display:   "inline-flex",
+        opacity:   disabled ? 0.5 : 1,
+        cursor:    disabled ? "not-allowed" : "default",
+        userSelect: "none",
+      }}
+    >
+      <svg
+        width={size}
+        height={size}
+        viewBox={viewBox}
+        onDoubleClick={handleSvgDblClick}
+        style={{ fontFamily: fontFamily ?? "sans-serif", overflow: "visible" }}
+        role="img"
+        aria-label={data.name}
+      >
+        <g ref={contentRef}>
+          {/* Center hole hit area for donut mode */}
+          {clampedInner > 0 && (
+            <circle
+              cx={0} cy={0}
+              r={clampedInner}
+              fill="transparent"
+              pointerEvents={disabled ? "none" : "auto"}
+              onClick={handleCenterClick}
+              onDoubleClick={handleCenterDblClick}
+              style={{ cursor: disabled ? "not-allowed" : "pointer" }}
+            >
+              <title>{t.doubleClickToZoomOut}</title>
+            </circle>
+          )}
+
+          {/* Segments */}
+          <g>
+            {renderNodes.map((node, idx) => {
+              const local = toLocal(node);
+              const visible = arcVisible(local);
+              const hasChildren = !!node.children;
+              return (
+                <path
+                  key={`seg-${node.data.id}-${idx}`}
+                  data-idx={idx}
+                  d={arc(local) || ""}
+                  fill={fillFor(node)}
+                  fillOpacity={visible ? (hasChildren ? 0.75 : 0.5) : 0}
+                  style={{
+                    pointerEvents: visible && !disabled ? "auto" : "none",
+                    cursor:        hasChildren && !disabled ? "pointer" : "default",
+                    transition:    "fill-opacity 0.15s",
+                  }}
+                  onClick={handlePathClick}
+                  onDoubleClick={handlePathDblClick}
+                >
+                  <title>
+                    {node.ancestors().map((a) => a.data.name).reverse().join(" / ")}
+                    {"\n"}
+                    {formatNumber(node.value ?? 0, valueDecimalCount, valueDecimalSeparator, valueThousandsSeparator)}
+                    {hasChildren && !disabled ? `\n${t.doubleClickToZoomIn}` : ""}
+                  </title>
+                </path>
+              );
+            })}
+          </g>
+
+          {/* Segment labels */}
+          {showSegmentLabels && (
+            <g pointerEvents="none" textAnchor="middle" fill={textColor}>
+              {renderNodes.map((node, idx) => {
+                if (!isInFocus(node)) return null;
+                const local = toLocal(node);
+                if (!labelVisible(local)) return null;
+                return (
+                  <text
+                    key={`lbl-${node.data.id}-${idx}`}
+                    transform={labelTransform(local)}
+                    dy="0.35em"
+                    fontSize={11}
+                  >
+                    {node.data.name}
+                  </text>
+                );
+              })}
+            </g>
+          )}
+
+          {/* Root label in center */}
+          {showRootLabel && (
+            <g pointerEvents="none" textAnchor="middle" fill={textColor}>
+              <text fontSize={13} dy="0.35em" fontWeight="bold">
+                {focusNode.data.name}
+              </text>
+            </g>
+          )}
+        </g>
+      </svg>
+    </Box>
+  );
+}
+
+SunburstChart.displayName = "SunburstChart";
