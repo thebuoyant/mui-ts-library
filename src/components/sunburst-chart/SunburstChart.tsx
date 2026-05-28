@@ -292,9 +292,9 @@ export function SunburstChart({
     onSegmentClick?.(serialize(focusNode.parent ?? root), e as React.MouseEvent<SVGCircleElement>);
   };
 
-  // Shared tooltip props — 50ms delay for snappy feel, MUI standard arrow
+  // Shared tooltip props — follows cursor so popup appears right next to the mouse
   const tooltipProps = {
-    arrow:           true,
+    followCursor:    true,
     enterDelay:      50,
     enterNextDelay:  0,
     disableHoverListener: disabled,
