@@ -244,6 +244,7 @@ export function ConfirmDialogProvider({ children, translation }: ConfirmDialogPr
 
 // ─── hook ────────────────────────────────────────────────────────────────────
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useConfirm(): ConfirmFn {
   return useContext(ConfirmDialogContext);
 }

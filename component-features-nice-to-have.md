@@ -29,9 +29,9 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 |---|---|---|---|
 | ~~Word Count~~ | ~~Wörter- und Zeichen-Zähler im Footer~~ | ~~Niedrig~~ | ✅ v1.4.0 |
 | ~~Full Screen Mode~~ | ~~Editor nimmt den gesamten Viewport ein~~ | ~~Niedrig~~ | ✅ v1.4.0 |
-| Tabellen | Tiptap Table Extension — Zeilen/Spalten einfügen | Mittel | — |
-| Bild-Embed | `<img>` per URL oder Base64 einfügen | Mittel | — |
-| Emoji Picker | 😀 Button mit Such-Emoji-Popover | Mittel | — |
+| ~~Tabellen~~ | ~~Tiptap Table Extension — Zeilen/Spalten einfügen~~ | ~~Mittel~~ | ✅ v2.1.0 |
+| ~~Bild-Embed~~ | ~~`<img>` per URL oder Base64 einfügen~~ | ~~Mittel~~ | ✅ v2.1.0 |
+| ~~Emoji Picker~~ | ~~😀 Button mit Such-Emoji-Popover~~ | ~~Mittel~~ | ✅ v2.1.0 |
 | Mention (@) | Personen oder Entitäten referenzieren mit Autocomplete | Hoch | — |
 | Slash Commands (/) | Kontextmenü beim Tippen von `/` für Blöcke | Hoch | — |
 | Mathformel (KaTeX) | `$$`-Block für LaTeX-Formeln | Hoch | — |

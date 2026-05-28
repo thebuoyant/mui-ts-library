@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { type MouseEvent, type ReactNode, useState } from "react";
 import { type Editor } from "@tiptap/react";
 import { Box, Divider, IconButton, Tooltip } from "@mui/material";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
+import ImageIcon from "@mui/icons-material/Image";
+import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
 import FormatBoldIcon from "@mui/icons-material/FormatBold";
 import FormatItalicIcon from "@mui/icons-material/FormatItalic";
 import FormatUnderlinedIcon from "@mui/icons-material/FormatUnderlined";
@@ -24,6 +26,9 @@ import {
 } from "./RichTextEditor.types";
 import { RichTextEditorLinkDialog } from "./RichTextEditorLinkDialog";
 import { RichTextEditorColorPicker } from "./RichTextEditorColorPicker";
+import { RichTextEditorTableMenu } from "./RichTextEditorTableMenu";
+import { RichTextEditorImageDialog } from "./RichTextEditorImageDialog";
+import { RichTextEditorEmojiPicker } from "./RichTextEditorEmojiPicker";
 import { ToolbarButton } from "../shared/ToolbarButton";
 
 type RichTextEditorToolbarProps = {
@@ -38,10 +43,10 @@ type RichTextEditorToolbarProps = {
 // Farb-Button mit farbiger Indikatorlinie unter dem Icon
 type ColorButtonProps = {
   label:       string;
-  icon:        React.ReactNode;
+  icon:        ReactNode;
   activeColor: string | null | undefined;
   disabled?:   boolean;
-  onClick:     (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onClick:     (e: MouseEvent<HTMLButtonElement>) => void;
 };
 
 function ColorButton({ label, icon, activeColor, disabled, onClick }: ColorButtonProps) {
@@ -89,8 +94,10 @@ export function RichTextEditorToolbar({
   isFullscreen,
   onToggleFullscreen,
 }: RichTextEditorToolbarProps) {
-  const [linkDialogOpen, setLinkDialogOpen]           = useState(false);
-  const [colorPickerAnchor, setColorPickerAnchor]     = useState<HTMLElement | null>(null);
+  const [linkDialogOpen, setLinkDialogOpen]               = useState(false);
+  const [imageDialogOpen, setImageDialogOpen]             = useState(false);
+  const [emojiPickerAnchor, setEmojiPickerAnchor]         = useState<HTMLElement | null>(null);
+  const [colorPickerAnchor, setColorPickerAnchor]         = useState<HTMLElement | null>(null);
   const [highlightPickerAnchor, setHighlightPickerAnchor] = useState<HTMLElement | null>(null);
 
   const isDisabled = disabled || !editor;
@@ -110,8 +117,10 @@ export function RichTextEditorToolbar({
     tc.showTextColor || tc.showHighlight;
   const hasHistoryGroup =
     tc.showUndoRedo || tc.showClearFormat;
+  const hasInsertGroup =
+    tc.showTableButton || tc.showImageButton || tc.showEmojiButton;
 
-  const groups = [hasTextGroup, hasHeadingGroup, hasListGroup, hasBlockGroup, hasColorGroup, hasHistoryGroup];
+  const groups = [hasTextGroup, hasHeadingGroup, hasListGroup, hasBlockGroup, hasColorGroup, hasHistoryGroup, hasInsertGroup];
   const activeGroupCount = groups.filter(Boolean).length;
 
   function divider(afterGroup: boolean, groupIndex: number) {
@@ -333,6 +342,40 @@ export function RichTextEditorToolbar({
           </Box>
         )}
 
+        {divider(hasHistoryGroup, 5)}
+
+        {hasInsertGroup && (
+          <Box sx={{ display: "flex", gap: 0.25 }}>
+            {tc.showTableButton && (
+              <RichTextEditorTableMenu editor={editor} translation={t} disabled={isDisabled} />
+            )}
+            {tc.showImageButton && (
+              <ToolbarButton
+                label={t.image}
+                icon={<ImageIcon fontSize="small" />}
+                onClick={() => setImageDialogOpen(true)}
+                disabled={isDisabled}
+              />
+            )}
+            {tc.showEmojiButton && (
+              <Tooltip title={t.emoji} arrow>
+                <span>
+                  <IconButton
+                    size="small"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={(e) => setEmojiPickerAnchor(e.currentTarget)}
+                    disabled={isDisabled}
+                    sx={{ borderRadius: 1 }}
+                    aria-label={t.emoji}
+                  >
+                    <EmojiEmotionsIcon fontSize="small" />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            )}
+          </Box>
+        )}
+
         {/* Verhindert Layout-Shift wenn activeGroupCount 0 ist */}
         {activeGroupCount === 0 && <Box sx={{ height: 32 }} />}
 
@@ -392,6 +435,25 @@ export function RichTextEditorToolbar({
           onSelectColor={(color) => editor?.chain().focus().setHighlight({ color }).run()}
           onRemoveColor={() => editor?.chain().focus().unsetHighlight().run()}
           removeLabel={t.removeHighlight}
+        />
+      )}
+
+      {tc.showImageButton && editor && (
+        <RichTextEditorImageDialog
+          open={imageDialogOpen}
+          onClose={() => setImageDialogOpen(false)}
+          editor={editor}
+          translation={t}
+        />
+      )}
+
+      {tc.showEmojiButton && (
+        <RichTextEditorEmojiPicker
+          anchorEl={emojiPickerAnchor}
+          open={Boolean(emojiPickerAnchor)}
+          onClose={() => setEmojiPickerAnchor(null)}
+          onSelect={(emoji) => editor?.chain().focus().insertContent(emoji).run()}
+          translation={t}
         />
       )}
     </>

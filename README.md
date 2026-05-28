@@ -14,7 +14,7 @@ A type-safe React component library built on **TypeScript** and **MUI (Material 
 | [`GanttChart`](#ganttchart) | Project timeline with hierarchical tasks, milestones, drag & drop, Ctrl+Scroll zoom, today chip, and built-in CRUD dialogs | [Full Manual →](user-manuals/GanttChart.md) |
 | [`TagSelection`](#tagselection) | Multi-tag selector with autocomplete, free tag creation, overflow chips, and MUI theme colors | [Full Manual →](user-manuals/TagSelection.md) |
 | [`PasswordStrengthMeter`](#passwordstrengthmeter) | Password input with animated strength meter, segmented bar, custom requirements, and requirements checklist | [Full Manual →](user-manuals/PasswordStrengthMeter.md) |
-| [`RichTextEditor`](#richtexteditor) | WYSIWYG editor (TipTap v3) with toolbar, link dialog, text color, highlight, word count, fullscreen mode, and Markdown paste | [Full Manual →](user-manuals/RichTextEditor.md) |
+| [`RichTextEditor`](#richtexteditor) | WYSIWYG editor (TipTap v3) with toolbar, link dialog, text color, highlight, word count, fullscreen mode, Markdown paste, table editing, image embed, and emoji picker | [Full Manual →](user-manuals/RichTextEditor.md) |
 | [`SqlEditor`](#sqleditor) | SQL code editor (CodeMirror 6) with syntax highlighting, multi-dialect, autocomplete, linting, and `Cmd+Enter` execute shortcut | [Full Manual →](user-manuals/SqlEditor.md) |
 | [`JsonEditor`](#jsoneditor) | JSON code editor (CodeMirror 6) with real-time validation, Format, Compact buttons, and optional minimap | [Full Manual →](user-manuals/JsonEditor.md) |
 

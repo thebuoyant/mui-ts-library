@@ -6,6 +6,12 @@
 
 The `RichTextEditor` is a full-featured WYSIWYG text editor built on [TipTap v3](https://tiptap.dev) and Material UI. It provides a rich input interface for content such as CMS texts, email templates, comments, and description fields — fully integrated with the MUI theme, without any external CSS dependencies.
 
+| ✨ New in v2.1.0 | |
+|---|---|
+| **Table editing** | Insert tables, manage rows/columns via toolbar dropdown (`showTableButton`) |
+| **Image embed** | Insert images by URL or Base64 (`showImageButton`) |
+| **Emoji picker** | ~200 curated emojis, live search, no external dependency (`showEmojiButton`) |
+
 **Typical use cases:**
 
 - CMS forms and content management
@@ -342,6 +348,57 @@ The total size of the editor (toolbar + content area) is controlled via `height`
 ```
 
 **Note on `height="auto"`:** The surrounding container must have `display: flex` and `flex-direction: column` for the editor to align to it.
+
+---
+
+## Tables
+
+Enable the table toolbar button via `showTableButton`:
+
+```tsx
+<RichTextEditor
+  toolbarConfig={{ showTableButton: true }}
+/>
+```
+
+Click the table icon → **"Insert 3×3 table"** to insert a table with a header row. Click anywhere inside the table and open the menu again to manage structure:
+
+| Menu action | Description |
+|---|---|
+| Insert 3×3 table | Always available — inserts a new table |
+| Add row before / after | Inserts a row relative to the current cursor row |
+| Delete row | Removes the current row |
+| Add column before / after | Inserts a column relative to the current cursor column |
+| Delete column | Removes the current column |
+| Delete table | Removes the entire table |
+
+---
+
+## Image Embed
+
+Enable the image toolbar button via `showImageButton`:
+
+```tsx
+<RichTextEditor
+  toolbarConfig={{ showImageButton: true }}
+/>
+```
+
+Click the image icon to open a dialog. Enter an **Image URL** (any public `https://` URL or a Base64 data URL) and an optional **Alt text**. The image is inserted inline and displayed with `max-width: 100%`.
+
+---
+
+## Emoji Picker
+
+Enable the emoji picker via `showEmojiButton`:
+
+```tsx
+<RichTextEditor
+  toolbarConfig={{ showEmojiButton: true }}
+/>
+```
+
+Click the smiley icon to open a popover with ~200 curated emojis in 6 categories: Smileys, Gestures, Hearts & Symbols, Nature, Food, Objects & Travel. Use the search field to filter by name. Clicking an emoji inserts it at the current cursor position. No external dependency.
 
 ---
 

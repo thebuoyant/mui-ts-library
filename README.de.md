@@ -14,7 +14,7 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 | [`GanttChart`](#ganttchart) | Projekt-Timeline mit hierarchischen Aufgaben, Meilensteinen, Drag & Drop, Ctrl+Scroll-Zoom, Heute-Chip und integrierten CRUD-Dialogen | [Vollständiges Manual →](user-manuals/GanttChart.de.md) |
 | [`TagSelection`](#tagselection) | Multi-Tag-Auswahlfeld mit Autocomplete, freier Tag-Erstellung, Overflow-Chips und MUI-Theme-Farben | [Vollständiges Manual →](user-manuals/TagSelection.de.md) |
 | [`PasswordStrengthMeter`](#passwordstrengthmeter) | Passwort-Eingabe mit animiertem Stärke-Meter, segmentierter Balkenanzeige, eigenen Anforderungen und Anforderungsliste | [Vollständiges Manual →](user-manuals/PasswordStrengthMeter.de.md) |
-| [`RichTextEditor`](#richtexteditor) | WYSIWYG-Editor (TipTap v3) mit Toolbar, Link-Dialog, Textfarbe, Hervorhebung, Wörter-Zähler, Vollbild-Modus und Markdown-Einfügen | [Vollständiges Manual →](user-manuals/RichTextEditor.de.md) |
+| [`RichTextEditor`](#richtexteditor) | WYSIWYG-Editor (TipTap v3) mit Toolbar, Link-Dialog, Textfarbe, Hervorhebung, Wörter-Zähler, Vollbild-Modus, Markdown-Einfügen, Tabellen-Bearbeitung, Bild-Embed und Emoji-Picker | [Vollständiges Manual →](user-manuals/RichTextEditor.de.md) |
 | [`SqlEditor`](#sqleditor) | SQL-Code-Editor (CodeMirror 6) mit Syntax-Highlighting, Multi-Dialekt, Autocomplete, Linting und `Cmd+Enter`-Ausführen-Shortcut | [Vollständiges Manual →](user-manuals/SqlEditor.de.md) |
 | [`JsonEditor`](#jsoneditor) | JSON-Code-Editor (CodeMirror 6) mit Echtzeit-Validierung, Format- und Komprimieren-Schaltfläche sowie optionaler Minimap | [Vollständiges Manual →](user-manuals/JsonEditor.de.md) |
 

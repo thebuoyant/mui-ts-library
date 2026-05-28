@@ -80,8 +80,21 @@ const LONG_HTML = `
 `;
 
 export const Default: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Full toolbar with all features enabled — including tables, image embed, and emoji picker. All new buttons are opt-in (`false` by default); this story enables them all so you can explore the complete feature set.',
+      },
+    },
+  },
   args: {
     placeholder: "Hier tippen …",
+    toolbarConfig: {
+      showTableButton: true,
+      showImageButton: true,
+      showEmojiButton: true,
+      showFullscreenButton: true,
+    },
   },
 };
 
@@ -270,6 +283,59 @@ export const NoToolbar: Story = {
   },
 };
 
+export const WithTable: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Enables the **Table** toolbar button (`showTableButton: true`). ' +
+          'Click the table icon to insert a 3×3 table with a header row. ' +
+          'Click inside any cell and re-open the menu to add/remove rows and columns, or delete the entire table.',
+      },
+    },
+  },
+  args: {
+    toolbarConfig: { showTableButton: true },
+    value: `<p>Click the table icon in the toolbar to insert a table.</p>`,
+    height: "300",
+  },
+};
+
+export const WithImageEmbed: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Enables the **Image** toolbar button (`showImageButton: true`). ' +
+          'Click the image icon, paste any public image URL, and optionally provide alt text. ' +
+          'Images are displayed inline with `max-width: 100%` and support Base64 URLs.',
+      },
+    },
+  },
+  args: {
+    toolbarConfig: { showImageButton: true },
+    value: `<p>Click the image icon to embed an image by URL.</p>`,
+    height: "300",
+  },
+};
+
+export const WithEmojiPicker: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Enables the **Emoji Picker** toolbar button (`showEmojiButton: true`). ' +
+          'Click the smiley icon to open a popover with ~200 curated emojis across 6 categories. ' +
+          'Use the search field to filter by emoji name. Clicking an emoji inserts it at the cursor.',
+      },
+    },
+  },
+  args: {
+    toolbarConfig: { showEmojiButton: true },
+    value: `<p>Click the smiley icon and pick an emoji 😀</p>`,
+  },
+};
+
 export const WithFullscreen: Story = {
   args: {
     toolbarConfig: { showFullscreenButton: true },
@@ -313,6 +379,23 @@ export const GermanTranslation: Story = {
       wordCount:         "{count} Wörter",
       fullscreen:        "Vollbild",
       exitFullscreen:    "Vollbild beenden",
+      table:             "Tabelle",
+      insertTable:       "3×3-Tabelle einfügen",
+      addRowBefore:      "Zeile davor einfügen",
+      addRowAfter:       "Zeile danach einfügen",
+      deleteRow:         "Zeile löschen",
+      addColumnBefore:   "Spalte davor einfügen",
+      addColumnAfter:    "Spalte danach einfügen",
+      deleteColumn:      "Spalte löschen",
+      deleteTable:       "Tabelle löschen",
+      image:             "Bild einfügen",
+      imageDialogTitle:  "Bild einfügen",
+      imageDialogUrlLabel: "Bild-URL",
+      imageDialogAltLabel: "Alternativtext (optional)",
+      imageDialogSave:   "Einfügen",
+      imageDialogCancel: "Abbrechen",
+      emoji:                  "Emoji",
+      emojiSearchPlaceholder: "Emoji suchen …",
     },
   },
 };

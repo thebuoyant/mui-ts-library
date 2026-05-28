@@ -44,11 +44,13 @@ export function SqlEditor({
   const effectH = isAutoH ? undefined : (normH ?? 300);
 
   const viewRef = useRef<EditorView | null>(null);
+  const [editorView,       setEditorView]       = useState<EditorView | null>(null);
   const [cursorPos,        setCursorPos]        = useState({ line: 1, col: 1 });
   const [diagnosticsCount, setDiagnosticsCount] = useState(0);
 
   const handleViewReady = useCallback((view: EditorView | null) => {
     viewRef.current = view;
+    setEditorView(view);
   }, []);
 
   const handleCursorChange = useCallback((line: number, col: number) => {
@@ -85,7 +87,7 @@ export function SqlEditor({
         {!readonly && (
           <>
             <SqlEditorToolbar
-              viewRef={viewRef}
+              editorView={editorView}
               toolbarConfig={tc}
               translation={t}
               dialect={dialect}

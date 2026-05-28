@@ -18,7 +18,7 @@
  *    wenn der User eigentlich gezogen hat (≥ 5px Bewegung).
  */
 
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useGanttChartStore, useRawGanttChartStore, useGanttTranslations } from "../GanttChart";
 import type { GanttTask, GanttTaskNode } from "../GanttChart.types";
 import { addDays } from "../util/gantt-chart.util";
@@ -86,15 +86,21 @@ export function useGanttDrag({
 
   // Pixel pro Tag — als Ref damit mousemove-Closures immer den aktuellen Wert lesen.
   const dayWidthPxRef = useRef(1);
-  dayWidthPxRef.current =
-    totalWidth > 0
-      ? totalWidth / ((displayRange.end.getTime() - displayRange.start.getTime()) / MS_PER_DAY)
-      : 1;
 
   // Stabile Callback-Refs (Muster 1) — kein useCallback-Rebuild bei Prop-Änderungen nötig.
-  const onTaskMovedRef   = useRef(onTaskMoved);   onTaskMovedRef.current   = onTaskMoved;
-  const onTaskResizedRef = useRef(onTaskResized); onTaskResizedRef.current = onTaskResized;
-  const onTasksChangeRef = useRef(onTasksChange); onTasksChangeRef.current = onTasksChange;
+  const onTaskMovedRef   = useRef(onTaskMoved);
+  const onTaskResizedRef = useRef(onTaskResized);
+  const onTasksChangeRef = useRef(onTasksChange);
+
+  useLayoutEffect(() => {
+    dayWidthPxRef.current =
+      totalWidth > 0
+        ? totalWidth / ((displayRange.end.getTime() - displayRange.start.getTime()) / MS_PER_DAY)
+        : 1;
+    onTaskMovedRef.current   = onTaskMoved;
+    onTaskResizedRef.current = onTaskResized;
+    onTasksChangeRef.current = onTasksChange;
+  });
 
   // Zwei-Ebenen State (Muster 2)
   const dragInitRef    = useRef<DragInit | null>(null);

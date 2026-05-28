@@ -18,6 +18,12 @@ export type RichTextEditorToolbarConfig = {
   showClearFormat?:      boolean;
   /** Fullscreen-Button in der Toolbar — standardmäßig deaktiviert (opt-in) */
   showFullscreenButton?: boolean;
+  /** Tabellen einfügen + Zeilen/Spalten verwalten — standardmäßig deaktiviert (opt-in) */
+  showTableButton?:      boolean;
+  /** Bilder per URL einfügen — standardmäßig deaktiviert (opt-in) */
+  showImageButton?:      boolean;
+  /** Emoji-Picker — standardmäßig deaktiviert (opt-in) */
+  showEmojiButton?:      boolean;
 };
 
 export const DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG: Required<RichTextEditorToolbarConfig> = {
@@ -39,6 +45,9 @@ export const DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG: Required<RichTextEditorToo
   showUndoRedo:         true,
   showClearFormat:      true,
   showFullscreenButton: false,
+  showTableButton:      false,
+  showImageButton:      false,
+  showEmojiButton:      false,
 };
 
 export type RichTextEditorTranslation = {
@@ -75,6 +84,26 @@ export type RichTextEditorTranslation = {
   fullscreen:        string;
   /** Tooltip für den Exit-Fullscreen-Button */
   exitFullscreen:    string;
+  // Table
+  table:             string;
+  insertTable:       string;
+  addRowBefore:      string;
+  addRowAfter:       string;
+  deleteRow:         string;
+  addColumnBefore:   string;
+  addColumnAfter:    string;
+  deleteColumn:      string;
+  deleteTable:       string;
+  // Image
+  image:             string;
+  imageDialogTitle:  string;
+  imageDialogUrlLabel: string;
+  imageDialogAltLabel: string;
+  imageDialogSave:   string;
+  imageDialogCancel: string;
+  // Emoji
+  emoji:                  string;
+  emojiSearchPlaceholder: string;
 };
 
 export const DEFAULT_RICH_TEXT_EDITOR_TRANSLATION: RichTextEditorTranslation = {
@@ -108,6 +137,23 @@ export const DEFAULT_RICH_TEXT_EDITOR_TRANSLATION: RichTextEditorTranslation = {
   wordCount:         "{count} words",
   fullscreen:        "Full screen",
   exitFullscreen:    "Exit full screen",
+  table:             "Table",
+  insertTable:       "Insert 3×3 table",
+  addRowBefore:      "Add row before",
+  addRowAfter:       "Add row after",
+  deleteRow:         "Delete row",
+  addColumnBefore:   "Add column before",
+  addColumnAfter:    "Add column after",
+  deleteColumn:      "Delete column",
+  deleteTable:       "Delete table",
+  image:             "Insert image",
+  imageDialogTitle:  "Insert image",
+  imageDialogUrlLabel: "Image URL",
+  imageDialogAltLabel: "Alt text (optional)",
+  imageDialogSave:   "Insert",
+  imageDialogCancel: "Cancel",
+  emoji:                  "Emoji",
+  emojiSearchPlaceholder: "Search emoji…",
 };
 
 export type RichTextEditorProps = {
