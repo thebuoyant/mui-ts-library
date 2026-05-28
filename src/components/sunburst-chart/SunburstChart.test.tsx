@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import { SunburstChart } from "./SunburstChart";
 import type { SunburstChartData } from "./SunburstChart.types";
 
@@ -22,10 +22,11 @@ const SIMPLE_DATA: SunburstChartData = {
   ],
 };
 
-// ProseMirror / SVG getBBox polyfill for JSDOM
+// SVG getBBox polyfill for JSDOM
 beforeAll(() => {
-  SVGElement.prototype.getBBox = vi.fn(() => ({ x: -250, y: -250, width: 500, height: 500, top: 0, right: 0, bottom: 0, left: 0 }));
-  SVGElement.prototype.getBBox = vi.fn(() => ({ x: -250, y: -250, width: 500, height: 500, top: 0, right: 0, bottom: 0, left: 0 }));
+  const mockBBox = { x: -250, y: -250, width: 500, height: 500, top: 0, right: 0, bottom: 0, left: 0 };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (SVGElement.prototype as any).getBBox = vi.fn(() => mockBBox);
 });
 
 describe("SunburstChart", () => {
@@ -101,14 +102,13 @@ describe("SunburstChart", () => {
     expect(box).toBeTruthy();
   });
 
-  it("Should use custom translation for doubleClickToZoomIn", () => {
+  it("Should use custom translation for ctrlClickToZoomIn", () => {
     render(
       <SunburstChart
         data={SIMPLE_DATA}
-        translation={{ doubleClickToZoomIn: "Doppelklick zum Hineinzoomen" }}
+        translation={{ ctrlClickToZoomIn: "Ctrl+Klick zum Hineinzoomen" }}
       />,
     );
-    // Translation is in SVG title elements — check it doesn't crash
     expect(document.querySelector("svg")).toBeInTheDocument();
   });
 });

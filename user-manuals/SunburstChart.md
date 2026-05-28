@@ -96,7 +96,7 @@ function App() {
 |---|---|---|---|
 | `data` | `SunburstChartData` | — | **Required.** Root node of the hierarchy |
 | `size` | `number` | `500` | Width and height of the SVG in pixels |
-| `showSegmentLabels` | `boolean` | `true` | Arc-aligned text labels on segments |
+| `showSegmentLabels` | `boolean` | `true` | Arc-aligned text labels; auto-truncated with `…` if the arc is too narrow |
 | `innerRadius` | `number` | `0` | `0` = solid sunburst; `> 0` = donut hole in px |
 | `sortBy` | `'value' \| 'name'` | `'value'` | Sort segments by total value or alphabetically |
 | `chartColors` | `string[]` | MUI palette | Custom top-level color palette |
@@ -244,7 +244,7 @@ All interactions are muted. The chart renders at reduced opacity (`0.5`). Useful
 />
 ```
 
-Translation strings appear as native SVG tooltip hints on hover. All keys are optional — unset keys fall back to the English defaults.
+Translation strings appear in the **custom MUI tooltip** that pops up instantly on hover (no browser delay). The tooltip shows the node name, formatted value, breadcrumb path, and zoom shortcut hints. All keys are optional — unset keys fall back to the English defaults.
 
 ---
 

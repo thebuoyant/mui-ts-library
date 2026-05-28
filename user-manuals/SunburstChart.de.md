@@ -96,7 +96,7 @@ function App() {
 |---|---|---|---|
 | `data` | `SunburstChartData` | — | **Pflichtfeld.** Wurzelknoten der Hierarchie |
 | `size` | `number` | `500` | Breite und Höhe des SVG in Pixeln |
-| `showSegmentLabels` | `boolean` | `true` | Arc-ausgerichtete Textlabels auf Segmenten |
+| `showSegmentLabels` | `boolean` | `true` | Arc-ausgerichtete Textlabels; werden automatisch mit `…` abgekürzt wenn der Arc zu schmal ist |
 | `innerRadius` | `number` | `0` | `0` = solider Sunburst; `> 0` = Donut-Loch in px |
 | `sortBy` | `'value' \| 'name'` | `'value'` | Nach Gesamtwert oder alphabetisch sortieren |
 | `chartColors` | `string[]` | MUI-Palette | Eigene Farbpalette für Top-Level-Segmente |
@@ -244,7 +244,7 @@ Alle Interaktionen sind deaktiviert. Das Chart wird mit reduzierter Opacity (`0.
 />
 ```
 
-Die Translation-Strings erscheinen als native SVG-Tooltip-Hints beim Hover. Alle Keys sind optional — nicht gesetzte Keys verwenden die englischen Standardwerte.
+Die Translation-Strings erscheinen im **Custom MUI-Tooltip**, der beim Hover sofort erscheint (kein Browser-Delay). Der Tooltip zeigt Knotenname, formatierten Wert, Breadcrumb-Pfad und Zoom-Shortcut-Hinweise. Alle Keys sind optional — nicht gesetzte Keys verwenden die englischen Standardwerte.
 
 ---
 
