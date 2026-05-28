@@ -13,6 +13,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.2.0] — 2026-05-28
+
+### Added
+
+#### SunburstChart — New Component (MTL-19) · First of the D3 Charts family
+
+The `SunburstChart` is the first component in the new **D3 Charts** family. More charts (Treemap, ZoomableCirclePacking, Chord, RadialTree) will follow in subsequent releases.
+
+- **Hierarchical data visualization** as concentric rings — root at the center, each depth level forms a ring
+- **`data: SunburstChartData`** — recursive tree structure: `{ id, name, value?, children? }`
+- **Zoom interactions:**
+  - `Ctrl+Click` on a segment with children → zoom in (drill down)
+  - `Ctrl+Double-click` → zoom out one level
+  - `Ctrl+Click` on the center label → zoom out one level
+  - `Escape` → reset zoom to root
+  - Regular `Click` → fires `onSegmentClick` callback immediately (no delay)
+- **`innerRadius?: number`** — `0` = solid sunburst (default); `> 0` = donut style
+- **`sortBy?: 'value' | 'name'`** — sort segments by value (largest first) or alphabetically
+- **`chartColors?: string[]`** — custom color palette; falls back to MUI theme palette (`primary`, `secondary`, `error`, `warning`, `success`, `info`)
+- **`showSegmentLabels?: boolean`** — arc-aligned text labels (default: `true`)
+- **`showRootLabel?: boolean`** — center label showing current focus node name (default: `true`)
+- **`onSegmentClick?: (info: SunburstSegmentInfo, event) => void`** — clean callback with `name`, `value`, `depth`, `path[]`, `childrenCount`, `data`
+- **`disabled?: boolean`** — mutes all interactions, reduces opacity
+- **`translation?: Partial<SunburstChartTranslation>`** — i18n for tooltip hints
+- MUI theme integration: colors, font family, text color, dark mode out of the box
+- New exported types: `SunburstChartData`, `SunburstSegmentInfo`, `SunburstChartTranslation`
+- New dependency: `d3@^7.9.0`
+
+---
+
 ## [2.1.0] — 2026-05-28
 
 ### Added

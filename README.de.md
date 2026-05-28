@@ -17,6 +17,7 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 | [`RichTextEditor`](#richtexteditor) | WYSIWYG-Editor (TipTap v3) mit Toolbar, Link-Dialog, Textfarbe, Hervorhebung, Wörter-Zähler, Vollbild-Modus, Markdown-Einfügen, Tabellen-Bearbeitung, Bild-Embed und Emoji-Picker | [Vollständiges Manual →](user-manuals/RichTextEditor.de.md) |
 | [`SqlEditor`](#sqleditor) | SQL-Code-Editor (CodeMirror 6) mit Syntax-Highlighting, Multi-Dialekt, Autocomplete, Linting und `Cmd+Enter`-Ausführen-Shortcut | [Vollständiges Manual →](user-manuals/SqlEditor.de.md) |
 | [`JsonEditor`](#jsoneditor) | JSON-Code-Editor (CodeMirror 6) mit Echtzeit-Validierung, Format- und Komprimieren-Schaltfläche sowie optionaler Minimap | [Vollständiges Manual →](user-manuals/JsonEditor.de.md) |
+| [`SunburstChart`](#sunburstchart) | D3 v7 hierarchisches Chart — konzentrische Ringe, Ctrl+Click-Zoom, Donut-Modus, eigene Farben, MUI-Theme-Integration. Erste der D3-Chart-Familie. | [Vollständiges Manual →](user-manuals/SunburstChart.de.md) |
 
 ---
 
@@ -168,6 +169,36 @@ import { JsonEditor } from '@thebuoyant-tsdev/mui-ts-library';
 ```
 
 → [Vollständige Dokumentation](user-manuals/JsonEditor.de.md)
+
+---
+
+### SunburstChart
+
+```tsx
+import { SunburstChart } from '@thebuoyant-tsdev/mui-ts-library';
+import type { SunburstChartData } from '@thebuoyant-tsdev/mui-ts-library';
+
+const data: SunburstChartData = {
+  id: 'root', name: 'Budget',
+  children: [
+    { id: 'eng',  name: 'Engineering', children: [
+      { id: 'fe', name: 'Frontend', value: 480 },
+      { id: 'be', name: 'Backend',  value: 620 },
+    ]},
+    { id: 'sales', name: 'Vertrieb', value: 890 },
+  ],
+};
+
+<SunburstChart
+  data={data}
+  size={500}
+  onSegmentClick={(info) => console.log(info.path, info.value)}
+/>
+```
+
+**Zoom:** `Ctrl+Click` → Drill-down · `Ctrl+Doppelklick` → Zoom out · `Escape` → Reset
+
+→ [Vollständige Dokumentation](user-manuals/SunburstChart.de.md)
 
 ---
 

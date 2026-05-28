@@ -135,7 +135,7 @@ mit exportiertem `DEFAULT_XXX_CHART_TRANSLATION` (englische Defaults) — analog
 
 Typische Translation-Keys pro Chart (je nach Bedarf):
 - `noData` — Platzhalter wenn `data` leer ist
-- `tooltip` / `clickToZoom` / `doubleClickToZoomIn` / `ctrlDoubleClickToZoomOut` — Interaktions-Hints
+- `ctrlClickToZoomIn` / `ctrlDblClickToZoomOut` / `escToResetZoom` — Interaktions-Hints (Ctrl+Click-Modell)
 - Komponentenspezifische Labels
 
 #### Weitere Konventionen
@@ -148,7 +148,7 @@ Typische Translation-Keys pro Chart (je nach Bedarf):
 
 ---
 
-### MTL-19 — SunburstChart ⭐ Als nächstes
+### ~~MTL-19 — SunburstChart~~ ✅ v2.2.0
 
 > Quelle: `skejlo-charts/src/components/_charts/sunburst-chart/SunburstChart.tsx`  
 > **Aufwand: Niedrig** — keinerlei Fluent UI-Abhängigkeiten, reines D3 + React SVG
@@ -181,7 +181,7 @@ Typische Translation-Keys pro Chart (je nach Bedarf):
 
 ---
 
-### MTL-20 — TreemapChart
+### MTL-20 — TreemapChart ⭐ Als nächstes
 
 > Quelle: `skejlo-charts/src/components/_charts/treemap-chart/TreemapChart.tsx`  
 > **Aufwand: Niedrig** — kein Fluent UI, reines D3 + React SVG (ähnlich SunburstChart)
