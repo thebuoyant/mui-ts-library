@@ -102,6 +102,7 @@ function App() {
 | `chartColors` | `string[]` | MUI-Palette | Eigene Farbpalette für Top-Level-Segmente |
 | `showRootLabel` | `boolean` | `true` | Aktuellen Fokus-Knotennamen im Zentrum anzeigen |
 | `onSegmentClick` | `(info, event) => void` | — | Wird bei jedem normalen Klick ausgelöst |
+| `onZoomChange` | `(zoom: SunburstZoomInfo) => void` | — | Wird bei Zoom-Wechsel ausgelöst (Ctrl+Click, Ctrl+DblClick, Escape) |
 | `valueDecimalCount` | `number` | `0` | Dezimalstellen in Tooltip-Werten |
 | `valueDecimalSeparator` | `string` | `'.'` | Dezimaltrennzeichen |
 | `valueThousandsSeparator` | `string` | `','` | Tausendertrennzeichen |
@@ -121,12 +122,20 @@ type SunburstChartData = {
 };
 
 type SunburstSegmentInfo = {
+  id:            string;        // direkt — entspricht data.id
   name:          string;
-  value:         number | null;
+  value:         number | null; // D3-Aggregat: Summe aller Blattknoten-Werte
+  percentage:    number;        // Anteil am Root-Gesamtwert in % (2 Dezimalstellen)
   depth:         number;
-  path:          string[];   // von Root bis zu diesem Knoten
+  path:          string[];      // Breadcrumb von Root — Array von Namen
+  pathIds:       string[];      // Breadcrumb von Root — Array von IDs (Backend-Verlinkung)
   childrenCount: number;
-  data:          SunburstChartData;
+  data:          SunburstChartData; // originaler Datenknoten
+};
+
+type SunburstZoomInfo = {
+  focusNode: SunburstSegmentInfo; // Knoten, der jetzt im Zentrum steht
+  isRoot:    boolean;             // true wenn Zoom zur Root zurückgesetzt wurde
 };
 
 type SunburstChartTranslation = {
@@ -208,12 +217,19 @@ Farben werden Top-Level-Segmenten zugewiesen und wiederholen sich zyklisch wenn 
 <SunburstChart
   data={data}
   onSegmentClick={(info, event) => {
+    console.log(info.id);            // "frontend"
     console.log(info.name);          // "Frontend"
-    console.log(info.value);         // 480
+    console.log(info.value);         // 480  (D3-Aggregat — Summe der Nachfolger)
+    console.log(info.percentage);    // 10.2 (% vom Root-Gesamtwert, 2 Dezimalstellen)
     console.log(info.depth);         // 2
     console.log(info.path);          // ["Unternehmen", "Engineering", "Frontend"]
+    console.log(info.pathIds);       // ["unternehmen", "engineering", "frontend"]
     console.log(info.childrenCount); // 0 (Blattknoten)
     console.log(info.data);          // originaler SunburstChartData-Knoten
+  }}
+  onZoomChange={(zoom) => {
+    console.log(zoom.focusNode.name); // "Engineering" — aktuelles Zentrum
+    console.log(zoom.isRoot);         // false — nicht auf Root-Ebene
   }}
 />
 ```

@@ -175,9 +175,26 @@ Typische Translation-Keys pro Chart (je nach Bedarf):
 - `CustomPalette` — `colors={[...]}`
 - `WithClickCallback` — `onSegmentClick` loggt in Storybook Actions
 
-| Status | — |
+| Status | ✅ v2.2.0 |
 |---|---|
-| Branch | MTL-19 (noch nicht erstellt) |
+
+---
+
+### SunburstChart — Feature-Ideen (nach v2.2.0)
+
+| Feature | Beschreibung | Aufwand |
+|---|---|---|
+| **Animierte Zoom-Übergänge** | D3 arc interpolation beim Drill-down — weiche Überblendung statt Sofortschnitt | Mittel |
+| **`onZoomChange` Callback** | Feuert beim Zoom-Wechsel mit `{ focusNode, isRoot }` — damit der Parent Breadcrumb außerhalb anzeigen oder Zoom-State persistieren kann | ✅ v2.2.0 |
+| **`focusId` controlled prop** | Parent kann den Zoom-Zustand von außen steuern — z.B. Breadcrumb-Click außerhalb des Charts navigiert hinein | Mittel |
+| **Hover-Highlight** | Fill-Opacity-Änderung beim Hover auf Segmente — visuelles Feedback bevor Click | Niedrig |
+| **"Sonstige"-Kollaps** | Sehr kleine Segmente (< X % des Gesamtwerts) werden zu einem "Other"-Segment zusammengefasst — `minPercentage?: number`-Prop | Mittel |
+| **Legende** | Optionale Farb-Legende unterhalb/seitlich des Charts — zeigt Top-Level-Segmente mit Farbe + Name + Wert | Mittel |
+| **Responsive Größe** | `size="auto"` passt sich dem Container an — statt fixer Pixelgröße | Mittel |
+| **Prozentanzeige in Labels** | Labels zeigen % statt Name — oder beides: `"Frontend 10.2%"` — `labelMode: 'name' | 'percent' | 'both'`-Prop | Niedrig |
+| **Export PNG/SVG** | Download-Button — Chart als Bild exportieren | Mittel |
+| **Multi-Ring Font-Sizes** | Tiefere Ringe → kleinere Schrift — `labelFontSizeByDepth?: number[]` | Niedrig |
+| **`id` in `SunburstSegmentInfo`** | Direkt zugängliche ID im Callback (kein `info.data.id`) + `pathIds` + `percentage` | ✅ v2.2.0 |
 
 ---
 

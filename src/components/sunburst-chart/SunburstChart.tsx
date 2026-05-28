@@ -4,6 +4,7 @@ import { Box, Paper, Typography, useTheme } from "@mui/material";
 import {
   type SunburstChartProps,
   type SunburstSegmentInfo,
+  type SunburstZoomInfo,
   DEFAULT_SUNBURST_CHART_TRANSLATION,
 } from "./SunburstChart.types";
 import type { SunburstChartData } from "./SunburstChart.types";
@@ -49,6 +50,7 @@ export function SunburstChart({
   chartColors,
   showRootLabel = true,
   onSegmentClick,
+  onZoomChange,
   valueDecimalCount = 0,
   valueDecimalSeparator = ".",
   valueThousandsSeparator = ",",
@@ -166,15 +168,37 @@ export function SunburstChart({
   );
 
   const serialize = useCallback(
-    (node: d3.HierarchyRectangularNode<SunburstChartData>): SunburstSegmentInfo => ({
-      name:          node.data.name,
-      value:         node.value ?? null,
-      depth:         node.depth,
-      path:          node.ancestors().map((a) => a.data.name).reverse(),
-      childrenCount: node.children?.length ?? 0,
-      data:          node.data,
-    }),
-    [],
+    (node: d3.HierarchyRectangularNode<SunburstChartData>): SunburstSegmentInfo => {
+      const ancestors = node.ancestors().reverse();
+      const nodeValue = node.value ?? 0;
+      const rootValue = root.value ?? 0;
+      return {
+        id:            node.data.id,
+        name:          node.data.name,
+        value:         nodeValue || null,
+        percentage:    rootValue > 0 ? Math.round((nodeValue / rootValue) * 10000) / 100 : 0,
+        depth:         node.depth,
+        path:          ancestors.map((a) => a.data.name),
+        pathIds:       ancestors.map((a) => a.data.id),
+        childrenCount: node.children?.length ?? 0,
+        data:          node.data,
+      };
+    },
+    [root],
+  );
+
+  const zoom = useCallback(
+    (newFocus: d3.HierarchyRectangularNode<SunburstChartData>) => {
+      setFocusNode(newFocus);
+      if (onZoomChange) {
+        const info: SunburstZoomInfo = {
+          focusNode: serialize(newFocus),
+          isRoot:    newFocus === root,
+        };
+        onZoomChange(info);
+      }
+    },
+    [root, serialize, onZoomChange],
   );
 
   // Auto-fit viewBox
@@ -207,11 +231,11 @@ export function SunburstChart({
   useLayoutEffect(() => {
     if (disabled) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { cancelZoomIn(); setFocusNode(root); }
+      if (e.key === "Escape") { cancelZoomIn(); zoom(root); }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [disabled, root]);
+  }, [disabled, root, zoom]);
 
   // Tooltip helpers — relative to container Box
   const getRelativePos = (e: React.MouseEvent) => {
@@ -229,7 +253,7 @@ export function SunburstChart({
     const node = renderNodes[idx];
     if (!node) return;
     if (e.ctrlKey || e.metaKey) {
-      if (node.children) scheduleZoomIn(() => setFocusNode(node));
+      if (node.children) scheduleZoomIn(() => zoom(node));
       return;
     }
     onSegmentClick?.(serialize(node), e);
@@ -239,7 +263,7 @@ export function SunburstChart({
     if (disabled) return;
     if (e.ctrlKey || e.metaKey) {
       cancelZoomIn();
-      setFocusNode((f) => f.parent ?? root);
+      zoom(focusNode.parent ?? root);
     }
   };
 
@@ -247,7 +271,7 @@ export function SunburstChart({
     if (disabled) return;
     if (e.ctrlKey || e.metaKey) {
       cancelZoomIn();
-      setFocusNode((f) => f.parent ?? root);
+      zoom(focusNode.parent ?? root);
       return;
     }
     onSegmentClick?.(serialize(focusNode.parent ?? root), e as React.MouseEvent<SVGCircleElement>);

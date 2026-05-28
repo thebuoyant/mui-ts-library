@@ -8,12 +8,28 @@ export type SunburstChartData = {
 };
 
 export type SunburstSegmentInfo = {
+  /** Node ID — direct access, same as `data.id` */
+  id:            string;
   name:          string;
+  /** D3 aggregate value — sum of all descendant leaf values */
   value:         number | null;
+  /** Percentage of root total — `(value / root.value) * 100` */
+  percentage:    number;
   depth:         number;
+  /** Breadcrumb path from root — array of node names */
   path:          string[];
+  /** Breadcrumb path from root — array of node IDs (for backend linking) */
+  pathIds:       string[];
   childrenCount: number;
+  /** Original data node as passed to the chart */
   data:          SunburstChartData;
+};
+
+export type SunburstZoomInfo = {
+  /** The node that is now the focus center */
+  focusNode: SunburstSegmentInfo;
+  /** True when zoom has been reset to root */
+  isRoot:    boolean;
 };
 
 export type SunburstChartTranslation = {
@@ -51,6 +67,8 @@ export type SunburstChartProps = {
   showRootLabel?:           boolean;
   /** Fired on single-click on any segment */
   onSegmentClick?:          (info: SunburstSegmentInfo, event: React.MouseEvent<SVGPathElement | SVGCircleElement>) => void;
+  /** Fired when zoom focus changes (Ctrl+Click in/out, Escape reset) */
+  onZoomChange?:            (zoom: SunburstZoomInfo) => void;
   /** Decimal places for value display in tooltips (default: 0) */
   valueDecimalCount?:       number;
   /** Decimal separator for values (default: '.') */

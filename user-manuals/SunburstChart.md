@@ -102,6 +102,7 @@ function App() {
 | `chartColors` | `string[]` | MUI palette | Custom top-level color palette |
 | `showRootLabel` | `boolean` | `true` | Show current focus node name in center |
 | `onSegmentClick` | `(info, event) => void` | — | Fires on every regular click |
+| `onZoomChange` | `(zoom: SunburstZoomInfo) => void` | — | Fires when zoom focus changes (Ctrl+Click, Ctrl+DblClick, Escape) |
 | `valueDecimalCount` | `number` | `0` | Decimal places in tooltip values |
 | `valueDecimalSeparator` | `string` | `'.'` | Decimal separator |
 | `valueThousandsSeparator` | `string` | `','` | Thousands separator |
@@ -121,12 +122,20 @@ type SunburstChartData = {
 };
 
 type SunburstSegmentInfo = {
+  id:            string;        // direct access — same as data.id
   name:          string;
-  value:         number | null;
+  value:         number | null; // D3 aggregate: sum of all descendant leaf values
+  percentage:    number;        // share of root total — (value / root.value) * 100
   depth:         number;
-  path:          string[];   // from root to this node
+  path:          string[];      // breadcrumb from root — array of names
+  pathIds:       string[];      // breadcrumb from root — array of IDs (backend linking)
   childrenCount: number;
-  data:          SunburstChartData;
+  data:          SunburstChartData; // original data node
+};
+
+type SunburstZoomInfo = {
+  focusNode: SunburstSegmentInfo; // node now at the center
+  isRoot:    boolean;             // true when zoom was reset to root
 };
 
 type SunburstChartTranslation = {
@@ -208,12 +217,19 @@ Colors are assigned to top-level segments and repeat cyclically if there are mor
 <SunburstChart
   data={data}
   onSegmentClick={(info, event) => {
+    console.log(info.id);            // "frontend"
     console.log(info.name);          // "Frontend"
-    console.log(info.value);         // 480
+    console.log(info.value);         // 480  (D3 aggregate — sum of descendants)
+    console.log(info.percentage);    // 10.2 (% of root total, 2 decimal places)
     console.log(info.depth);         // 2
     console.log(info.path);          // ["Company", "Engineering", "Frontend"]
+    console.log(info.pathIds);       // ["company", "engineering", "frontend"]
     console.log(info.childrenCount); // 0 (leaf node)
     console.log(info.data);          // original SunburstChartData node
+  }}
+  onZoomChange={(zoom) => {
+    console.log(zoom.focusNode.name); // "Engineering" — current center
+    console.log(zoom.isRoot);         // false — not at root level
   }}
 />
 ```
