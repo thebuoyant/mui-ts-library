@@ -251,19 +251,34 @@ All types and defaults are exported directly — no separate `@types/...` packag
 
 ```tsx
 import type {
-  GanttTask,
-  ConfirmDialogOptions,
-  JsonEditorHighlightColors,
-  SqlEditorProps,
-  RichTextEditorTranslation,
+  // ConfirmDialog
+  ConfirmDialogOptions, ConfirmDialogSeverity,
+
+  // GanttChart
+  GanttTask, GanttTranslations, GanttTheme, GanttToolbarConfig,
+
+  // TagSelection
+  TagSelectionItem,
+
+  // PasswordStrengthMeter
+  CustomRequirement, StrengthResult,
+
+  // RichTextEditor
+  RichTextEditorToolbarConfig, RichTextEditorTranslation,
+
+  // SqlEditor
+  SqlEditorDialect, SqlEditorTranslation, SqlEditorToolbarConfig,
+
+  // JsonEditor
+  JsonEditorHighlightColors, JsonEditorTranslation, JsonEditorToolbarConfig,
+
+  // SunburstChart
+  SunburstChartData, SunburstSegmentInfo, SunburstZoomInfo,
+
+  // ChordChart
+  ChordChartData, ChordGroupInfo, ChordInfo, ChordSortBy,
 } from '@thebuoyant-tsdev/mui-ts-library';
 ```
-
----
-
-## Development
-
-For local setup, Storybook, tests, and publishing instructions, see [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ---
 
