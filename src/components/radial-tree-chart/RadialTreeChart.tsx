@@ -324,9 +324,22 @@ export function RadialTreeChart({
                       <circle r={nodeRadius} fill={nodeColor(node)} />
                     )}
                     {icon && (
-                      <g transform={`translate(${-iconSize / 2}, ${-iconSize / 2})`}>
-                        {icon}
-                      </g>
+                      <foreignObject
+                        x={-iconSize / 2}
+                        y={-iconSize / 2}
+                        width={iconSize}
+                        height={iconSize}
+                        style={{ overflow: "visible" }}
+                      >
+                        {/* xmlns required for foreignObject HTML content */}
+                        <span
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          {...{ xmlns: "http://www.w3.org/1999/xhtml" } as any}
+                          style={{ display: "flex", alignItems: "center", justifyContent: "center", width: iconSize, height: iconSize }}
+                        >
+                          {icon}
+                        </span>
+                      </foreignObject>
                     )}
                   </g>
                 </Tooltip>
