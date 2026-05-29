@@ -139,10 +139,8 @@ type SunburstZoomInfo = {
 };
 
 type SunburstChartTranslation = {
-  noData:                string;
-  ctrlClickToZoomIn:     string;
-  ctrlDblClickToZoomOut: string;
-  escToResetZoom:        string;
+  /** Shown when data has no value or children */
+  noData: string;
 };
 ```
 
@@ -161,7 +159,7 @@ type SunburstChartTranslation = {
 > **Why Ctrl+Click instead of double-click?**  
 > This model eliminates the classic 200ms click-delay hack. `onSegmentClick` fires instantly on every click, giving a snappy feel. Zoom is an explicit, intentional action (modifier key required) and can never happen accidentally.
 
-The center label always shows the **current focus node name** — when zoomed in, it acts as a breadcrumb. Hovering the center shows the available shortcuts as a tooltip.
+The center label always shows the **current focus node name** — when zoomed in, it acts as a breadcrumb.
 
 ---
 
@@ -251,16 +249,11 @@ All interactions are muted. The chart renders at reduced opacity (`0.5`). Useful
 ```tsx
 <SunburstChart
   data={data}
-  translation={{
-    ctrlClickToZoomIn:     'Ctrl+Klick zum Hineinzoomen',
-    ctrlDblClickToZoomOut: 'Ctrl+Doppelklick zum Herauszoomen',
-    escToResetZoom:        'Esc zum Zurücksetzen',
-    noData:                'Keine Daten',
-  }}
+  translation={{ noData: 'No data available' }}
 />
 ```
 
-Translation strings appear in the **MUI `<Tooltip>` component** (dark background, arrow, `enterDelay={50}ms`) that wraps each segment. The tooltip shows the node name, formatted value, breadcrumb path, and zoom shortcut hints. All keys are optional — unset keys fall back to the English defaults.
+Currently the only translation key is `noData` (shown when the data has no value or children). All keys are optional — unset keys fall back to the English defaults.
 
 ---
 

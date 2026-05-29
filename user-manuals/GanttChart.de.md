@@ -158,7 +158,6 @@ type GanttTask = {
 | `resizable` | `boolean` | `false` | Erlaubt das Verändern des `endDate` durch Ziehen am rechten Balkenrand. |
 | `showCriticalPath` | `boolean` | `false` | Hebt den kritischen Pfad farbig hervor — die längste Abhängigkeitskette, die die Projektlaufzeit bestimmt. |
 | `showToolbar` | `boolean` | `true` | Blendet die gesamte Toolbar (Skalenbuttons, Datumsbereich, Aktionsbuttons) ein oder aus. |
-| `statusColors` | `GanttStatusColors` | — | ⚠️ **Veraltet.** Bitte `ganttTheme.statusColors` verwenden. Überschreibt Balkenfarben je Status. |
 | `tasks` | `GanttTask[]` | — | **Pflichtfeld.** Flaches Array aller Tasks. Hierarchie wird intern über `parentId` aufgebaut. Änderungen werden über die `onTasksChange`-Callback nach oben gespiegelt. |
 | `timeScale` | `GanttTimeScale` | `"months"` | Initialer Zeitskalentyp: `"days"` · `"weeks"` · `"months"` · `"quarters"`. Der Nutzer kann die Skala über die Toolbar jederzeit wechseln. |
 | `toolbarConfig` | `GanttToolbarConfig` | alle `true` | Feingranulare Steuerung einzelner Toolbar-Elemente. Nur abweichende Keys angeben — nicht gesetzte Keys bleiben sichtbar. Siehe [GanttToolbarConfig](#ganttToolbarConfig). |
@@ -576,7 +575,6 @@ Bei `zoomable={true}` kann der Nutzer direkt in der Timeline durch die Zoom-Stuf
 | Thema | Hinweis |
 |---|---|
 | **Standard-Sprache** | Die Standardtexte sind eine Mischung: Toolbar auf Deutsch, Status-Labels auf Englisch. Für einheitliche Lokalisierung alle Keys setzen. |
-| **`statusColors` (deprecated)** | Die `statusColors`-Prop auf Komponentenebene ist veraltet. Bitte `ganttTheme.statusColors` verwenden. Wenn beide gesetzt sind, hat `ganttTheme.statusColors` Vorrang. |
 | **`virtualizeRows` in jsdom** | In Unit-Tests mit jsdom ist `clientHeight` immer 0, weshalb nur Overscan-Zeilen im DOM erscheinen. Das ist kein Fehler — in realen Browsern funktioniert die Virtualisierung korrekt. |
 | **`cascadeDependencies`** | Wirkt nur auf Finish-to-Start-Abhängigkeiten (via `dependencies`-Array). Zirkuläre Abhängigkeiten werden erkannt und abgebrochen. |
 | **Fortschritts-Drag** | `progressDraggable` benötigt `progress` in den Task-Daten. Wenn `progress` undefiniert ist, wird der Handle nicht angezeigt. |

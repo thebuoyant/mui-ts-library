@@ -158,7 +158,6 @@ type GanttTask = {
 | `resizable` | `boolean` | `false` | Allows changing the `endDate` by dragging the right edge of a bar. |
 | `showCriticalPath` | `boolean` | `false` | Highlights the critical path — the longest dependency chain that determines the project duration. |
 | `showToolbar` | `boolean` | `true` | Shows or hides the entire toolbar (scale buttons, date range, action buttons). |
-| `statusColors` | `GanttStatusColors` | — | ⚠️ **Deprecated.** Use `ganttTheme.statusColors` instead. Overrides bar colors per status. |
 | `tasks` | `GanttTask[]` | — | **Required.** Flat array of all tasks. Hierarchy is built internally via `parentId`. Changes are reflected back via the `onTasksChange` callback. |
 | `timeScale` | `GanttTimeScale` | `"months"` | Initial time scale: `"days"` · `"weeks"` · `"months"` · `"quarters"`. The user can switch the scale via the toolbar at any time. |
 | `toolbarConfig` | `GanttToolbarConfig` | all `true` | Fine-grained control over individual toolbar elements. Only specify deviating keys — unset keys remain visible. See [GanttToolbarConfig](#gantttoolbarconfig). |
@@ -576,7 +575,6 @@ When `zoomable={true}`, the user can cycle through zoom levels directly in the t
 | Topic | Note |
 |---|---|
 | **Default language** | The default texts are a mix: toolbar labels in German, status labels in English. For consistent localization, set all keys. |
-| **`statusColors` (deprecated)** | The `statusColors` prop at the component level is deprecated. Use `ganttTheme.statusColors` instead. When both are set, `ganttTheme.statusColors` takes precedence. |
 | **`virtualizeRows` in jsdom** | In unit tests with jsdom, `clientHeight` is always 0, so only overscan rows appear in the DOM. This is not a bug — virtualization works correctly in real browsers. |
 | **`cascadeDependencies`** | Only applies to finish-to-start dependencies (via the `dependencies` array). Circular dependencies are detected and aborted. |
 | **Progress drag** | `progressDraggable` requires `progress` in the task data. When `progress` is undefined, the handle is not shown. |
