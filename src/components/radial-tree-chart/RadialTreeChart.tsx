@@ -100,8 +100,14 @@ export function RadialTreeChart({
   showLabels = true,
   showIcons = true,
   chartColors,
-  linkStrokeOpacity = 0.25,
+  rootNodeRadius = 22,
+  branchNodeRadius = 16,
+  leafNodeRadius = 11,
+  linkColor,
+  linkStrokeOpacity = 1,
   linkStrokeWidth = 1.5,
+  labelFontSize = 12,
+  labelColor,
   separationSibling = 1,
   separationCousin = 2,
   showNodePopover = false,
@@ -127,11 +133,11 @@ export function RadialTreeChart({
   // Node sizes by role — root largest, leaves smallest
   const nodeR = useCallback(
     (node: HierarchyPointNode<RadialTreeChartData>): number => {
-      if (node.depth === 0) return 22;            // root — prominent
-      if (node.children) return 16;               // branch node
-      return 11;                                  // leaf node
+      if (node.depth === 0) return rootNodeRadius;
+      if (node.children) return branchNodeRadius;
+      return leafNodeRadius;
     },
-    [],
+    [rootNodeRadius, branchNodeRadius, leafNodeRadius],
   );
 
   const nodeColor = useCallback(
@@ -239,9 +245,10 @@ export function RadialTreeChart({
     onNodeClick?.(info, e);
   };
 
-  const textColor  = theme.palette.text.primary;
-  const bgColor    = theme.palette.background.paper;
-  const fontFamily = theme.typography.fontFamily;
+  const textColor    = labelColor ?? theme.palette.text.primary;
+  const resolvedLink = linkColor  ?? theme.palette.text.secondary;
+  const bgColor      = theme.palette.background.paper;
+  const fontFamily   = theme.typography.fontFamily;
 
   return (
     <Box
@@ -277,7 +284,7 @@ export function RadialTreeChart({
           {/* ── Curved links ─────────────────────────────────────────────── */}
           <g
             fill="none"
-            stroke={theme.palette.divider}
+            stroke={resolvedLink}
             strokeOpacity={linkStrokeOpacity}
             strokeWidth={linkStrokeWidth}
           >
@@ -387,7 +394,7 @@ export function RadialTreeChart({
                     stroke={bgColor}
                     strokeWidth={3}
                     fill={textColor}
-                    fontSize={11}
+                    fontSize={labelFontSize}
                     fontWeight={node.depth === 0 ? "bold" : "normal"}
                     pointerEvents="none"
                   >

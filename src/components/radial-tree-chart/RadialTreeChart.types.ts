@@ -57,12 +57,22 @@ export type RadialTreeChartProps = {
   showLabels?:               boolean;
   /** Per-depth node colors — falls back to MUI theme palette when omitted */
   chartColors?:              string[];
-  /** Link line opacity (default: 0.4) */
+  /** Root node circle radius in px (default: 22) */
+  rootNodeRadius?:           number;
+  /** Branch node circle radius in px (default: 16) */
+  branchNodeRadius?:         number;
+  /** Leaf node circle radius in px (default: 11) */
+  leafNodeRadius?:           number;
+  /** Link line color — defaults to `theme.palette.text.secondary` */
+  linkColor?:                string;
+  /** Link line opacity — 0 to 1 (default: 1) */
   linkStrokeOpacity?:        number;
   /** Link line width in px (default: 1.5) */
   linkStrokeWidth?:          number;
-  /** Node circle radius in px (default: 4) */
-  nodeRadius?:               number;
+  /** Label font size in px (default: 12) */
+  labelFontSize?:            number;
+  /** Label text color — defaults to `theme.palette.text.primary` */
+  labelColor?:               string;
   /** Separation factor between sibling nodes (default: 1) */
   separationSibling?:        number;
   /** Separation factor between cousin nodes (default: 2) */
