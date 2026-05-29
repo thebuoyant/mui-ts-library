@@ -18,6 +18,7 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 | [`SqlEditor`](#sqleditor) | SQL-Code-Editor (CodeMirror 6) mit Syntax-Highlighting, Multi-Dialekt, Autocomplete, Linting und `Cmd+Enter`-Ausführen-Shortcut | [Vollständiges Manual →](user-manuals/SqlEditor.de.md) |
 | [`JsonEditor`](#jsoneditor) | JSON-Code-Editor (CodeMirror 6) mit Echtzeit-Validierung, Format- und Komprimieren-Schaltfläche sowie optionaler Minimap | [Vollständiges Manual →](user-manuals/JsonEditor.de.md) |
 | [`SunburstChart`](#sunburstchart) | D3 v7 hierarchisches Chart — konzentrische Ringe, Ctrl+Click-Zoom, Donut-Modus, eigene Farben, MUI-Theme-Integration. Erste der D3-Chart-Familie. | [Vollständiges Manual →](user-manuals/SunburstChart.de.md) |
+| [`ChordChart`](#chordchart) | D3 v7 Fluss-Chart — Arc-Gruppen verbunden durch Bänder, Hover-Highlight, gerichtet/ungerichtet, MUI-Theme-Integration | [Vollständiges Manual →](user-manuals/ChordChart.de.md) |
 
 ---
 
@@ -53,6 +54,8 @@ Die App wie gewohnt in MUI's `ThemeProvider` einschließen. `ConfirmDialog` ben�
 
 ### ConfirmDialog
 
+Ersetzt jedes manuelle `open/setOpen`-State-Muster durch einen einzigen `await confirm(...)`-Aufruf. Eliminiert Boilerplate bei Lösch-Bestätigungen, destruktiven Aktionen und allen Flows, die vor dem Fortfahren eine Nutzerzustimmung benötigen — mit optionalem Countdown-Auto-Confirm und Enter = Bestätigen.
+
 ```tsx
 import { ConfirmDialogProvider, useConfirm } from '@thebuoyant-tsdev/mui-ts-library';
 
@@ -73,6 +76,8 @@ if (ok) handleDelete();
 
 ### GanttChart
 
+Interaktive Projekt-Timeline für Planung und Aufgaben-Tracking. Einsetzbar in Projektmanagement-Dashboards, Sprint-Planern und Ressourcenansichten — mit Drag & Drop, Größenänderung, Ctrl+Scroll-Zoom, Meilensteinen, Abhängigkeiten und Heute-Chip.
+
 ```tsx
 import { GanttChart } from '@thebuoyant-tsdev/mui-ts-library';
 import type { GanttTask } from '@thebuoyant-tsdev/mui-ts-library';
@@ -90,6 +95,8 @@ const tasks: GanttTask[] = [
 ---
 
 ### TagSelection
+
+Multi-Select-Eingabe mit Autocomplete für Tag- und Label-Verwaltung. Ideal für Filter-UIs, Content-Tagging, Skill-Auswahl und alle Szenarien, in denen Nutzer aus einer vordefinierten Liste wählen oder neue Einträge erstellen sollen.
 
 ```tsx
 import { TagSelection } from '@thebuoyant-tsdev/mui-ts-library';
@@ -109,6 +116,8 @@ const tags: TagSelectionItem[] = [
 
 ### PasswordStrengthMeter
 
+Passwort-Eingabe mit Echtzeit-Stärke-Feedback. Konzipiert für Registrierungs- und Passwort-Änderungs-Flows, bei denen Nutzer zu sicheren Passwörtern geführt werden sollen — mit animiertem Stärke-Meter, segmentierten Balken und einer Live-Anforderungs-Checkliste.
+
 ```tsx
 import { PasswordStrengthMeter } from '@thebuoyant-tsdev/mui-ts-library';
 
@@ -125,6 +134,8 @@ import { PasswordStrengthMeter } from '@thebuoyant-tsdev/mui-ts-library';
 
 ### RichTextEditor
 
+Vollständiger WYSIWYG-Editor für formatierte Langtexte. Ideal für CMS-Felder, E-Mail-Templates, Kommentarbereiche und alle Eingaben, die mehr als ein einfaches `<textarea>` benötigen — mit Toolbar, Tabellen, Bild-Embed, Emoji-Picker, Vollbild und Markdown-Einfügen.
+
 ```tsx
 import { RichTextEditor } from '@thebuoyant-tsdev/mui-ts-library';
 
@@ -139,6 +150,8 @@ import { RichTextEditor } from '@thebuoyant-tsdev/mui-ts-library';
 ---
 
 ### SqlEditor
+
+SQL-Code-Editor mit Syntax-Highlighting, dialektbewusstem Autocomplete und Inline-Linting. Konzipiert für Developer-Tools, Datenbank-Clients und Admin-Panels — mit `Cmd+Enter`-Shortcut, Multi-Dialekt-Support (MySQL, PostgreSQL, SQLite, MSSQL) und Schema-basiertem Autocomplete.
 
 ```tsx
 import { SqlEditor } from '@thebuoyant-tsdev/mui-ts-library';
@@ -157,6 +170,8 @@ import { SqlEditor } from '@thebuoyant-tsdev/mui-ts-library';
 
 ### JsonEditor
 
+JSON-Code-Editor mit Echtzeit-Validierung, Formatierung und optionaler Minimap. Ideal für Konfigurations-Panels, API-Explorer und Developer-Tools — mit sofortigen Fehler-Markierungen, Format- und Komprimieren-Buttons sowie Cursorpositionsanzeige.
+
 ```tsx
 import { JsonEditor } from '@thebuoyant-tsdev/mui-ts-library';
 
@@ -173,6 +188,8 @@ import { JsonEditor } from '@thebuoyant-tsdev/mui-ts-library';
 ---
 
 ### SunburstChart
+
+Hierarchische Datenvisualisierung als konzentrische Ringe — Wurzel im Zentrum, jede Tiefenebene bildet einen Ring. Perfekt für Budget-Aufschlüsselungen, Org-Charts, Dateisystemgrößen und alle Daten, die sowohl hierarchisch als auch proportional sind. Ctrl+Click zum Drill-down in ein Segment.
 
 ```tsx
 import { SunburstChart } from '@thebuoyant-tsdev/mui-ts-library';
@@ -202,25 +219,66 @@ const data: SunburstChartData = {
 
 ---
 
+### ChordChart
+
+Fluss- und Beziehungsvisualisierung zwischen benannten Gruppen als Kreisdiagramm. Ideal für Abhängigkeitskarten, Migrationsflüsse, Handelsbeziehungen und alle Quelle→Ziel-Daten mit numerischem Gewicht. Hover über eine Gruppe hebt deren Verbindungen hervor, Klick löst Callbacks aus.
+
+```tsx
+import { ChordChart } from '@thebuoyant-tsdev/mui-ts-library';
+import type { ChordChartData } from '@thebuoyant-tsdev/mui-ts-library';
+
+const data: ChordChartData[] = [
+  { source: 'Frontend', target: 'Backend',  value: 45 },
+  { source: 'Backend',  target: 'Frontend', value: 20 },
+  { source: 'Backend',  target: 'DevOps',   value: 35 },
+];
+
+<ChordChart
+  data={data}
+  size={500}
+  onGroupClick={(info) => console.log(info.name, info.valueOut)}
+  onChordClick={(info) => console.log(info.source.name, '→', info.target.name)}
+/>
+```
+
+→ [Vollständige Dokumentation](user-manuals/ChordChart.de.md)
+
+---
+
 ## TypeScript
 
 Alle Typen und Defaults werden direkt exportiert — kein separates `@types/...`-Paket nötig.
 
 ```tsx
 import type {
-  GanttTask,
-  ConfirmDialogOptions,
-  JsonEditorHighlightColors,
-  SqlEditorProps,
-  RichTextEditorTranslation,
+  // ConfirmDialog
+  ConfirmDialogOptions, ConfirmDialogSeverity,
+
+  // GanttChart
+  GanttTask, GanttTranslations, GanttTheme, GanttToolbarConfig,
+
+  // TagSelection
+  TagSelectionItem,
+
+  // PasswordStrengthMeter
+  CustomRequirement, StrengthResult,
+
+  // RichTextEditor
+  RichTextEditorToolbarConfig, RichTextEditorTranslation,
+
+  // SqlEditor
+  SqlEditorDialect, SqlEditorTranslation, SqlEditorToolbarConfig,
+
+  // JsonEditor
+  JsonEditorHighlightColors, JsonEditorTranslation, JsonEditorToolbarConfig,
+
+  // SunburstChart
+  SunburstChartData, SunburstSegmentInfo, SunburstZoomInfo,
+
+  // ChordChart
+  ChordChartData, ChordGroupInfo, ChordInfo, ChordSortBy,
 } from '@thebuoyant-tsdev/mui-ts-library';
 ```
-
----
-
-## Entwicklung
-
-Für lokales Setup, Storybook, Tests und Publish-Anleitung: [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ---
 

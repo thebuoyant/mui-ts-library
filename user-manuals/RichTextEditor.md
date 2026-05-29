@@ -2,6 +2,8 @@
 
 > [Deutsche Version →](RichTextEditor.de.md)
 
+**A drop-in WYSIWYG editor that goes far beyond a `<textarea>` — without any external CSS dependencies.** Use `RichTextEditor` for CMS fields, email templates, comment boxes, description inputs, or any content area where users need formatting, tables, images, and emoji.
+
 ## Overview
 
 The `RichTextEditor` is a full-featured WYSIWYG text editor built on [TipTap v3](https://tiptap.dev) and Material UI. It provides a rich input interface for content such as CMS texts, email templates, comments, and description fields — fully integrated with the MUI theme, without any external CSS dependencies.

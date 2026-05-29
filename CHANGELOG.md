@@ -13,6 +13,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.3.0] — 2026-05-29
+
+### Added
+
+#### ChordChart — New Component (MTL-20) · D3 Charts family #2
+
+- **Flow visualization** as concentric arc groups connected by ribbons — ideal for dependency maps, migrations, trade flows, or any source→target relationship data
+- **`data: ChordChartData[]`** — flat array of `{ source: string, target: string, value: number }` links; groups are auto-derived from unique names
+- **Hover highlight** — hovering any arc group dims unrelated ribbons (opacity 0.12), focusing attention on the hovered group's flows
+- **`directed?: boolean`** (default: `true`) — `true` = arrow ribbons (directional flows); `false` = symmetric ribbons
+- **`chartColors?: string[]`** — custom palette; falls back to MUI theme palette (`primary`, `secondary`, `error`, `warning`, `success`, `info`)
+- **`showGroupLabels?: boolean`** (default: `true`) — group name labels outside the arc ring
+- **`ringThickness?: number`** (default: `20`) — thickness of the arc ring in px
+- **`ribbonOpacity?: number`** (default: `0.75`) — opacity of all ribbons
+- **`ribbonBlendMode?`** (default: `'multiply'`) — CSS mix-blend-mode for ribbons
+- **`sortSubgroups?` / `sortChords?`** — `'ascending' | 'descending' | 'none'` (default: `'descending'`)
+- **`onGroupClick?: (info: ChordGroupInfo, event) => void`** — `ChordGroupInfo`: `{ name, index, valueOut, valueIn }`
+- **`onChordClick?: (info: ChordInfo, event) => void`** — `ChordInfo`: `{ source: { name, index, value }, target: { name, index, value } }`
+- **`disabled?: boolean`** — mutes all interactions, reduces opacity
+- MUI `<Tooltip followCursor>` on every group arc and ribbon — instant appear, no browser delay
+- MUI theme integration: colors, font family, text color, dark mode
+- New exported types: `ChordChartData`, `ChordGroupInfo`, `ChordInfo`, `ChordChartTranslation`, `ChordSortBy`
+
+---
+
 ## [2.2.0] — 2026-05-28
 
 ### Added

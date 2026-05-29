@@ -2,6 +2,8 @@
 
 > [English Version →](SunburstChart.md)
 
+**Jede Hierarchie, bei der Größenverhältnisse wichtig sind — Budgets, Org-Strukturen, Dateisysteme — als konzentrische Ringe mit Drill-down visualisieren.** `SunburstChart` einsetzen, wenn gleichzeitig die hierarchische Struktur und das proportionale Gewicht jedes Knotens sichtbar sein soll.
+
 ## Überblick
 
 Der `SunburstChart` visualisiert **hierarchische Daten als konzentrische Ringe** — der Wurzelknoten befindet sich im Zentrum, jede Tiefenebene bildet einen Ring darum. Segmentgrößen sind proportional zu ihren Werten. Er ist die erste Komponente der **D3-Charts-Familie** dieser Bibliothek.

@@ -1,6 +1,6 @@
 {
   "name": "@thebuoyant-tsdev/mui-ts-library",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "private": false,
   "description": "Type-safe React component library for MUI v9. Confirm dialog, Gantt chart, tag selector, rich text editor, SQL editor, JSON editor, password strength meter, and D3 charts (SunburstChart). Full TypeScript, dark mode, i18n.",
   "author": {

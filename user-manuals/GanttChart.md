@@ -2,6 +2,8 @@
 
 > [Deutsche Version →](GanttChart.de.md)
 
+**An interactive project timeline with drag & drop, milestones, and dependencies — ready to drop into any React app.** Use `GanttChart` in project management dashboards, sprint planners, or resource views where teams need to see and manage schedules at a glance.
+
 ## Overview
 
 The `GanttChart` is a fully interactive project planning component built on React and Material UI. It visualizes tasks as bars on a timeline and supports hierarchical structures, task dependencies, drag & drop, inline editing, and a critical path mode.

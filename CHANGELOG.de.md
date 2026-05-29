@@ -13,6 +13,31 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [2.3.0] — 2026-05-29
+
+### Hinzugefügt
+
+#### ChordChart — Neue Komponente (MTL-20) · D3-Charts-Familie #2
+
+- **Fluss-Visualisierung** als konzentrische Arc-Gruppen verbunden durch Bänder — ideal für Abhängigkeitskarten, Migrationen, Handelsströme oder beliebige Quelle→Ziel-Beziehungen
+- **`data: ChordChartData[]`** — flaches Array aus `{ source: string, target: string, value: number }` Links; Gruppen werden automatisch aus eindeutigen Namen abgeleitet
+- **Hover-Highlight** — beim Hovern einer Arc-Gruppe werden nicht zugehörige Bänder gedimmt (Opacity 0.12)
+- **`directed?: boolean`** (Standard: `true`) — `true` = Pfeil-Bänder (gerichtete Flüsse); `false` = symmetrische Bänder
+- **`chartColors?: string[]`** — eigene Palette; Fallback: MUI-Theme-Palette
+- **`showGroupLabels?: boolean`** (Standard: `true`) — Gruppenname-Labels außerhalb des Arc-Rings
+- **`ringThickness?: number`** (Standard: `20`) — Dicke des Arc-Rings in px
+- **`ribbonOpacity?: number`** (Standard: `0.75`) — Opacity aller Bänder
+- **`ribbonBlendMode?`** (Standard: `'multiply'`) — CSS mix-blend-mode für Bänder
+- **`sortSubgroups?` / `sortChords?`** — `'ascending' | 'descending' | 'none'`
+- **`onGroupClick?: (info: ChordGroupInfo, event) => void`** — `ChordGroupInfo`: `{ name, index, valueOut, valueIn }`
+- **`onChordClick?: (info: ChordInfo, event) => void`** — `ChordInfo`: `{ source: { name, index, value }, target: { name, index, value } }`
+- **`disabled?: boolean`** — deaktiviert alle Interaktionen, reduziert Opacity
+- MUI `<Tooltip followCursor>` auf jedem Arc und Band — sofortiges Erscheinen, kein Browser-Delay
+- MUI-Theme-Integration: Farben, Schriftart, Textfarbe, Dark Mode
+- Neue exportierte Typen: `ChordChartData`, `ChordGroupInfo`, `ChordInfo`, `ChordChartTranslation`, `ChordSortBy`
+
+---
+
 ## [2.2.0] — 2026-05-28
 
 ### Hinzugefügt

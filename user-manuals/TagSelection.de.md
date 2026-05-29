@@ -2,6 +2,8 @@
 
 > [English Version →](TagSelection.md)
 
+**Multi-Select-Eingabe mit Autocomplete, Chip-Anzeige und freier Tag-Erstellung — alles in einer Komponente.** `TagSelection` überall einsetzen, wo Nutzer aus einer Liste wählen oder neue Labels erstellen sollen: Filter-Leisten, Content-Tagging, Skill-Auswahl, Kategorie-Picker.
+
 ## Überblick
 
 Die `TagSelection`-Komponente ist ein flexibles Multi-Tag-Auswahlfeld auf Basis von React und Material UI. Sie kombiniert eine Such-Autocomplete-Eingabe mit einer Chip-basierten Anzeige der ausgewählten Tags und unterstützt asynchrones Laden, Tag-Limits, freie Tag-Erstellung und vollständige Tastatursteuerung.
