@@ -321,12 +321,15 @@ export function RadialTreeChart({
                       {node.data.subname}
                     </Typography>
                   )}
-                  <Typography
-                    variant="caption"
-                    sx={{ display: "block", opacity: 0.6, mt: 0.25 }}
-                  >
-                    {info.path.join(" › ")}
-                  </Typography>
+                  {/* Breadcrumb: parent chain only, not the node itself */}
+                  {info.path.length > 1 && (
+                    <Typography
+                      variant="caption"
+                      sx={{ display: "block", opacity: 0.6, mt: 0.25 }}
+                    >
+                      {info.path.slice(0, -1).join(" › ")}
+                    </Typography>
+                  )}
                 </Box>
               );
 

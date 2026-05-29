@@ -56,43 +56,43 @@ type Story = StoryObj<typeof RadialTreeChart>;
 // ── Demo data: org chart ───────────────────────────────────────────────────
 
 const ORG_DATA: RadialTreeChartData = {
-  id: "ceo", name: "CEO", subname: "Leadership",
-  specialValueA: "L0", specialValueB: "Executive",
+  id: "ceo", name: "CEO", subname: "Thomas Müller",
+  specialValueA: "Since 2019", specialValueB: "15 direct reports",
   children: [
     {
-      id: "cto", name: "CTO", subname: "Technology",
-      specialValueA: "L1", specialValueB: "Engineering",
+      id: "cto", name: "CTO", subname: "Anna Schmidt",
+      specialValueA: "Since 2021", specialValueB: "Technology",
       children: [
-        { id: "fe",     name: "Frontend Lead",  subname: "React / TS",     specialValueA: "L2", specialValueB: "8 reports" },
-        { id: "be",     name: "Backend Lead",   subname: "Node / Go",      specialValueA: "L2", specialValueB: "6 reports" },
-        { id: "devops", name: "DevOps Lead",    subname: "Infrastructure", specialValueA: "L2", specialValueB: "4 reports" },
-        { id: "qa",     name: "QA Lead",        subname: "Quality",        specialValueA: "L2", specialValueB: "3 reports" },
+        { id: "fe",     name: "Frontend Lead",  subname: "Marc Weber",   specialValueA: "Since 2022", specialValueB: "8 engineers" },
+        { id: "be",     name: "Backend Lead",   subname: "Julia Fischer",specialValueA: "Since 2021", specialValueB: "6 engineers" },
+        { id: "devops", name: "DevOps Lead",    subname: "Tim Bauer",    specialValueA: "Since 2023", specialValueB: "4 engineers" },
+        { id: "qa",     name: "QA Lead",        subname: "Sara Klein",   specialValueA: "Since 2022", specialValueB: "3 engineers" },
       ],
     },
     {
-      id: "cpo", name: "CPO", subname: "Product",
-      specialValueA: "L1", specialValueB: "Strategy",
+      id: "cpo", name: "CPO", subname: "Laura Hoffmann",
+      specialValueA: "Since 2020", specialValueB: "Product",
       children: [
-        { id: "ux",  name: "UX Lead",         subname: "Design",   specialValueA: "L2", specialValueB: "5 reports" },
-        { id: "pm1", name: "Product Manager", subname: "Core",     specialValueA: "L2", specialValueB: "2 reports" },
-        { id: "pm2", name: "Product Analyst", subname: "Insights", specialValueA: "L2", specialValueB: "2 reports" },
+        { id: "ux",  name: "UX Lead",         subname: "Nina Schulz",  specialValueA: "Since 2022", specialValueB: "5 designers" },
+        { id: "pm1", name: "Product Manager", subname: "Ben Richter",  specialValueA: "Since 2021", specialValueB: "Core product" },
+        { id: "pm2", name: "Product Analyst", subname: "Eva Wolf",     specialValueA: "Since 2023", specialValueB: "Insights" },
       ],
     },
     {
-      id: "cmo", name: "CMO", subname: "Marketing",
-      specialValueA: "L1", specialValueB: "Growth",
+      id: "cmo", name: "CMO", subname: "Max Braun",
+      specialValueA: "Since 2022", specialValueB: "Marketing",
       children: [
-        { id: "content", name: "Content Lead", subname: "Brand",       specialValueA: "L2", specialValueB: "3 reports" },
-        { id: "growth",  name: "Growth Lead",  subname: "Acquisition", specialValueA: "L2", specialValueB: "4 reports" },
-        { id: "seo",     name: "SEO Lead",     subname: "Organic",     specialValueA: "L2", specialValueB: "2 reports" },
+        { id: "content", name: "Content Lead", subname: "Lea Koch",    specialValueA: "Since 2023", specialValueB: "3 writers" },
+        { id: "growth",  name: "Growth Lead",  subname: "Jan Meyer",   specialValueA: "Since 2022", specialValueB: "Acquisition" },
+        { id: "seo",     name: "SEO Lead",     subname: "Mia Lange",   specialValueA: "Since 2023", specialValueB: "Organic" },
       ],
     },
     {
-      id: "cfo", name: "CFO", subname: "Finance",
-      specialValueA: "L1", specialValueB: "Operations",
+      id: "cfo", name: "CFO", subname: "Klaus Wagner",
+      specialValueA: "Since 2020", specialValueB: "Finance",
       children: [
-        { id: "controller", name: "Controller",  subname: "Accounting", specialValueA: "L2", specialValueB: "2 reports" },
-        { id: "fp-and-a",   name: "FP&A Lead",   subname: "Planning",   specialValueA: "L2", specialValueB: "2 reports" },
+        { id: "controller", name: "Controller",  subname: "Petra Fuchs", specialValueA: "Since 2021", specialValueB: "Accounting" },
+        { id: "fp-and-a",   name: "FP&A Lead",   subname: "Hans Keller", specialValueA: "Since 2022", specialValueB: "Planning" },
       ],
     },
   ],
@@ -126,7 +126,7 @@ export const WithNodePopover: Story = {
   args: {
     data:           ORG_DATA,
     showNodePopover: true,
-    translation: { specialValueA: "Level", specialValueB: "Team size" },
+    translation: { specialValueA: "In Role", specialValueB: "Department" },
   },
 };
 
