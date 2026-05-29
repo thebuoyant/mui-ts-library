@@ -13,18 +13,6 @@ export type RadialTreeChartData = {
   children?:     RadialTreeChartData[];
 };
 
-/**
- * Icon spec per depth level — use SVG path data for reliable rendering inside SVG.
- *
- * Preferred: `{ path: string; color?: string }` — SVG path (viewBox 0 0 24 24)
- * rendered directly as <path> — works perfectly in any SVG transform context.
- *
- * For convenience, `builtIn: 'folder' | 'person' | 'circle' | 'diamond'` selects
- * one of the built-in icon paths.
- */
-export type RadialTreeNodeIconSpec =
-  | { path: string; color?: string }
-  | { builtIn: 'folder' | 'person' | 'circle' | 'diamond'; color?: string };
 
 /** Clean payload passed to `onNodeClick` — no D3 or Fluent UI types exposed */
 export type RadialTreeNodeInfo = {
@@ -79,14 +67,8 @@ export type RadialTreeChartProps = {
   separationSibling?:        number;
   /** Separation factor between cousin nodes (default: 2) */
   separationCousin?:         number;
-  /** Show icons on nodes (default: true) */
+  /** Show white icons (folder/person) inside the node circles (default: true) */
   showIcons?:                boolean;
-  /** Icon size in px (default: 20) */
-  iconSize?:                 number;
-  /** SVG path icon overrides by depth level */
-  nodeIconsByDepth?:         Record<number, RadialTreeNodeIconSpec>;
-  /** Return a custom SVG path spec for a specific node — overrides `nodeIconsByDepth` */
-  renderNodeIcon?:           (info: RadialTreeNodeInfo) => RadialTreeNodeIconSpec | null;
   /** Show a built-in MUI Popover with node details on click (default: false) */
   showNodePopover?:          boolean;
   /** Render custom content inside the built-in node popover */

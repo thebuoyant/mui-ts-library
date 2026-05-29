@@ -12,8 +12,6 @@ const meta: Meta<typeof RadialTreeChart> = {
     sortBy:             { control: "radio", options: ["name", "value"] },
     showLabels:         { control: "boolean" },
     showIcons:          { control: "boolean" },
-    iconSize:           { control: "number" },
-    nodeRadius:         { control: "number" },
     linkStrokeOpacity:  { control: { type: "range", min: 0, max: 1, step: 0.05 } },
     linkStrokeWidth:    { control: "number" },
     separationSibling:  { control: "number" },
@@ -21,8 +19,6 @@ const meta: Meta<typeof RadialTreeChart> = {
     showNodePopover:    { control: "boolean" },
     disabled:           { control: "boolean" },
     chartColors:              { control: false },
-    nodeIconsByDepth:         { control: false },
-    renderNodeIcon:           { control: false },
     renderNodePopoverContent: { control: false },
     translation:              { control: false },
     data:                     { control: false },
@@ -34,9 +30,7 @@ const meta: Meta<typeof RadialTreeChart> = {
     sortBy:            "name",
     showLabels:        true,
     showIcons:         true,
-    iconSize:          18,
-    nodeRadius:        4,
-    linkStrokeOpacity: 0.4,
+    linkStrokeOpacity: 0.25,
     linkStrokeWidth:   1.5,
     separationSibling: 1,
     separationCousin:  2,
@@ -126,25 +120,18 @@ export const WithNodePopover: Story = {
   },
 };
 
-export const CustomIcons: Story = {
+export const CustomPalette: Story = {
   parameters: {
     docs: {
       description: {
         story:
-          '`nodeIconsByDepth` maps depth levels to icon specs. ' +
-          'Use `{ builtIn: "folder"|"person"|"circle"|"diamond", color }` for built-in icons, ' +
-          'or `{ path: "SVG path data", color }` for fully custom shapes. ' +
-          'Depth 0 = root, depth 1 = first ring, depth 2+ = leaf nodes.',
+          '`chartColors` overrides the default MUI theme palette. Colors are assigned per depth level and repeat cyclically.',
       },
     },
   },
   args: {
     data: ORG_DATA,
-    nodeIconsByDepth: {
-      0: { builtIn: "diamond", color: "#1565C0" },
-      1: { builtIn: "folder",  color: "#6A1B9A" },
-      2: { builtIn: "person",  color: "#00695C" },
-    },
+    chartColors: ["#1565C0", "#6A1B9A", "#00695C"],
   },
 };
 

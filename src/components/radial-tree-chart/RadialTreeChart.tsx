@@ -13,56 +13,41 @@ import {
 import {
   type RadialTreeChartProps,
   type RadialTreeNodeInfo,
-  type RadialTreeNodeIconSpec,
   DEFAULT_RADIAL_TREE_CHART_TRANSLATION,
 } from "./RadialTreeChart.types";
 import type { RadialTreeChartData } from "./RadialTreeChart.types";
 
-// ── Built-in SVG icon paths (viewBox 0 0 24 24) ──────────────────────────────
-// Using SVG path data avoids all HTML/SVG embedding issues.
-// These are the MUI icon path definitions, rendered as native SVG <path> elements.
-
-const BUILT_IN_PATHS: Record<string, string> = {
+// ── Built-in icon path data (MUI-compatible, viewBox 0 0 24 24) ────────────
+const ICON_PATHS = {
   folder:
     "M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z",
   person:
     "M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z",
-  circle:
-    "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z",
-  diamond:
-    "M12 2L2 12l10 10 10-10L12 2zm0 3.83L18.17 12 12 18.17 5.83 12 12 5.83z",
 };
 
-function resolveIconSpec(spec: RadialTreeNodeIconSpec): { path: string; color?: string } {
-  if ("builtIn" in spec) {
-    return { path: BUILT_IN_PATHS[spec.builtIn] ?? BUILT_IN_PATHS.circle, color: spec.color };
-  }
-  return { path: spec.path, color: spec.color };
-}
-
-// ── SVG Icon renderer — always works in any SVG transform context ─────────────
-
-type SvgIconProps = { path: string; size: number; color: string };
-
-function SvgIcon({ path, size, color }: SvgIconProps) {
+// ── Inline icon rendered as white SVG path inside the colored circle ──────
+function NodeIcon({ path, size }: { path: string; size: number }) {
+  const half = size / 2;
   return (
-    <g transform={`translate(${-size / 2},${-size / 2})`}>
+    // scale from 24×24 viewBox to `size` px, centered at 0,0
+    <g transform={`translate(${-half},${-half})`} pointerEvents="none">
       <svg width={size} height={size} viewBox="0 0 24 24" overflow="visible">
-        <path d={path} fill={color} />
+        <path d={path} fill="white" />
       </svg>
     </g>
   );
 }
 
-// ── Built-in node popover content ─────────────────────────────────────────────
-
-type DefaultPopoverContentProps = {
-  info:   RadialTreeNodeInfo;
+// ── Built-in MUI Popover content ──────────────────────────────────────────
+function DefaultPopoverContent({
+  info,
+  labelA,
+  labelB,
+}: {
+  info: RadialTreeNodeInfo;
   labelA: string;
   labelB: string;
-};
-
-function DefaultPopoverContent({ info, labelA, labelB }: DefaultPopoverContentProps) {
+}) {
   return (
     <Box sx={{ p: 2, minWidth: 200, maxWidth: 280 }}>
       <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1.5 }}>
@@ -70,9 +55,13 @@ function DefaultPopoverContent({ info, labelA, labelB }: DefaultPopoverContentPr
           {info.name.charAt(0).toUpperCase()}
         </Avatar>
         <Box>
-          <Typography variant="body2" sx={{ fontWeight: "bold" }}>{info.name}</Typography>
+          <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+            {info.name}
+          </Typography>
           {info.subname && (
-            <Typography variant="caption" color="text.secondary">{info.subname}</Typography>
+            <Typography variant="caption" color="text.secondary">
+              {info.subname}
+            </Typography>
           )}
         </Box>
       </Box>
@@ -81,13 +70,17 @@ function DefaultPopoverContent({ info, labelA, labelB }: DefaultPopoverContentPr
           <Divider sx={{ mb: 1.5 }} />
           {info.specialValueA != null && (
             <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
-              <Typography variant="caption" color="text.secondary">{labelA}</Typography>
+              <Typography variant="caption" color="text.secondary">
+                {labelA}
+              </Typography>
               <Typography variant="caption">{String(info.specialValueA)}</Typography>
             </Box>
           )}
           {info.specialValueB != null && (
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-              <Typography variant="caption" color="text.secondary">{labelB}</Typography>
+              <Typography variant="caption" color="text.secondary">
+                {labelB}
+              </Typography>
               <Typography variant="caption">{String(info.specialValueB)}</Typography>
             </Box>
           )}
@@ -105,16 +98,12 @@ export function RadialTreeChart({
   autoFit = true,
   sortBy = "name",
   showLabels = true,
+  showIcons = true,
   chartColors,
-  linkStrokeOpacity = 0.35,
+  linkStrokeOpacity = 0.25,
   linkStrokeWidth = 1.5,
-  nodeRadius = 5,
   separationSibling = 1,
   separationCousin = 2,
-  showIcons = true,
-  iconSize = 20,
-  nodeIconsByDepth,
-  renderNodeIcon,
   showNodePopover = false,
   renderNodePopoverContent,
   onNodeClick,
@@ -124,42 +113,57 @@ export function RadialTreeChart({
   const theme = useTheme();
   const t = { ...DEFAULT_RADIAL_TREE_CHART_TRANSLATION, ...translation };
 
+  // Depth-based colors from MUI theme palette
   const defaultColors = [
     theme.palette.primary.main,
     theme.palette.secondary.main,
-    theme.palette.error.main,
-    theme.palette.warning.main,
-    theme.palette.success.main,
     theme.palette.info.main,
+    theme.palette.success.main,
+    theme.palette.warning.main,
+    theme.palette.error.main,
   ];
   const palette = chartColors && chartColors.length > 0 ? chartColors : defaultColors;
 
-  const margin = 60;
+  // Node sizes by role — root largest, leaves smallest
+  const nodeR = useCallback(
+    (node: HierarchyPointNode<RadialTreeChartData>): number => {
+      if (node.depth === 0) return 22;            // root — prominent
+      if (node.children) return 16;               // branch node
+      return 11;                                  // leaf node
+    },
+    [],
+  );
+
+  const nodeColor = useCallback(
+    (node: HierarchyPointNode<RadialTreeChartData>): string =>
+      palette[node.depth % palette.length],
+    [palette],
+  );
+
+  const margin = 70;
   const radius = Math.max(1, size / 2 - margin);
 
-  // ── hierarchy + layout ────────────────────────────────────────────────────
+  // ── D3 hierarchy + radial tree layout ─────────────────────────────────────
   const root = useMemo(() => {
     const h = d3.hierarchy<RadialTreeChartData>(data);
     if (sortBy === "value") {
       h.sum((d) => d.value ?? 0);
       h.sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
     } else {
-      h.sort((a, b) => d3.ascending(String(a.data.name), String(b.data.name)));
+      h.sort((a, b) => d3.ascending(a.data.name, b.data.name));
     }
-    const spacingBoost = showIcons ? 1.3 : 1;
     return d3
       .tree<RadialTreeChartData>()
       .size([2 * Math.PI, radius])
       .separation((a, b) => {
         const base = a.parent === b.parent ? separationSibling : separationCousin;
-        return (base * spacingBoost) / Math.max(1, a.depth);
+        return (base * 1.4) / Math.max(1, a.depth);
       })(h);
-  }, [data, sortBy, radius, separationSibling, separationCousin, showIcons]);
+  }, [data, sortBy, radius, separationSibling, separationCousin]);
 
   const links = root.links();
   const nodes = root.descendants();
 
-  // ── radial link generator ─────────────────────────────────────────────────
   const linkGen = useMemo(
     () =>
       d3
@@ -169,14 +173,7 @@ export function RadialTreeChart({
     [],
   );
 
-  // ── node color by depth ───────────────────────────────────────────────────
-  const nodeColor = useCallback(
-    (node: HierarchyPointNode<RadialTreeChartData>): string =>
-      palette[node.depth % palette.length],
-    [palette],
-  );
-
-  // ── serializer ────────────────────────────────────────────────────────────
+  // ── Serializer ─────────────────────────────────────────────────────────────
   const serializeNode = useCallback(
     (node: HierarchyPointNode<RadialTreeChartData>): RadialTreeNodeInfo => ({
       id:            node.data.id,
@@ -193,31 +190,7 @@ export function RadialTreeChart({
     [],
   );
 
-  // ── icon resolution ───────────────────────────────────────────────────────
-  const resolveIcon = useCallback(
-    (node: HierarchyPointNode<RadialTreeChartData>): { path: string; color: string } | null => {
-      if (!showIcons) return null;
-      const info = serializeNode(node);
-      // 1. custom per-node renderer
-      const customSpec = renderNodeIcon?.(info);
-      if (customSpec) {
-        const { path, color } = resolveIconSpec(customSpec);
-        return { path, color: color ?? nodeColor(node) };
-      }
-      // 2. depth override
-      const depthSpec = nodeIconsByDepth?.[node.depth];
-      if (depthSpec) {
-        const { path, color } = resolveIconSpec(depthSpec);
-        return { path, color: color ?? nodeColor(node) };
-      }
-      // 3. default: folder for branch, person for leaf
-      const builtIn = node.children ? "folder" : "person";
-      return { path: BUILT_IN_PATHS[builtIn], color: nodeColor(node) };
-    },
-    [showIcons, renderNodeIcon, nodeIconsByDepth, serializeNode, nodeColor],
-  );
-
-  // ── auto-fit viewBox ──────────────────────────────────────────────────────
+  // ── Auto-fit viewBox ────────────────────────────────────────────────────────
   const contentRef = useRef<SVGGElement>(null);
   const [viewBox, setViewBox] = useState(`-${size / 2} -${size / 2} ${size} ${size}`);
 
@@ -227,20 +200,19 @@ export function RadialTreeChart({
     const id = requestAnimationFrame(() => {
       try {
         const box = g.getBBox();
-        const pad = showLabels ? 24 : 12;
-        if (autoFit) {
-          setViewBox(`${box.x - pad} ${box.y - pad} ${box.width + 2 * pad} ${box.height + 2 * pad}`);
-        } else {
-          setViewBox(`-${size / 2} -${size / 2} ${size} ${size}`);
-        }
+        const pad = 20;
+        setViewBox(`${box.x - pad} ${box.y - pad} ${box.width + 2 * pad} ${box.height + 2 * pad}`);
       } catch {
         setViewBox(`-${size / 2} -${size / 2} ${size} ${size}`);
       }
     });
     return () => cancelAnimationFrame(id);
-  }, [autoFit, size, root, showLabels]);
+  }, [size, root, showLabels, autoFit]);
 
-  // ── popover state ─────────────────────────────────────────────────────────
+  // ── Hover state for subtle visual feedback ──────────────────────────────────
+  const [hoverIdx, setHoverIdx] = useState<number | null>(null);
+
+  // ── Popover state ──────────────────────────────────────────────────────────
   const containerRef = useRef<HTMLDivElement>(null);
   const anchorRef    = useRef<HTMLDivElement>(null);
   const [popoverOpen,     setPopoverOpen]     = useState(false);
@@ -269,7 +241,6 @@ export function RadialTreeChart({
 
   const textColor  = theme.palette.text.primary;
   const bgColor    = theme.palette.background.paper;
-  const linkColor  = theme.palette.action.disabled;
   const fontFamily = theme.typography.fontFamily;
 
   return (
@@ -283,7 +254,6 @@ export function RadialTreeChart({
         userSelect: "none",
       }}
     >
-      {/* invisible anchor for MUI Popover */}
       <Box
         ref={anchorRef}
         sx={{
@@ -303,30 +273,51 @@ export function RadialTreeChart({
         aria-label={data.name}
       >
         <g ref={contentRef}>
-          {/* Links */}
-          <g fill="none" stroke={linkColor} strokeOpacity={linkStrokeOpacity} strokeWidth={linkStrokeWidth}>
+
+          {/* ── Curved links ─────────────────────────────────────────────── */}
+          <g
+            fill="none"
+            stroke={theme.palette.divider}
+            strokeOpacity={linkStrokeOpacity}
+            strokeWidth={linkStrokeWidth}
+          >
             {links.map((link, i) => (
               <path key={`link-${i}`} d={linkGen(link) as string} />
             ))}
           </g>
 
-          {/* Nodes */}
+          {/* ── Nodes ────────────────────────────────────────────────────── */}
           <g>
             {nodes.map((node, i) => {
-              const icon      = resolveIcon(node);
-              const showCircle = !icon;
-              const info      = serializeNode(node);
-              const tooltipTitle = (
+              const r     = nodeR(node);
+              const color = nodeColor(node);
+              const info  = serializeNode(node);
+              const isHov = hoverIdx === i;
+              // Icon: folder for branch, person for leaf
+              const iconPath = node.children ? ICON_PATHS.folder : ICON_PATHS.person;
+              // Icon size = ~65% of circle diameter, fits nicely inside
+              const iSize = Math.round(r * 1.3);
+
+              const tooltipContent = (
                 <Box sx={{ py: 0.25 }}>
-                  <Typography variant="caption" sx={{ fontWeight: "bold", display: "block" }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ fontWeight: "bold", display: "block" }}
+                  >
                     {node.data.name}
                   </Typography>
                   {node.data.subname && (
-                    <Typography variant="caption" sx={{ display: "block", opacity: 0.75 }}>
+                    <Typography
+                      variant="caption"
+                      sx={{ display: "block", opacity: 0.75 }}
+                    >
                       {node.data.subname}
                     </Typography>
                   )}
-                  <Typography variant="caption" sx={{ display: "block", opacity: 0.6, mt: 0.25 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ display: "block", opacity: 0.6, mt: 0.25 }}
+                  >
                     {info.path.join(" › ")}
                   </Typography>
                 </Box>
@@ -335,7 +326,7 @@ export function RadialTreeChart({
               return (
                 <Tooltip
                   key={`node-${node.data.id}-${i}`}
-                  title={tooltipTitle}
+                  title={tooltipContent}
                   followCursor
                   enterDelay={50}
                   enterNextDelay={0}
@@ -346,13 +337,28 @@ export function RadialTreeChart({
                     data-idx={i}
                     transform={`rotate(${(node.x * 180) / Math.PI - 90}) translate(${node.y},0)`}
                     onClick={handleNodeClick}
+                    onMouseEnter={() => !disabled && setHoverIdx(i)}
+                    onMouseLeave={() => setHoverIdx(null)}
                     style={{ cursor: disabled ? "not-allowed" : "pointer" }}
                   >
-                    {showCircle && (
-                      <circle r={nodeRadius} fill={nodeColor(node)} />
-                    )}
-                    {icon && (
-                      <SvgIcon path={icon.path} size={iconSize} color={icon.color} />
+                    {/* Drop shadow for depth */}
+                    <circle
+                      r={r + 2}
+                      fill={color}
+                      fillOpacity={0.15}
+                    />
+
+                    {/* Main filled circle */}
+                    <circle
+                      r={r}
+                      fill={color}
+                      fillOpacity={isHov ? 0.85 : 1}
+                      style={{ transition: "fill-opacity 0.15s" }}
+                    />
+
+                    {/* White icon centered inside */}
+                    {showIcons && (
+                      <NodeIcon path={iconPath} size={iSize} />
                     )}
                   </g>
                 </Tooltip>
@@ -360,26 +366,29 @@ export function RadialTreeChart({
             })}
           </g>
 
-          {/* Labels */}
+          {/* ── Labels ───────────────────────────────────────────────────── */}
           {showLabels && (
             <g>
               {nodes.map((node, i) => {
-                const isRight  = node.x < Math.PI === !node.children;
-                const offset   = showIcons ? iconSize * 0.65 + 4 : nodeRadius + 4;
-                const xOffset  = isRight ? offset : -offset;
-                const anchor   = isRight ? "start" : "end";
+                const r      = nodeR(node);
+                const isRight = node.x < Math.PI === !node.children;
+                const offset  = r + 6;
+                const xOff    = isRight ? offset : -offset;
+                const anchor  = isRight ? "start" : "end";
+
                 return (
                   <text
                     key={`lbl-${node.data.id}-${i}`}
                     transform={`rotate(${(node.x * 180) / Math.PI - 90}) translate(${node.y},0) rotate(${node.x >= Math.PI ? 180 : 0})`}
                     dy="0.35em"
-                    x={xOffset}
+                    x={xOff}
                     textAnchor={anchor}
                     paintOrder="stroke"
                     stroke={bgColor}
                     strokeWidth={3}
                     fill={textColor}
                     fontSize={11}
+                    fontWeight={node.depth === 0 ? "bold" : "normal"}
                     pointerEvents="none"
                   >
                     {node.data.name}
@@ -391,7 +400,7 @@ export function RadialTreeChart({
         </g>
       </svg>
 
-      {/* Built-in MUI Popover */}
+      {/* ── Built-in MUI Popover ────────────────────────────────────────── */}
       {showNodePopover && (
         <Popover
           open={popoverOpen}
@@ -401,15 +410,16 @@ export function RadialTreeChart({
           transformOrigin={{ vertical: "top", horizontal: "left" }}
           slotProps={{ paper: { elevation: 4 } }}
         >
-          {activeInfo && (
-            renderNodePopoverContent
-              ? renderNodePopoverContent(activeInfo)
-              : <DefaultPopoverContent
-                  info={activeInfo}
-                  labelA={t.specialValueA ?? "Value A"}
-                  labelB={t.specialValueB ?? "Value B"}
-                />
-          )}
+          {activeInfo &&
+            (renderNodePopoverContent ? (
+              renderNodePopoverContent(activeInfo)
+            ) : (
+              <DefaultPopoverContent
+                info={activeInfo}
+                labelA={t.specialValueA ?? "Value A"}
+                labelB={t.specialValueB ?? "Value B"}
+              />
+            ))}
         </Popover>
       )}
     </Box>
