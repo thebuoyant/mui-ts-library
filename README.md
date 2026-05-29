@@ -54,6 +54,8 @@ Wrap your app in MUI's `ThemeProvider` as usual. `ConfirmDialog` additionally re
 
 ### ConfirmDialog
 
+Replace every manual `open/setOpen` state pattern with a single `await confirm(...)` call. Eliminates boilerplate from delete confirmations, destructive actions, and any flow that needs user approval before proceeding — with optional countdown auto-confirm and `Enter` = confirm shortcut.
+
 ```tsx
 import { ConfirmDialogProvider, useConfirm } from '@thebuoyant-tsdev/mui-ts-library';
 
@@ -74,6 +76,8 @@ if (ok) handleDelete();
 
 ### GanttChart
 
+An interactive project timeline for planning and tracking tasks. Use it in project management dashboards, sprint planners, or resource views where teams need to see schedules, milestones, dependencies, and progress at a glance — with drag & drop, resize, and Ctrl+Scroll zoom built in.
+
 ```tsx
 import { GanttChart } from '@thebuoyant-tsdev/mui-ts-library';
 import type { GanttTask } from '@thebuoyant-tsdev/mui-ts-library';
@@ -91,6 +95,8 @@ const tasks: GanttTask[] = [
 ---
 
 ### TagSelection
+
+Multi-select input with autocomplete for tag and label management. Best suited for filter UIs, content tagging, skill selection, and any scenario where users pick from a predefined list or create new items on the fly.
 
 ```tsx
 import { TagSelection } from '@thebuoyant-tsdev/mui-ts-library';
@@ -110,6 +116,8 @@ const tags: TagSelectionItem[] = [
 
 ### PasswordStrengthMeter
 
+Password input with real-time strength feedback. Designed for registration flows and password-change screens where you want to guide users toward secure passwords with an animated strength bar, segmented segments, and a live requirements checklist.
+
 ```tsx
 import { PasswordStrengthMeter } from '@thebuoyant-tsdev/mui-ts-library';
 
@@ -126,6 +134,8 @@ import { PasswordStrengthMeter } from '@thebuoyant-tsdev/mui-ts-library';
 
 ### RichTextEditor
 
+Full-featured WYSIWYG editor for long-form formatted content. Best for CMS fields, email templates, comment boxes, and any input that needs more than a plain `<textarea>` — with toolbar, tables, image embed, emoji picker, fullscreen, and Markdown paste support.
+
 ```tsx
 import { RichTextEditor } from '@thebuoyant-tsdev/mui-ts-library';
 
@@ -140,6 +150,8 @@ import { RichTextEditor } from '@thebuoyant-tsdev/mui-ts-library';
 ---
 
 ### SqlEditor
+
+SQL code editor with syntax highlighting, dialect-aware autocomplete, and inline linting. Designed for developer tools, database clients, and admin panels where users write and execute SQL queries — with `Cmd+Enter` shortcut, multi-dialect support (MySQL, PostgreSQL, SQLite, MSSQL), and schema-based autocomplete.
 
 ```tsx
 import { SqlEditor } from '@thebuoyant-tsdev/mui-ts-library';
@@ -158,6 +170,8 @@ import { SqlEditor } from '@thebuoyant-tsdev/mui-ts-library';
 
 ### JsonEditor
 
+JSON code editor with real-time validation, formatting, and an optional minimap. Ideal for configuration panels, API explorers, and developer tools where users need to view, edit, paste, or validate JSON — with instant error markers, Format and Compact buttons, and cursor-position display.
+
 ```tsx
 import { JsonEditor } from '@thebuoyant-tsdev/mui-ts-library';
 
@@ -174,6 +188,8 @@ import { JsonEditor } from '@thebuoyant-tsdev/mui-ts-library';
 ---
 
 ### SunburstChart
+
+Hierarchical data visualization as concentric rings — root at the center, each depth level forms one ring. Perfect for budget breakdowns, org charts, file system usage, and any data that is both hierarchical and proportional. Ctrl+Click to drill down into any segment.
 
 ```tsx
 import { SunburstChart } from '@thebuoyant-tsdev/mui-ts-library';
@@ -200,6 +216,32 @@ const data: SunburstChartData = {
 **Zoom:** `Ctrl+Click` → drill down · `Ctrl+Double-click` → zoom out · `Escape` → reset
 
 → [Full documentation](user-manuals/SunburstChart.md)
+
+---
+
+### ChordChart
+
+Flow and relationship visualization between named groups as a circular diagram. Ideal for dependency maps, migration flows, trade relationships, and any source→target data with a numeric weight. Hover any group to highlight its connections, click to trigger callbacks.
+
+```tsx
+import { ChordChart } from '@thebuoyant-tsdev/mui-ts-library';
+import type { ChordChartData } from '@thebuoyant-tsdev/mui-ts-library';
+
+const data: ChordChartData[] = [
+  { source: 'Frontend', target: 'Backend',  value: 45 },
+  { source: 'Backend',  target: 'Frontend', value: 20 },
+  { source: 'Backend',  target: 'DevOps',   value: 35 },
+];
+
+<ChordChart
+  data={data}
+  size={500}
+  onGroupClick={(info) => console.log(info.name, info.valueOut)}
+  onChordClick={(info) => console.log(info.source.name, '→', info.target.name)}
+/>
+```
+
+→ [Full documentation](user-manuals/ChordChart.md)
 
 ---
 

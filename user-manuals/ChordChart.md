@@ -2,6 +2,8 @@
 
 > [Deutsche Version →](ChordChart.de.md)
 
+**Make relationships and flows between groups visible at a glance — hover any group to highlight its connections.** Use `ChordChart` for dependency maps, migration flows, trade relationships, or any source→target data where the direction and magnitude of flows matter.
+
 ## Overview
 
 The `ChordChart` visualizes **flows between named groups** as a circular diagram — groups are represented as arc segments around the circle, and the flows between them as ribbons connecting the arcs. It is the second component in the **D3 Charts family**.

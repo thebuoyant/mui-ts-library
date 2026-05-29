@@ -2,6 +2,8 @@
 
 > [English Version →](ChordChart.md)
 
+**Beziehungen und Flüsse zwischen Gruppen auf einen Blick sichtbar machen — Hover über eine Gruppe hebt deren Verbindungen hervor.** `ChordChart` für Abhängigkeitskarten, Migrationsflüsse, Handelsbeziehungen oder alle Quelle→Ziel-Daten einsetzen, bei denen Richtung und Stärke der Flüsse wichtig sind.
+
 ## Überblick
 
 Der `ChordChart` visualisiert **Flüsse zwischen benannten Gruppen** als Kreisdiagramm — Gruppen werden als Arc-Segmente um den Kreis dargestellt, die Flüsse zwischen ihnen als verbindende Bänder. Er ist die zweite Komponente der **D3-Charts-Familie**.

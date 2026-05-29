@@ -2,6 +2,8 @@
 
 > [Deutsche Version →](TagSelection.de.md)
 
+**A multi-select input with autocomplete, chip display, and free tag creation — all in one component.** Use `TagSelection` wherever users need to pick from a list or create new labels: filter bars, content tagging, skill selectors, category pickers.
+
 ## Overview
 
 The `TagSelection` component is a flexible multi-tag selector built on React and Material UI. It combines a search autocomplete input with a chip-based display of selected tags, and supports async loading, tag limits, free tag creation, and full keyboard navigation.

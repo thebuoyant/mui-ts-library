@@ -2,6 +2,8 @@
 
 > [Deutsche Version →](SunburstChart.de.md)
 
+**Visualize any hierarchy where size matters — budgets, org structures, file systems — as concentric rings with drill-down.** Use `SunburstChart` when you need to show both the hierarchical structure and the proportional weight of each node at the same time.
+
 ## Overview
 
 The `SunburstChart` visualizes **hierarchical data as concentric rings** — the root node sits at the center, and each depth level forms one ring around it. Segment sizes are proportional to their values. It is the first component in the **D3 Charts family** of this library.

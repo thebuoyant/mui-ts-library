@@ -2,6 +2,8 @@
 
 > [Deutsche Version →](PasswordStrengthMeter.de.md)
 
+**Guide users toward secure passwords without blocking them — with live strength feedback, segmented bar, and a requirements checklist.** Use `PasswordStrengthMeter` in registration flows and password-change screens where security matters but UX friction should stay minimal.
+
 ## Overview
 
 The `PasswordStrengthMeter` is a password input component built on React and Material UI. It combines a text field with an animated strength bar and a requirements checklist. The component is fully integrable into forms (React Hook Form, Formik, native HTML forms) and supports both controlled and uncontrolled operation.

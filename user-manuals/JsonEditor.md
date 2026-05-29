@@ -2,6 +2,8 @@
 
 > [Deutsche Version →](JsonEditor.de.md)
 
+**Real-time JSON validation with inline error markers, Format and Compact buttons, and an optional minimap — all in the familiar MUI Paper layout.** Use `JsonEditor` in configuration panels, API explorers, and developer tools where users need to view, edit, or validate JSON.
+
 ## Overview
 
 `JsonEditor` is a full-featured JSON code editor built on [CodeMirror 6](https://codemirror.net/) and Material UI. It provides real-time JSON validation with inline error markers, Format (pretty-print) and Compact (minify) buttons, and a validation status indicator in the footer — all wrapped in the same MUI Paper layout as `SqlEditor`.

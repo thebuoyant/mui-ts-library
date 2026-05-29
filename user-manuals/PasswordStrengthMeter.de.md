@@ -2,6 +2,8 @@
 
 > [English Version →](PasswordStrengthMeter.md)
 
+**Nutzer zu sicheren Passwörtern führen, ohne sie zu blockieren — mit Live-Stärke-Feedback, segmentiertem Balken und Anforderungs-Checkliste.** `PasswordStrengthMeter` in Registrierungs- und Passwort-Änderungs-Flows einsetzen, wo Sicherheit wichtig ist, die UX-Hürde aber minimal bleiben soll.
+
 ## Überblick
 
 Der `PasswordStrengthMeter` ist eine Passwort-Eingabe-Komponente auf Basis von React und Material UI. Sie kombiniert ein Textfeld mit einem animierten Stärke-Balken und einer Anforderungscheckliste. Die Komponente ist vollständig in Formulare integrierbar (React Hook Form, Formik, native HTML-Forms) und unterstützt kontrollierten sowie unkontrollierten Betrieb.

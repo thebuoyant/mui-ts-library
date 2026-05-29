@@ -2,6 +2,8 @@
 
 > [English Version →](ConfirmDialog.md)
 
+**Ersetzt jeden `useState + Dialog`-Boilerplate durch einen einzigen `await confirm(...)`-Aufruf.** `ConfirmDialog` verwenden, wenn vor einer destruktiven oder nicht rückgängig machbaren Aktion — Löschen, Zurücksetzen, Veröffentlichen, Überschreiben — eine Nutzerzustimmung erforderlich ist.
+
 ## Übersicht
 
 `ConfirmDialog` ist ein deklaratives Bestätigungs-Dialog-System auf Basis von MUI. Es ersetzt den wiederholenden `useState + Dialog + DialogTitle + DialogContent + DialogActions`-Boilerplate durch einen einzigen `await confirm({ ... })`-Aufruf — verwendbar von überall im App-Baum.

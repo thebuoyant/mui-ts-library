@@ -2,6 +2,8 @@
 
 > [English Version →](RichTextEditor.md)
 
+**Ein Drop-in-WYSIWYG-Editor, der weit über ein `<textarea>` hinausgeht — ohne externe CSS-Abhängigkeiten.** `RichTextEditor` für CMS-Felder, E-Mail-Templates, Kommentarbereiche, Beschreibungsfelder und alle Inhaltsbereiche einsetzen, in denen Nutzer Formatierungen, Tabellen, Bilder und Emojis benötigen.
+
 ## Überblick
 
 Der `RichTextEditor` ist ein vollständiger WYSIWYG-Texteditor auf Basis von [TipTap v3](https://tiptap.dev) und Material UI. Er bietet eine formatreiche Eingabeoberfläche für Inhalte wie CMS-Texte, E-Mail-Templates, Kommentare und Beschreibungsfelder — vollständig in das MUI-Theme integriert, ohne externe CSS-Abhängigkeiten.

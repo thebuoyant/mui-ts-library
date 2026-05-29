@@ -2,6 +2,8 @@
 
 > [Deutsche Version →](SqlEditor.de.md)
 
+**A professional SQL editor with syntax highlighting, dialect-aware autocomplete, and `Cmd+Enter` execute — ready for any tool that runs queries.** Use `SqlEditor` in database clients, admin panels, BI dashboards, and query builders where developers or analysts write and execute SQL.
+
 ## Overview
 
 The `SqlEditor` is a full-featured SQL code editor built on [CodeMirror 6](https://codemirror.net/) with the same MUI Paper layout as the `RichTextEditor`. It provides a rich SQL input interface for query builders, admin tools, BI dashboards, and database frontends — fully integrated with the MUI theme, without any external CSS dependencies.
