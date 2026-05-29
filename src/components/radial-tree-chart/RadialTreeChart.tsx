@@ -305,29 +305,26 @@ export function RadialTreeChart({
               // Icon size = ~65% of circle diameter, fits nicely inside
               const iSize = Math.round(r * 1.3);
 
+              // Tooltip: name (role) + subname (person) + hierarchy path
+              const parentPath = info.path.slice(0, -1);
               const tooltipContent = (
-                <Box sx={{ py: 0.25 }}>
-                  <Typography
-                    variant="caption"
-                    sx={{ fontWeight: "bold", display: "block" }}
-                  >
+                <Box sx={{ py: 0.5 }}>
+                  <Typography variant="caption" sx={{ fontWeight: "bold", display: "block", fontSize: "0.75rem" }}>
                     {node.data.name}
                   </Typography>
                   {node.data.subname && (
-                    <Typography
-                      variant="caption"
-                      sx={{ display: "block", opacity: 0.75 }}
-                    >
+                    <Typography variant="caption" sx={{ display: "block", opacity: 0.9 }}>
                       {node.data.subname}
                     </Typography>
                   )}
-                  {/* Breadcrumb: parent chain only, not the node itself */}
-                  {info.path.length > 1 && (
-                    <Typography
-                      variant="caption"
-                      sx={{ display: "block", opacity: 0.6, mt: 0.25 }}
-                    >
-                      {info.path.slice(0, -1).join(" › ")}
+                  {parentPath.length > 0 && (
+                    <Typography variant="caption" sx={{ display: "block", opacity: 0.6, mt: 0.5 }}>
+                      {parentPath.join(" › ")}
+                    </Typography>
+                  )}
+                  {node.children && (
+                    <Typography variant="caption" sx={{ display: "block", opacity: 0.55, mt: 0.25 }}>
+                      {node.children.length} direct report{node.children.length !== 1 ? "s" : ""}
                     </Typography>
                   )}
                 </Box>
@@ -341,7 +338,7 @@ export function RadialTreeChart({
                   enterDelay={50}
                   enterNextDelay={0}
                   disableHoverListener={disabled}
-                  slotProps={{ tooltip: { sx: { maxWidth: 240 } } }}
+                  slotProps={{ tooltip: { sx: { maxWidth: 260 } } }}
                 >
                   <g
                     data-idx={i}
@@ -351,6 +348,9 @@ export function RadialTreeChart({
                     onMouseLeave={() => setHoverIdx(null)}
                     style={{ cursor: disabled ? "not-allowed" : "pointer" }}
                   >
+                    {/* Large invisible hit area — ensures hover detection on small nodes */}
+                    <circle r={Math.max(r + 8, 24)} fill="transparent" />
+
                     {/* Drop shadow for depth */}
                     <circle
                       r={r + 2}
