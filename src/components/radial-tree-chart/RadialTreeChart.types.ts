@@ -14,13 +14,17 @@ export type RadialTreeChartData = {
 };
 
 /**
- * Icon spec per depth level.
- * Pass either a React component (e.g. an MUI SvgIcon) or
- * `{ icon: Component, color: '#hex' }` for per-depth coloring.
+ * Icon spec per depth level — use SVG path data for reliable rendering inside SVG.
+ *
+ * Preferred: `{ path: string; color?: string }` — SVG path (viewBox 0 0 24 24)
+ * rendered directly as <path> — works perfectly in any SVG transform context.
+ *
+ * For convenience, `builtIn: 'folder' | 'person' | 'circle' | 'diamond'` selects
+ * one of the built-in icon paths.
  */
 export type RadialTreeNodeIconSpec =
-  | React.ElementType
-  | { icon: React.ElementType; color?: string };
+  | { path: string; color?: string }
+  | { builtIn: 'folder' | 'person' | 'circle' | 'diamond'; color?: string };
 
 /** Clean payload passed to `onNodeClick` — no D3 or Fluent UI types exposed */
 export type RadialTreeNodeInfo = {
@@ -77,12 +81,12 @@ export type RadialTreeChartProps = {
   separationCousin?:         number;
   /** Show icons on nodes (default: true) */
   showIcons?:                boolean;
-  /** Icon size in px (default: 18) */
+  /** Icon size in px (default: 20) */
   iconSize?:                 number;
-  /** Icon component overrides by depth level */
+  /** SVG path icon overrides by depth level */
   nodeIconsByDepth?:         Record<number, RadialTreeNodeIconSpec>;
-  /** Render a custom icon for a specific node — takes precedence over `nodeIconsByDepth` */
-  renderNodeIcon?:           (info: RadialTreeNodeInfo) => React.ReactElement | null;
+  /** Return a custom SVG path spec for a specific node — overrides `nodeIconsByDepth` */
+  renderNodeIcon?:           (info: RadialTreeNodeInfo) => RadialTreeNodeIconSpec | null;
   /** Show a built-in MUI Popover with node details on click (default: false) */
   showNodePopover?:          boolean;
   /** Render custom content inside the built-in node popover */

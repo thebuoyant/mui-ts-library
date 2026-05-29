@@ -1,8 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { fn } from "storybook/test";
-import BusinessCenterOutlinedIcon from "@mui/icons-material/BusinessCenterOutlined";
-import GroupsOutlinedIcon          from "@mui/icons-material/GroupsOutlined";
-import CodeOutlinedIcon            from "@mui/icons-material/CodeOutlined";
 import { RadialTreeChart } from "./RadialTreeChart";
 import type { RadialTreeChartData } from "./RadialTreeChart.types";
 
@@ -134,17 +131,19 @@ export const CustomIcons: Story = {
     docs: {
       description: {
         story:
-          '`nodeIconsByDepth` maps depth levels to MUI icon components (or `{ icon, color }` for colored icons). ' +
-          'Depth 0 = root, depth 1 = first ring, depth 2 = leaf nodes.',
+          '`nodeIconsByDepth` maps depth levels to icon specs. ' +
+          'Use `{ builtIn: "folder"|"person"|"circle"|"diamond", color }` for built-in icons, ' +
+          'or `{ path: "SVG path data", color }` for fully custom shapes. ' +
+          'Depth 0 = root, depth 1 = first ring, depth 2+ = leaf nodes.',
       },
     },
   },
   args: {
     data: ORG_DATA,
     nodeIconsByDepth: {
-      0: { icon: BusinessCenterOutlinedIcon, color: "#1565C0" },
-      1: { icon: GroupsOutlinedIcon,         color: "#6A1B9A" },
-      2: { icon: CodeOutlinedIcon,            color: "#00695C" },
+      0: { builtIn: "diamond", color: "#1565C0" },
+      1: { builtIn: "folder",  color: "#6A1B9A" },
+      2: { builtIn: "person",  color: "#00695C" },
     },
   },
 };

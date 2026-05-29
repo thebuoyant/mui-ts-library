@@ -10,8 +10,6 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import FolderOutlinedIcon    from "@mui/icons-material/FolderOutlined";
-import PersonOutlinedIcon    from "@mui/icons-material/PersonOutlined";
 import {
   type RadialTreeChartProps,
   type RadialTreeNodeInfo,
@@ -20,16 +18,48 @@ import {
 } from "./RadialTreeChart.types";
 import type { RadialTreeChartData } from "./RadialTreeChart.types";
 
-// Discriminates between { icon, color } spec and bare component
-const isIconSpec = (s: RadialTreeNodeIconSpec): s is { icon: React.ElementType; color?: string } =>
-  typeof s === "object" && "icon" in s;
+// ── Built-in SVG icon paths (viewBox 0 0 24 24) ──────────────────────────────
+// Using SVG path data avoids all HTML/SVG embedding issues.
+// These are the MUI icon path definitions, rendered as native SVG <path> elements.
+
+const BUILT_IN_PATHS: Record<string, string> = {
+  folder:
+    "M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z",
+  person:
+    "M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z",
+  circle:
+    "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z",
+  diamond:
+    "M12 2L2 12l10 10 10-10L12 2zm0 3.83L18.17 12 12 18.17 5.83 12 12 5.83z",
+};
+
+function resolveIconSpec(spec: RadialTreeNodeIconSpec): { path: string; color?: string } {
+  if ("builtIn" in spec) {
+    return { path: BUILT_IN_PATHS[spec.builtIn] ?? BUILT_IN_PATHS.circle, color: spec.color };
+  }
+  return { path: spec.path, color: spec.color };
+}
+
+// ── SVG Icon renderer — always works in any SVG transform context ─────────────
+
+type SvgIconProps = { path: string; size: number; color: string };
+
+function SvgIcon({ path, size, color }: SvgIconProps) {
+  return (
+    <g transform={`translate(${-size / 2},${-size / 2})`}>
+      <svg width={size} height={size} viewBox="0 0 24 24" overflow="visible">
+        <path d={path} fill={color} />
+      </svg>
+    </g>
+  );
+}
 
 // ── Built-in node popover content ─────────────────────────────────────────────
 
 type DefaultPopoverContentProps = {
-  info:           RadialTreeNodeInfo;
-  labelA:         string;
-  labelB:         string;
+  info:   RadialTreeNodeInfo;
+  labelA: string;
+  labelB: string;
 };
 
 function DefaultPopoverContent({ info, labelA, labelB }: DefaultPopoverContentProps) {
@@ -76,13 +106,13 @@ export function RadialTreeChart({
   sortBy = "name",
   showLabels = true,
   chartColors,
-  linkStrokeOpacity = 0.4,
+  linkStrokeOpacity = 0.35,
   linkStrokeWidth = 1.5,
-  nodeRadius = 4,
+  nodeRadius = 5,
   separationSibling = 1,
   separationCousin = 2,
   showIcons = true,
-  iconSize = 18,
+  iconSize = 20,
   nodeIconsByDepth,
   renderNodeIcon,
   showNodePopover = false,
@@ -104,7 +134,7 @@ export function RadialTreeChart({
   ];
   const palette = chartColors && chartColors.length > 0 ? chartColors : defaultColors;
 
-  const margin = 40;
+  const margin = 60;
   const radius = Math.max(1, size / 2 - margin);
 
   // ── hierarchy + layout ────────────────────────────────────────────────────
@@ -116,7 +146,7 @@ export function RadialTreeChart({
     } else {
       h.sort((a, b) => d3.ascending(String(a.data.name), String(b.data.name)));
     }
-    const spacingBoost = showIcons ? 1.25 : 1;
+    const spacingBoost = showIcons ? 1.3 : 1;
     return d3
       .tree<RadialTreeChartData>()
       .size([2 * Math.PI, radius])
@@ -126,8 +156,8 @@ export function RadialTreeChart({
       })(h);
   }, [data, sortBy, radius, separationSibling, separationCousin, showIcons]);
 
-  const links  = root.links();
-  const nodes  = root.descendants();
+  const links = root.links();
+  const nodes = root.descendants();
 
   // ── radial link generator ─────────────────────────────────────────────────
   const linkGen = useMemo(
@@ -139,34 +169,11 @@ export function RadialTreeChart({
     [],
   );
 
-  // ── color per depth ───────────────────────────────────────────────────────
+  // ── node color by depth ───────────────────────────────────────────────────
   const nodeColor = useCallback(
-    (node: HierarchyPointNode<RadialTreeChartData>): string => {
-      if (palette.length > 0) return palette[node.depth % palette.length];
-      return node.children
-        ? theme.palette.text.secondary
-        : theme.palette.action.disabled;
-    },
-    [palette, theme],
-  );
-
-  // ── icon resolution ───────────────────────────────────────────────────────
-  const pickIcon = useCallback(
-    (node: HierarchyPointNode<RadialTreeChartData>) => {
-      if (!showIcons) return null;
-      const info = serializeNode(node);
-      if (renderNodeIcon) return renderNodeIcon(info);
-      const spec = nodeIconsByDepth?.[node.depth];
-      let Comp: React.ElementType = node.children ? FolderOutlinedIcon : PersonOutlinedIcon;
-      let color: string | undefined;
-      if (spec) {
-        if (isIconSpec(spec)) { Comp = spec.icon; color = spec.color; }
-        else { Comp = spec; }
-      }
-      return <Comp style={{ fontSize: iconSize, width: iconSize, height: iconSize, color }} />;
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [showIcons, renderNodeIcon, nodeIconsByDepth, iconSize],
+    (node: HierarchyPointNode<RadialTreeChartData>): string =>
+      palette[node.depth % palette.length],
+    [palette],
   );
 
   // ── serializer ────────────────────────────────────────────────────────────
@@ -186,6 +193,30 @@ export function RadialTreeChart({
     [],
   );
 
+  // ── icon resolution ───────────────────────────────────────────────────────
+  const resolveIcon = useCallback(
+    (node: HierarchyPointNode<RadialTreeChartData>): { path: string; color: string } | null => {
+      if (!showIcons) return null;
+      const info = serializeNode(node);
+      // 1. custom per-node renderer
+      const customSpec = renderNodeIcon?.(info);
+      if (customSpec) {
+        const { path, color } = resolveIconSpec(customSpec);
+        return { path, color: color ?? nodeColor(node) };
+      }
+      // 2. depth override
+      const depthSpec = nodeIconsByDepth?.[node.depth];
+      if (depthSpec) {
+        const { path, color } = resolveIconSpec(depthSpec);
+        return { path, color: color ?? nodeColor(node) };
+      }
+      // 3. default: folder for branch, person for leaf
+      const builtIn = node.children ? "folder" : "person";
+      return { path: BUILT_IN_PATHS[builtIn], color: nodeColor(node) };
+    },
+    [showIcons, renderNodeIcon, nodeIconsByDepth, serializeNode, nodeColor],
+  );
+
   // ── auto-fit viewBox ──────────────────────────────────────────────────────
   const contentRef = useRef<SVGGElement>(null);
   const [viewBox, setViewBox] = useState(`-${size / 2} -${size / 2} ${size} ${size}`);
@@ -196,7 +227,7 @@ export function RadialTreeChart({
     const id = requestAnimationFrame(() => {
       try {
         const box = g.getBBox();
-        const pad = showLabels ? 16 + iconSize : 8;
+        const pad = showLabels ? 24 : 12;
         if (autoFit) {
           setViewBox(`${box.x - pad} ${box.y - pad} ${box.width + 2 * pad} ${box.height + 2 * pad}`);
         } else {
@@ -207,23 +238,22 @@ export function RadialTreeChart({
       }
     });
     return () => cancelAnimationFrame(id);
-  }, [autoFit, size, root, showLabels, iconSize]);
+  }, [autoFit, size, root, showLabels]);
 
   // ── popover state ─────────────────────────────────────────────────────────
   const containerRef = useRef<HTMLDivElement>(null);
   const anchorRef    = useRef<HTMLDivElement>(null);
-  const [popoverOpen,    setPopoverOpen]    = useState(false);
-  const [popoverAnchor,  setPopoverAnchor]  = useState<HTMLElement | null>(null);
+  const [popoverOpen,     setPopoverOpen]     = useState(false);
+  const [popoverAnchor,   setPopoverAnchor]   = useState<HTMLElement | null>(null);
   const [popoverAnchorPos, setPopoverAnchorPos] = useState({ left: 0, top: 0 });
-  const [activeInfo,     setActiveInfo]     = useState<RadialTreeNodeInfo | null>(null);
+  const [activeInfo,      setActiveInfo]      = useState<RadialTreeNodeInfo | null>(null);
 
   const handleNodeClick: React.MouseEventHandler<SVGGElement> = (e) => {
     if (disabled) return;
-    const idx = Number(e.currentTarget.getAttribute("data-idx"));
+    const idx  = Number(e.currentTarget.getAttribute("data-idx"));
     const node = nodes[idx];
     if (!node) return;
     const info = serializeNode(node);
-
     if (showNodePopover) {
       const rect = containerRef.current?.getBoundingClientRect();
       setPopoverAnchorPos({
@@ -234,35 +264,33 @@ export function RadialTreeChart({
       setActiveInfo(info);
       setPopoverOpen(true);
     }
-
     onNodeClick?.(info, e);
   };
 
   const textColor  = theme.palette.text.primary;
   const bgColor    = theme.palette.background.paper;
-  const linkColor  = theme.palette.divider;
+  const linkColor  = theme.palette.action.disabled;
   const fontFamily = theme.typography.fontFamily;
 
   return (
     <Box
       ref={containerRef}
       sx={{
-        display:   "inline-flex",
-        position:  "relative",
-        opacity:   disabled ? 0.5 : 1,
-        cursor:    disabled ? "not-allowed" : "default",
+        display:    "inline-flex",
+        position:   "relative",
+        opacity:    disabled ? 0.5 : 1,
+        cursor:     disabled ? "not-allowed" : "default",
         userSelect: "none",
       }}
     >
-      {/* invisible anchor for MUI Popover positioning */}
+      {/* invisible anchor for MUI Popover */}
       <Box
         ref={anchorRef}
         sx={{
           position: "absolute",
-          left:     popoverAnchorPos.left,
-          top:      popoverAnchorPos.top,
-          width:    0,
-          height:   0,
+          left: popoverAnchorPos.left,
+          top:  popoverAnchorPos.top,
+          width: 0, height: 0,
         }}
       />
 
@@ -285,9 +313,9 @@ export function RadialTreeChart({
           {/* Nodes */}
           <g>
             {nodes.map((node, i) => {
-              const icon     = pickIcon(node);
-              const showCircle = !(showIcons && icon);
-              const info     = serializeNode(node);
+              const icon      = resolveIcon(node);
+              const showCircle = !icon;
+              const info      = serializeNode(node);
               const tooltipTitle = (
                 <Box sx={{ py: 0.25 }}>
                   <Typography variant="caption" sx={{ fontWeight: "bold", display: "block" }}>
@@ -324,22 +352,7 @@ export function RadialTreeChart({
                       <circle r={nodeRadius} fill={nodeColor(node)} />
                     )}
                     {icon && (
-                      <foreignObject
-                        x={-iconSize / 2}
-                        y={-iconSize / 2}
-                        width={iconSize}
-                        height={iconSize}
-                        style={{ overflow: "visible" }}
-                      >
-                        {/* xmlns required for foreignObject HTML content */}
-                        <span
-                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                          {...{ xmlns: "http://www.w3.org/1999/xhtml" } as any}
-                          style={{ display: "flex", alignItems: "center", justifyContent: "center", width: iconSize, height: iconSize }}
-                        >
-                          {icon}
-                        </span>
-                      </foreignObject>
+                      <SvgIcon path={icon.path} size={iconSize} color={icon.color} />
                     )}
                   </g>
                 </Tooltip>
@@ -349,18 +362,17 @@ export function RadialTreeChart({
 
           {/* Labels */}
           {showLabels && (
-            <g strokeLinejoin="round" strokeWidth={3}>
+            <g>
               {nodes.map((node, i) => {
                 const isRight  = node.x < Math.PI === !node.children;
-                const xOffset  = isRight
-                  ? (showIcons ? iconSize * 0.7 + 4 : nodeRadius + 4)
-                  : -(showIcons ? iconSize * 0.7 + 4 : nodeRadius + 4);
+                const offset   = showIcons ? iconSize * 0.65 + 4 : nodeRadius + 4;
+                const xOffset  = isRight ? offset : -offset;
                 const anchor   = isRight ? "start" : "end";
                 return (
                   <text
                     key={`lbl-${node.data.id}-${i}`}
                     transform={`rotate(${(node.x * 180) / Math.PI - 90}) translate(${node.y},0) rotate(${node.x >= Math.PI ? 180 : 0})`}
-                    dy="0.31em"
+                    dy="0.35em"
                     x={xOffset}
                     textAnchor={anchor}
                     paintOrder="stroke"
