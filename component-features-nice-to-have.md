@@ -196,7 +196,11 @@ Typische Translation-Keys pro Chart (je nach Bedarf):
 
 ---
 
-### MTL-20 — TreemapChart ⭐ Als nächstes
+### ~~MTL-20 — ChordChart~~ ✅ v2.3.0 — Branch MTL-20, merge + npm publish ausstehend
+
+---
+
+### MTL-21 — TreemapChart ⭐ Als nächstes
 
 > Quelle: `skejlo-charts/src/components/_charts/treemap-chart/TreemapChart.tsx`  
 > **Aufwand: Niedrig** — kein Fluent UI, reines D3 + React SVG (ähnlich SunburstChart)

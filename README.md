@@ -18,6 +18,7 @@ A type-safe React component library built on **TypeScript** and **MUI (Material 
 | [`SqlEditor`](#sqleditor) | SQL code editor (CodeMirror 6) with syntax highlighting, multi-dialect, autocomplete, linting, and `Cmd+Enter` execute shortcut | [Full Manual →](user-manuals/SqlEditor.md) |
 | [`JsonEditor`](#jsoneditor) | JSON code editor (CodeMirror 6) with real-time validation, Format, Compact buttons, and optional minimap | [Full Manual →](user-manuals/JsonEditor.md) |
 | [`SunburstChart`](#sunburstchart) | D3 v7 hierarchical chart — concentric rings, Ctrl+Click zoom, donut mode, custom colors, MUI theme integration. First of the D3 Charts family. | [Full Manual →](user-manuals/SunburstChart.md) |
+| [`ChordChart`](#chordchart) | D3 v7 flow chart — arc groups connected by ribbons, hover highlight, directed/undirected, MUI theme integration | [Full Manual →](user-manuals/ChordChart.md) |
 
 ---
 

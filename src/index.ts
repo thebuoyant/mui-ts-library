@@ -14,3 +14,5 @@ export * from "./components/sql-editor/SqlEditor";
 export * from "./components/sql-editor/SqlEditor.types";
 export * from "./components/sunburst-chart/SunburstChart";
 export * from "./components/sunburst-chart/SunburstChart.types";
+export * from "./components/chord-chart/ChordChart";
+export * from "./components/chord-chart/ChordChart.types";
