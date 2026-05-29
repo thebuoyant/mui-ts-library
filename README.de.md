@@ -19,6 +19,7 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 | [`JsonEditor`](#jsoneditor) | JSON-Code-Editor (CodeMirror 6) mit Echtzeit-Validierung, Format- und Komprimieren-Schaltfläche sowie optionaler Minimap | [Vollständiges Manual →](user-manuals/JsonEditor.de.md) |
 | [`SunburstChart`](#sunburstchart) | D3 v7 hierarchisches Chart — konzentrische Ringe, Ctrl+Click-Zoom, Donut-Modus, eigene Farben, MUI-Theme-Integration. Erste der D3-Chart-Familie. | [Vollständiges Manual →](user-manuals/SunburstChart.de.md) |
 | [`ChordChart`](#chordchart) | D3 v7 Fluss-Chart — Arc-Gruppen verbunden durch Bänder, Hover-Highlight, gerichtet/ungerichtet, MUI-Theme-Integration | [Vollständiges Manual →](user-manuals/ChordChart.de.md) |
+| [`RadialTreeChart`](#radialtreedchart) | D3 v7 radialer Baum — hierarchische Knoten auf konzentrischen Ringen, MUI-Icons, eingebautes Knoten-Popover, MUI-Theme-Integration | [Vollständiges Manual →](user-manuals/RadialTreeChart.de.md) |
 
 ---
 
@@ -277,6 +278,9 @@ import type {
 
   // ChordChart
   ChordChartData, ChordGroupInfo, ChordInfo, ChordSortBy,
+
+  // RadialTreeChart
+  RadialTreeChartData, RadialTreeNodeInfo, RadialTreeNodeIconSpec, RadialTreeSortBy,
 } from '@thebuoyant-tsdev/mui-ts-library';
 ```
 

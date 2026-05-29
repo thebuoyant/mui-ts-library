@@ -19,6 +19,7 @@ A type-safe React component library built on **TypeScript** and **MUI (Material 
 | [`JsonEditor`](#jsoneditor) | JSON code editor (CodeMirror 6) with real-time validation, Format, Compact buttons, and optional minimap | [Full Manual →](user-manuals/JsonEditor.md) |
 | [`SunburstChart`](#sunburstchart) | D3 v7 hierarchical chart — concentric rings, Ctrl+Click zoom, donut mode, custom colors, MUI theme integration. First of the D3 Charts family. | [Full Manual →](user-manuals/SunburstChart.md) |
 | [`ChordChart`](#chordchart) | D3 v7 flow chart — arc groups connected by ribbons, hover highlight, directed/undirected, MUI theme integration | [Full Manual →](user-manuals/ChordChart.md) |
+| [`RadialTreeChart`](#radialtreedchart) | D3 v7 radial tree — hierarchical nodes on concentric rings, MUI icons, built-in node popover, MUI theme integration | [Full Manual →](user-manuals/RadialTreeChart.md) |
 
 ---
 
@@ -245,6 +246,38 @@ const data: ChordChartData[] = [
 
 ---
 
+### RadialTreeChart
+
+Hierarchical data as a radial tree — nodes on concentric rings connected by curved links. Use `RadialTreeChart` for org charts, skill taxonomies, dependency trees, or any hierarchy where you want both structure and spatial layout. Hover for a tooltip, click for a popover with node details.
+
+```tsx
+import { RadialTreeChart } from '@thebuoyant-tsdev/mui-ts-library';
+import type { RadialTreeChartData } from '@thebuoyant-tsdev/mui-ts-library';
+
+const data: RadialTreeChartData = {
+  id: 'ceo', name: 'CEO', subname: 'Leadership',
+  children: [
+    { id: 'cto', name: 'CTO', subname: 'Technology',
+      children: [
+        { id: 'fe', name: 'Frontend Lead' },
+        { id: 'be', name: 'Backend Lead'  },
+      ]},
+    { id: 'cpo', name: 'CPO', subname: 'Product' },
+  ],
+};
+
+<RadialTreeChart
+  data={data}
+  size={600}
+  showNodePopover
+  onNodeClick={(info) => console.log(info.name, info.depth)}
+/>
+```
+
+→ [Full documentation](user-manuals/RadialTreeChart.md)
+
+---
+
 ## TypeScript
 
 All types and defaults are exported directly — no separate `@types/...` package needed.
@@ -277,6 +310,9 @@ import type {
 
   // ChordChart
   ChordChartData, ChordGroupInfo, ChordInfo, ChordSortBy,
+
+  // RadialTreeChart
+  RadialTreeChartData, RadialTreeNodeInfo, RadialTreeNodeIconSpec, RadialTreeSortBy,
 } from '@thebuoyant-tsdev/mui-ts-library';
 ```
 
