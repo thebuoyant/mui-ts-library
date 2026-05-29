@@ -105,12 +105,15 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          'Radial tree chart showing an org chart. **Hover** any node to see its details in a MUI tooltip. ' +
-          '**Click** any node to fire `onNodeClick`. Default icons: folder for branch nodes, person for leaf nodes.',
+          'Org chart as a radial tree. **Hover** any node for a rich tooltip — name, person, tenure, department, reports. ' +
+          '**Click** any node to fire `onNodeClick`.',
       },
     },
   },
-  args: { data: ORG_DATA },
+  args: {
+    data: ORG_DATA,
+    translation: { specialValueA: "In Role Since", specialValueB: "Department" },
+  },
 };
 
 export const WithNodePopover: Story = {
@@ -126,7 +129,7 @@ export const WithNodePopover: Story = {
   args: {
     data:           ORG_DATA,
     showNodePopover: true,
-    translation: { specialValueA: "In Role", specialValueB: "Department" },
+    translation: { specialValueA: "In Role Since", specialValueB: "Department" },
   },
 };
 
