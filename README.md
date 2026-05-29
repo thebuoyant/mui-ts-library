@@ -17,6 +17,7 @@ A type-safe React component library built on **TypeScript** and **MUI (Material 
 | [`RichTextEditor`](#richtexteditor) | WYSIWYG editor (TipTap v3) with toolbar, link dialog, text color, highlight, word count, fullscreen mode, Markdown paste, table editing, image embed, and emoji picker | [Full Manual →](user-manuals/RichTextEditor.md) |
 | [`SqlEditor`](#sqleditor) | SQL code editor (CodeMirror 6) with syntax highlighting, multi-dialect, autocomplete, linting, and `Cmd+Enter` execute shortcut | [Full Manual →](user-manuals/SqlEditor.md) |
 | [`JsonEditor`](#jsoneditor) | JSON code editor (CodeMirror 6) with real-time validation, Format, Compact buttons, and optional minimap | [Full Manual →](user-manuals/JsonEditor.md) |
+| [`SunburstChart`](#sunburstchart) | D3 v7 hierarchical chart — concentric rings, Ctrl+Click zoom, donut mode, custom colors, MUI theme integration. First of the D3 Charts family. | [Full Manual →](user-manuals/SunburstChart.md) |
 
 ---
 
@@ -168,6 +169,36 @@ import { JsonEditor } from '@thebuoyant-tsdev/mui-ts-library';
 ```
 
 → [Full documentation](user-manuals/JsonEditor.md)
+
+---
+
+### SunburstChart
+
+```tsx
+import { SunburstChart } from '@thebuoyant-tsdev/mui-ts-library';
+import type { SunburstChartData } from '@thebuoyant-tsdev/mui-ts-library';
+
+const data: SunburstChartData = {
+  id: 'root', name: 'Budget',
+  children: [
+    { id: 'eng',  name: 'Engineering', children: [
+      { id: 'fe', name: 'Frontend', value: 480 },
+      { id: 'be', name: 'Backend',  value: 620 },
+    ]},
+    { id: 'sales', name: 'Sales', value: 890 },
+  ],
+};
+
+<SunburstChart
+  data={data}
+  size={500}
+  onSegmentClick={(info) => console.log(info.path, info.value)}
+/>
+```
+
+**Zoom:** `Ctrl+Click` → drill down · `Ctrl+Double-click` → zoom out · `Escape` → reset
+
+→ [Full documentation](user-manuals/SunburstChart.md)
 
 ---
 

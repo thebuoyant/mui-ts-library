@@ -135,7 +135,7 @@ mit exportiertem `DEFAULT_XXX_CHART_TRANSLATION` (englische Defaults) — analog
 
 Typische Translation-Keys pro Chart (je nach Bedarf):
 - `noData` — Platzhalter wenn `data` leer ist
-- `tooltip` / `clickToZoom` / `doubleClickToZoomIn` / `ctrlDoubleClickToZoomOut` — Interaktions-Hints
+- `ctrlClickToZoomIn` / `ctrlDblClickToZoomOut` / `escToResetZoom` — Interaktions-Hints (Ctrl+Click-Modell)
 - Komponentenspezifische Labels
 
 #### Weitere Konventionen
@@ -148,40 +148,55 @@ Typische Translation-Keys pro Chart (je nach Bedarf):
 
 ---
 
-### MTL-19 — SunburstChart ⭐ Als nächstes
+### ~~MTL-19 — SunburstChart~~ ✅ v2.2.0 — Branch bereit zum Merge
 
 > Quelle: `skejlo-charts/src/components/_charts/sunburst-chart/SunburstChart.tsx`  
-> **Aufwand: Niedrig** — keinerlei Fluent UI-Abhängigkeiten, reines D3 + React SVG
+> Branch: `MTL-19` — noch nicht in main gemergt, noch nicht auf npm
+
+**Implementiert:**
 
 | Feature | Beschreibung |
 |---|---|
-| Hierarchische Daten | `ISunburstData { id, name, value?, children? }` — Baum-Struktur |
+| Hierarchische Daten | `SunburstChartData { id, name, value?, children? }` |
 | Konzentrische Ringe | Jede Ebene = ein Ring; Wurzel im Zentrum |
-| Zoom (Doppelklick) | Doppelklick auf Segment → Drill-down; Ctrl+Dbl → Zoom out |
-| Donut-Modus | `innerRadius > 0` erzeugt ein Loch in der Mitte |
-| Segment-Labels | `showSegmentLabels` — Labels entlang der Arc-Mittellinie |
-| Root-Label | `showRootLabel` — Name der Wurzel im Zentrum |
-| Farbpalette | `colors?: string[]` — eigene Palette; Fallback: D3 Rainbow |
-| Sortierung | `sortBy: 'value' | 'name'` |
-| Click-Callback | `onSegmentClick` mit serialisiertem Node (name, value, depth, path, childrenCount) |
-| Zahlformatierung | `valueDecimalCount`, `valueDecimalSeparator`, `valueThousandsSeparator` |
-| MUI-Integration (neu) | Farb-Defaults aus `useTheme()`; SVG-Text via `theme.palette.text.primary` |
+| **Ctrl+Click Zoom-Modell** | Click → `onSegmentClick` sofort; Ctrl+Click → Zoom in; Ctrl+DblClick → Zoom out; Escape → Reset |
+| Donut-Modus | `innerRadius > 0` |
+| Label-Truncation | Arc-Breite berechnet, Ellipsis + MIN_LABEL_L=5 (zu kurze Labels werden ausgeblendet) |
+| MUI Tooltip | `followCursor`, `enterDelay=50ms` — erscheint direkt am Mauszeiger; zeigt Name, Wert, Breadcrumb |
+| MUI-Theme-Palette | Default-Farben aus `useTheme()` (primary → secondary → error → warning → success → info) |
+| Farbpalette | `chartColors?: string[]` Override |
+| `onSegmentClick` | `SunburstSegmentInfo`: `id`, `name`, `value`, `percentage`, `depth`, `path`, `pathIds`, `childrenCount`, `data` |
+| `onZoomChange` | `SunburstZoomInfo { focusNode, isRoot }` — feuert bei jedem Zoom-Wechsel |
+| Sortierung | `sortBy: 'value' \| 'name'` |
+| `disabled` | Interaktionen deaktiviert, Opacity 0.5 |
+| Stories | Default, DonutStyle, SortedByName, NoLabels, CustomPalette, Disabled |
+| Tests | 11 Vitest-Tests, alle grün |
+| Docs | User Manual EN+DE, CHANGELOG EN+DE, README EN+DE |
 
-**Geplante Stories:**
-- `Default` — pre-filled mit Demo-Daten
-- `DonutStyle` — `innerRadius={120}`
-- `SortedByName` — `sortBy="name"`
-- `NoLabels` — `showSegmentLabels={false}`
-- `CustomPalette` — `colors={[...]}`
-- `WithClickCallback` — `onSegmentClick` loggt in Storybook Actions
-
-| Status | — |
+| Status | ✅ v2.2.0 — Branch `MTL-19`, merge + npm publish ausstehend |
 |---|---|
-| Branch | MTL-19 (noch nicht erstellt) |
 
 ---
 
-### MTL-20 — TreemapChart
+### SunburstChart — Feature-Ideen (nach v2.2.0)
+
+| Feature | Beschreibung | Aufwand |
+|---|---|---|
+| **Animierte Zoom-Übergänge** | D3 arc interpolation beim Drill-down — weiche Überblendung statt Sofortschnitt | Mittel |
+| **`onZoomChange` Callback** | Feuert beim Zoom-Wechsel mit `{ focusNode, isRoot }` — damit der Parent Breadcrumb außerhalb anzeigen oder Zoom-State persistieren kann | ✅ v2.2.0 |
+| **`focusId` controlled prop** | Parent kann den Zoom-Zustand von außen steuern — z.B. Breadcrumb-Click außerhalb des Charts navigiert hinein | Mittel |
+| **Hover-Highlight** | Fill-Opacity-Änderung beim Hover auf Segmente — visuelles Feedback bevor Click | Niedrig |
+| **"Sonstige"-Kollaps** | Sehr kleine Segmente (< X % des Gesamtwerts) werden zu einem "Other"-Segment zusammengefasst — `minPercentage?: number`-Prop | Mittel |
+| **Legende** | Optionale Farb-Legende unterhalb/seitlich des Charts — zeigt Top-Level-Segmente mit Farbe + Name + Wert | Mittel |
+| **Responsive Größe** | `size="auto"` passt sich dem Container an — statt fixer Pixelgröße | Mittel |
+| **Prozentanzeige in Labels** | Labels zeigen % statt Name — oder beides: `"Frontend 10.2%"` — `labelMode: 'name' | 'percent' | 'both'`-Prop | Niedrig |
+| **Export PNG/SVG** | Download-Button — Chart als Bild exportieren | Mittel |
+| **Multi-Ring Font-Sizes** | Tiefere Ringe → kleinere Schrift — `labelFontSizeByDepth?: number[]` | Niedrig |
+| **`id` in `SunburstSegmentInfo`** | Direkt zugängliche ID im Callback (kein `info.data.id`) + `pathIds` + `percentage` | ✅ v2.2.0 |
+
+---
+
+### MTL-20 — TreemapChart ⭐ Als nächstes
 
 > Quelle: `skejlo-charts/src/components/_charts/treemap-chart/TreemapChart.tsx`  
 > **Aufwand: Niedrig** — kein Fluent UI, reines D3 + React SVG (ähnlich SunburstChart)

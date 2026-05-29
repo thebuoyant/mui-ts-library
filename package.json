@@ -1,8 +1,8 @@
 {
   "name": "@thebuoyant-tsdev/mui-ts-library",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "private": false,
-  "description": "Type-safe React component library for MUI v9. Confirm dialog with useConfirm hook, Gantt chart with drag & drop, multi-tag selector, WYSIWYG rich text editor (TipTap v3), SQL code editor (CodeMirror 6), JSON editor with real-time validation (CodeMirror 6), and password strength meter. Full TypeScript, dark mode, i18n.",
+  "description": "Type-safe React component library for MUI v9. Confirm dialog, Gantt chart, tag selector, rich text editor, SQL editor, JSON editor, password strength meter, and D3 charts (SunburstChart). Full TypeScript, dark mode, i18n.",
   "author": {
     "name": "Thomas Schlender",
     "email": "thebuoyant@gmail.com"
@@ -149,6 +149,7 @@
     "@tiptap/extension-underline": "^3.23.6",
     "@tiptap/react": "^3.23.6",
     "@tiptap/starter-kit": "^3.23.6",
+    "d3": "^7.9.0",
     "sql-formatter": "^15.8.0",
     "tiptap-markdown": "^0.9.0",
     "zustand": "^5.0.12"
@@ -163,6 +164,7 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
+    "@types/d3": "^7.4.3",
     "@types/node": "^24.12.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",

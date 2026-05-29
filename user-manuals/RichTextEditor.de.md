@@ -124,6 +124,12 @@ type RichTextEditorToolbarConfig = {
   showClearFormat?:      boolean;
   /** Fullscreen-Button rechts in der Toolbar — opt-in, Standard false */
   showFullscreenButton?: boolean;
+  /** Tabellen einfügen + Zeilen/Spalten-Verwaltung — opt-in, Standard false */
+  showTableButton?:      boolean;
+  /** Bild-Einfüge-Dialog (URL oder Base64) — opt-in, Standard false */
+  showImageButton?:      boolean;
+  /** Emoji-Picker-Popover — opt-in, Standard false */
+  showEmojiButton?:      boolean;
 };
 ```
 
@@ -172,6 +178,26 @@ type RichTextEditorTranslation = {
   // Fullscreen-Button-Tooltips
   fullscreen:        string;
   exitFullscreen:    string;
+  // Tabellen-Toolbar (showTableButton)
+  table:             string;
+  insertTable:       string;
+  addRowBefore:      string;
+  addRowAfter:       string;
+  deleteRow:         string;
+  addColumnBefore:   string;
+  addColumnAfter:    string;
+  deleteColumn:      string;
+  deleteTable:       string;
+  // Bild-Dialog (showImageButton)
+  image:             string;
+  imageDialogTitle:  string;
+  imageDialogUrlLabel: string;
+  imageDialogAltLabel: string;
+  imageDialogSave:   string;
+  imageDialogCancel: string;
+  // Emoji-Picker (showEmojiButton)
+  emoji:                  string;
+  emojiSearchPlaceholder: string;
 };
 ```
 
