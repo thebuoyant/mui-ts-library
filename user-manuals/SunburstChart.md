@@ -199,14 +199,24 @@ The center hole area is clickable — `Ctrl / Cmd ⌘+Click` zooms out, regular 
 
 ## Colors
 
-### Default — MUI Theme Palette
+### Default — MUI Theme Palette (automatic)
 
-Without `chartColors`, the chart uses the active MUI theme palette in this order:
-`primary` → `secondary` → `error` → `warning` → `success` → `info`
+When `chartColors` is not set, the chart derives colors from the active MUI theme in this order:
 
-This means colors automatically adapt when the user switches between light/dark themes or when you apply a custom MUI theme.
+| Depth 1 segment | MUI token | Default (blue theme) |
+|---|---|---|
+| 1st | `theme.palette.primary.main` | `#1976d2` |
+| 2nd | `theme.palette.secondary.main` | `#9c27b0` |
+| 3rd | `theme.palette.error.main` | `#d32f2f` |
+| 4th | `theme.palette.warning.main` | `#ed6c02` |
+| 5th | `theme.palette.success.main` | `#2e7d32` |
+| 6th | `theme.palette.info.main` | `#0288d1` |
 
-### Custom Palette
+Colors repeat cyclically if there are more top-level segments than palette entries. **Dark mode is handled automatically** — when the user switches to a dark MUI theme, colors adapt without any extra configuration.
+
+### Custom fixed colors
+
+Pass any CSS color strings (hex, rgb, hsl, named):
 
 ```tsx
 <SunburstChart
@@ -215,7 +225,32 @@ This means colors automatically adapt when the user switches between light/dark 
 />
 ```
 
-Colors are assigned to top-level segments and repeat cyclically if there are more segments than colors.
+### Using MUI theme tokens at runtime
+
+To pick colors from a custom MUI theme, read them with `useTheme()` and pass to `chartColors`:
+
+```tsx
+import { useTheme } from '@mui/material';
+
+function MyChart({ data }) {
+  const theme = useTheme();
+  return (
+    <SunburstChart
+      data={data}
+      chartColors={[
+        theme.palette.primary.dark,
+        theme.palette.secondary.dark,
+        theme.palette.success.main,
+        theme.palette.warning.main,
+      ]}
+    />
+  );
+}
+```
+
+### How colors are assigned
+
+Colors are assigned to **top-level segments** (depth 1). All child segments of the same parent automatically receive a lighter tint of the parent's color (via fill-opacity 0.5 vs 0.75).
 
 ---
 

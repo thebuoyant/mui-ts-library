@@ -199,14 +199,22 @@ Der Lochbereich im Zentrum ist klickbar — `Ctrl / Cmd ⌘+Click` zoomt heraus,
 
 ## Farben
 
-### Standard — MUI-Theme-Palette
+### Standard — MUI-Theme-Palette (automatisch)
 
-Ohne `chartColors` verwendet das Chart die aktive MUI-Theme-Palette in dieser Reihenfolge:
-`primary` → `secondary` → `error` → `warning` → `success` → `info`
+Ohne `chartColors` werden Farben aus der aktiven MUI-Theme-Palette bezogen:
 
-Farben passen sich automatisch an, wenn der User zwischen Light/Dark-Theme oder einem Custom-Theme wechselt.
+| Tiefe-1-Segment | MUI-Token | Standard (blaues Theme) |
+|---|---|---|
+| 1. | `theme.palette.primary.main` | `#1976d2` |
+| 2. | `theme.palette.secondary.main` | `#9c27b0` |
+| 3. | `theme.palette.error.main` | `#d32f2f` |
+| 4. | `theme.palette.warning.main` | `#ed6c02` |
+| 5. | `theme.palette.success.main` | `#2e7d32` |
+| 6. | `theme.palette.info.main` | `#0288d1` |
 
-### Eigene Palette
+Farben wiederholen sich zyklisch bei mehr Segmenten. **Dark Mode wird automatisch berücksichtigt.**
+
+### Eigene Farbpalette
 
 ```tsx
 <SunburstChart
@@ -215,7 +223,30 @@ Farben passen sich automatisch an, wenn der User zwischen Light/Dark-Theme oder 
 />
 ```
 
-Farben werden Top-Level-Segmenten zugewiesen und wiederholen sich zyklisch wenn mehr Segmente als Farben vorhanden sind.
+### MUI-Theme-Tokens zur Laufzeit
+
+```tsx
+import { useTheme } from '@mui/material';
+
+function MyChart({ data }) {
+  const theme = useTheme();
+  return (
+    <SunburstChart
+      data={data}
+      chartColors={[
+        theme.palette.primary.dark,
+        theme.palette.secondary.dark,
+        theme.palette.success.main,
+        theme.palette.warning.main,
+      ]}
+    />
+  );
+}
+```
+
+### Farb-Zuweisung
+
+Farben werden den **Top-Level-Segmenten** (Tiefe 1) zugewiesen. Kind-Segmente erhalten automatisch eine transparentere Variante der Elternfarbe (fill-opacity 0.5 vs 0.75).
 
 ---
 

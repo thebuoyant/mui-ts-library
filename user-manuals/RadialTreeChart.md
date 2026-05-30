@@ -118,6 +118,70 @@ function App() {
 
 ---
 
+## Colors & Visual Customization
+
+### Node colors — depth-based (automatic)
+
+`chartColors` assigns colors **per depth level** (not per group). When not set, the MUI theme palette is used:
+
+| Depth | Role | MUI token | Default (blue theme) |
+|---|---|---|---|
+| 0 | Root | `theme.palette.primary.main` | `#1976d2` |
+| 1 | 1st ring | `theme.palette.secondary.main` | `#9c27b0` |
+| 2 | 2nd ring | `theme.palette.error.main` | `#d32f2f` |
+| 3 | 3rd ring | `theme.palette.warning.main` | `#ed6c02` |
+| 4 | 4th ring | `theme.palette.success.main` | `#2e7d32` |
+| 5+ | deeper | `theme.palette.info.main` | `#0288d1` |
+
+**Dark mode is handled automatically** — colors adapt with the active MUI theme.
+
+### Custom depth colors
+
+```tsx
+// 3-level org chart: root blue, managers purple, team members teal
+<RadialTreeChart
+  data={data}
+  chartColors={['#1565C0', '#6A1B9A', '#00695C']}
+/>
+```
+
+### Using MUI theme tokens at runtime
+
+```tsx
+import { useTheme } from '@mui/material';
+
+function MyChart({ data }) {
+  const theme = useTheme();
+  return (
+    <RadialTreeChart
+      data={data}
+      chartColors={[
+        theme.palette.primary.dark,    // root
+        theme.palette.secondary.main,  // managers
+        theme.palette.info.light,      // team members
+      ]}
+    />
+  );
+}
+```
+
+### Link and label colors
+
+The link lines and text labels can also be customized independently:
+
+```tsx
+<RadialTreeChart
+  data={data}
+  linkColor="#bdbdbd"          // link line color (default: theme.palette.text.secondary)
+  linkStrokeOpacity={0.6}      // 0–1
+  linkStrokeWidth={1}          // px
+  labelColor="#424242"         // text color (default: theme.palette.text.primary)
+  labelFontSize={11}           // px
+/>
+```
+
+> **Tip:** Leave `linkColor` and `labelColor` unset to automatically adapt to light/dark mode via MUI theme tokens.
+
 ## TypeScript Types
 
 ```ts

@@ -163,20 +163,57 @@ Use `directed={false}` when the relationship is bidirectional by nature (e.g., "
 
 ## Colors
 
-### Default — MUI Theme Palette
+### Default — MUI Theme Palette (automatic)
 
-Without `chartColors`, the chart uses the active MUI theme palette:
-`primary` → `secondary` → `error` → `warning` → `success` → `info`
+When `chartColors` is not set, the chart derives colors from the active MUI theme in this order:
 
-Colors repeat cyclically if there are more groups than palette entries.
+| Group | MUI token | Default (blue theme) |
+|---|---|---|
+| 1st | `theme.palette.primary.main` | `#1976d2` |
+| 2nd | `theme.palette.secondary.main` | `#9c27b0` |
+| 3rd | `theme.palette.error.main` | `#d32f2f` |
+| 4th | `theme.palette.warning.main` | `#ed6c02` |
+| 5th | `theme.palette.success.main` | `#2e7d32` |
+| 6th | `theme.palette.info.main` | `#0288d1` |
 
-### Custom Palette
+Colors repeat cyclically if there are more groups than palette entries. **Dark mode is handled automatically.**
+
+### Custom fixed colors
 
 ```tsx
 <ChordChart
   data={data}
   chartColors={['#1565C0', '#6A1B9A', '#00695C', '#E65100', '#AD1457', '#37474F']}
 />
+```
+
+### Using MUI theme tokens at runtime
+
+```tsx
+import { useTheme } from '@mui/material';
+
+function MyChart({ data }) {
+  const theme = useTheme();
+  return (
+    <ChordChart
+      data={data}
+      chartColors={[
+        theme.palette.primary.main,
+        theme.palette.secondary.main,
+        theme.palette.success.main,
+        theme.palette.warning.main,
+      ]}
+    />
+  );
+}
+```
+
+### Ribbon opacity and blend mode
+
+Ribbon appearance can be further tuned with `ribbonOpacity` (default `0.75`) and `ribbonBlendMode` (default `'multiply'`). On white backgrounds `'multiply'` creates natural color overlap — on dark backgrounds try `'screen'` or `'normal'`.
+
+```tsx
+<ChordChart data={data} ribbonOpacity={0.6} ribbonBlendMode="screen" />
 ```
 
 ---

@@ -163,20 +163,57 @@ Der MUI-Tooltip (`followCursor`) erscheint beim Hover direkt am Mauszeiger:
 
 ## Farben
 
-### Standard — MUI-Theme-Palette
+### Standard — MUI-Theme-Palette (automatisch)
 
-Ohne `chartColors` verwendet das Chart die aktive MUI-Theme-Palette:
-`primary` → `secondary` → `error` → `warning` → `success` → `info`
+Ohne `chartColors` werden Farben aus der aktiven MUI-Theme-Palette bezogen:
 
-Farben wiederholen sich zyklisch wenn mehr Gruppen als Palette-Einträge vorhanden sind.
+| Gruppe | MUI-Token | Standard (blaues Theme) |
+|---|---|---|
+| 1. | `theme.palette.primary.main` | `#1976d2` |
+| 2. | `theme.palette.secondary.main` | `#9c27b0` |
+| 3. | `theme.palette.error.main` | `#d32f2f` |
+| 4. | `theme.palette.warning.main` | `#ed6c02` |
+| 5. | `theme.palette.success.main` | `#2e7d32` |
+| 6. | `theme.palette.info.main` | `#0288d1` |
 
-### Eigene Palette
+Farben wiederholen sich zyklisch. **Dark Mode wird automatisch berücksichtigt.**
+
+### Eigene Farbpalette
 
 ```tsx
 <ChordChart
   data={data}
   chartColors={['#1565C0', '#6A1B9A', '#00695C', '#E65100', '#AD1457', '#37474F']}
 />
+```
+
+### MUI-Theme-Tokens zur Laufzeit
+
+```tsx
+import { useTheme } from '@mui/material';
+
+function MyChart({ data }) {
+  const theme = useTheme();
+  return (
+    <ChordChart
+      data={data}
+      chartColors={[
+        theme.palette.primary.main,
+        theme.palette.secondary.main,
+        theme.palette.success.main,
+        theme.palette.warning.main,
+      ]}
+    />
+  );
+}
+```
+
+### Band-Opacity und Blend-Mode
+
+`ribbonOpacity` (Standard `0.75`) und `ribbonBlendMode` (Standard `'multiply'`) steuern das visuelle Erscheinen der Bänder. Auf weißem Hintergrund erzeugt `'multiply'` natürliche Überlagerungen — auf dunklem Hintergrund empfiehlt sich `'screen'` oder `'normal'`.
+
+```tsx
+<ChordChart data={data} ribbonOpacity={0.6} ribbonBlendMode="screen" />
 ```
 
 ---
