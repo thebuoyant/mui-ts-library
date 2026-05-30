@@ -40,93 +40,123 @@ const meta: Meta<typeof CirclePackingChart> = {
 export default meta;
 type Story = StoryObj<typeof CirclePackingChart>;
 
-// ── Demo data: company budget ─────────────────────────────────────────────────
+// ── Demo data: Global Software Market (realistic revenue figures in $M) ───────
 
-const BUDGET_DATA: CirclePackingData = {
-  name: "Company",
+const GLOBAL_SOFTWARE: CirclePackingData = {
+  id: "root", name: "Global Software Market",
   children: [
     {
-      name: "Engineering", children: [
-        { name: "Frontend",  value: 480 },
-        { name: "Backend",   value: 620 },
-        { name: "DevOps",    value: 210 },
-        { name: "QA",        value: 190 },
-        { name: "Mobile",    value: 340 },
+      id: "cloud", name: "Cloud & Infrastructure",
+      children: [
+        { id: "aws",      name: "AWS",           value: 90757 },
+        { id: "azure",    name: "Azure",          value: 75000 },
+        { id: "gcp",      name: "Google Cloud",   value: 33000 },
+        { id: "ibm",      name: "IBM Cloud",      value: 21200 },
+        { id: "oracle",   name: "Oracle Cloud",   value: 19800 },
       ],
     },
     {
-      name: "Sales", children: [
-        { name: "EMEA",      value: 540 },
-        { name: "Americas",  value: 490 },
-        { name: "APAC",      value: 220 },
-        { name: "Partners",  value: 180 },
+      id: "saas", name: "SaaS Platforms",
+      children: [
+        { id: "salesforce",name: "Salesforce",    value: 34900 },
+        { id: "sap",      name: "SAP",            value: 31600 },
+        { id: "workday",  name: "Workday",         value: 7300  },
+        { id: "servicenow",name: "ServiceNow",    value: 8970  },
+        { id: "adobe",    name: "Adobe",           value: 19400 },
+        { id: "hubspot",  name: "HubSpot",         value: 2170  },
       ],
     },
     {
-      name: "Product", children: [
-        { name: "Design",    value: 290 },
-        { name: "Research",  value: 200 },
-        { name: "Strategy",  value: 150 },
+      id: "collab", name: "Collaboration & Productivity",
+      children: [
+        { id: "msoffice", name: "Microsoft 365",  value: 63000 },
+        { id: "google-w", name: "Google Workspace",value: 12000 },
+        { id: "slack",    name: "Slack",           value: 1500  },
+        { id: "zoom",     name: "Zoom",            value: 4600  },
+        { id: "atlassian",name: "Atlassian",       value: 3570  },
+        { id: "notion",   name: "Notion",          value: 800   },
       ],
     },
     {
-      name: "Marketing", children: [
-        { name: "Content",   value: 180 },
-        { name: "SEO",       value: 120 },
-        { name: "Ads",       value: 310 },
-        { name: "Events",    value: 140 },
+      id: "dev", name: "Developer Tools",
+      children: [
+        { id: "github",   name: "GitHub",          value: 2000  },
+        { id: "gitlab",   name: "GitLab",          value: 580   },
+        { id: "jfrog",    name: "JFrog",           value: 350   },
+        { id: "hashicorp",name: "HashiCorp",       value: 520   },
+        { id: "datadog",  name: "Datadog",         value: 2100  },
+        { id: "pagerduty",name: "PagerDuty",       value: 400   },
       ],
     },
     {
-      name: "Operations", children: [
-        { name: "HR",        value: 180 },
-        { name: "Finance",   value: 240 },
-        { name: "Legal",     value: 130 },
-        { name: "IT",        value: 160 },
+      id: "security", name: "Cybersecurity",
+      children: [
+        { id: "crowdstrike",name: "CrowdStrike",   value: 3100  },
+        { id: "palo-alto", name: "Palo Alto",      value: 7800  },
+        { id: "fortinet", name: "Fortinet",        value: 5300  },
+        { id: "zscaler",  name: "Zscaler",         value: 1900  },
+        { id: "okta",     name: "Okta",            value: 2260  },
+      ],
+    },
+    {
+      id: "data", name: "Data & Analytics",
+      children: [
+        { id: "snowflake",name: "Snowflake",       value: 2800  },
+        { id: "databricks",name: "Databricks",    value: 1600  },
+        { id: "tableau",  name: "Tableau",         value: 2000  },
+        { id: "palantir", name: "Palantir",        value: 2230  },
+        { id: "dbt",      name: "dbt Labs",        value: 300   },
       ],
     },
   ],
 };
 
-// ── Deep data: 4 levels ───────────────────────────────────────────────────────
+// ── Deep hierarchy: Open-Source Ecosystem ────────────────────────────────────
 
-const DEEP_DATA: CirclePackingData = {
-  name: "Portfolio",
+const OSS_ECOSYSTEM: CirclePackingData = {
+  id: "oss", name: "Open Source Ecosystem",
   children: [
-    { name: "Platform", children: [
-      { name: "Frontend", children: [
-        { name: "Web",      value: 1200 },
-        { name: "Mobile",   value: 950 },
-        { name: "Desktop",  value: 400 },
+    { id: "frontend", name: "Frontend", children: [
+      { id: "react-eco", name: "React Ecosystem", children: [
+        { id: "react",     name: "React",          value: 48000 },
+        { id: "next",      name: "Next.js",        value: 28000 },
+        { id: "remix",     name: "Remix",          value: 5000  },
+        { id: "gatsby",    name: "Gatsby",         value: 4000  },
       ]},
-      { name: "Backend", children: [
-        { name: "API",      value: 1100 },
-        { name: "Auth",     value: 700 },
-        { name: "Data",     value: 900 },
-        { name: "Search",   value: 500 },
+      { id: "vue-eco", name: "Vue Ecosystem", children: [
+        { id: "vue",       name: "Vue",            value: 22000 },
+        { id: "nuxt",      name: "Nuxt",           value: 12000 },
       ]},
-    ]},
-    { name: "Products", children: [
-      { name: "Analytics", children: [
-        { name: "Realtime", value: 1500 },
-        { name: "Reports",  value: 1100 },
-      ]},
-      { name: "Commerce", children: [
-        { name: "Checkout", value: 2000 },
-        { name: "Catalog",  value: 1300 },
-        { name: "Cart",     value: 800 },
+      { id: "build", name: "Build Tools", children: [
+        { id: "vite",      name: "Vite",           value: 18000 },
+        { id: "webpack",   name: "Webpack",        value: 14000 },
+        { id: "esbuild",   name: "esbuild",        value: 9000  },
+        { id: "turbo",     name: "Turborepo",      value: 5000  },
       ]},
     ]},
-    { name: "Infrastructure", children: [
-      { name: "Cloud", children: [
-        { name: "Compute",  value: 2200 },
-        { name: "Storage",  value: 1400 },
-        { name: "Network",  value: 800 },
+    { id: "backend", name: "Backend", children: [
+      { id: "node-fw", name: "Node.js Frameworks", children: [
+        { id: "express",   name: "Express",        value: 25000 },
+        { id: "fastify",   name: "Fastify",        value: 8000  },
+        { id: "nestjs",    name: "NestJS",         value: 12000 },
       ]},
-      { name: "Security", children: [
-        { name: "IAM",      value: 500 },
-        { name: "Audit",    value: 400 },
+      { id: "go-fw", name: "Go Frameworks", children: [
+        { id: "gin",       name: "Gin",            value: 7000  },
+        { id: "echo",      name: "Echo",           value: 4500  },
+        { id: "fiber",     name: "Fiber",          value: 5200  },
       ]},
+      { id: "py-fw", name: "Python Frameworks", children: [
+        { id: "fastapi",   name: "FastAPI",        value: 11000 },
+        { id: "django",    name: "Django",         value: 9000  },
+        { id: "flask",     name: "Flask",          value: 7500  },
+      ]},
+    ]},
+    { id: "infra-oss", name: "Infrastructure", children: [
+      { id: "k8s",       name: "Kubernetes",       value: 35000 },
+      { id: "docker",    name: "Docker",           value: 22000 },
+      { id: "terraform", name: "Terraform",        value: 12000 },
+      { id: "prometheus",name: "Prometheus",       value: 9000  },
+      { id: "grafana",   name: "Grafana",          value: 8500  },
     ]},
   ],
 };
@@ -138,16 +168,15 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          'Circle packing chart with company budget data. ' +
-          '**Double-click** any circle to zoom in (animated D3 transition). ' +
-          '**Double-click** the background to zoom out. ' +
-          '**Single-click** fires `onCircleClick`. ' +
-          '**Alt+Double-click** for slow-motion zoom. ' +
-          'A breadcrumb appears when zoomed in.',
+          '**Global Software Market** — annual revenue in $M by category. ' +
+          '`Ctrl / Cmd ⌘+Click` any circle with children → animated zoom in. ' +
+          '`Ctrl / Cmd ⌘+Double-click` → zoom out one level. ' +
+          '`Escape` → reset to root. ' +
+          'Regular click fires `onCircleClick` with name, value, percentage, and path.',
       },
     },
   },
-  args: { data: BUDGET_DATA },
+  args: { data: GLOBAL_SOFTWARE },
 };
 
 export const DeepHierarchy: Story = {
@@ -155,46 +184,45 @@ export const DeepHierarchy: Story = {
     docs: {
       description: {
         story:
-          '**4 depth levels** — shows how D3 circle packing handles deep hierarchies. ' +
-          'Double-click any circle to drill in; the animation smoothly zooms to that circle. ' +
-          'Double-click background to return up one level.',
+          '**Open-Source Ecosystem** — 4 depth levels, npm weekly downloads in thousands. ' +
+          'Shows how D3 circle packing handles deep hierarchies with the animated zoom.',
       },
     },
   },
-  args: { data: DEEP_DATA, size: 650 },
+  args: { data: OSS_ECOSYSTEM, size: 650 },
 };
 
-export const CustomColors: Story = {
+export const CustomPalette: Story = {
   parameters: {
     docs: {
       description: {
         story:
-          '`chartColors` overrides the default depth-gradient with a fixed per-depth palette. ' +
-          'Colors cycle: depth 0 → color[0], depth 1 → color[1], etc.',
+          '`chartColors` overrides the default MUI theme palette with a custom per-depth color array.',
       },
     },
   },
   args: {
-    data: BUDGET_DATA,
-    chartColors: ["#1565C0", "#1976D2", "#42A5F5", "#90CAF9", "#E3F2FD"],
-    background: "#F5F5F5",
+    data: GLOBAL_SOFTWARE,
+    chartColors: ["#1A237E", "#1565C0", "#0288D1", "#00ACC1", "#00897B", "#43A047"],
+    background: "#0D1B2A",
+    labelColor: "#FFFFFF",
   },
 };
 
-export const GradientCustom: Story = {
+export const GradientMode: Story = {
   parameters: {
     docs: {
       description: {
         story:
-          '`depthColorStart` / `depthColorEnd` customize the HCL gradient used when `chartColors` is not set. ' +
-          'HCL interpolation produces perceptually uniform color progressions.',
+          '`depthColorStart` + `depthColorEnd` enable HCL gradient mode — perceptually uniform color progression across depth levels.',
       },
     },
   },
   args: {
-    data: BUDGET_DATA,
-    depthColorStart: "hsl(200, 80%, 85%)",
-    depthColorEnd:   "hsl(260, 60%, 35%)",
+    data: GLOBAL_SOFTWARE,
+    depthColorStart: "hsl(195, 100%, 85%)",
+    depthColorEnd:   "hsl(250, 70%, 30%)",
+    background:      "#F8F9FA",
   },
 };
 
@@ -202,9 +230,9 @@ export const Disabled: Story = {
   parameters: {
     docs: {
       description: {
-        story: '`disabled={true}` mutes all interactions (zoom, click) and reduces opacity.',
+        story: '`disabled={true}` mutes all interactions and reduces opacity.',
       },
     },
   },
-  args: { data: BUDGET_DATA, disabled: true },
+  args: { data: GLOBAL_SOFTWARE, disabled: true },
 };

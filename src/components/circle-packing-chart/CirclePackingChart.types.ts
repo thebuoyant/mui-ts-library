@@ -1,4 +1,6 @@
 export type CirclePackingData = {
+  /** Optional ID for backend linking */
+  id?:       string;
   name:      string;
   value?:    number;
   children?: CirclePackingData[];
@@ -8,10 +10,15 @@ export type CirclePackingSortBy = 'value' | 'name';
 
 /** Clean callback payload — no D3 types exposed */
 export type CirclePackingNodeInfo = {
+  /** Node id — same as data.id when provided */
+  id:            string | null;
   name:          string;
+  /** D3 aggregate value — sum of all descendant leaf values */
   value:         number | null;
+  /** Percentage of root total — (value / root.value) * 100 */
+  percentage:    number;
   depth:         number;
-  /** Breadcrumb from root to this node */
+  /** Breadcrumb from root to this node — array of names */
   path:          string[];
   childrenCount: number;
   data:          CirclePackingData;
@@ -35,47 +42,46 @@ export const DEFAULT_CIRCLE_PACKING_TRANSLATION: CirclePackingTranslation = {
 
 export type CirclePackingChartProps = {
   /** Root node of the hierarchy */
-  data:               CirclePackingData;
+  data:              CirclePackingData;
   /** Width and height of the SVG in pixels — always square (default: 600) */
-  size?:              number;
+  size?:             number;
   /** Padding between nested circles in px (default: 3) */
-  padding?:           number;
+  padding?:          number;
   /** Sort children by value or alphabetically (default: 'value') */
-  sortBy?:            CirclePackingSortBy;
+  sortBy?:           CirclePackingSortBy;
   /** Show centered name labels on circles (default: true) */
-  showLabels?:        boolean;
+  showLabels?:       boolean;
   /** Label font size in px (default: 11) */
-  labelFontSize?:     number;
+  labelFontSize?:    number;
   /** Label text color — defaults to `theme.palette.text.primary` */
-  labelColor?:        string;
+  labelColor?:       string;
   /**
-   * Custom depth-based color palette — falls back to gradient when not set.
-   * colors[depth % length] is used per node.
+   * Custom depth-based color palette — overrides the default MUI theme palette.
+   * colors[depth % length] per node. Falls back to MUI palette when not set.
    */
-  chartColors?:       string[];
+  chartColors?:      string[];
   /**
-   * Gradient start color for depth coloring (used when `chartColors` is not set).
-   * Default: derived from `theme.palette.primary.light`
+   * HCL gradient start color — when set together with `depthColorEnd`,
+   * overrides `chartColors` and the MUI palette with a smooth gradient.
    */
-  depthColorStart?:   string;
+  depthColorStart?:  string;
   /**
-   * Gradient end color for depth coloring (used when `chartColors` is not set).
-   * Default: derived from `theme.palette.secondary.dark`
+   * HCL gradient end color — see `depthColorStart`.
    */
-  depthColorEnd?:     string;
-  /** Background fill of the SVG. Default: `theme.palette.background.default` */
-  background?:        string;
+  depthColorEnd?:    string;
+  /** SVG background fill. Default: `theme.palette.background.default` */
+  background?:       string;
   /**
    * Zoom animation duration in ms (default: 750).
-   * Alt+Double-click uses 10× this value for slow-motion.
+   * Alt+Ctrl / Alt+Cmd+Click uses 10× for slow-motion demos.
    */
-  duration?:          number;
+  duration?:         number;
   /** Disables all interactions (default: false) */
-  disabled?:          boolean;
-  /** Fires on single click of any circle */
-  onCircleClick?:     (info: CirclePackingNodeInfo, event: React.MouseEvent<SVGCircleElement>) => void;
+  disabled?:         boolean;
+  /** Fires on regular click — immediately, no delay */
+  onCircleClick?:    (info: CirclePackingNodeInfo, event: React.MouseEvent<SVGCircleElement>) => void;
   /** Fires when the zoom focus changes */
-  onZoomChange?:      (zoom: CirclePackingZoomInfo) => void;
+  onZoomChange?:     (zoom: CirclePackingZoomInfo) => void;
   /** Override translation strings */
-  translation?:       Partial<CirclePackingTranslation>;
+  translation?:      Partial<CirclePackingTranslation>;
 };

@@ -56,6 +56,7 @@ describe("CirclePackingChart", () => {
     const [info] = handler.mock.calls[0];
     expect(info).toHaveProperty("name");
     expect(info).toHaveProperty("value");
+    expect(info).toHaveProperty("percentage");
     expect(info).toHaveProperty("depth");
     expect(info).toHaveProperty("path");
     vi.useRealTimers();
