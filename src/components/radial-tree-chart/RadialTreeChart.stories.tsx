@@ -170,3 +170,150 @@ export const Disabled: Story = {
   },
   args: { data: ORG_DATA, disabled: true },
 };
+
+// ── Deep tree dataset (5 levels, ~65 nodes) ───────────────────────────────
+// Technology skill taxonomy: Company → Domain → Category → Skill → Subskill
+
+const DEEP_TREE_DATA: RadialTreeChartData = {
+  id: "root", name: "Tech Skills", subname: "Full taxonomy",
+  children: [
+    {
+      id: "fe", name: "Frontend", subname: "UI Engineering",
+      children: [
+        {
+          id: "fe-fw", name: "Frameworks", subname: "UI libraries",
+          children: [
+            { id: "fe-fw-react", name: "React", subname: "v19",
+              children: [
+                { id: "fe-fw-react-hooks", name: "Hooks",      subname: "useState/useEffect" },
+                { id: "fe-fw-react-ctx",   name: "Context",    subname: "State management" },
+                { id: "fe-fw-react-perf",  name: "Performance",subname: "memo/useMemo" },
+              ],
+            },
+            { id: "fe-fw-vue",     name: "Vue",     subname: "v3 Composition" },
+            { id: "fe-fw-angular", name: "Angular",  subname: "v18 Signals" },
+          ],
+        },
+        {
+          id: "fe-style", name: "Styling", subname: "CSS & design",
+          children: [
+            { id: "fe-style-ts",  name: "TypeScript", subname: "5.x strict" },
+            { id: "fe-style-css", name: "CSS-in-JS",  subname: "MUI / styled" },
+            { id: "fe-style-tw",  name: "Tailwind",   subname: "v4" },
+          ],
+        },
+        {
+          id: "fe-test", name: "Testing", subname: "Quality",
+          children: [
+            { id: "fe-test-vit",  name: "Vitest",   subname: "Unit tests" },
+            { id: "fe-test-play", name: "Playwright",subname: "E2E tests" },
+          ],
+        },
+      ],
+    },
+    {
+      id: "be", name: "Backend", subname: "Server Engineering",
+      children: [
+        {
+          id: "be-lang", name: "Languages", subname: "Server-side",
+          children: [
+            { id: "be-lang-node",   name: "Node.js",  subname: "v22 LTS" },
+            { id: "be-lang-go",     name: "Go",       subname: "1.22" },
+            { id: "be-lang-python", name: "Python",   subname: "3.12" },
+            { id: "be-lang-rust",   name: "Rust",     subname: "2024 edition" },
+          ],
+        },
+        {
+          id: "be-db", name: "Databases", subname: "Storage",
+          children: [
+            { id: "be-db-pg",    name: "PostgreSQL", subname: "v16" },
+            { id: "be-db-mongo", name: "MongoDB",    subname: "v7" },
+            { id: "be-db-redis", name: "Redis",      subname: "Cache / PubSub" },
+          ],
+        },
+        {
+          id: "be-api", name: "APIs", subname: "Integration",
+          children: [
+            { id: "be-api-rest",  name: "REST",     subname: "OpenAPI 3.1" },
+            { id: "be-api-gql",   name: "GraphQL",  subname: "Apollo v4" },
+            { id: "be-api-grpc",  name: "gRPC",     subname: "Protobuf" },
+          ],
+        },
+      ],
+    },
+    {
+      id: "devops", name: "DevOps", subname: "Infrastructure",
+      children: [
+        {
+          id: "devops-ci", name: "CI/CD", subname: "Automation",
+          children: [
+            { id: "devops-ci-gh",    name: "GitHub Actions", subname: "Workflows" },
+            { id: "devops-ci-argocd",name: "ArgoCD",         subname: "GitOps" },
+          ],
+        },
+        {
+          id: "devops-cloud", name: "Cloud", subname: "Platforms",
+          children: [
+            { id: "devops-cloud-aws", name: "AWS",   subname: "ECS / Lambda" },
+            { id: "devops-cloud-gcp", name: "GCP",   subname: "GKE / Cloud Run" },
+            { id: "devops-cloud-az",  name: "Azure", subname: "AKS / Functions" },
+          ],
+        },
+        {
+          id: "devops-obs", name: "Observability", subname: "Monitoring",
+          children: [
+            { id: "devops-obs-prom",  name: "Prometheus", subname: "Metrics" },
+            { id: "devops-obs-graf",  name: "Grafana",    subname: "Dashboards" },
+            { id: "devops-obs-otel",  name: "OpenTelemetry",subname: "Traces" },
+          ],
+        },
+      ],
+    },
+    {
+      id: "data", name: "Data", subname: "Analytics & ML",
+      children: [
+        {
+          id: "data-eng", name: "Engineering", subname: "Pipelines",
+          children: [
+            { id: "data-eng-spark", name: "Spark",  subname: "Batch processing" },
+            { id: "data-eng-kafka", name: "Kafka",  subname: "Streaming" },
+            { id: "data-eng-dbt",   name: "dbt",    subname: "Transformations" },
+          ],
+        },
+        {
+          id: "data-ml", name: "Machine Learning", subname: "AI/ML",
+          children: [
+            { id: "data-ml-pt",   name: "PyTorch",    subname: "Deep learning" },
+            { id: "data-ml-hf",   name: "HuggingFace",subname: "LLM / NLP" },
+            { id: "data-ml-sk",   name: "scikit-learn",subname: "Classical ML" },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
+export const DeepTree: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '**Stress test with 5 depth levels and ~65 nodes.** ' +
+          'Technology skill taxonomy: Company → Domain → Category → Skill → Subskill. ' +
+          'Shows how `autoFit`, label truncation, node spacing, and color cycling behave with many nodes. ' +
+          'Try toggling `showLabels` and adjusting `separationCousin` in the Controls panel.',
+      },
+    },
+  },
+  args: {
+    data:           DEEP_TREE_DATA,
+    size:           750,
+    autoFit:        true,
+    showLabels:     true,
+    labelFontSize:  10,
+    branchNodeRadius: 13,
+    leafNodeRadius:   8,
+    separationCousin: 2.5,
+    translation: { specialValueA: "Version", specialValueB: "Focus area" },
+  },
+};
