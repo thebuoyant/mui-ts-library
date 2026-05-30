@@ -196,11 +196,18 @@ Typische Translation-Keys pro Chart (je nach Bedarf):
 
 ---
 
-### ~~MTL-20 — ChordChart~~ ✅ v2.3.0 — Branch MTL-20, merge + npm publish ausstehend
+### ~~MTL-20 — ChordChart~~ ✅ v2.3.0
 
 ---
 
-### MTL-21 — TreemapChart ⭐ Als nächstes
+### ~~MTL-21 — RadialTreeChart~~ ✅ v2.4.0 — Branch MTL-21, merge + npm publish ausstehend
+
+Fluent UI vollständig durch MUI ersetzt: Icons (`FolderOutlined`/`PersonOutlined`), Avatar, Popover.
+Neues API: `onNodeClick` statt `onClick` mit `api`, `showNodePopover`, `renderNodePopoverContent`, `nodeIconsByDepth`.
+
+---
+
+### MTL-22 — TreemapChart ⭐ Als nächstes
 
 > Quelle: `skejlo-charts/src/components/_charts/treemap-chart/TreemapChart.tsx`  
 > **Aufwand: Niedrig** — kein Fluent UI, reines D3 + React SVG (ähnlich SunburstChart)

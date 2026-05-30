@@ -18,7 +18,11 @@ Der `SunburstChart` visualisiert **hierarchische Daten als konzentrische Ringe**
 
 | ✨ Neu in v2.2.0 | |
 |---|---|
-| **SunburstChart** | Erstes D3-Chart — Ctrl+Click-Zoom, Donut-Modus, MUI-Theme-Palette |
+| **SunburstChart** | Erstes D3-Chart — Ctrl / Cmd ⌘+Click Drill-Down, Donut-Modus, MUI-Theme-Palette |
+| **`zoomable`** *(v2.4.0)* | `Ctrl / Cmd ⌘ + Scroll` visueller Zoom — Inhalt wird am `size`-Rand abgeschnitten |
+
+> **macOS-Tastaturkürzel:** `Cmd ⌘` statt `Ctrl` verwenden — z. B. `Cmd ⌘+Click`, `Cmd ⌘+Scroll`.  
+> Alle Interaktionen prüfen `ctrlKey || metaKey`, funktionieren also auf beiden Plattformen.
 
 ---
 
@@ -104,7 +108,8 @@ function App() {
 | `chartColors` | `string[]` | MUI-Palette | Eigene Farbpalette für Top-Level-Segmente |
 | `showRootLabel` | `boolean` | `true` | Aktuellen Fokus-Knotennamen im Zentrum anzeigen |
 | `onSegmentClick` | `(info, event) => void` | — | Wird bei jedem normalen Klick ausgelöst |
-| `onZoomChange` | `(zoom: SunburstZoomInfo) => void` | — | Wird bei Zoom-Wechsel ausgelöst (Ctrl+Click, Ctrl+DblClick, Escape) |
+| `onZoomChange` | `(zoom: SunburstZoomInfo) => void` | — | Wird bei Drill-Down-Wechsel ausgelöst (Ctrl / Cmd ⌘+Click, Ctrl / Cmd ⌘+DblClick, Escape) |
+| `zoomable` | `boolean` | `false` | `Ctrl / Cmd ⌘ + Scroll` visueller Zoom — clippt am `size`-Rand |
 | `valueDecimalCount` | `number` | `0` | Dezimalstellen in Tooltip-Werten |
 | `valueDecimalSeparator` | `string` | `'.'` | Dezimaltrennzeichen |
 | `valueThousandsSeparator` | `string` | `','` | Tausendertrennzeichen |
@@ -153,13 +158,16 @@ type SunburstChartTranslation = {
 | Geste | Aktion |
 |---|---|
 | **Klick** | Löst `onSegmentClick` sofort aus — kein Delay |
-| **Ctrl+Klick** auf ein Elternsegment | Zoom in (Drill-down in dieses Segment) |
-| **Ctrl+Doppelklick** auf ein Segment | Zoom out eine Ebene |
-| **Ctrl+Klick** auf Center-Label | Zoom out eine Ebene |
-| **Escape** | Zoom zur Root zurücksetzen |
+| **Ctrl+Klick** / **Cmd ⌘+Klick** auf Elternsegment | Drill-Down — dieses Segment wird zum neuen Zentrum |
+| **Ctrl+Doppelklick** / **Cmd ⌘+Doppelklick** | Zoom out eine Ebene |
+| **Ctrl+Klick** / **Cmd ⌘+Klick** auf Center-Label | Zoom out eine Ebene |
+| **Ctrl+Scroll** / **Cmd ⌘+Scroll** *(benötigt `zoomable`)* | Visueller Zoom — clippt am `size`-Rand |
+| **Escape** | Alles zurücksetzen |
 
-> **Warum Ctrl+Click statt Doppelklick?**  
-> Dieses Modell eliminiert den klassischen 200ms-Delay-Hack. `onSegmentClick` feuert sofort bei jedem Klick — keine spürbare Verzögerung. Zoom ist eine bewusste, explizite Aktion (Modifier-Taste erforderlich) und kann nie versehentlich passieren.
+> **macOS:** Bitte `Cmd ⌘` statt `Ctrl` verwenden.
+
+> **Warum Modifier+Click statt Doppelklick?**  
+> Eliminiert den klassischen 200ms-Delay-Hack. `onSegmentClick` feuert sofort bei jedem Klick. Zoom ist eine bewusste, explizite Aktion die nie versehentlich passiert.
 
 Das Center-Label zeigt immer den **aktuellen Fokus-Knotennamen** — beim Zoom-Zustand funktioniert es als Breadcrumb.
 
@@ -173,7 +181,7 @@ Das Center-Label zeigt immer den **aktuellen Fokus-Knotennamen** — beim Zoom-Z
 <SunburstChart data={data} innerRadius={100} />
 ```
 
-Der Lochbereich im Zentrum ist klickbar — `Ctrl+Click` zoomt heraus, normaler Klick löst `onSegmentClick` für den Elternknoten aus.
+Der Lochbereich im Zentrum ist klickbar — `Ctrl / Cmd ⌘+Click` zoomt heraus, normaler Klick löst `onSegmentClick` für den Elternknoten aus.
 
 ---
 
@@ -191,14 +199,22 @@ Der Lochbereich im Zentrum ist klickbar — `Ctrl+Click` zoomt heraus, normaler 
 
 ## Farben
 
-### Standard — MUI-Theme-Palette
+### Standard — MUI-Theme-Palette (automatisch)
 
-Ohne `chartColors` verwendet das Chart die aktive MUI-Theme-Palette in dieser Reihenfolge:
-`primary` → `secondary` → `error` → `warning` → `success` → `info`
+Ohne `chartColors` werden Farben aus der aktiven MUI-Theme-Palette bezogen:
 
-Farben passen sich automatisch an, wenn der User zwischen Light/Dark-Theme oder einem Custom-Theme wechselt.
+| Tiefe-1-Segment | MUI-Token | Standard (blaues Theme) |
+|---|---|---|
+| 1. | `theme.palette.primary.main` | `#1976d2` |
+| 2. | `theme.palette.secondary.main` | `#9c27b0` |
+| 3. | `theme.palette.error.main` | `#d32f2f` |
+| 4. | `theme.palette.warning.main` | `#ed6c02` |
+| 5. | `theme.palette.success.main` | `#2e7d32` |
+| 6. | `theme.palette.info.main` | `#0288d1` |
 
-### Eigene Palette
+Farben wiederholen sich zyklisch bei mehr Segmenten. **Dark Mode wird automatisch berücksichtigt.**
+
+### Eigene Farbpalette
 
 ```tsx
 <SunburstChart
@@ -207,7 +223,30 @@ Farben passen sich automatisch an, wenn der User zwischen Light/Dark-Theme oder 
 />
 ```
 
-Farben werden Top-Level-Segmenten zugewiesen und wiederholen sich zyklisch wenn mehr Segmente als Farben vorhanden sind.
+### MUI-Theme-Tokens zur Laufzeit
+
+```tsx
+import { useTheme } from '@mui/material';
+
+function MyChart({ data }) {
+  const theme = useTheme();
+  return (
+    <SunburstChart
+      data={data}
+      chartColors={[
+        theme.palette.primary.dark,
+        theme.palette.secondary.dark,
+        theme.palette.success.main,
+        theme.palette.warning.main,
+      ]}
+    />
+  );
+}
+```
+
+### Farb-Zuweisung
+
+Farben werden den **Top-Level-Segmenten** (Tiefe 1) zugewiesen. Kind-Segmente erhalten automatisch eine transparentere Variante der Elternfarbe (fill-opacity 0.5 vs 0.75).
 
 ---
 

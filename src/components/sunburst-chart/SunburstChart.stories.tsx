@@ -12,6 +12,7 @@ const meta: Meta<typeof SunburstChart> = {
     innerRadius:             { control: "number" },
     sortBy:                  { control: "radio", options: ["value", "name"] },
     showRootLabel:           { control: "boolean" },
+    zoomable:                { control: "boolean" },
     disabled:                { control: "boolean" },
     valueDecimalCount:       { control: "number" },
     valueDecimalSeparator:   { control: "text" },
@@ -27,6 +28,7 @@ const meta: Meta<typeof SunburstChart> = {
     innerRadius:             0,
     sortBy:                  "value",
     showRootLabel:           true,
+    zoomable:                false,
     disabled:                false,
     valueDecimalCount:       0,
     valueDecimalSeparator:   ".",
@@ -171,4 +173,79 @@ export const Disabled: Story = {
     },
   },
   args: { data: BUDGET_DATA, disabled: true },
+};
+
+// ── Deep hierarchy dataset (5 levels) ───────────────────────────────────────
+
+const DEEP_DATA: SunburstChartData = {
+  id: "root", name: "Portfolio",
+  children: [
+    { id: "p1", name: "Platform", children: [
+      { id: "p1-a", name: "Frontend", children: [
+        { id: "p1-a1", name: "Web App",   children: [
+          { id: "p1-a1-x", name: "Dashboard", value: 1200 },
+          { id: "p1-a1-y", name: "Reports",   value: 800 },
+          { id: "p1-a1-z", name: "Settings",  value: 400 },
+        ]},
+        { id: "p1-a2", name: "Mobile", children: [
+          { id: "p1-a2-x", name: "iOS",     value: 950 },
+          { id: "p1-a2-y", name: "Android", value: 870 },
+        ]},
+      ]},
+      { id: "p1-b", name: "Backend", children: [
+        { id: "p1-b1", name: "API Gateway",  value: 1100 },
+        { id: "p1-b2", name: "Auth Service", value: 700 },
+        { id: "p1-b3", name: "Data Service", value: 900 },
+      ]},
+    ]},
+    { id: "p2", name: "Products", children: [
+      { id: "p2-a", name: "Analytics", children: [
+        { id: "p2-a1", name: "Realtime",  value: 1500 },
+        { id: "p2-a2", name: "Historical",value: 1100 },
+      ]},
+      { id: "p2-b", name: "Commerce", children: [
+        { id: "p2-b1", name: "Checkout", value: 2000 },
+        { id: "p2-b2", name: "Catalog",  value: 1300 },
+        { id: "p2-b3", name: "Search",   value: 900 },
+      ]},
+      { id: "p2-c", name: "Messaging", children: [
+        { id: "p2-c1", name: "Email",    value: 600 },
+        { id: "p2-c2", name: "Push",     value: 450 },
+        { id: "p2-c3", name: "In-App",   value: 380 },
+      ]},
+    ]},
+    { id: "p3", name: "Infrastructure", children: [
+      { id: "p3-a", name: "Cloud",  children: [
+        { id: "p3-a1", name: "Compute",  value: 2200 },
+        { id: "p3-a2", name: "Storage",  value: 1400 },
+        { id: "p3-a3", name: "Network",  value: 800 },
+      ]},
+      { id: "p3-b", name: "Security", children: [
+        { id: "p3-b1", name: "IAM",       value: 500 },
+        { id: "p3-b2", name: "Encryption",value: 400 },
+        { id: "p3-b3", name: "Audit",     value: 350 },
+      ]},
+    ]},
+  ],
+};
+
+export const DeepHierarchy: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '**5 depth levels — combines Ctrl+Click drill-down with Ctrl+Scroll zoom.** ' +
+          '`Ctrl+Click` any ring segment → drill-down into that subtree. ' +
+          '`Ctrl+Scroll` → visual zoom (content outside `size` is clipped). ' +
+          '`Escape` resets both zoom and drill-down to root.',
+      },
+    },
+  },
+  args: {
+    data:      DEEP_DATA,
+    size:      520,
+    sortBy:    "value",
+    zoomable:  true,
+    showSegmentLabels: true,
+  },
 };

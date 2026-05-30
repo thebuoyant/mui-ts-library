@@ -66,6 +66,8 @@ export type SunburstChartProps = {
   valueDecimalSeparator?:   string;
   /** Thousands separator for values (default: ',') */
   valueThousandsSeparator?: string;
+  /** Enable Ctrl+Scroll zoom — content outside `size` is clipped (default: false) */
+  zoomable?:                boolean;
   /** Disables all interactions (default: false) */
   disabled?:                boolean;
   /** Override any translation string */

@@ -18,7 +18,11 @@ The `SunburstChart` visualizes **hierarchical data as concentric rings** — the
 
 | ✨ New in v2.2.0 | |
 |---|---|
-| **SunburstChart** | First D3 chart — Ctrl+Click zoom, donut mode, MUI theme palette |
+| **SunburstChart** | First D3 chart — Ctrl / Cmd ⌘+Click drill-down zoom, donut mode, MUI theme palette |
+| **`zoomable`** *(v2.4.0)* | `Ctrl / Cmd ⌘ + Scroll` visual zoom — content clipped at `size` boundary |
+
+> **macOS keyboard shortcuts:** Use `Cmd ⌘` instead of `Ctrl` — e.g. `Cmd ⌘+Click`, `Cmd ⌘+Scroll`.  
+> All interactions check `ctrlKey || metaKey`, so both keys work on every platform.
 
 ---
 
@@ -104,7 +108,8 @@ function App() {
 | `chartColors` | `string[]` | MUI palette | Custom top-level color palette |
 | `showRootLabel` | `boolean` | `true` | Show current focus node name in center |
 | `onSegmentClick` | `(info, event) => void` | — | Fires on every regular click |
-| `onZoomChange` | `(zoom: SunburstZoomInfo) => void` | — | Fires when zoom focus changes (Ctrl+Click, Ctrl+DblClick, Escape) |
+| `onZoomChange` | `(zoom: SunburstZoomInfo) => void` | — | Fires when drill-down focus changes (Ctrl / Cmd ⌘+Click, Ctrl / Cmd ⌘+DblClick, Escape) |
+| `zoomable` | `boolean` | `false` | Enable `Ctrl / Cmd ⌘ + Scroll` visual zoom — clips content at `size` boundary |
 | `valueDecimalCount` | `number` | `0` | Decimal places in tooltip values |
 | `valueDecimalSeparator` | `string` | `'.'` | Decimal separator |
 | `valueThousandsSeparator` | `string` | `','` | Thousands separator |
@@ -153,15 +158,18 @@ type SunburstChartTranslation = {
 | Gesture | Action |
 |---|---|
 | **Click** | Fires `onSegmentClick` immediately — no delay |
-| **Ctrl+Click** on a parent segment | Zoom in (drill down into that segment) |
-| **Ctrl+Double-click** on any segment | Zoom out one level |
-| **Ctrl+Click** on center label | Zoom out one level |
-| **Escape** | Reset zoom to root |
+| **Ctrl+Click** / **Cmd ⌘+Click** on a parent segment | Drill-down — that segment becomes the new center |
+| **Ctrl+Double-click** / **Cmd ⌘+Double-click** | Zoom out one level |
+| **Ctrl+Click** / **Cmd ⌘+Click** on center label | Zoom out one level |
+| **Ctrl+Scroll** / **Cmd ⌘+Scroll** *(requires `zoomable`)* | Visual zoom — clips at `size` boundary |
+| **Escape** | Reset all zoom to root |
 
-> **Why Ctrl+Click instead of double-click?**  
-> This model eliminates the classic 200ms click-delay hack. `onSegmentClick` fires instantly on every click, giving a snappy feel. Zoom is an explicit, intentional action (modifier key required) and can never happen accidentally.
+> **macOS:** Use `Cmd ⌘` instead of `Ctrl` for all shortcuts above.
 
-The center label always shows the **current focus node name** — when zoomed in, it acts as a breadcrumb.
+> **Why modifier+Click instead of double-click?**  
+> This eliminates the classic 200ms click-delay hack. `onSegmentClick` fires instantly on every click. Zoom is an explicit, intentional action that can never happen accidentally.
+
+The center label always shows the **current focus node name** — when drilled in, it acts as a breadcrumb. Use `Ctrl / Cmd ⌘+Click` on the center to step back up.
 
 ---
 
@@ -173,7 +181,7 @@ Set `innerRadius > 0` to create a hole in the center:
 <SunburstChart data={data} innerRadius={100} />
 ```
 
-The center hole area is clickable — `Ctrl+Click` zooms out, regular click fires `onSegmentClick` for the parent.
+The center hole area is clickable — `Ctrl / Cmd ⌘+Click` zooms out, regular click fires `onSegmentClick` for the parent.
 
 ---
 
@@ -191,14 +199,24 @@ The center hole area is clickable — `Ctrl+Click` zooms out, regular click fire
 
 ## Colors
 
-### Default — MUI Theme Palette
+### Default — MUI Theme Palette (automatic)
 
-Without `chartColors`, the chart uses the active MUI theme palette in this order:
-`primary` → `secondary` → `error` → `warning` → `success` → `info`
+When `chartColors` is not set, the chart derives colors from the active MUI theme in this order:
 
-This means colors automatically adapt when the user switches between light/dark themes or when you apply a custom MUI theme.
+| Depth 1 segment | MUI token | Default (blue theme) |
+|---|---|---|
+| 1st | `theme.palette.primary.main` | `#1976d2` |
+| 2nd | `theme.palette.secondary.main` | `#9c27b0` |
+| 3rd | `theme.palette.error.main` | `#d32f2f` |
+| 4th | `theme.palette.warning.main` | `#ed6c02` |
+| 5th | `theme.palette.success.main` | `#2e7d32` |
+| 6th | `theme.palette.info.main` | `#0288d1` |
 
-### Custom Palette
+Colors repeat cyclically if there are more top-level segments than palette entries. **Dark mode is handled automatically** — when the user switches to a dark MUI theme, colors adapt without any extra configuration.
+
+### Custom fixed colors
+
+Pass any CSS color strings (hex, rgb, hsl, named):
 
 ```tsx
 <SunburstChart
@@ -207,7 +225,32 @@ This means colors automatically adapt when the user switches between light/dark 
 />
 ```
 
-Colors are assigned to top-level segments and repeat cyclically if there are more segments than colors.
+### Using MUI theme tokens at runtime
+
+To pick colors from a custom MUI theme, read them with `useTheme()` and pass to `chartColors`:
+
+```tsx
+import { useTheme } from '@mui/material';
+
+function MyChart({ data }) {
+  const theme = useTheme();
+  return (
+    <SunburstChart
+      data={data}
+      chartColors={[
+        theme.palette.primary.dark,
+        theme.palette.secondary.dark,
+        theme.palette.success.main,
+        theme.palette.warning.main,
+      ]}
+    />
+  );
+}
+```
+
+### How colors are assigned
+
+Colors are assigned to **top-level segments** (depth 1). All child segments of the same parent automatically receive a lighter tint of the parent's color (via fill-opacity 0.5 vs 0.75).
 
 ---
 

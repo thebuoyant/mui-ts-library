@@ -87,12 +87,23 @@ export function SunburstChart({
   valueDecimalCount = 0,
   valueDecimalSeparator = ".",
   valueThousandsSeparator = ",",
+  zoomable = false,
   disabled = false,
 }: SunburstChartProps) {
   const theme = useTheme();
 
   const contentRef = useRef<SVGGElement>(null);
-  const [viewBox, setViewBox] = useState(`-${size / 2} -${size / 2} ${size} ${size}`);
+  const [baseViewBox, setBaseViewBox] = useState(`-${size / 2} -${size / 2} ${size} ${size}`);
+  const [zoomScale,   setZoomScale]   = useState(1);
+
+  // Zoom viewBox: shrink/expand around center (0,0 — the SVG center)
+  const viewBox = useMemo(() => {
+    if (zoomScale === 1) return baseViewBox;
+    const [x, y, w, h] = baseViewBox.split(" ").map(Number);
+    const nw = w / zoomScale;
+    const nh = h / zoomScale;
+    return `${x + (w - nw) / 2} ${y + (h - nh) / 2} ${nw} ${nh}`;
+  }, [baseViewBox, zoomScale]);
 
   const radius       = size / 2;
   const clampedInner = Math.max(0, Math.min(innerRadius, Math.max(0, radius - 1)));
@@ -236,9 +247,9 @@ export function SunburstChart({
       try {
         const box = g.getBBox();
         const pad = 8;
-        setViewBox(`${box.x - pad} ${box.y - pad} ${box.width + 2 * pad} ${box.height + 2 * pad}`);
+        setBaseViewBox(`${box.x - pad} ${box.y - pad} ${box.width + 2 * pad} ${box.height + 2 * pad}`);
       } catch {
-        setViewBox(`-${size / 2} -${size / 2} ${size} ${size}`);
+        setBaseViewBox(`-${size / 2} -${size / 2} ${size} ${size}`);
       }
     });
     return () => cancelAnimationFrame(id);
@@ -256,11 +267,22 @@ export function SunburstChart({
   useLayoutEffect(() => {
     if (disabled) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { cancelZoomIn(); zoom(root); }
+      if (e.key === "Escape") { cancelZoomIn(); zoom(root); setZoomScale(1); }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [disabled, root, zoom]);
+
+  // Ctrl+Scroll visual zoom — viewBox scale, content clipped at SVG boundary
+  const handleWheel = useCallback(
+    (e: React.WheelEvent<SVGSVGElement>) => {
+      if (!zoomable || disabled || !e.ctrlKey) return;
+      e.preventDefault();
+      const factor = e.deltaY < 0 ? 1.15 : 1 / 1.15;
+      setZoomScale((prev) => Math.max(0.25, Math.min(8, prev * factor)));
+    },
+    [zoomable, disabled],
+  );
 
   const renderNodes = root.descendants().filter((n) => n.depth > 0);
 
@@ -321,7 +343,12 @@ export function SunburstChart({
         width={size}
         height={size}
         viewBox={viewBox}
-        style={{ fontFamily: fontFamily ?? "sans-serif", overflow: "visible" }}
+        onWheel={handleWheel}
+        style={{
+          fontFamily: fontFamily ?? "sans-serif",
+          // clip content at SVG boundary when zoomed in
+          overflow: zoomable && zoomScale > 1 ? "hidden" : "visible",
+        }}
         role="img"
         aria-label={data.name}
       >

@@ -13,6 +13,32 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [2.4.0] — 2026-05-29
+
+### Hinzugefügt
+
+#### RadialTreeChart — Neue Komponente (MTL-21) · D3-Charts-Familie #3
+
+- **Hierarchische Daten als radialer Baum** — Knoten auf konzentrischen Ringen, verbunden durch geschwungene Bézier-Links; ideal für Org-Charts, Taxonomien, Abhängigkeitsbäume und Wissensgraphen
+- **`data: RadialTreeChartData`** — rekursiver Baum mit optionalen Feldern `subname`, `value`, `specialValueA`, `specialValueB`
+- **Icons auf Knoten** (`showIcons`, Standard `true`) — Standard: `FolderOutlined` für Branch-Knoten, `PersonOutlined` für Blätter; Override per Tiefe via `nodeIconsByDepth` oder vollständig custom via `renderNodeIcon`
+- **MUI-Tooltip** (`followCursor`) auf jedem Knoten — zeigt Name, Subname und Breadcrumb-Pfad beim Hover
+- **Eingebautes MUI-Popover** (`showNodePopover`, Standard `false`) — Klick auf Knoten öffnet Karte mit Avatar, Name, Subname und beschrifteten Sonderwerten; ersetzbar via `renderNodePopoverContent`
+- **`onNodeClick?: (info: RadialTreeNodeInfo, event) => void`** — sauberer Callback ohne D3- oder Fluent-UI-Typen
+- **`chartColors?: string[]`** — Farben pro Tiefenebene; Fallback: MUI-Theme-Palette
+- **`autoFit?: boolean`** (Standard `true`) — viewBox passt sich automatisch dem Inhalt an
+- Von Fluent UI (`@fluentui/react-components`, `@fluentui/react-icons`) auf MUI migriert: Icons, Avatar, Popover
+- **`zoomable?: boolean`** — `Ctrl / Cmd ⌘ + Scroll` visueller Zoom; clippt am `size`-Rand
+- **`drillable?: boolean`** — `Ctrl / Cmd ⌘ + Click` Drill-Down; `Ctrl / Cmd ⌘ + DblClick` zurück; `Escape` Reset; Breadcrumb bei Drill-In
+- **`onFocusChange?`** — Callback bei Drill-Down-Wechsel
+- **`rootNodeRadius` / `branchNodeRadius` / `leafNodeRadius`** — Kreisgrößen pro Knotenrolle
+- **`linkColor` / `labelFontSize` / `labelColor`** — vollständig konfigurierbare Visuelles
+- `SunburstChart`: `zoomable`-Prop ergänzt — gleiche `Ctrl / Cmd ⌘ + Scroll` Zoom-Logik
+
+> **Plattform-Hinweis:** Alle `Ctrl+...`-Shortcuts funktionieren auf macOS auch mit `Cmd ⌘`. Der Code prüft `ctrlKey || metaKey` für alle Modifier-Interaktionen.
+
+---
+
 ## [2.3.0] — 2026-05-29
 
 ### Hinzugefügt

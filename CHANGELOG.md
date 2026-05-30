@@ -13,6 +13,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.4.0] — 2026-05-29
+
+### Added
+
+#### RadialTreeChart — New Component (MTL-21) · D3 Charts family #3
+
+- **Hierarchical data as a radial tree** — nodes placed on concentric rings connected by curved Bézier links; ideal for org charts, taxonomies, dependency trees, and knowledge graphs
+- **`data: RadialTreeChartData`** — recursive tree with optional `subname`, `value`, `specialValueA`, `specialValueB` fields
+- **Icons on nodes** (`showIcons`, default `true`) — default: `FolderOutlined` for branch nodes, `PersonOutlined` for leaves; override per depth via `nodeIconsByDepth` or fully custom via `renderNodeIcon`
+- **MUI Tooltip** (`followCursor`) on every node — shows name, subname, and breadcrumb path on hover
+- **Built-in MUI Popover** (`showNodePopover`, default `false`) — click a node to open a styled card with Avatar, name, subname, and labeled special values; fully replaceable via `renderNodePopoverContent`
+- **`onNodeClick?: (info: RadialTreeNodeInfo, event) => void`** — clean callback without D3 or Fluent UI types; `RadialTreeNodeInfo`: `{ id, name, subname, value, specialValueA, specialValueB, depth, path, childrenCount, data }`
+- **`chartColors?: string[]`** — per-depth colors; falls back to MUI theme palette
+- **`autoFit?: boolean`** (default `true`) — auto-fits the viewBox to the rendered content
+- **`sortBy?: 'name' | 'value'`** (default `'name'`)
+- **`disabled?: boolean`** — mutes all interactions, reduces opacity
+- Migrated from Fluent UI (`@fluentui/react-components`, `@fluentui/react-icons`) to MUI: icons, Avatar, Popover — zero Fluent UI dependencies
+- **`zoomable?: boolean`** — `Ctrl / Cmd ⌘ + Scroll` visual zoom; clips content at `size` boundary when zoomed in
+- **`drillable?: boolean`** — `Ctrl / Cmd ⌘ + Click` drill-down into subtrees; `Ctrl / Cmd ⌘ + DblClick` zooms out; `Escape` resets; breadcrumb shown when drilled in
+- **`onFocusChange?: (info: RadialTreeNodeInfo | null) => void`** — fires when drill-down focus changes
+- **`rootNodeRadius` / `branchNodeRadius` / `leafNodeRadius`** — configurable circle sizes per role
+- **`linkColor` / `labelFontSize` / `labelColor`** — fully configurable visual properties
+- New exported types: `RadialTreeChartData`, `RadialTreeNodeInfo`, `RadialTreeNodeIconSpec`, `RadialTreeSortBy`, `RadialTreeChartTranslation`
+- `SunburstChart`: added `zoomable` prop — same `Ctrl / Cmd ⌘ + Scroll` zoom behavior
+
+> **Platform note:** All `Ctrl+...` shortcuts also work with `Cmd ⌘` on macOS. The code checks `ctrlKey || metaKey` for all modifier-based interactions.
+
+---
+
 ## [2.3.0] — 2026-05-29
 
 ### Added
