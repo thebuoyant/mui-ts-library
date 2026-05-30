@@ -200,56 +200,67 @@ Typische Translation-Keys pro Chart (je nach Bedarf):
 
 ---
 
-### ~~MTL-21 — RadialTreeChart~~ ✅ v2.4.0 — Branch MTL-21, merge + npm publish ausstehend
+### ~~MTL-21 — RadialTreeChart~~ ✅ v2.4.0
 
-Fluent UI vollständig durch MUI ersetzt: Icons (`FolderOutlined`/`PersonOutlined`), Avatar, Popover.
-Neues API: `onNodeClick` statt `onClick` mit `api`, `showNodePopover`, `renderNodePopoverContent`, `nodeIconsByDepth`.
-
----
-
-### MTL-22 — TreemapChart ⭐ Als nächstes
-
-> Quelle: `skejlo-charts/src/components/_charts/treemap-chart/TreemapChart.tsx`  
-> **Aufwand: Niedrig** — kein Fluent UI, reines D3 + React SVG (ähnlich SunburstChart)
-
-Hierarchische Daten als verschachtelte Rechtecke. Gut für Proportionsvergleiche auf einer Ebene.
-
-| Status | — (nach MTL-19) |
-|---|---|
+Fluent UI vollständig durch MUI ersetzt. Features: farbige Bubble-Nodes, weißes Icon drin, `drillable` (Ctrl / Cmd ⌘+Click), `zoomable` (Ctrl / Cmd ⌘+Scroll), `onFocusChange`, `showNodePopover`, vollständig konfigurierbare Farben/Abstände/Labels.
 
 ---
 
-### MTL-21 — ZoomableCirclePackingChart
+### SunburstChart + RadialTreeChart — Feature-Ideen (nach v2.4.0)
+
+| Feature | Komponente | Beschreibung | Aufwand |
+|---|---|---|---|
+| **Animierte Drill-Down-Übergänge** | SunburstChart | D3 arc interpolation beim Ctrl+Click — weiche Überblendung statt Sofortschnitt | Mittel |
+| **Responsive Größe** | Alle D3 Charts | `size="auto"` passt sich dem Container an — statt fixer Pixelgröße | Mittel |
+| **Export PNG/SVG** | Alle D3 Charts | Download-Button im Chart — Browser-nativer SVG/Canvas-Export | Mittel |
+| **Legende** | SunburstChart, ChordChart | Optionale Farb-Legende — Top-Level-Segmente/Gruppen mit Farbe + Name | Niedrig |
+| **`focusId` controlled** | SunburstChart, RadialTreeChart | Parent kann Drill-Down-Zustand von außen steuern (URL-persistierbar) | Mittel |
+| **Collapsible Nodes** | RadialTreeChart | Klick auf Knoten klappt seinen Teilbaum zusammen/auf | Hoch |
+| **Suche/Highlight** | RadialTreeChart | Knoten nach Name suchen — gefundene Knoten hervorheben | Mittel |
+| **Prozentlabels** | SunburstChart | `labelMode: 'name' | 'percent' | 'both'` | Niedrig |
+
+---
+
+### MTL-22 — ZoomableCirclePackingChart ⭐ Als nächstes
 
 > Quelle: `skejlo-charts/src/components/_charts/zoomable-circle-packing-chart/ZoomableCirclePackingChart.tsx`  
-> **Aufwand: Mittel** — kein Fluent UI; Zoom-Animation via D3 interpolation
+> **Aufwand: Mittel** — kein Fluent UI; D3 pack-Layout mit animiertem Zoom via D3 interpolation (nicht ViewBox-Scale!)
 
-Hierarchische Daten als ineinander geschachtelte Kreise. Zoom per Klick.
+Hierarchische Daten als **ineinander geschachtelte Kreise** (Circle Packing). Das Besondere: Zoom per **Doppelklick** mit echter D3-Animation (smooth transition auf den geklickten Kreis), nicht nur ViewBox-Skalierung.
 
-| Status | — (nach MTL-20) |
+**Geplante Features (aus Quellcode):**
+| Feature | Beschreibung |
+|---|---|
+| D3 Pack Layout | Kreise proportional zur Größe, automatisch verschachtelt |
+| Animierter Zoom | Doppelklick → smooth D3 interpolation zum geklickten Kreis; DblClick Background → zurück |
+| Tiefenbasierte Farben | Gradient (depthColorStart → depthColorEnd, HCL-Interpolation) **oder** Palette pro Tiefe via `chartColors` |
+| Labels | Fade-in/out beim Zoom, `showLabels`, `labelFontSize` |
+| `onCircleClick` | Sauberer Callback: `{ name, value, depth, path[], childrenCount, data }` |
+| `onZoom` | Callback mit `{ previous, current }` — für externe Breadcrumb-Anzeige |
+| Animationsdauer | `duration` in ms (Standard: 750) |
+| `disabled` | Alle Interaktionen deaktiviert |
+| `size` | Statt `width`/`height` — quadratischer SVG (einfachere API) |
+| MUI-Theme-Farben | Default-Gradient aus `theme.palette.primary/secondary` wenn kein `chartColors` |
+| MUI Tooltip followCursor | Wie alle anderen D3-Charts |
+
+**MUI-Anpassungen:**
+- `className` / `style` → MUI `Box` wrapper
+- `hierarchyNodeColors` → `chartColors` (konsistent mit anderen Charts)
+- `depthColorStart`/`depthColorEnd` → Default aus MUI-Theme-Palette (opt-in für eigene Gradienten)
+- `d3.HierarchyCircularNode` aus Callback-Typ entfernen → saubere serialisierte Typen
+
+| Status | Branch MTL-22 (noch nicht erstellt) |
 |---|---|
 
 ---
 
-### MTL-22 — ChordChart
+### MTL-23 — TreemapChart
 
-> Quelle: `skejlo-charts/src/components/_charts/chord-chart/ChordChart.tsx`  
-> **Aufwand: Mittel** — Fluent UI nur in Stories (nicht in der Komponente); Stories müssen angepasst werden
+> Quelle: `skejlo-charts/src/components/_charts/treemap-chart/TreemapChart.tsx`  
+> **Aufwand: Niedrig** — kein Fluent UI, reines D3 + React SVG
 
-Beziehungen zwischen Gruppen als Chord-Diagramm. Ideal für Netzwerk- und Flow-Daten.
+Hierarchische Daten als verschachtelte Rechtecke. Ideal für Proportionsvergleiche: Budgets, Speicherverbrauch, Marktanteile.
 
-| Status | — (nach MTL-21) |
+| Status | — (nach MTL-22) |
 |---|---|
-
----
-
-### MTL-23 — RadialTreeChart
-
-> Quelle: `skejlo-charts/src/components/_charts/radial-tree-chart/RadialTreeChart.tsx`  
-> **Aufwand: Hoch** — Fluent UI tief integriert in der Komponente selbst (`@fluentui/react-components`, `@fluentui/react-icons`)  
-> Fluent UI Icons müssen durch MUI Icons (`@mui/icons-material`) oder eigene SVG-Icons ersetzt werden
-
-Hierarchische Daten als radialer Baum. Nodes können eigene Icons haben (File, Folder, Person…).
-
-| Status | — (nach MTL-22, größter Umbau) |
 |---|---|
