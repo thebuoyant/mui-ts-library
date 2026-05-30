@@ -13,6 +13,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.5.0] — 2026-05-30
+
+### Added
+
+#### CirclePackingChart — New Component (MTL-22) · D3 Charts family #4
+
+- **Hierarchical data as nested circles** — sizes proportional to values; ideal for budget breakdowns, portfolio analysis, and any dataset where proportional nesting matters
+- **Animated D3 zoom** — `double-click` any circle → smooth `d3.interpolateZoom` transition into that circle; `double-click` background → animate back out; labels fade in/out during transition
+- **Alt+Double-click** → slow-motion zoom (10× duration) for demos and presentations
+- **`data: CirclePackingData`** — recursive `{ name, value?, children? }` structure
+- **Depth-based coloring** — two modes:
+  - `chartColors?: string[]` — fixed per-depth palette (cycles automatically)
+  - HCL gradient (`depthColorStart` / `depthColorEnd`) — perceptually uniform, defaults to MUI theme palette
+- **`showLabels?: boolean`** — centered labels that fade in/out with zoom focus
+- **`size?: number`** (default: `600`) — single prop for square SVG; replaces separate `width`/`height`
+- **`padding?: number`** (default: `3`) — spacing between nested circles
+- **`duration?: number`** (default: `750`) — animation duration in ms
+- **`onCircleClick?: (info: CirclePackingNodeInfo, event) => void`** — clean callback; `CirclePackingNodeInfo`: `{ name, value, depth, path, childrenCount, data }`
+- **`onZoomChange?: (zoom: CirclePackingZoomInfo) => void`** — fires on every zoom; `CirclePackingZoomInfo`: `{ previousName, currentName, currentDepth, isRoot }`
+- **`disabled?: boolean`** — mutes all interactions
+- MUI `<Tooltip followCursor>` on every circle — instant, no browser delay
+- MUI theme integration: background, label color, font family, gradient from theme palette
+- New exported types: `CirclePackingData`, `CirclePackingNodeInfo`, `CirclePackingZoomInfo`, `CirclePackingSortBy`
+
+---
+
 ## [2.4.0] — 2026-05-29
 
 ### Added

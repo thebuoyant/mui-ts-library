@@ -20,6 +20,7 @@ A type-safe React component library built on **TypeScript** and **MUI (Material 
 | [`SunburstChart`](#sunburstchart) | D3 v7 hierarchical chart — concentric rings, Ctrl / Cmd ⌘+Click drill-down, Ctrl / Cmd ⌘+Scroll zoom, donut mode, MUI theme integration | [Full Manual →](user-manuals/SunburstChart.md) |
 | [`ChordChart`](#chordchart) | D3 v7 flow chart — arc groups connected by ribbons, hover highlight, directed/undirected, MUI theme integration | [Full Manual →](user-manuals/ChordChart.md) |
 | [`RadialTreeChart`](#radialtreedchart) | D3 v7 radial tree — hierarchical nodes on concentric rings, MUI icons, Ctrl / Cmd ⌘+Click drill-down, Ctrl / Cmd ⌘+Scroll zoom, MUI theme integration | [Full Manual →](user-manuals/RadialTreeChart.md) |
+| [`CirclePackingChart`](#circlepackingchart) | D3 v7 circle packing — nested circles sized by value, animated double-click zoom (D3 interpolation), depth gradient or palette, MUI theme integration | [Full Manual →](user-manuals/CirclePackingChart.md) |
 
 ---
 
@@ -315,6 +316,9 @@ import type {
 
   // RadialTreeChart
   RadialTreeChartData, RadialTreeNodeInfo, RadialTreeNodeIconSpec, RadialTreeSortBy,
+
+  // CirclePackingChart
+  CirclePackingData, CirclePackingNodeInfo, CirclePackingZoomInfo, CirclePackingSortBy,
 } from '@thebuoyant-tsdev/mui-ts-library';
 ```
 
