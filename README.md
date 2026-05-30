@@ -18,9 +18,9 @@ A type-safe React component library built on **TypeScript** and **MUI (Material 
 | [`SqlEditor`](#sqleditor) | SQL code editor (CodeMirror 6) with syntax highlighting, multi-dialect, autocomplete, linting, and `Cmd+Enter` execute shortcut | [Full Manual →](user-manuals/SqlEditor.md) |
 | [`JsonEditor`](#jsoneditor) | JSON code editor (CodeMirror 6) with real-time validation, Format, Compact buttons, and optional minimap | [Full Manual →](user-manuals/JsonEditor.md) |
 | [`SunburstChart`](#sunburstchart) | D3 v7 hierarchical chart — concentric rings, Ctrl / Cmd ⌘+Click drill-down, Ctrl / Cmd ⌘+Scroll zoom, donut mode, MUI theme integration | [Full Manual →](user-manuals/SunburstChart.md) |
-| [`ChordChart`](#chordchart) | D3 v7 flow chart — arc groups connected by ribbons, hover highlight, directed/undirected, MUI theme integration | [Full Manual →](user-manuals/ChordChart.md) |
+| [`ChordChart`](#chordchart) | D3 v7 flow chart — arc groups, ribbons, hover highlight, Ctrl / Cmd ⌘+Scroll zoom, directed/undirected, MUI theme integration | [Full Manual →](user-manuals/ChordChart.md) |
 | [`RadialTreeChart`](#radialtreedchart) | D3 v7 radial tree — hierarchical nodes on concentric rings, MUI icons, Ctrl / Cmd ⌘+Click drill-down, Ctrl / Cmd ⌘+Scroll zoom, MUI theme integration | [Full Manual →](user-manuals/RadialTreeChart.md) |
-| [`CirclePackingChart`](#circlepackingchart) | D3 v7 circle packing — nested circles sized by value, animated double-click zoom (D3 interpolation), depth gradient or palette, MUI theme integration | [Full Manual →](user-manuals/CirclePackingChart.md) |
+| [`CirclePackingChart`](#circlepackingchart) | D3 v7 circle packing — nested circles, animated D3 zoom, Ctrl / Cmd ⌘+Scroll zoom, depth gradient or palette, MUI theme integration | [Full Manual →](user-manuals/CirclePackingChart.md) |
 
 ---
 

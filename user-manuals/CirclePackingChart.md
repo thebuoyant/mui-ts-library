@@ -87,6 +87,7 @@ function App() {
 | `depthColorEnd` | `string` | theme secondary | Gradient end color (when no `chartColors`) |
 | `background` | `string` | theme background | SVG background fill |
 | `duration` | `number` | `750` | Zoom animation duration in ms |
+| `zoomable` | `boolean` | `false` | Enable `Ctrl / Cmd ⌘ + Scroll` visual zoom — clips at `size` boundary |
 | `disabled` | `boolean` | `false` | Mutes all interactions |
 | `onCircleClick` | `(info, event) => void` | — | Fires on single click |
 | `onZoomChange` | `(zoom) => void` | — | Fires on every zoom transition |

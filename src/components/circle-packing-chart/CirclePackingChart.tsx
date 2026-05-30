@@ -35,6 +35,7 @@ export function CirclePackingChart({
   depthColorEnd,
   background,
   duration = 750,
+  zoomable = false,
   disabled = false,
   onCircleClick,
   onZoomChange,
@@ -99,6 +100,35 @@ export function CirclePackingChart({
     },
     [useGradient, colorGradient, palette, theme],
   );
+
+  // ── Ctrl / Cmd ⌘ + Scroll visual zoom (viewBox scale) ────────────────────
+  const [zoomScale, setZoomScale] = useState(1);
+
+  const handleWheel = useCallback(
+    (e: React.WheelEvent<SVGSVGElement>) => {
+      if (!zoomable || disabled || !e.ctrlKey) return;
+      e.preventDefault();
+      const factor = e.deltaY < 0 ? 1.15 : 1 / 1.15;
+      setZoomScale((prev) => Math.max(0.25, Math.min(8, prev * factor)));
+    },
+    [zoomable, disabled],
+  );
+
+  useLayoutEffect(() => {
+    if (!zoomable) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setZoomScale(1); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [zoomable]);
+
+  // Zoomed viewBox: scale around center (0,0)
+  const zoomedViewBox = useMemo(() => {
+    const base = `${-size / 2} ${-size / 2} ${size} ${size}`;
+    if (zoomScale === 1) return base;
+    const s = size / zoomScale;
+    const offset = (size - s) / 2;
+    return `${-size / 2 + offset} ${-size / 2 + offset} ${s} ${s}`;
+  }, [size, zoomScale]);
 
   // ── Serializer — enriched like SunburstChart ──────────────────────────────
   const serialize = useCallback(
@@ -299,8 +329,9 @@ export function CirclePackingChart({
       <svg
         ref={svgRef}
         width={size} height={size}
-        viewBox={`${-size / 2} ${-size / 2} ${size} ${size}`}
-        style={{ display: "block", background: resolvedBackground, fontFamily: fontFamily ?? "sans-serif" }}
+        viewBox={zoomedViewBox}
+        onWheel={handleWheel}
+        style={{ display: "block", background: resolvedBackground, fontFamily: fontFamily ?? "sans-serif", overflow: zoomable && zoomScale > 1 ? "hidden" : "visible" }}
         role="img"
         aria-label={data.name}
         onDoubleClick={handleSvgDblClick}

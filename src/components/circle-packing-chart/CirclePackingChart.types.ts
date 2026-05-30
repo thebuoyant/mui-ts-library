@@ -100,6 +100,8 @@ export type CirclePackingChartProps = {
    * Alt+Ctrl / Alt+Cmd+Click uses 10× for slow-motion demos.
    */
   duration?:         number;
+  /** Enable Ctrl / Cmd ⌘ + Scroll visual zoom — clips content at `size` boundary (default: false) */
+  zoomable?:         boolean;
   /** Disables all interactions (default: false) */
   disabled?:         boolean;
   /** Fires on regular click — immediately, no delay */

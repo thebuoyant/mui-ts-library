@@ -87,6 +87,8 @@ export type ChordChartProps = {
   onGroupClick?:            (info: ChordGroupInfo, event: React.MouseEvent<SVGGElement>) => void;
   /** Fired on click of a ribbon */
   onChordClick?:            (info: ChordInfo, event: React.MouseEvent<SVGPathElement>) => void;
+  /** Enable Ctrl / Cmd ⌘ + Scroll visual zoom — clips content at `size` boundary (default: false) */
+  zoomable?:                boolean;
   /** Disables all interactions (default: false) */
   disabled?:                boolean;
   /** Override translation strings */

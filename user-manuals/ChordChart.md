@@ -97,6 +97,7 @@ function App() {
 | `valueThousandsSeparator` | `string` | `','` | Thousands separator |
 | `onGroupClick` | `(info, event) => void` | — | Fires on click of a group arc |
 | `onChordClick` | `(info, event) => void` | — | Fires on click of a ribbon |
+| `zoomable` | `boolean` | `false` | Enable `Ctrl / Cmd ⌘ + Scroll` visual zoom — clips at `size` boundary |
 | `disabled` | `boolean` | `false` | Mutes all interactions, reduces opacity |
 | `translation` | `Partial<ChordChartTranslation>` | EN defaults | Override translation strings |
 

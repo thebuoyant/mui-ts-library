@@ -87,6 +87,7 @@ function App() {
 | `depthColorEnd` | `string` | Theme secondary | Gradient-Endfarbe |
 | `background` | `string` | Theme-Hintergrund | SVG-Hintergrundfüllung |
 | `duration` | `number` | `750` | Zoom-Animationsdauer in ms |
+| `zoomable` | `boolean` | `false` | `Ctrl / Cmd ⌘ + Scroll` visueller Zoom — clippt am `size`-Rand |
 | `disabled` | `boolean` | `false` | Deaktiviert alle Interaktionen |
 | `onCircleClick` | `(info, event) => void` | — | Einfacher Klick auf Kreis |
 | `onZoomChange` | `(zoom) => void` | — | Bei jedem Zoom-Übergang |
