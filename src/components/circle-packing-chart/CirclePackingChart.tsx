@@ -157,9 +157,12 @@ export function CirclePackingChart({
       if (showLabels) {
         const outerLabels = el.querySelectorAll<SVGTextElement>("g[data-role='labels'] > text");
         for (let i = 0; i < nodes.length; i++) {
-          const d = nodes[i];
+          const d   = nodes[i];
           const txt = outerLabels[i];
-          if (txt) txt.setAttribute("transform", `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`);
+          if (!txt) continue;
+          txt.setAttribute("transform", `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`);
+          // Bold for parent circles, normal for leaves
+          txt.setAttribute("font-weight", d.children ? "bold" : "normal");
         }
       }
 
@@ -171,18 +174,19 @@ export function CirclePackingChart({
           const txt = innerLabels[i];
           if (!txt) continue;
 
-          const r          = d.r * k;
-          const availWidth = r * 1.5; // 75% of diameter for padding
-          const isDescendant = currentFocus !== root ? d.ancestors().includes(currentFocus) : d !== root;
+          const r             = d.r * k;
+          // Use full diameter (80%) as available width — text centered
+          const availWidth    = r * 1.6;
+          const isDescendant  = currentFocus !== root ? d.ancestors().includes(currentFocus) : d !== root;
           const isDirectChild = d.parent === currentFocus;
-
-          // Show for descendants that are NOT direct children (those get outer labels)
-          // and only if the circle is big enough
-          if (isDescendant && !isDirectChild && r >= 6) {
+          // Minimum radius: 14px — smaller circles get no label (reduces clutter)
+          if (isDescendant && !isDirectChild && r >= 14) {
             const label = fitOrEllipsis(d.data.name, availWidth, innerLabelFontSize);
             if (label) {
               txt.textContent = label;
               txt.setAttribute("transform", `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`);
+              // Bold for parent circles, normal for leaves
+              txt.setAttribute("font-weight", d.children ? "bold" : "normal");
               txt.style.display = "inline";
             } else {
               txt.style.display = "none";
@@ -377,10 +381,10 @@ export function CirclePackingChart({
           })}
         </g>
 
-        {/* ── Outer-ring labels (direct children of focus) — bold, larger ── */}
+        {/* ── Outer-ring labels — bold for parents, normal for leaves (set imperatively) ── */}
         {showLabels && (
           <g data-role="labels" textAnchor="middle" dominantBaseline="middle"
-             pointerEvents="none" fontSize={labelFontSize} fontWeight="bold" fill={resolvedLabelColor}>
+             pointerEvents="none" fontSize={labelFontSize} fill={resolvedLabelColor}>
             {nodes.map((d, i) => (
               <text key={`lbl-${i}`}
                 transform={`translate(${d.x - size / 2},${d.y - size / 2})`}
