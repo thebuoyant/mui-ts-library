@@ -15,10 +15,10 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 | Spalte: Assignee | Zusätzliche Spalte im Task-Panel für Verantwortliche | Mittel | — |
 | Resource View | Horizontale Ansicht: eine Zeile pro Person | Hoch | — |
 | Baseline-Vergleich | Ursprungsplanung vs. Ist-Stand visuell überlagern | Hoch | — |
-| ~~Zoom per Scroll~~ | ~~Ctrl+Scroll ändert TimeScale (days/weeks/months/quarters)~~ | ~~Mittel~~ | ✅ bereits implementiert (`zoomable={true}`) |
+| ~~Zoom per Scroll~~ | ~~Ctrl / Cmd ⌘+Scroll ändert TimeScale~~ | ~~Mittel~~ | ✅ v1.5.0 (`zoomable={true}`) |
 | Multi-Select | Mehrere Tasks gleichzeitig verschieben | Hoch | — |
-| ~~Today-Button~~ | ~~Toolbar-Button scrollt automatisch zum heutigen Tag~~ | ~~Niedrig~~ | ✅ bereits implementiert |
-| ~~Heute-Chip~~ | ~~Kleiner Chip oben an der gestrichelten Heute-Linie, Tooltip = aktuelles Datum, `todayLabel`-Translation~~ | ~~Niedrig~~ | ✅ v1.5.0 |
+| ~~Today-Button~~ | ~~Toolbar-Button scrollt zum heutigen Tag~~ | ~~Niedrig~~ | ✅ bereits implementiert |
+| ~~Heute-Chip~~ | ~~Chip an der gestrichelten Heute-Linie~~ | ~~Niedrig~~ | ✅ v1.5.0 |
 | Mini-Map | Kleine Übersichts-Timeline zum schnellen Navigieren | Hoch | — |
 
 ---
@@ -48,8 +48,8 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 | Query-Verlauf | Letzte N Abfragen im Dropdown | Mittel | — |
 | Snippet-Bibliothek | Gespeicherte SQL-Bausteine einfügen | Mittel | — |
 | Hover-Doku | Spalten-/Tabellen-Kommentar als Tooltip beim Hover | Mittel | — |
-| ~~Keyboard Shortcut Execute~~ | ~~Cmd+Enter für `onExecute`~~ | ~~Niedrig~~ | ✅ v1.5.0 |
-| ~~Zeilennummern-Gutter anpassen~~ | ~~Breite automatisch an max. Zeilenzahl anpassen~~ | ~~Niedrig~~ | ✅ v1.5.0 |
+| ~~Keyboard Shortcut Execute~~ | ~~Cmd / Ctrl+Enter für `onExecute`~~ | ~~Niedrig~~ | ✅ v1.5.0 |
+| ~~Zeilennummern-Gutter anpassen~~ | ~~Breite auto an max. Zeilenzahl~~ | ~~Niedrig~~ | ✅ v1.5.0 |
 
 ---
 
@@ -84,8 +84,8 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 |---|---|---|---|
 | Passwort-Generator | Button generiert ein sicheres Passwort | Mittel | — |
 | Confirm-Feld | Zweites Eingabefeld mit Match-Validierung | Mittel | — |
-| ~~Custom Requirements~~ | ~~Eigene Anforderungen als Array-Prop übergeben~~ | ~~Niedrig~~ | ✅ v1.5.0 |
-| ~~Animated Segments~~ | ~~Strength-Bar als 4 separate Segmente statt einer Bar~~ | ~~Niedrig~~ | ✅ v1.5.0 |
+| ~~Custom Requirements~~ | ~~Eigene Anforderungen als Array-Prop~~ | ~~Niedrig~~ | ✅ v1.5.0 |
+| ~~Animated Segments~~ | ~~Strength-Bar als 4 separate Segmente~~ | ~~Niedrig~~ | ✅ v1.5.0 |
 
 ---
 
@@ -93,174 +93,89 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
-| Loading State | `confirm()` bleibt offen mit Spinner während async Action läuft | Mittel | — |
-| ~~Countdown~~ | ~~Auto-Close nach n Sekunden mit Timer-Anzeige~~ | ~~Niedrig~~ | ✅ v1.5.0 |
+| Loading State | `confirm()` bleibt offen mit Spinner während async Action | Mittel | — |
+| ~~Countdown~~ | ~~Auto-Close nach n Sekunden~~ | ~~Niedrig~~ | ✅ v1.5.0 |
 | ~~Keyboard Shortcut~~ | ~~Enter = Confirm, Escape = Cancel~~ | ~~Niedrig~~ | ✅ v1.5.0 |
 | Stacked Dialogs | Mehrere Dialoge in einer Queue statt auto-cancel | Mittel | — |
 
 ---
 
-## D3 Charts — Neue Komponentenfamilie
+## D3 Charts — Komponentenfamilie
 
-> **Quell-Projekt (Fluent UI Basis):** `/Users/thomasschlender/Development-PCF/skejlo-charts`  
-> Alle Charts befinden sich unter `src/components/_charts/`, Demo-Daten unter `src/_demo-data/*.json`.  
-> Alle Charts basieren auf **D3 v7** + React SVG. Fluent UI-Abhängigkeiten werden durch MUI-Integration ersetzt.  
-> **Neue peer dependency:** `d3@^7` (muss zu `peerDependencies` + `devDependencies` hinzugefügt werden).
-
-### Migration-Strategie (gilt für alle Charts)
-
-#### Look & Feel — wie aus einem Guss mit der bestehenden Library
-
-1. **D3-Kern-Logik 1:1 übernehmen** (keine Fluent UI-Imports außer in RadialTreeChart)
-2. **SVG in MUI `Box` / `Paper` wrappen** — gleiche Struktur wie SqlEditor, JsonEditor, RichTextEditor
-3. **MUI-Theme-Integration (Pflicht für jeden Chart):**
-   - Dark Mode automatisch: SVG-Texte via `theme.palette.text.primary`, Hintergründe via `theme.palette.background.paper`
-   - Schriftart: `theme.typography.fontFamily` statt hardcoded `'sans-serif'`
-   - Segment-Hover: `theme.palette.action.hover`
-
-#### Farb-Prop — Spielraum für den User
-
-Jeder Chart bekommt ein `chartColors?: string[]`-Prop (opt-in Override):
-- **Kein Prop gesetzt** → automatische MUI-Palette: `[primary.main, secondary.main, error.main, warning.main, success.main, info.main, ...]` aus `useTheme()` — passt automatisch zum aktiven Theme (light/dark/custom)
-- **`chartColors` gesetzt** → User-Palette wird 1:1 verwendet (wie bisher `colors` in SunburstChart)
-- Export: `DEFAULT_CHART_COLORS` — die 6 MUI-Palette-Farben als Fallback-Array für Tests und Dokumentation
-
-#### Translation-Prop — wie überall in der Library
-
-Jeder Chart bekommt:
-```ts
-translation?: Partial<XxxChartTranslation>
-```
-mit exportiertem `DEFAULT_XXX_CHART_TRANSLATION` (englische Defaults) — analog zu `RichTextEditorTranslation`, `SqlEditorTranslation` etc.
-
-Typische Translation-Keys pro Chart (je nach Bedarf):
-- `noData` — Platzhalter wenn `data` leer ist
-- `ctrlClickToZoomIn` / `ctrlDblClickToZoomOut` / `escToResetZoom` — Interaktions-Hints (Ctrl+Click-Modell)
-- Komponentenspezifische Labels
-
-#### Weitere Konventionen
-- `console.log` entfernen — nur strukturierte Callbacks (`onSegmentClick`, `onNodeClick` etc.)
-- `disabled?: boolean` — deaktiviert Interaktionen, reduziert Opacity (wie überall)
-- Storybook: pre-filled Demo-Daten aus `_demo-data/*.json`, alle wichtigen Features als dedizierte named Stories mit `parameters.docs.description.story`
-- Vitest: render-Test, prop-defaults, Callback-Test
-- User Manual EN + DE mit `✨ New in vX.X.X`-Callout
-- CHANGELOG EN + DE, README EN + DE, `component-features-nice-to-have.md` aktualisieren
+> **Quell-Projekt:** `/Users/thomasschlender/Development-PCF/skejlo-charts`  
+> Alle Charts: D3 v7 + React SVG + MUI-Theme-Integration.  
+> **Gemeinsame Konventionen aller D3-Charts:**
+> - `chartColors?: string[]` — eigene Palette; Fallback: MUI-Palette (primary → secondary → ...)
+> - `colorConfig?: { fill?, textColor?, stroke? }` **pro Daten-Knoten** — überschreibt Palette für diesen Knoten
+> - `zoomable?: boolean` — Ctrl / Cmd ⌘+Scroll visueller Zoom, Escape-Reset, overflow-Clipping
+> - `disabled?: boolean` — alle Interaktionen aus, Opacity 0.5
+> - `translation?: Partial<XxxTranslation>` — i18n wie überall in der Library
+> - MUI `<Tooltip followCursor>` — kein Browser-Delay, direkt am Mauszeiger
+> - Vollständige User Manuals EN + DE, CHANGELOG EN + DE, README EN + DE
 
 ---
 
-### ~~MTL-19 — SunburstChart~~ ✅ v2.2.0 — Branch bereit zum Merge
+### ~~MTL-19 — SunburstChart~~ ✅ v2.2.0
 
-> Quelle: `skejlo-charts/src/components/_charts/sunburst-chart/SunburstChart.tsx`  
-> Branch: `MTL-19` — noch nicht in main gemergt, noch nicht auf npm
-
-**Implementiert:**
-
-| Feature | Beschreibung |
-|---|---|
-| Hierarchische Daten | `SunburstChartData { id, name, value?, children? }` |
-| Konzentrische Ringe | Jede Ebene = ein Ring; Wurzel im Zentrum |
-| **Ctrl+Click Zoom-Modell** | Click → `onSegmentClick` sofort; Ctrl+Click → Zoom in; Ctrl+DblClick → Zoom out; Escape → Reset |
-| Donut-Modus | `innerRadius > 0` |
-| Label-Truncation | Arc-Breite berechnet, Ellipsis + MIN_LABEL_L=5 (zu kurze Labels werden ausgeblendet) |
-| MUI Tooltip | `followCursor`, `enterDelay=50ms` — erscheint direkt am Mauszeiger; zeigt Name, Wert, Breadcrumb |
-| MUI-Theme-Palette | Default-Farben aus `useTheme()` (primary → secondary → error → warning → success → info) |
-| Farbpalette | `chartColors?: string[]` Override |
-| `onSegmentClick` | `SunburstSegmentInfo`: `id`, `name`, `value`, `percentage`, `depth`, `path`, `pathIds`, `childrenCount`, `data` |
-| `onZoomChange` | `SunburstZoomInfo { focusNode, isRoot }` — feuert bei jedem Zoom-Wechsel |
-| Sortierung | `sortBy: 'value' \| 'name'` |
-| `disabled` | Interaktionen deaktiviert, Opacity 0.5 |
-| Stories | Default, DonutStyle, SortedByName, NoLabels, CustomPalette, Disabled |
-| Tests | 11 Vitest-Tests, alle grün |
-| Docs | User Manual EN+DE, CHANGELOG EN+DE, README EN+DE |
-
-| Status | ✅ v2.2.0 — Branch `MTL-19`, merge + npm publish ausstehend |
-|---|---|
-
----
-
-### SunburstChart — Feature-Ideen (nach v2.2.0)
-
-| Feature | Beschreibung | Aufwand |
-|---|---|---|
-| **Animierte Zoom-Übergänge** | D3 arc interpolation beim Drill-down — weiche Überblendung statt Sofortschnitt | Mittel |
-| **`onZoomChange` Callback** | Feuert beim Zoom-Wechsel mit `{ focusNode, isRoot }` — damit der Parent Breadcrumb außerhalb anzeigen oder Zoom-State persistieren kann | ✅ v2.2.0 |
-| **`focusId` controlled prop** | Parent kann den Zoom-Zustand von außen steuern — z.B. Breadcrumb-Click außerhalb des Charts navigiert hinein | Mittel |
-| **Hover-Highlight** | Fill-Opacity-Änderung beim Hover auf Segmente — visuelles Feedback bevor Click | Niedrig |
-| **"Sonstige"-Kollaps** | Sehr kleine Segmente (< X % des Gesamtwerts) werden zu einem "Other"-Segment zusammengefasst — `minPercentage?: number`-Prop | Mittel |
-| **Legende** | Optionale Farb-Legende unterhalb/seitlich des Charts — zeigt Top-Level-Segmente mit Farbe + Name + Wert | Mittel |
-| **Responsive Größe** | `size="auto"` passt sich dem Container an — statt fixer Pixelgröße | Mittel |
-| **Prozentanzeige in Labels** | Labels zeigen % statt Name — oder beides: `"Frontend 10.2%"` — `labelMode: 'name' | 'percent' | 'both'`-Prop | Niedrig |
-| **Export PNG/SVG** | Download-Button — Chart als Bild exportieren | Mittel |
-| **Multi-Ring Font-Sizes** | Tiefere Ringe → kleinere Schrift — `labelFontSizeByDepth?: number[]` | Niedrig |
-| **`id` in `SunburstSegmentInfo`** | Direkt zugängliche ID im Callback (kein `info.data.id`) + `pathIds` + `percentage` | ✅ v2.2.0 |
+**Features:** Konzentrische Ringe, Ctrl / Cmd ⌘+Click Drill-Down, Ctrl / Cmd ⌘+DblClick Zoom-Out, Ctrl / Cmd ⌘+Scroll visueller Zoom, Label-Truncation (MIN_LABEL_L), `onSegmentClick` mit `id`/`percentage`/`pathIds`, `onZoomChange`, `innerRadius` (Donut), `sortBy`, `colorConfig` pro Knoten.
 
 ---
 
 ### ~~MTL-20 — ChordChart~~ ✅ v2.3.0
 
+**Features:** Arc-Gruppen + Ribbon-Bänder, Hover-Highlight, `directed`/`undirected`, `onGroupClick`/`onChordClick` mit sauberen Infos, `groupColorConfigs` (Record<groupName, config>) für Gruppen-Farb-Override, Ctrl / Cmd ⌘+Scroll visueller Zoom.
+
 ---
 
 ### ~~MTL-21 — RadialTreeChart~~ ✅ v2.4.0
 
-Fluent UI vollständig durch MUI ersetzt. Features: farbige Bubble-Nodes, weißes Icon drin, `drillable` (Ctrl / Cmd ⌘+Click), `zoomable` (Ctrl / Cmd ⌘+Scroll), `onFocusChange`, `showNodePopover`, vollständig konfigurierbare Farben/Abstände/Labels.
+**Features:** Farbige Bubble-Nodes (Kreise mit weißem Icon), `drillable` (Ctrl / Cmd ⌘+Click Drill-Down / DblClick Zoom-Out), `zoomable` (Ctrl / Cmd ⌘+Scroll), Breadcrumb-Anzeige beim Drill-In, `onFocusChange`, `showNodePopover` (MUI Popover mit Avatar + Datenwerten), `colorConfig` pro Knoten, konfigurierbare Node-Radien/Farben/Abstände.
 
 ---
 
-### SunburstChart + RadialTreeChart — Feature-Ideen (nach v2.4.0)
+### ~~MTL-22 — CirclePackingChart~~ ✅ v2.5.0 — Branch MTL-22, merge ausstehend
 
-| Feature | Komponente | Beschreibung | Aufwand |
+**Features:**
+| Feature | Beschreibung | Status |
+|---|---|---|
+| D3 pack-Layout | Kreise proportional zur Größe, automatisch verschachtelt | ✅ |
+| Animierter Zoom | Ctrl / Cmd ⌘+Click → smooth `d3.interpolateZoom`-Transition; Ctrl / Cmd ⌘+DblClick → zurück | ✅ |
+| Visueller Zoom | `zoomable`: Ctrl / Cmd ⌘+Scroll → ViewBox-Skalierung, Escape-Reset | ✅ |
+| `showAllLabels` | Inner-Circle Labels — voller Text wenn passt, `…` bei overflow, ab r≥14px | ✅ |
+| Outer-Labels | Fett für Eltern-Kreise, normal für Blätter | ✅ |
+| `colorConfig` | Per-Knoten Farb-Override im Datenmodell | ✅ |
+| Farb-Modi | MUI-Palette (default), `chartColors` (Palette), `depthColorStart`+`depthColorEnd` (HCL-Gradient) | ✅ |
+| `onCircleClick` | `CirclePackingNodeInfo`: `id`, `name`, `value`, `percentage`, `depth`, `path`, `childrenCount` | ✅ |
+| `onZoomChange` | `CirclePackingZoomInfo`: `previousName`, `currentName`, `currentDepth`, `isRoot` | ✅ |
+| Storybook | Default, DeepHierarchy, CustomColors, GradientMode, WithColorConfig, WithAllLabels, Disabled | ✅ |
+
+---
+
+### D3 Charts — Feature-Ideen (nach v2.5.0, aus User-Sicht)
+
+| Feature | Komponenten | Beschreibung | Aufwand |
 |---|---|---|---|
-| **Animierte Drill-Down-Übergänge** | SunburstChart | D3 arc interpolation beim Ctrl+Click — weiche Überblendung statt Sofortschnitt | Mittel |
-| **Responsive Größe** | Alle D3 Charts | `size="auto"` passt sich dem Container an — statt fixer Pixelgröße | Mittel |
-| **Export PNG/SVG** | Alle D3 Charts | Download-Button im Chart — Browser-nativer SVG/Canvas-Export | Mittel |
-| **Legende** | SunburstChart, ChordChart | Optionale Farb-Legende — Top-Level-Segmente/Gruppen mit Farbe + Name | Niedrig |
-| **`focusId` controlled** | SunburstChart, RadialTreeChart | Parent kann Drill-Down-Zustand von außen steuern (URL-persistierbar) | Mittel |
-| **Collapsible Nodes** | RadialTreeChart | Klick auf Knoten klappt seinen Teilbaum zusammen/auf | Hoch |
-| **Suche/Highlight** | RadialTreeChart | Knoten nach Name suchen — gefundene Knoten hervorheben | Mittel |
-| **Prozentlabels** | SunburstChart | `labelMode: 'name' | 'percent' | 'both'` | Niedrig |
+| **Responsive `size`** | Alle 4 | `size="auto"` passt sich dem Container an — kein fixer Pixel-Wert | Mittel |
+| **Export PNG/SVG** | Alle 4 | Download-Button — Browser-nativer SVG/Canvas-Export | Mittel |
+| **Legende** | Sunburst, Chord | Farb-Legende mit Segment/Gruppen-Namen + Wert | Niedrig |
+| **`focusId` controlled** | Sunburst, RadialTree, CirclePacking | Parent steuert Drill-Down-Zustand (URL-persistierbar, Breadcrumb-Sync) | Mittel |
+| **Animierte Drill-Down-Übergänge** | SunburstChart | D3 arc interpolation beim Ctrl+Click — weiche Überblendung | Mittel |
+| **Prozentlabels** | SunburstChart | `labelMode: 'name' \| 'percent' \| 'both'` | Niedrig |
+| **Collapsible Nodes** | RadialTreeChart | Klick klappt Teilbaum zusammen/auf | Hoch |
+| **Suche / Highlight** | RadialTreeChart, CirclePacking | Knoten nach Name suchen — Treffer hervorheben | Mittel |
+| **"Sonstige"-Kollaps** | Sunburst, CirclePacking | Sehr kleine Segmente (< X%) → "Other"-Gruppe | Mittel |
+| **`colorConfig.gradient`** | Alle 4 | Pro-Knoten Gradient-Farben (Start → Ende) | Niedrig |
 
 ---
 
-### MTL-22 — ZoomableCirclePackingChart ⭐ Als nächstes
-
-> Quelle: `skejlo-charts/src/components/_charts/zoomable-circle-packing-chart/ZoomableCirclePackingChart.tsx`  
-> **Aufwand: Mittel** — kein Fluent UI; D3 pack-Layout mit animiertem Zoom via D3 interpolation (nicht ViewBox-Scale!)
-
-Hierarchische Daten als **ineinander geschachtelte Kreise** (Circle Packing). Das Besondere: Zoom per **Doppelklick** mit echter D3-Animation (smooth transition auf den geklickten Kreis), nicht nur ViewBox-Skalierung.
-
-**Geplante Features (aus Quellcode):**
-| Feature | Beschreibung |
-|---|---|
-| D3 Pack Layout | Kreise proportional zur Größe, automatisch verschachtelt |
-| Animierter Zoom | Doppelklick → smooth D3 interpolation zum geklickten Kreis; DblClick Background → zurück |
-| Tiefenbasierte Farben | Gradient (depthColorStart → depthColorEnd, HCL-Interpolation) **oder** Palette pro Tiefe via `chartColors` |
-| Labels | Fade-in/out beim Zoom, `showLabels`, `labelFontSize` |
-| `onCircleClick` | Sauberer Callback: `{ name, value, depth, path[], childrenCount, data }` |
-| `onZoom` | Callback mit `{ previous, current }` — für externe Breadcrumb-Anzeige |
-| Animationsdauer | `duration` in ms (Standard: 750) |
-| `disabled` | Alle Interaktionen deaktiviert |
-| `size` | Statt `width`/`height` — quadratischer SVG (einfachere API) |
-| MUI-Theme-Farben | Default-Gradient aus `theme.palette.primary/secondary` wenn kein `chartColors` |
-| MUI Tooltip followCursor | Wie alle anderen D3-Charts |
-
-**MUI-Anpassungen:**
-- `className` / `style` → MUI `Box` wrapper
-- `hierarchyNodeColors` → `chartColors` (konsistent mit anderen Charts)
-- `depthColorStart`/`depthColorEnd` → Default aus MUI-Theme-Palette (opt-in für eigene Gradienten)
-- `d3.HierarchyCircularNode` aus Callback-Typ entfernen → saubere serialisierte Typen
-
-| Status | Branch MTL-22 (noch nicht erstellt) |
-|---|---|
-
----
-
-### MTL-23 — TreemapChart
+### MTL-23 — TreemapChart ⭐ Als nächstes
 
 > Quelle: `skejlo-charts/src/components/_charts/treemap-chart/TreemapChart.tsx`  
 > **Aufwand: Niedrig** — kein Fluent UI, reines D3 + React SVG
 
 Hierarchische Daten als verschachtelte Rechtecke. Ideal für Proportionsvergleiche: Budgets, Speicherverbrauch, Marktanteile.
 
-| Status | — (nach MTL-22) |
-|---|---|
+Gleiche Konventionen wie alle D3-Charts: `chartColors`, `colorConfig`, `zoomable`, `disabled`, `translation`, MUI Tooltip.
+
+| Status | — (nach MTL-22 merge) |
 |---|---|
