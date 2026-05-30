@@ -305,58 +305,41 @@ export function RadialTreeChart({
               // Icon size = ~65% of circle diameter, fits nicely inside
               const iSize = Math.round(r * 1.3);
 
-              const parentPath = info.path.slice(0, -1);
               const tooltipContent = (
-                <Box sx={{ py: 0.5, minWidth: 180 }}>
-                  {/* Header: role + person */}
+                <Box sx={{ py: 0.5, minWidth: 160 }}>
+                  {/* Role */}
                   <Typography variant="caption" sx={{ fontWeight: "bold", display: "block", fontSize: "0.8rem" }}>
                     {node.data.name}
                   </Typography>
+                  {/* Person name */}
                   {node.data.subname && (
                     <Typography variant="caption" sx={{ display: "block", opacity: 0.85 }}>
                       {node.data.subname}
                     </Typography>
                   )}
 
-                  {/* Special values — shown as labeled rows */}
-                  {(info.specialValueA != null || info.specialValueB != null) && (
+                  {/* Custom data fields + reports count */}
+                  {(info.specialValueA != null || info.specialValueB != null || node.children) && (
                     <Box sx={{ mt: 0.75, borderTop: "1px solid rgba(255,255,255,0.2)", pt: 0.75 }}>
                       {info.specialValueA != null && (
-                        <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1.5 }}>
-                          <Typography variant="caption" sx={{ opacity: 0.6 }}>
-                            {t.specialValueA ?? "A"}
-                          </Typography>
-                          <Typography variant="caption" sx={{ opacity: 0.9 }}>
-                            {String(info.specialValueA)}
-                          </Typography>
+                        <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
+                          <Typography variant="caption" sx={{ opacity: 0.6 }}>{t.specialValueA ?? "A"}</Typography>
+                          <Typography variant="caption">{String(info.specialValueA)}</Typography>
                         </Box>
                       )}
                       {info.specialValueB != null && (
-                        <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1.5 }}>
-                          <Typography variant="caption" sx={{ opacity: 0.6 }}>
-                            {t.specialValueB ?? "B"}
-                          </Typography>
-                          <Typography variant="caption" sx={{ opacity: 0.9 }}>
-                            {String(info.specialValueB)}
-                          </Typography>
+                        <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
+                          <Typography variant="caption" sx={{ opacity: 0.6 }}>{t.specialValueB ?? "B"}</Typography>
+                          <Typography variant="caption">{String(info.specialValueB)}</Typography>
                         </Box>
                       )}
                       {node.children && (
-                        <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1.5 }}>
+                        <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
                           <Typography variant="caption" sx={{ opacity: 0.6 }}>Reports</Typography>
-                          <Typography variant="caption" sx={{ opacity: 0.9 }}>
-                            {node.children.length}
-                          </Typography>
+                          <Typography variant="caption">{node.children.length}</Typography>
                         </Box>
                       )}
                     </Box>
-                  )}
-
-                  {/* Hierarchy breadcrumb */}
-                  {parentPath.length > 0 && (
-                    <Typography variant="caption" sx={{ display: "block", opacity: 0.5, mt: 0.75, borderTop: "1px solid rgba(255,255,255,0.15)", pt: 0.5 }}>
-                      {parentPath.join(" › ")}
-                    </Typography>
                   )}
                 </Box>
               );
