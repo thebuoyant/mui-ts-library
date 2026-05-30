@@ -22,6 +22,7 @@ const meta: Meta<typeof RadialTreeChart> = {
     labelColor:        { control: "color" },
     separationSibling: { control: "number" },
     separationCousin:  { control: "number" },
+    zoomable:          { control: "boolean" },
     showNodePopover:   { control: "boolean" },
     disabled:          { control: "boolean" },
     chartColors:              { control: false },
@@ -44,6 +45,7 @@ const meta: Meta<typeof RadialTreeChart> = {
     labelFontSize:     12,
     separationSibling: 1,
     separationCousin:  2,
+    zoomable:          false,
     showNodePopover:   false,
     disabled:          false,
     onNodeClick:       fn(),
@@ -298,19 +300,20 @@ export const DeepTree: Story = {
     docs: {
       description: {
         story:
-          '**Stress test with 5 depth levels and ~65 nodes.** ' +
+          '**Stress test: 5 depth levels, ~65 nodes, `zoomable` enabled.** ' +
           'Technology skill taxonomy: Company → Domain → Category → Skill → Subskill. ' +
-          'Shows how `autoFit`, label truncation, node spacing, and color cycling behave with many nodes. ' +
-          'Try toggling `showLabels` and adjusting `separationCousin` in the Controls panel.',
+          '`Ctrl+Scroll` to zoom in/out — ideal when labels overlap at the default zoom level. ' +
+          '`Escape` resets zoom. Try toggling `showLabels` and adjusting `separationCousin` in Controls.',
       },
     },
   },
   args: {
-    data:           DEEP_TREE_DATA,
-    size:           750,
-    autoFit:        true,
-    showLabels:     true,
-    labelFontSize:  10,
+    data:             DEEP_TREE_DATA,
+    size:             750,
+    autoFit:          true,
+    zoomable:         true,
+    showLabels:       true,
+    labelFontSize:    10,
     branchNodeRadius: 13,
     leafNodeRadius:   8,
     separationCousin: 2.5,

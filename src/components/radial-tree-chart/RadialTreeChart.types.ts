@@ -85,6 +85,8 @@ export type RadialTreeChartProps = {
   renderNodePopoverContent?: (info: RadialTreeNodeInfo) => React.ReactNode;
   /** Fired on every node click */
   onNodeClick?:              (info: RadialTreeNodeInfo, event: React.MouseEvent<SVGGElement>) => void;
+  /** Enable Ctrl+Scroll zoom — Ctrl+Wheel zooms in/out, Escape resets (default: false) */
+  zoomable?:                 boolean;
   /** Disables all interactions (default: false) */
   disabled?:                 boolean;
   /** Override translation strings */
