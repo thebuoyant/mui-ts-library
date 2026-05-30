@@ -5,6 +5,46 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 
 ---
 
+## 🚀 Nächste Aktion: Live-Storybook auf GitHub Pages
+
+**Ziel:** Jeder User kann die Komponenten online ausprobieren — ohne Installation, direkt im Browser.  
+**URL (nach Setup):** `https://thebuoyant.github.io/mui-ts-library/`  
+**Ansatz:** `peaceiris/actions-gh-pages@v4` — baut Storybook und pusht auf `gh-pages` Branch
+
+### Warum dieser Ansatz (und nicht der alte)?
+
+Der erste Versuch scheiterte an `actions/deploy-pages@v4` (OIDC 404-Fehler, GitHub-seitige Provisioning-Probleme).  
+`peaceiris/actions-gh-pages@v4` umgeht das komplett: baut Storybook → pusht HTML/JS in `gh-pages` Branch → GitHub Pages served daraus. Kein OIDC, kein Environment-Problem.
+
+### Setup-Schritte (einmalig, ~5 Minuten)
+
+**Schritt 1 — Workflow-Datei anlegen** *(Claude erledigt das)*  
+Datei: `.github/workflows/deploy-storybook.yml`  
+Trigger: jeder Push auf `main`  
+Action: `peaceiris/actions-gh-pages@v4` mit `publish_dir: ./storybook-static`
+
+**Schritt 2 — GitHub Repository Settings** *(du, 3 Klicks)*  
+`github.com/thebuoyant/mui-ts-library/settings/pages`  
+→ **Source:** "Deploy from a branch"  
+→ **Branch:** `gh-pages`  
+→ **Folder:** `/ (root)`  
+→ **Save**
+
+**Schritt 3 — Ersten Push machen** *(Claude)*  
+Commit + Push auf `main` → Workflow läuft → `gh-pages` Branch wird angelegt → Pages aktiv
+
+**Schritt 4 — URL in README + npm eintragen** *(Claude)*  
+`https://thebuoyant.github.io/mui-ts-library/` in README.md ergänzen
+
+### Wichtig: npm publish v2.5.0 vorher!
+Bevor das Storybook live geht, sollte v2.5.0 auf npm published sein.  
+`npm login` → `npm publish --access public`
+
+| Status | ⏳ Nächste Session — Implementierung ausstehend |
+|---|---|
+
+---
+
 ## GanttChart
 
 | Feature | Beschreibung | Aufwand | Status |
