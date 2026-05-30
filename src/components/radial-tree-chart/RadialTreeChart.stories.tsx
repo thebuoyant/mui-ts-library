@@ -164,6 +164,69 @@ export const NoLabels: Story = {
   args: { data: ORG_DATA, showLabels: false },
 };
 
+export const WithColorConfig: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`colorConfig` in the data — each node can define its own `fill` color. ' +
+          'Here, each C-level uses a distinct brand color for their subtree. ' +
+          'Nodes without `colorConfig` fall back to the depth-based palette.',
+      },
+    },
+  },
+  args: {
+    data: {
+      id: "ceo", name: "CEO", subname: "Thomas Müller",
+      specialValueA: "Since 2019", specialValueB: "15 direct reports",
+      colorConfig: { fill: "#1A237E" },   // deep navy for root
+      children: [
+        {
+          id: "cto", name: "CTO", subname: "Anna Schmidt",
+          specialValueA: "Since 2021", specialValueB: "Technology",
+          colorConfig: { fill: "#1565C0" },  // blue for tech
+          children: [
+            { id: "fe",     name: "Frontend Lead",  subname: "Marc Weber",    specialValueA: "Since 2022", specialValueB: "8 engineers",   colorConfig: { fill: "#1976D2" } },
+            { id: "be",     name: "Backend Lead",   subname: "Julia Fischer", specialValueA: "Since 2021", specialValueB: "6 engineers",   colorConfig: { fill: "#0D47A1" } },
+            { id: "devops", name: "DevOps Lead",    subname: "Tim Bauer",     specialValueA: "Since 2023", specialValueB: "4 engineers",   colorConfig: { fill: "#42A5F5" } },
+            { id: "qa",     name: "QA Lead",        subname: "Sara Klein",    specialValueA: "Since 2022", specialValueB: "3 engineers",   colorConfig: { fill: "#90CAF9" } },
+          ],
+        },
+        {
+          id: "cpo", name: "CPO", subname: "Laura Hoffmann",
+          specialValueA: "Since 2020", specialValueB: "Product",
+          colorConfig: { fill: "#6A1B9A" },  // purple for product
+          children: [
+            { id: "ux",  name: "UX Lead",         subname: "Nina Schulz",  specialValueA: "Since 2022", specialValueB: "5 designers", colorConfig: { fill: "#7B1FA2" } },
+            { id: "pm1", name: "Product Manager", subname: "Ben Richter",  specialValueA: "Since 2021", specialValueB: "Core",        colorConfig: { fill: "#AB47BC" } },
+            { id: "pm2", name: "Product Analyst", subname: "Eva Wolf",     specialValueA: "Since 2023", specialValueB: "Insights",    colorConfig: { fill: "#CE93D8" } },
+          ],
+        },
+        {
+          id: "cmo", name: "CMO", subname: "Max Braun",
+          specialValueA: "Since 2022", specialValueB: "Marketing",
+          colorConfig: { fill: "#00695C" },  // teal for marketing
+          children: [
+            { id: "content", name: "Content Lead", subname: "Lea Koch",  specialValueA: "Since 2023", specialValueB: "3 writers",   colorConfig: { fill: "#00796B" } },
+            { id: "growth",  name: "Growth Lead",  subname: "Jan Meyer", specialValueA: "Since 2022", specialValueB: "Acquisition", colorConfig: { fill: "#26A69A" } },
+          ],
+        },
+        {
+          id: "cfo", name: "CFO", subname: "Klaus Wagner",
+          specialValueA: "Since 2020", specialValueB: "Finance",
+          // no colorConfig → uses default palette
+          children: [
+            { id: "controller", name: "Controller",  subname: "Petra Fuchs", specialValueA: "Since 2021", specialValueB: "Accounting" },
+            { id: "fp-and-a",   name: "FP&A Lead",   subname: "Hans Keller", specialValueA: "Since 2022", specialValueB: "Planning" },
+          ],
+        },
+      ],
+    },
+    translation: { specialValueA: "In Role Since", specialValueB: "Department" },
+    showNodePopover: true,
+  },
+};
+
 export const Disabled: Story = {
   parameters: {
     docs: {

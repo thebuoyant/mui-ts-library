@@ -208,6 +208,25 @@ function MyChart({ data }) {
 }
 ```
 
+### Farb-Override pro Gruppe — `groupColorConfigs`
+
+```tsx
+<ChordChart
+  data={data}
+  groupColorConfigs={{
+    "Engineering": { fill: "#1565C0" },
+    "Sales":       { fill: "#6A1B9A" },
+    // Gruppen ohne Eintrag → chartColors oder MUI-Palette
+  }}
+/>
+```
+
+| Feld | Beschreibung |
+|---|---|
+| `fill` | Arc- und Band-Füllfarbe |
+| `textColor` | Label-Textfarbe |
+| `stroke` | Arc-Rahmenfarbe |
+
 ### Band-Opacity und Blend-Mode
 
 `ribbonOpacity` (Standard `0.75`) und `ribbonBlendMode` (Standard `'multiply'`) steuern das visuelle Erscheinen der Bänder. Auf weißem Hintergrund erzeugt `'multiply'` natürliche Überlagerungen — auf dunklem Hintergrund empfiehlt sich `'screen'` oder `'normal'`.

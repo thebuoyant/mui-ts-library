@@ -252,6 +252,38 @@ function MyChart({ data }) {
 
 Colors are assigned to **top-level segments** (depth 1). All child segments of the same parent automatically receive a lighter tint of the parent's color (via fill-opacity 0.5 vs 0.75).
 
+### Per-node color override — `colorConfig`
+
+Any node in the data can define its own color, overriding the chart-level palette:
+
+```tsx
+const data: SunburstChartData = {
+  id: "company", name: "Company",
+  children: [
+    {
+      id: "engineering", name: "Engineering",
+      colorConfig: { fill: "#1565C0" },   // brand blue — overrides palette
+      children: [
+        { id: "fe", name: "Frontend", value: 480, colorConfig: { fill: "#1976D2" } },
+        { id: "be", name: "Backend",  value: 620, colorConfig: { fill: "#0D47A1" } },
+      ],
+    },
+    {
+      id: "sales", name: "Sales",
+      // no colorConfig → falls back to chart palette
+      children: [/* ... */],
+    },
+  ],
+};
+```
+
+`colorConfig` fields:
+| Field | Description |
+|---|---|
+| `fill` | Segment fill / background color |
+| `textColor` | Label text color (future use) |
+| `stroke` | Segment border color |
+
 ---
 
 ## Segment Click Callback

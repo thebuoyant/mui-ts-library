@@ -208,6 +208,28 @@ function MyChart({ data }) {
 }
 ```
 
+### Per-group color override — `groupColorConfigs`
+
+For ChordChart, color overrides are specified as a `Record` keyed by group name (since the data model uses links, not explicit group nodes):
+
+```tsx
+<ChordChart
+  data={data}
+  groupColorConfigs={{
+    "Engineering": { fill: "#1565C0" },   // brand blue
+    "Sales":       { fill: "#6A1B9A" },   // brand purple
+    "DevOps":      { fill: "#00695C" },   // brand teal
+    // groups without an entry → use chartColors or MUI palette
+  }}
+/>
+```
+
+| Field | Description |
+|---|---|
+| `fill` | Arc and ribbon fill color |
+| `textColor` | Label text color |
+| `stroke` | Arc border color |
+
 ### Ribbon opacity and blend mode
 
 Ribbon appearance can be further tuned with `ribbonOpacity` (default `0.75`) and `ribbonBlendMode` (default `'multiply'`). On white backgrounds `'multiply'` creates natural color overlap — on dark backgrounds try `'screen'` or `'normal'`.

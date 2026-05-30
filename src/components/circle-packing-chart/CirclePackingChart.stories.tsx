@@ -230,6 +230,80 @@ export const GradientMode: Story = {
   },
 };
 
+// ── colorConfig demo data ─────────────────────────────────────────────────────
+
+const COLOR_CONFIG_BUDGET: CirclePackingData = {
+  id: "company", name: "Company",
+  children: [
+    {
+      id: "engineering", name: "Engineering",
+      colorConfig: { fill: "#1565C0" },
+      children: [
+        { id: "fe",     name: "Frontend",  value: 480, colorConfig: { fill: "#1976D2" } },
+        { id: "be",     name: "Backend",   value: 620, colorConfig: { fill: "#0D47A1" } },
+        { id: "devops", name: "DevOps",    value: 210, colorConfig: { fill: "#42A5F5" } },
+        { id: "mobile", name: "Mobile",    value: 340, colorConfig: { fill: "#90CAF9" } },
+      ],
+    },
+    {
+      id: "sales", name: "Sales",
+      colorConfig: { fill: "#6A1B9A" },
+      children: [
+        { id: "emea",    name: "EMEA",    value: 540, colorConfig: { fill: "#7B1FA2" } },
+        { id: "amer",    name: "Americas",value: 490, colorConfig: { fill: "#AB47BC" } },
+        { id: "apac",    name: "APAC",    value: 220, colorConfig: { fill: "#CE93D8" } },
+        { id: "partner", name: "Partners",value: 180, colorConfig: { fill: "#E1BEE7" } },
+      ],
+    },
+    {
+      id: "product", name: "Product",
+      colorConfig: { fill: "#00695C" },
+      children: [
+        { id: "design",   name: "Design",   value: 290, colorConfig: { fill: "#00796B" } },
+        { id: "research", name: "Research", value: 200, colorConfig: { fill: "#26A69A" } },
+        { id: "strategy", name: "Strategy", value: 150, colorConfig: { fill: "#80CBC4" } },
+      ],
+    },
+    {
+      id: "ops", name: "Operations",
+      // no colorConfig — uses default MUI palette
+      children: [
+        { id: "hr",      name: "HR",      value: 180 },
+        { id: "finance", name: "Finance", value: 240 },
+        { id: "legal",   name: "Legal",   value: 130 },
+        { id: "it",      name: "IT",      value: 160 },
+      ],
+    },
+    {
+      id: "marketing", name: "Marketing",
+      colorConfig: { fill: "#E65100" },
+      children: [
+        { id: "content", name: "Content", value: 180, colorConfig: { fill: "#EF6C00" } },
+        { id: "seo",     name: "SEO",     value: 120, colorConfig: { fill: "#FB8C00" } },
+        { id: "ads",     name: "Ads",     value: 310, colorConfig: { fill: "#FFA726" } },
+      ],
+    },
+  ],
+};
+
+export const WithColorConfig: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`colorConfig: { fill }` per node in the data — each department and its sub-items use brand colors. ' +
+          '"Operations" has no `colorConfig` and falls back to the default MUI palette. ' +
+          'This works alongside `showAllLabels` to show a richly colored hierarchy.',
+      },
+    },
+  },
+  args: {
+    data:          COLOR_CONFIG_BUDGET,
+    showAllLabels: true,
+    size:          620,
+  },
+};
+
 export const WithAllLabels: Story = {
   parameters: {
     docs: {

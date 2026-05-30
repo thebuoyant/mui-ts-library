@@ -175,6 +175,65 @@ export const Disabled: Story = {
   args: { data: BUDGET_DATA, disabled: true },
 };
 
+// ── colorConfig demo data — per-segment brand colors ─────────────────────────
+
+const COLOR_CONFIG_DATA: SunburstChartData = {
+  id: "company", name: "Company",
+  children: [
+    {
+      id: "engineering", name: "Engineering",
+      colorConfig: { fill: "#1565C0" },   // brand blue
+      children: [
+        { id: "fe",     name: "Frontend",  value: 480, colorConfig: { fill: "#1976D2" } },
+        { id: "be",     name: "Backend",   value: 620, colorConfig: { fill: "#0D47A1" } },
+        { id: "devops", name: "DevOps",    value: 210, colorConfig: { fill: "#42A5F5" } },
+        { id: "qa",     name: "QA",        value: 190, colorConfig: { fill: "#90CAF9" } },
+      ],
+    },
+    {
+      id: "sales", name: "Sales",
+      colorConfig: { fill: "#6A1B9A" },   // brand purple
+      children: [
+        { id: "emea",     name: "EMEA",     value: 540, colorConfig: { fill: "#7B1FA2" } },
+        { id: "americas", name: "Americas", value: 490, colorConfig: { fill: "#AB47BC" } },
+        { id: "apac",     name: "APAC",     value: 220, colorConfig: { fill: "#CE93D8" } },
+      ],
+    },
+    {
+      id: "product", name: "Product",
+      colorConfig: { fill: "#00695C" },   // brand teal
+      children: [
+        { id: "design",   name: "Design",   value: 290, colorConfig: { fill: "#00796B" } },
+        { id: "research", name: "Research", value: 200, colorConfig: { fill: "#26A69A" } },
+        { id: "strategy", name: "Strategy", value: 150 },  // no colorConfig → uses default
+      ],
+    },
+    {
+      id: "ops", name: "Operations",
+      // no colorConfig → uses chart default palette
+      children: [
+        { id: "hr",      name: "HR",      value: 180 },
+        { id: "finance", name: "Finance", value: 240 },
+        { id: "legal",   name: "Legal",   value: 130 },
+      ],
+    },
+  ],
+};
+
+export const WithColorConfig: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`colorConfig` in the data — each node can override its fill color independently. ' +
+          'Engineering (blues), Sales (purples), Product (teals) use brand colors via `colorConfig: { fill }`. ' +
+          'Operations has no `colorConfig` and falls back to the default MUI palette.',
+      },
+    },
+  },
+  args: { data: COLOR_CONFIG_DATA },
+};
+
 // ── Deep hierarchy dataset (5 levels) ───────────────────────────────────────
 
 const DEEP_DATA: SunburstChartData = {

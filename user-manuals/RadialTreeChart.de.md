@@ -164,6 +164,31 @@ function MyChart({ data }) {
 }
 ```
 
+### Farb-Override pro Knoten — `colorConfig`
+
+```tsx
+const data: RadialTreeChartData = {
+  id: "ceo", name: "CEO",
+  colorConfig: { fill: "#1A237E" },
+  children: [
+    {
+      id: "cto", name: "CTO",
+      colorConfig: { fill: "#1565C0" },
+      children: [
+        { id: "fe", name: "Frontend Lead", colorConfig: { fill: "#42A5F5" } },
+      ],
+    },
+    { id: "cfo", name: "CFO" }, // kein colorConfig → Tiefen-Palette
+  ],
+};
+```
+
+| Feld | Beschreibung |
+|---|---|
+| `fill` | Knoten-Kreisfarbe |
+| `textColor` | Label-Textfarbe (zukünftige Verwendung) |
+| `stroke` | Knoten-Rahmenfarbe |
+
 ### Link- und Label-Farben
 
 Link-Linien und Text-Labels können unabhängig angepasst werden:

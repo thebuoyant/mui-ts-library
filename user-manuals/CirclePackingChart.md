@@ -193,6 +193,40 @@ function MyChart({ data }) {
 
 ---
 
+## Per-node color override — `colorConfig`
+
+Any node can define its own fill color directly in the data, overriding the chart-level palette or gradient:
+
+```tsx
+const data: CirclePackingData = {
+  id: "company", name: "Company",
+  children: [
+    {
+      id: "engineering", name: "Engineering",
+      colorConfig: { fill: "#1565C0" },        // brand blue
+      children: [
+        { id: "fe", name: "Frontend",  value: 480, colorConfig: { fill: "#1976D2" } },
+        { id: "be", name: "Backend",   value: 620, colorConfig: { fill: "#0D47A1" } },
+      ],
+    },
+    {
+      id: "ops", name: "Operations",
+      // no colorConfig → uses default MUI palette
+      children: [/* ... */],
+    },
+  ],
+};
+```
+
+`colorConfig` fields:
+| Field | Description |
+|---|---|
+| `fill` | Circle fill / background color |
+| `textColor` | Label text color (future use) |
+| `stroke` | Circle border color |
+
+This is consistent with `SunburstChart`, `RadialTreeChart`, and `ChordChart` — all D3 charts support per-node color overrides.
+
 ## Callbacks
 
 ```tsx

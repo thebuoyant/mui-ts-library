@@ -165,6 +165,37 @@ function MyChart({ data }) {
 }
 ```
 
+### Per-node color override — `colorConfig`
+
+Any node in the data can define its own fill color, overriding the depth-based palette:
+
+```tsx
+const data: RadialTreeChartData = {
+  id: "ceo", name: "CEO",
+  colorConfig: { fill: "#1A237E" },          // deep navy for root
+  children: [
+    {
+      id: "cto", name: "CTO",
+      colorConfig: { fill: "#1565C0" },       // blue for tech subtree
+      children: [
+        { id: "fe", name: "Frontend Lead", colorConfig: { fill: "#42A5F5" } },
+        { id: "be", name: "Backend Lead",  colorConfig: { fill: "#0D47A1" } },
+      ],
+    },
+    {
+      id: "cfo", name: "CFO",
+      // no colorConfig → uses depth-based palette
+    },
+  ],
+};
+```
+
+| Field | Description |
+|---|---|
+| `fill` | Node circle fill color |
+| `textColor` | Label text color (future use) |
+| `stroke` | Node circle border color |
+
 ### Link and label colors
 
 The link lines and text labels can also be customized independently:

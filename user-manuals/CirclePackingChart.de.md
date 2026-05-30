@@ -162,6 +162,28 @@ function MyChart({ data }) {
 
 ---
 
+## Farb-Override pro Knoten — `colorConfig`
+
+Jeder Knoten kann direkt in den Daten seine eigene Farbe definieren:
+
+```tsx
+const data: CirclePackingData = {
+  id: "company", name: "Unternehmen",
+  children: [
+    {
+      id: "engineering", name: "Engineering",
+      colorConfig: { fill: "#1565C0" },
+      children: [
+        { id: "fe", name: "Frontend", value: 480, colorConfig: { fill: "#1976D2" } },
+      ],
+    },
+    { id: "ops", name: "Operations" }, // kein colorConfig → Standard-Palette
+  ],
+};
+```
+
+Konsistent mit `SunburstChart`, `RadialTreeChart` und `ChordChart` — alle D3-Charts unterstützen Per-Knoten-Farb-Overrides.
+
 ## D3-Charts-Roadmap
 
 | Komponente | Beschreibung | Status |
