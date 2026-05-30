@@ -87,6 +87,10 @@ export type RadialTreeChartProps = {
   onNodeClick?:              (info: RadialTreeNodeInfo, event: React.MouseEvent<SVGGElement>) => void;
   /** Enable Ctrl+Scroll zoom — Ctrl+Wheel zooms in/out, Escape resets (default: false) */
   zoomable?:                 boolean;
+  /** Enable Ctrl+Click drill-down into subtrees, Ctrl+DblClick zoom out (default: false) */
+  drillable?:                boolean;
+  /** Fired when drill-down focus changes — null when reset to root */
+  onFocusChange?:            (focusedNode: RadialTreeNodeInfo | null) => void;
   /** Disables all interactions (default: false) */
   disabled?:                 boolean;
   /** Override translation strings */

@@ -23,6 +23,7 @@ const meta: Meta<typeof RadialTreeChart> = {
     separationSibling: { control: "number" },
     separationCousin:  { control: "number" },
     zoomable:          { control: "boolean" },
+    drillable:         { control: "boolean" },
     showNodePopover:   { control: "boolean" },
     disabled:          { control: "boolean" },
     chartColors:              { control: false },
@@ -46,6 +47,7 @@ const meta: Meta<typeof RadialTreeChart> = {
     separationSibling: 1,
     separationCousin:  2,
     zoomable:          false,
+    drillable:         false,
     showNodePopover:   false,
     disabled:          false,
     onNodeClick:       fn(),
@@ -300,10 +302,11 @@ export const DeepTree: Story = {
     docs: {
       description: {
         story:
-          '**Stress test: 5 depth levels, ~65 nodes, `zoomable` enabled.** ' +
-          'Technology skill taxonomy: Company → Domain → Category → Skill → Subskill. ' +
-          '`Ctrl+Scroll` to zoom in/out — ideal when labels overlap at the default zoom level. ' +
-          '`Escape` resets zoom. Try toggling `showLabels` and adjusting `separationCousin` in Controls.',
+          '**Stress test: 5 depth levels, ~65 nodes — both `drillable` and `zoomable` enabled.** ' +
+          '`Ctrl+Click` on any branch node → drill down into that subtree. ' +
+          '`Ctrl+Double-click` → zoom out one level. ' +
+          '`Ctrl+Scroll` → visual zoom (content clipped at SVG boundary). ' +
+          '`Escape` resets everything. Breadcrumb shown at top when drilled in.',
       },
     },
   },
@@ -312,6 +315,7 @@ export const DeepTree: Story = {
     size:             750,
     autoFit:          true,
     zoomable:         true,
+    drillable:        true,
     showLabels:       true,
     labelFontSize:    10,
     branchNodeRadius: 13,

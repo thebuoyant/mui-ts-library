@@ -111,6 +111,8 @@ export function RadialTreeChart({
   separationSibling = 1,
   separationCousin = 2,
   zoomable = false,
+  drillable = false,
+  onFocusChange,
   showNodePopover = false,
   renderNodePopoverContent,
   onNodeClick,
@@ -147,12 +149,20 @@ export function RadialTreeChart({
     [palette],
   );
 
+  // ── Drill-down focus stack ────────────────────────────────────────────────
+  const [focusStack, setFocusStack] = useState<RadialTreeChartData[]>([data]);
+  const focusData = focusStack[focusStack.length - 1];
+
+  // Reset stack when root data changes
+  const [prevData, setPrevData] = useState(data);
+  if (prevData !== data) { setPrevData(data); setFocusStack([data]); }
+
   const margin = 70;
   const radius = Math.max(1, size / 2 - margin);
 
-  // ── D3 hierarchy + radial tree layout ─────────────────────────────────────
+  // ── D3 hierarchy + radial tree layout — built from focusData ─────────────
   const root = useMemo(() => {
-    const h = d3.hierarchy<RadialTreeChartData>(data);
+    const h = d3.hierarchy<RadialTreeChartData>(focusData);
     if (sortBy === "value") {
       h.sum((d) => d.value ?? 0);
       h.sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
@@ -166,7 +176,7 @@ export function RadialTreeChart({
         const base = a.parent === b.parent ? separationSibling : separationCousin;
         return (base * 1.4) / Math.max(1, a.depth);
       })(h);
-  }, [data, sortBy, radius, separationSibling, separationCousin]);
+  }, [focusData, sortBy, radius, separationSibling, separationCousin]);
 
   const links = root.links();
   const nodes = root.descendants();
@@ -237,15 +247,28 @@ export function RadialTreeChart({
     [zoomable, disabled],
   );
 
-  // Escape resets zoom
+  // Escape resets zoom + drill-down
   useLayoutEffect(() => {
-    if (!zoomable) return;
+    if (!zoomable && !drillable) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setZoomScale(1);
+      if (e.key === "Escape") {
+        if (zoomable) setZoomScale(1);
+        if (drillable) { setFocusStack([data]); onFocusChange?.(null); }
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [zoomable]);
+  }, [zoomable, drillable, data, onFocusChange]);
+
+  // ── Drill-Down: 250ms timer disambiguates Ctrl+Click vs Ctrl+DblClick ────
+  const drillTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const scheduleDrill = (fn: () => void) => {
+    if (drillTimerRef.current) { clearTimeout(drillTimerRef.current); drillTimerRef.current = null; }
+    drillTimerRef.current = setTimeout(() => { fn(); drillTimerRef.current = null; }, 250);
+  };
+  const cancelDrill = () => {
+    if (drillTimerRef.current) { clearTimeout(drillTimerRef.current); drillTimerRef.current = null; }
+  };
 
   // ── Hover state for subtle visual feedback ──────────────────────────────────
   const [hoverIdx, setHoverIdx] = useState<number | null>(null);
@@ -258,12 +281,37 @@ export function RadialTreeChart({
   const [popoverAnchorPos, setPopoverAnchorPos] = useState({ left: 0, top: 0 });
   const [activeInfo,      setActiveInfo]      = useState<RadialTreeNodeInfo | null>(null);
 
+  const drillOut = useCallback(() => {
+    setFocusStack((prev) => {
+      if (prev.length <= 1) return prev;
+      const next = prev.slice(0, -1);
+      onFocusChange?.(next.length <= 1 ? null : { id: next[next.length - 1].id, name: next[next.length - 1].name, subname: next[next.length - 1].subname ?? null, value: null, specialValueA: null, specialValueB: null, depth: next.length - 1, path: next.map((n) => n.name), childrenCount: next[next.length - 1].children?.length ?? 0, data: next[next.length - 1] });
+      return next;
+    });
+  }, [onFocusChange]);
+
+  const handleNodeDblClick: React.MouseEventHandler<SVGGElement> = (e) => {
+    if (disabled || !drillable) return;
+    if (e.ctrlKey || e.metaKey) { cancelDrill(); drillOut(); }
+  };
+
   const handleNodeClick: React.MouseEventHandler<SVGGElement> = (e) => {
     if (disabled) return;
     const idx  = Number(e.currentTarget.getAttribute("data-idx"));
     const node = nodes[idx];
     if (!node) return;
     const info = serializeNode(node);
+
+    // Ctrl+Click: drill-down into subtree
+    if ((e.ctrlKey || e.metaKey) && drillable && node.children) {
+      scheduleDrill(() => {
+        setFocusStack((prev) => [...prev, node.data]);
+        onFocusChange?.(info);
+      });
+      return;
+    }
+
+    // Regular click: popover + callback
     if (showNodePopover) {
       const rect = containerRef.current?.getBoundingClientRect();
       setPopoverAnchorPos({
@@ -293,6 +341,37 @@ export function RadialTreeChart({
         userSelect: "none",
       }}
     >
+      {/* Drill-down breadcrumb — shown when not at root */}
+      {drillable && focusStack.length > 1 && (
+        <Box
+          sx={{
+            position: "absolute",
+            top: 4,
+            left: 0,
+            right: 0,
+            display: "flex",
+            justifyContent: "center",
+            gap: 0.5,
+            pointerEvents: "none",
+            zIndex: 1,
+          }}
+        >
+          <Typography
+            variant="caption"
+            sx={{
+              bgcolor: "action.hover",
+              borderRadius: 1,
+              px: 1,
+              py: 0.25,
+              color: "text.secondary",
+              fontSize: "0.7rem",
+            }}
+          >
+            {focusStack.map((n) => n.name).join(" › ")}
+          </Typography>
+        </Box>
+      )}
+
       <Box
         ref={anchorRef}
         sx={{
@@ -395,6 +474,7 @@ export function RadialTreeChart({
                     data-idx={i}
                     transform={`rotate(${(node.x * 180) / Math.PI - 90}) translate(${node.y},0)`}
                     onClick={handleNodeClick}
+                    onDoubleClick={handleNodeDblClick}
                     onMouseEnter={() => !disabled && setHoverIdx(i)}
                     onMouseLeave={() => setHoverIdx(null)}
                     style={{ cursor: disabled ? "not-allowed" : "pointer" }}
