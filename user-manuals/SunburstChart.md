@@ -18,7 +18,11 @@ The `SunburstChart` visualizes **hierarchical data as concentric rings** — the
 
 | ✨ New in v2.2.0 | |
 |---|---|
-| **SunburstChart** | First D3 chart — Ctrl+Click zoom, donut mode, MUI theme palette |
+| **SunburstChart** | First D3 chart — Ctrl / Cmd ⌘+Click drill-down zoom, donut mode, MUI theme palette |
+| **`zoomable`** *(v2.4.0)* | `Ctrl / Cmd ⌘ + Scroll` visual zoom — content clipped at `size` boundary |
+
+> **macOS keyboard shortcuts:** Use `Cmd ⌘` instead of `Ctrl` — e.g. `Cmd ⌘+Click`, `Cmd ⌘+Scroll`.  
+> All interactions check `ctrlKey || metaKey`, so both keys work on every platform.
 
 ---
 
@@ -104,7 +108,8 @@ function App() {
 | `chartColors` | `string[]` | MUI palette | Custom top-level color palette |
 | `showRootLabel` | `boolean` | `true` | Show current focus node name in center |
 | `onSegmentClick` | `(info, event) => void` | — | Fires on every regular click |
-| `onZoomChange` | `(zoom: SunburstZoomInfo) => void` | — | Fires when zoom focus changes (Ctrl+Click, Ctrl+DblClick, Escape) |
+| `onZoomChange` | `(zoom: SunburstZoomInfo) => void` | — | Fires when drill-down focus changes (Ctrl / Cmd ⌘+Click, Ctrl / Cmd ⌘+DblClick, Escape) |
+| `zoomable` | `boolean` | `false` | Enable `Ctrl / Cmd ⌘ + Scroll` visual zoom — clips content at `size` boundary |
 | `valueDecimalCount` | `number` | `0` | Decimal places in tooltip values |
 | `valueDecimalSeparator` | `string` | `'.'` | Decimal separator |
 | `valueThousandsSeparator` | `string` | `','` | Thousands separator |
@@ -153,15 +158,18 @@ type SunburstChartTranslation = {
 | Gesture | Action |
 |---|---|
 | **Click** | Fires `onSegmentClick` immediately — no delay |
-| **Ctrl+Click** on a parent segment | Zoom in (drill down into that segment) |
-| **Ctrl+Double-click** on any segment | Zoom out one level |
-| **Ctrl+Click** on center label | Zoom out one level |
-| **Escape** | Reset zoom to root |
+| **Ctrl+Click** / **Cmd ⌘+Click** on a parent segment | Drill-down — that segment becomes the new center |
+| **Ctrl+Double-click** / **Cmd ⌘+Double-click** | Zoom out one level |
+| **Ctrl+Click** / **Cmd ⌘+Click** on center label | Zoom out one level |
+| **Ctrl+Scroll** / **Cmd ⌘+Scroll** *(requires `zoomable`)* | Visual zoom — clips at `size` boundary |
+| **Escape** | Reset all zoom to root |
 
-> **Why Ctrl+Click instead of double-click?**  
-> This model eliminates the classic 200ms click-delay hack. `onSegmentClick` fires instantly on every click, giving a snappy feel. Zoom is an explicit, intentional action (modifier key required) and can never happen accidentally.
+> **macOS:** Use `Cmd ⌘` instead of `Ctrl` for all shortcuts above.
 
-The center label always shows the **current focus node name** — when zoomed in, it acts as a breadcrumb.
+> **Why modifier+Click instead of double-click?**  
+> This eliminates the classic 200ms click-delay hack. `onSegmentClick` fires instantly on every click. Zoom is an explicit, intentional action that can never happen accidentally.
+
+The center label always shows the **current focus node name** — when drilled in, it acts as a breadcrumb. Use `Ctrl / Cmd ⌘+Click` on the center to step back up.
 
 ---
 
@@ -173,7 +181,7 @@ Set `innerRadius > 0` to create a hole in the center:
 <SunburstChart data={data} innerRadius={100} />
 ```
 
-The center hole area is clickable — `Ctrl+Click` zooms out, regular click fires `onSegmentClick` for the parent.
+The center hole area is clickable — `Ctrl / Cmd ⌘+Click` zooms out, regular click fires `onSegmentClick` for the parent.
 
 ---
 

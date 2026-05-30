@@ -22,7 +22,7 @@ Der `GanttChart` ist eine vollständig interaktive Projektplanungs-Komponente au
 > | Feature | Beschreibung | Springe zu |
 > |---|---|---|
 > | **Heute-Chip** | Beschrifteter Chip am oberen Ende der gestrichelten Heute-Linie — Label via `translations.todayLabel`, Farbe via `ganttTheme.todayLineColor` | [→ Heute-Linie & Chip](#heute-linie--chip) |
-> | **`zoomable`** | `Ctrl+Scroll` wechselt zwischen Tage / Wochen / Monate / Quartale direkt in der Timeline | [→ Ctrl+Scroll-Zoom](#ctrlscroll-zoom) |
+> | **`zoomable`** | `Ctrl / Cmd ⌘+Scroll` wechselt zwischen Tage / Wochen / Monate / Quartale direkt in der Timeline | [→ Ctrl+Scroll-Zoom](#ctrlscroll-zoom) |
 
 ---
 
@@ -548,12 +548,14 @@ Beim Hover auf den Chip erscheint ein Tooltip mit dem vollständigen lokalisiert
 
 ## Ctrl+Scroll-Zoom
 
+> **macOS:** Bitte `Cmd ⌘ + Scroll` statt `Strg + Scroll` verwenden.
+
 Bei `zoomable={true}` kann der Nutzer direkt in der Timeline durch die Zoom-Stufen wechseln:
 
 | Aktion | Ergebnis |
 |---|---|
-| `Strg + Scroll hoch` (bzw. `Cmd + Scroll hoch` auf macOS) | Hereinzoomen — wechselt `Quartale` → `Monate` → `Wochen` → `Tage` |
-| `Strg + Scroll runter` | Herauszoomen — wechselt `Tage` → `Wochen` → `Monate` → `Quartale` |
+| `Strg + Scroll hoch` / `Cmd ⌘ + Scroll hoch` | Hereinzoomen — wechselt `Quartale` → `Monate` → `Wochen` → `Tage` |
+| `Strg + Scroll runter` / `Cmd ⌘ + Scroll runter` | Herauszoomen — wechselt `Tage` → `Wochen` → `Monate` → `Quartale` |
 
 ```tsx
 <GanttChart tasks={tasks} zoomable />

@@ -28,6 +28,14 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - **`chartColors?: string[]`** — Farben pro Tiefenebene; Fallback: MUI-Theme-Palette
 - **`autoFit?: boolean`** (Standard `true`) — viewBox passt sich automatisch dem Inhalt an
 - Von Fluent UI (`@fluentui/react-components`, `@fluentui/react-icons`) auf MUI migriert: Icons, Avatar, Popover
+- **`zoomable?: boolean`** — `Ctrl / Cmd ⌘ + Scroll` visueller Zoom; clippt am `size`-Rand
+- **`drillable?: boolean`** — `Ctrl / Cmd ⌘ + Click` Drill-Down; `Ctrl / Cmd ⌘ + DblClick` zurück; `Escape` Reset; Breadcrumb bei Drill-In
+- **`onFocusChange?`** — Callback bei Drill-Down-Wechsel
+- **`rootNodeRadius` / `branchNodeRadius` / `leafNodeRadius`** — Kreisgrößen pro Knotenrolle
+- **`linkColor` / `labelFontSize` / `labelColor`** — vollständig konfigurierbare Visuelles
+- `SunburstChart`: `zoomable`-Prop ergänzt — gleiche `Ctrl / Cmd ⌘ + Scroll` Zoom-Logik
+
+> **Plattform-Hinweis:** Alle `Ctrl+...`-Shortcuts funktionieren auf macOS auch mit `Cmd ⌘`. Der Code prüft `ctrlKey || metaKey` für alle Modifier-Interaktionen.
 
 ---
 

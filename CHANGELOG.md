@@ -30,7 +30,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`sortBy?: 'name' | 'value'`** (default `'name'`)
 - **`disabled?: boolean`** — mutes all interactions, reduces opacity
 - Migrated from Fluent UI (`@fluentui/react-components`, `@fluentui/react-icons`) to MUI: icons, Avatar, Popover — zero Fluent UI dependencies
+- **`zoomable?: boolean`** — `Ctrl / Cmd ⌘ + Scroll` visual zoom; clips content at `size` boundary when zoomed in
+- **`drillable?: boolean`** — `Ctrl / Cmd ⌘ + Click` drill-down into subtrees; `Ctrl / Cmd ⌘ + DblClick` zooms out; `Escape` resets; breadcrumb shown when drilled in
+- **`onFocusChange?: (info: RadialTreeNodeInfo | null) => void`** — fires when drill-down focus changes
+- **`rootNodeRadius` / `branchNodeRadius` / `leafNodeRadius`** — configurable circle sizes per role
+- **`linkColor` / `labelFontSize` / `labelColor`** — fully configurable visual properties
 - New exported types: `RadialTreeChartData`, `RadialTreeNodeInfo`, `RadialTreeNodeIconSpec`, `RadialTreeSortBy`, `RadialTreeChartTranslation`
+- `SunburstChart`: added `zoomable` prop — same `Ctrl / Cmd ⌘ + Scroll` zoom behavior
+
+> **Platform note:** All `Ctrl+...` shortcuts also work with `Cmd ⌘` on macOS. The code checks `ctrlKey || metaKey` for all modifier-based interactions.
 
 ---
 

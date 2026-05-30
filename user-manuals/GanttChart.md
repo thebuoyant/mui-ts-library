@@ -22,7 +22,7 @@ The `GanttChart` is a fully interactive project planning component built on Reac
 > | Feature | Description | Jump to |
 > |---|---|---|
 > | **Today chip** | Labeled chip at the top of the dashed today line — label via `translations.todayLabel`, color via `ganttTheme.todayLineColor` | [→ Today Line & Chip](#today-line--chip) |
-> | **`zoomable`** | `Ctrl+Scroll` cycles through days / weeks / months / quarters directly in the timeline | [→ Ctrl+Scroll Zoom](#ctrlscroll-zoom) |
+> | **`zoomable`** | `Ctrl / Cmd ⌘+Scroll` cycles through days / weeks / months / quarters directly in the timeline | [→ Ctrl+Scroll Zoom](#ctrlscroll-zoom) |
 
 ---
 
@@ -548,12 +548,14 @@ Hovering the chip shows a Tooltip with the full localized date (e.g. "Wednesday,
 
 ## Ctrl+Scroll Zoom
 
+> **macOS:** Use `Cmd ⌘ + Scroll` instead of `Ctrl + Scroll`.
+
 When `zoomable={true}`, the user can cycle through zoom levels directly in the timeline:
 
 | Action | Result |
 |---|---|
-| `Ctrl + Scroll up` (or `Cmd + Scroll up` on macOS) | Zoom in — cycles `quarters` → `months` → `weeks` → `days` |
-| `Ctrl + Scroll down` | Zoom out — cycles `days` → `weeks` → `months` → `quarters` |
+| `Ctrl + Scroll up` / `Cmd ⌘ + Scroll up` | Zoom in — cycles `quarters` → `months` → `weeks` → `days` |
+| `Ctrl + Scroll down` / `Cmd ⌘ + Scroll down` | Zoom out — cycles `days` → `weeks` → `months` → `quarters` |
 
 ```tsx
 <GanttChart tasks={tasks} zoomable />

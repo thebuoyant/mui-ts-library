@@ -18,6 +18,11 @@ Der `RadialTreeChart` stellt hierarchische Daten als kreisförmigen radialen Bau
 | ✨ Neu in v2.4.0 | |
 |---|---|
 | **RadialTreeChart** | D3 radialer Baum, MUI-Icons, eingebautes Knoten-Popover |
+| **`zoomable`** | `Ctrl / Cmd ⌘ + Scroll` visueller Zoom — Inhalt am `size`-Rand abschneiden |
+| **`drillable`** | `Ctrl / Cmd ⌘ + Click` Drill-Down in Teilbäume, `Ctrl / Cmd ⌘ + DblClick` zurück |
+
+> **macOS-Tastaturkürzel:** `Cmd ⌘` statt `Ctrl` verwenden — z. B. `Cmd ⌘+Click`, `Cmd ⌘+Scroll`.  
+> Alle Interaktionen prüfen `ctrlKey || metaKey`, funktionieren also auf beiden Plattformen.
 
 ---
 
@@ -101,9 +106,12 @@ function App() {
 | `iconSize` | `number` | `18` | Icon-Größe in px |
 | `nodeIconsByDepth` | `Record<number, RadialTreeNodeIconSpec>` | — | Icon-Overrides pro Tiefenebene |
 | `renderNodeIcon` | `(info) => ReactElement \| null` | — | Vollständig custom Icon-Renderer pro Knoten |
+| `zoomable` | `boolean` | `false` | `Ctrl / Cmd ⌘ + Scroll` visueller Zoom — clippt am `size`-Rand |
+| `drillable` | `boolean` | `false` | `Ctrl / Cmd ⌘ + Click` Drill-Down in Teilbäume |
+| `onFocusChange` | `(info \| null) => void` | — | Wird bei Drill-Down-Wechsel ausgelöst |
 | `showNodePopover` | `boolean` | `false` | Eingebautes MUI-Popover bei Knotenklick öffnen |
 | `renderNodePopoverContent` | `(info) => ReactNode` | — | Custom Popover-Inhalt (ersetzt Standard) |
-| `onNodeClick` | `(info, event) => void` | — | Wird bei jedem Knotenklick ausgelöst |
+| `onNodeClick` | `(info, event) => void` | — | Wird bei normalem Klick ausgelöst |
 | `disabled` | `boolean` | `false` | Deaktiviert alle Interaktionen, reduziert Opacity |
 | `translation` | `Partial<RadialTreeChartTranslation>` | EN-Standard | Translation-Strings überschreiben |
 
@@ -152,10 +160,17 @@ type RadialTreeChartTranslation = {
 
 ## Interaktionsmodell
 
-| Geste | Aktion |
-|---|---|
-| **Hover** über Knoten | MUI-Tooltip erscheint am Mauszeiger — zeigt Name, Subname, Breadcrumb-Pfad |
-| **Klick** auf Knoten | Löst `onNodeClick` aus + öffnet eingebautes Popover wenn `showNodePopover={true}` |
+> **macOS:** Bitte `Cmd ⌘` statt `Ctrl` verwenden.
+
+| Geste | Aktion | Benötigt |
+|---|---|---|
+| **Hover** über Knoten | MUI-Tooltip am Mauszeiger — zeigt Name, Subname, Datenwerte | immer |
+| **Klick** auf Knoten | Löst `onNodeClick` aus + öffnet Popover wenn `showNodePopover` | immer |
+| **Ctrl / Cmd ⌘ + Klick** auf Branch-Knoten | Drill-Down in Teilbaum (250 ms Timer für DblClick-Unterscheidung) | `drillable` |
+| **Ctrl / Cmd ⌘ + Doppelklick** | Zoom out eine Ebene | `drillable` |
+| **Ctrl / Cmd ⌘ + Scroll hoch** | Visueller Zoom in (clippt am `size`-Rand) | `zoomable` |
+| **Ctrl / Cmd ⌘ + Scroll runter** | Visueller Zoom out | `zoomable` |
+| **Escape** | Drill-Down + visuellen Zoom zurücksetzen | `drillable` / `zoomable` |
 
 ---
 

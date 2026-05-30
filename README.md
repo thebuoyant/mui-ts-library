@@ -11,15 +11,15 @@ A type-safe React component library built on **TypeScript** and **MUI (Material 
 | Component | Description | Docs |
 |---|---|---|
 | [`ConfirmDialog`](#confirmdialog) | Declarative async confirmation dialog — `await confirm({ title, severity })` from anywhere in the app. Supports countdown auto-confirm and `Enter` = confirm shortcut. | [Full Manual →](user-manuals/ConfirmDialog.md) |
-| [`GanttChart`](#ganttchart) | Project timeline with hierarchical tasks, milestones, drag & drop, Ctrl+Scroll zoom, today chip, and built-in CRUD dialogs | [Full Manual →](user-manuals/GanttChart.md) |
+| [`GanttChart`](#ganttchart) | Project timeline with hierarchical tasks, milestones, drag & drop, Ctrl / Cmd ⌘+Scroll zoom, today chip, and built-in CRUD dialogs | [Full Manual →](user-manuals/GanttChart.md) |
 | [`TagSelection`](#tagselection) | Multi-tag selector with autocomplete, free tag creation, overflow chips, and MUI theme colors | [Full Manual →](user-manuals/TagSelection.md) |
 | [`PasswordStrengthMeter`](#passwordstrengthmeter) | Password input with animated strength meter, segmented bar, custom requirements, and requirements checklist | [Full Manual →](user-manuals/PasswordStrengthMeter.md) |
 | [`RichTextEditor`](#richtexteditor) | WYSIWYG editor (TipTap v3) with toolbar, link dialog, text color, highlight, word count, fullscreen mode, Markdown paste, table editing, image embed, and emoji picker | [Full Manual →](user-manuals/RichTextEditor.md) |
 | [`SqlEditor`](#sqleditor) | SQL code editor (CodeMirror 6) with syntax highlighting, multi-dialect, autocomplete, linting, and `Cmd+Enter` execute shortcut | [Full Manual →](user-manuals/SqlEditor.md) |
 | [`JsonEditor`](#jsoneditor) | JSON code editor (CodeMirror 6) with real-time validation, Format, Compact buttons, and optional minimap | [Full Manual →](user-manuals/JsonEditor.md) |
-| [`SunburstChart`](#sunburstchart) | D3 v7 hierarchical chart — concentric rings, Ctrl+Click zoom, donut mode, custom colors, MUI theme integration. First of the D3 Charts family. | [Full Manual →](user-manuals/SunburstChart.md) |
+| [`SunburstChart`](#sunburstchart) | D3 v7 hierarchical chart — concentric rings, Ctrl / Cmd ⌘+Click drill-down, Ctrl / Cmd ⌘+Scroll zoom, donut mode, MUI theme integration | [Full Manual →](user-manuals/SunburstChart.md) |
 | [`ChordChart`](#chordchart) | D3 v7 flow chart — arc groups connected by ribbons, hover highlight, directed/undirected, MUI theme integration | [Full Manual →](user-manuals/ChordChart.md) |
-| [`RadialTreeChart`](#radialtreedchart) | D3 v7 radial tree — hierarchical nodes on concentric rings, MUI icons, built-in node popover, MUI theme integration | [Full Manual →](user-manuals/RadialTreeChart.md) |
+| [`RadialTreeChart`](#radialtreedchart) | D3 v7 radial tree — hierarchical nodes on concentric rings, MUI icons, Ctrl / Cmd ⌘+Click drill-down, Ctrl / Cmd ⌘+Scroll zoom, MUI theme integration | [Full Manual →](user-manuals/RadialTreeChart.md) |
 
 ---
 
@@ -77,7 +77,7 @@ if (ok) handleDelete();
 
 ### GanttChart
 
-An interactive project timeline for planning and tracking tasks. Use it in project management dashboards, sprint planners, or resource views where teams need to see schedules, milestones, dependencies, and progress at a glance — with drag & drop, resize, and Ctrl+Scroll zoom built in.
+An interactive project timeline for planning and tracking tasks. Use it in project management dashboards, sprint planners, or resource views where teams need to see schedules, milestones, dependencies, and progress at a glance — with drag & drop, resize, and Ctrl / Cmd ⌘+Scroll zoom built in.
 
 ```tsx
 import { GanttChart } from '@thebuoyant-tsdev/mui-ts-library';
@@ -190,7 +190,7 @@ import { JsonEditor } from '@thebuoyant-tsdev/mui-ts-library';
 
 ### SunburstChart
 
-Hierarchical data visualization as concentric rings — root at the center, each depth level forms one ring. Perfect for budget breakdowns, org charts, file system usage, and any data that is both hierarchical and proportional. Ctrl+Click to drill down into any segment.
+Hierarchical data visualization as concentric rings — root at the center, each depth level forms one ring. Perfect for budget breakdowns, org charts, file system usage, and any data that is both hierarchical and proportional. `Ctrl / Cmd ⌘+Click` to drill down, `Ctrl / Cmd ⌘+Scroll` to zoom.
 
 ```tsx
 import { SunburstChart } from '@thebuoyant-tsdev/mui-ts-library';
@@ -214,7 +214,7 @@ const data: SunburstChartData = {
 />
 ```
 
-**Zoom:** `Ctrl+Click` → drill down · `Ctrl+Double-click` → zoom out · `Escape` → reset
+**Drill-down:** `Ctrl+Click` / `Cmd ⌘+Click` · **Zoom out:** `Ctrl+DblClick` / `Cmd ⌘+DblClick` · **Reset:** `Escape`
 
 → [Full documentation](user-manuals/SunburstChart.md)
 
@@ -248,7 +248,7 @@ const data: ChordChartData[] = [
 
 ### RadialTreeChart
 
-Hierarchical data as a radial tree — nodes on concentric rings connected by curved links. Use `RadialTreeChart` for org charts, skill taxonomies, dependency trees, or any hierarchy where you want both structure and spatial layout. Hover for a tooltip, click for a popover with node details.
+Hierarchical data as a radial tree — nodes on concentric rings connected by curved links. Use `RadialTreeChart` for org charts, skill taxonomies, dependency trees, or any hierarchy where you want both structure and spatial layout. Hover for a tooltip, click for a popover with node details. `Ctrl / Cmd ⌘+Click` drills into subtrees, `Ctrl / Cmd ⌘+Scroll` zooms.
 
 ```tsx
 import { RadialTreeChart } from '@thebuoyant-tsdev/mui-ts-library';
@@ -269,6 +269,8 @@ const data: RadialTreeChartData = {
 <RadialTreeChart
   data={data}
   size={600}
+  drillable    // Ctrl / Cmd ⌘+Click to drill in, DblClick to go back
+  zoomable     // Ctrl / Cmd ⌘+Scroll to zoom
   showNodePopover
   onNodeClick={(info) => console.log(info.name, info.depth)}
 />

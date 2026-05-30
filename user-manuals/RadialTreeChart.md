@@ -18,7 +18,12 @@ The `RadialTreeChart` renders hierarchical data as a circular radial tree built 
 
 | ✨ New in v2.4.0 | |
 |---|---|
-| **RadialTreeChart** | D3 radial tree, MUI icons, built-in node popover, Fluent UI → MUI migration |
+| **RadialTreeChart** | D3 radial tree, MUI icons, built-in node popover |
+| **`zoomable`** | `Ctrl / Cmd ⌘ + Scroll` visual zoom — clips content at `size` boundary |
+| **`drillable`** | `Ctrl / Cmd ⌘ + Click` drill-down into subtrees, `Ctrl / Cmd ⌘ + DblClick` back out |
+
+> **macOS keyboard shortcuts:** Use `Cmd ⌘` instead of `Ctrl` — e.g. `Cmd ⌘+Click`, `Cmd ⌘+Scroll`.  
+> All interactions check `ctrlKey || metaKey`, so both keys work on every platform.
 
 ---
 
@@ -102,9 +107,12 @@ function App() {
 | `iconSize` | `number` | `18` | Icon size in px |
 | `nodeIconsByDepth` | `Record<number, RadialTreeNodeIconSpec>` | — | Icon overrides per depth level |
 | `renderNodeIcon` | `(info) => ReactElement \| null` | — | Fully custom icon renderer per node |
+| `zoomable` | `boolean` | `false` | Enable `Ctrl / Cmd ⌘ + Scroll` visual zoom — clips at `size` |
+| `drillable` | `boolean` | `false` | Enable `Ctrl / Cmd ⌘ + Click` drill-down into subtrees |
+| `onFocusChange` | `(info \| null) => void` | — | Fires when drill-down focus changes |
 | `showNodePopover` | `boolean` | `false` | Open built-in MUI Popover on node click |
 | `renderNodePopoverContent` | `(info) => ReactNode` | — | Custom popover content (replaces default) |
-| `onNodeClick` | `(info, event) => void` | — | Fires on every node click |
+| `onNodeClick` | `(info, event) => void` | — | Fires on every regular click |
 | `disabled` | `boolean` | `false` | Mutes all interactions, reduces opacity |
 | `translation` | `Partial<RadialTreeChartTranslation>` | EN defaults | Override translation strings |
 
@@ -154,10 +162,17 @@ type RadialTreeChartTranslation = {
 
 ## Interaction Model
 
-| Gesture | Action |
-|---|---|
-| **Hover** any node | MUI tooltip appears near cursor — shows name, subname, breadcrumb path |
-| **Click** any node | Fires `onNodeClick` + opens built-in Popover if `showNodePopover={true}` |
+> **macOS:** Use `Cmd ⌘` instead of `Ctrl` for all shortcuts below.
+
+| Gesture | Action | Requires |
+|---|---|---|
+| **Hover** any node | MUI tooltip near cursor — shows name, subname, data values | always |
+| **Click** any node | Fires `onNodeClick` + opens popover if `showNodePopover` | always |
+| **Ctrl / Cmd ⌘ + Click** on branch node | Drill-down into subtree (250 ms to distinguish from DblClick) | `drillable` |
+| **Ctrl / Cmd ⌘ + DblClick** | Zoom out one level | `drillable` |
+| **Ctrl / Cmd ⌘ + Scroll up** | Visual zoom in (clips at `size` boundary) | `zoomable` |
+| **Ctrl / Cmd ⌘ + Scroll down** | Visual zoom out | `zoomable` |
+| **Escape** | Reset drill-down to root + reset visual zoom | `drillable` / `zoomable` |
 
 ---
 

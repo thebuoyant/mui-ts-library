@@ -11,15 +11,15 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 | Komponente | Beschreibung | Docs |
 |---|---|---|
 | [`ConfirmDialog`](#confirmdialog) | Deklarativer Async-Bestätigungs-Dialog — `await confirm({ title, severity })` von überall in der App. Unterstützt Countdown-Auto-Confirm und `Enter` = Bestätigen. | [Vollständiges Manual →](user-manuals/ConfirmDialog.de.md) |
-| [`GanttChart`](#ganttchart) | Projekt-Timeline mit hierarchischen Aufgaben, Meilensteinen, Drag & Drop, Ctrl+Scroll-Zoom, Heute-Chip und integrierten CRUD-Dialogen | [Vollständiges Manual →](user-manuals/GanttChart.de.md) |
+| [`GanttChart`](#ganttchart) | Projekt-Timeline mit hierarchischen Aufgaben, Meilensteinen, Drag & Drop, Ctrl / Cmd ⌘+Scroll-Zoom, Heute-Chip und integrierten CRUD-Dialogen | [Vollständiges Manual →](user-manuals/GanttChart.de.md) |
 | [`TagSelection`](#tagselection) | Multi-Tag-Auswahlfeld mit Autocomplete, freier Tag-Erstellung, Overflow-Chips und MUI-Theme-Farben | [Vollständiges Manual →](user-manuals/TagSelection.de.md) |
 | [`PasswordStrengthMeter`](#passwordstrengthmeter) | Passwort-Eingabe mit animiertem Stärke-Meter, segmentierter Balkenanzeige, eigenen Anforderungen und Anforderungsliste | [Vollständiges Manual →](user-manuals/PasswordStrengthMeter.de.md) |
 | [`RichTextEditor`](#richtexteditor) | WYSIWYG-Editor (TipTap v3) mit Toolbar, Link-Dialog, Textfarbe, Hervorhebung, Wörter-Zähler, Vollbild-Modus, Markdown-Einfügen, Tabellen-Bearbeitung, Bild-Embed und Emoji-Picker | [Vollständiges Manual →](user-manuals/RichTextEditor.de.md) |
 | [`SqlEditor`](#sqleditor) | SQL-Code-Editor (CodeMirror 6) mit Syntax-Highlighting, Multi-Dialekt, Autocomplete, Linting und `Cmd+Enter`-Ausführen-Shortcut | [Vollständiges Manual →](user-manuals/SqlEditor.de.md) |
 | [`JsonEditor`](#jsoneditor) | JSON-Code-Editor (CodeMirror 6) mit Echtzeit-Validierung, Format- und Komprimieren-Schaltfläche sowie optionaler Minimap | [Vollständiges Manual →](user-manuals/JsonEditor.de.md) |
-| [`SunburstChart`](#sunburstchart) | D3 v7 hierarchisches Chart — konzentrische Ringe, Ctrl+Click-Zoom, Donut-Modus, eigene Farben, MUI-Theme-Integration. Erste der D3-Chart-Familie. | [Vollständiges Manual →](user-manuals/SunburstChart.de.md) |
+| [`SunburstChart`](#sunburstchart) | D3 v7 hierarchisches Chart — konzentrische Ringe, Ctrl / Cmd ⌘+Click Drill-Down, Ctrl / Cmd ⌘+Scroll Zoom, Donut-Modus, eigene Farben, MUI-Theme-Integration. Erste der D3-Chart-Familie. | [Vollständiges Manual →](user-manuals/SunburstChart.de.md) |
 | [`ChordChart`](#chordchart) | D3 v7 Fluss-Chart — Arc-Gruppen verbunden durch Bänder, Hover-Highlight, gerichtet/ungerichtet, MUI-Theme-Integration | [Vollständiges Manual →](user-manuals/ChordChart.de.md) |
-| [`RadialTreeChart`](#radialtreedchart) | D3 v7 radialer Baum — hierarchische Knoten auf konzentrischen Ringen, MUI-Icons, eingebautes Knoten-Popover, MUI-Theme-Integration | [Vollständiges Manual →](user-manuals/RadialTreeChart.de.md) |
+| [`RadialTreeChart`](#radialtreedchart) | D3 v7 radialer Baum — Knoten auf konzentrischen Ringen, MUI-Icons, Ctrl / Cmd ⌘+Click Drill-Down, Ctrl / Cmd ⌘+Scroll Zoom, MUI-Theme-Integration | [Vollständiges Manual →](user-manuals/RadialTreeChart.de.md) |
 
 ---
 
@@ -77,7 +77,7 @@ if (ok) handleDelete();
 
 ### GanttChart
 
-Interaktive Projekt-Timeline für Planung und Aufgaben-Tracking. Einsetzbar in Projektmanagement-Dashboards, Sprint-Planern und Ressourcenansichten — mit Drag & Drop, Größenänderung, Ctrl+Scroll-Zoom, Meilensteinen, Abhängigkeiten und Heute-Chip.
+Interaktive Projekt-Timeline für Planung und Aufgaben-Tracking. Einsetzbar in Projektmanagement-Dashboards, Sprint-Planern und Ressourcenansichten — mit Drag & Drop, Größenänderung, Ctrl / Cmd ⌘+Scroll-Zoom, Meilensteinen, Abhängigkeiten und Heute-Chip.
 
 ```tsx
 import { GanttChart } from '@thebuoyant-tsdev/mui-ts-library';
@@ -214,7 +214,7 @@ const data: SunburstChartData = {
 />
 ```
 
-**Zoom:** `Ctrl+Click` → Drill-down · `Ctrl+Doppelklick` → Zoom out · `Escape` → Reset
+**Zoom:** `Ctrl+Click` → Drill-down · `Ctrl / Cmd ⌘+Doppelklick` → Zoom out · `Escape` → Reset
 
 → [Vollständige Dokumentation](user-manuals/SunburstChart.de.md)
 
@@ -243,6 +243,40 @@ const data: ChordChartData[] = [
 ```
 
 → [Vollständige Dokumentation](user-manuals/ChordChart.de.md)
+
+---
+
+### RadialTreeChart
+
+Hierarchische Daten als radialer Baum — Knoten auf konzentrischen Ringen, verbunden durch geschwungene Links. Ideal für Org-Charts, Skill-Taxonomien und Abhängigkeitsbäume. `Ctrl / Cmd ⌘+Click` bohrt in Teilbäume, `Ctrl / Cmd ⌘+Scroll` zoomt.
+
+```tsx
+import { RadialTreeChart } from '@thebuoyant-tsdev/mui-ts-library';
+import type { RadialTreeChartData } from '@thebuoyant-tsdev/mui-ts-library';
+
+const data: RadialTreeChartData = {
+  id: 'ceo', name: 'CEO', subname: 'Führung',
+  children: [
+    { id: 'cto', name: 'CTO', subname: 'Technologie',
+      children: [
+        { id: 'fe', name: 'Frontend Lead' },
+        { id: 'be', name: 'Backend Lead'  },
+      ]},
+    { id: 'cpo', name: 'CPO', subname: 'Produkt' },
+  ],
+};
+
+<RadialTreeChart
+  data={data}
+  size={600}
+  drillable    // Ctrl / Cmd ⌘+Click zum Drill-in, DblClick zurück
+  zoomable     // Ctrl / Cmd ⌘+Scroll zum Zoomen
+  showNodePopover
+  onNodeClick={(info) => console.log(info.name, info.depth)}
+/>
+```
+
+→ [Vollständige Dokumentation](user-manuals/RadialTreeChart.de.md)
 
 ---
 
