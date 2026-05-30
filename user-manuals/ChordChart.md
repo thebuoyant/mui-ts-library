@@ -97,6 +97,7 @@ function App() {
 | `valueThousandsSeparator` | `string` | `','` | Thousands separator |
 | `onGroupClick` | `(info, event) => void` | — | Fires on click of a group arc |
 | `onChordClick` | `(info, event) => void` | — | Fires on click of a ribbon |
+| `zoomable` | `boolean` | `false` | Enable `Ctrl / Cmd ⌘ + Scroll` visual zoom — clips at `size` boundary |
 | `disabled` | `boolean` | `false` | Mutes all interactions, reduces opacity |
 | `translation` | `Partial<ChordChartTranslation>` | EN defaults | Override translation strings |
 
@@ -207,6 +208,28 @@ function MyChart({ data }) {
   );
 }
 ```
+
+### Per-group color override — `groupColorConfigs`
+
+For ChordChart, color overrides are specified as a `Record` keyed by group name (since the data model uses links, not explicit group nodes):
+
+```tsx
+<ChordChart
+  data={data}
+  groupColorConfigs={{
+    "Engineering": { fill: "#1565C0" },   // brand blue
+    "Sales":       { fill: "#6A1B9A" },   // brand purple
+    "DevOps":      { fill: "#00695C" },   // brand teal
+    // groups without an entry → use chartColors or MUI palette
+  }}
+/>
+```
+
+| Field | Description |
+|---|---|
+| `fill` | Arc and ribbon fill color |
+| `textColor` | Label text color |
+| `stroke` | Arc border color |
 
 ### Ribbon opacity and blend mode
 

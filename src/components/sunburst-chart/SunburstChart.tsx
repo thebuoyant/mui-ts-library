@@ -156,6 +156,7 @@ export function SunburstChart({
   );
 
   const fillFor = (node: d3.HierarchyRectangularNode<SunburstChartData>) => {
+    if (node.data.colorConfig?.fill) return node.data.colorConfig.fill;
     let top = node;
     while (top.depth > 1) top = top.parent!;
     return colorScale(top.data.name);

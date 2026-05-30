@@ -84,6 +84,7 @@ export function ChordChart({
   sortSubgroups = "descending",
   sortChords = "descending",
   chartColors,
+  groupColorConfigs,
   showGroupLabels = true,
   labelOffset = 8,
   ribbonOpacity = 0.75,
@@ -94,6 +95,7 @@ export function ChordChart({
   valueThousandsSeparator = ",",
   onGroupClick,
   onChordClick,
+  zoomable = false,
   disabled = false,
 }: ChordChartProps) {
   const theme = useTheme();
@@ -175,7 +177,7 @@ export function ChordChart({
     [ribbonGen, radiusInner],
   );
 
-  // ── color scale ─────────────────────────────────────────────────────────
+  // ── color scale — groupColorConfigs override takes priority ──────────────
   const colorScale = useMemo(
     () =>
       d3
@@ -188,9 +190,24 @@ export function ChordChart({
     [palette, names.length],
   );
 
-  // ── viewBox auto-fit ────────────────────────────────────────────────────
+  const groupFill = useCallback(
+    (index: number): string =>
+      groupColorConfigs?.[names[index]]?.fill ?? colorScale(index),
+    [groupColorConfigs, names, colorScale],
+  );
+
+  // ── viewBox auto-fit + zoom ──────────────────────────────────────────────
   const contentRef = useRef<SVGGElement>(null);
-  const [viewBox, setViewBox] = useState(`-${size / 2} -${size / 2} ${size} ${size}`);
+  const [baseViewBox, setBaseViewBox] = useState(`-${size / 2} -${size / 2} ${size} ${size}`);
+  const [zoomScale,   setZoomScale]   = useState(1);
+
+  const viewBox = useMemo(() => {
+    if (zoomScale === 1) return baseViewBox;
+    const [x, y, w, h] = baseViewBox.split(" ").map(Number);
+    const nw = w / zoomScale;
+    const nh = h / zoomScale;
+    return `${x + (w - nw) / 2} ${y + (h - nh) / 2} ${nw} ${nh}`;
+  }, [baseViewBox, zoomScale]);
 
   useLayoutEffect(() => {
     const g = contentRef.current;
@@ -199,9 +216,9 @@ export function ChordChart({
       try {
         const box = g.getBBox();
         const pad = 8;
-        setViewBox(`${box.x - pad} ${box.y - pad} ${box.width + 2 * pad} ${box.height + 2 * pad}`);
+        setBaseViewBox(`${box.x - pad} ${box.y - pad} ${box.width + 2 * pad} ${box.height + 2 * pad}`);
       } catch {
-        setViewBox(`-${size / 2} -${size / 2} ${size} ${size}`);
+        setBaseViewBox(`-${size / 2} -${size / 2} ${size} ${size}`);
       }
     });
     return () => cancelAnimationFrame(id);
@@ -240,6 +257,24 @@ export function ChordChart({
   const textAnchor = (group: D3ChordGroup) =>
     (group.startAngle + group.endAngle) / 2 > Math.PI ? "end" : "start";
 
+  // Ctrl / Cmd ⌘ + Scroll visual zoom
+  const handleWheel = useCallback(
+    (e: React.WheelEvent<SVGSVGElement>) => {
+      if (!zoomable || disabled || !e.ctrlKey) return;
+      e.preventDefault();
+      const factor = e.deltaY < 0 ? 1.15 : 1 / 1.15;
+      setZoomScale((prev) => Math.max(0.25, Math.min(8, prev * factor)));
+    },
+    [zoomable, disabled],
+  );
+
+  useLayoutEffect(() => {
+    if (!zoomable) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setZoomScale(1); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [zoomable]);
+
   const tooltipProps = {
     followCursor:         true,
     enterDelay:           50,
@@ -264,7 +299,8 @@ export function ChordChart({
         width={size}
         height={size}
         viewBox={viewBox}
-        style={{ fontFamily: fontFamily ?? "sans-serif", overflow: "visible" }}
+        onWheel={handleWheel}
+        style={{ fontFamily: fontFamily ?? "sans-serif", overflow: zoomable && zoomScale > 1 ? "hidden" : "visible" }}
         role="img"
         aria-label="Chord chart"
       >
@@ -296,7 +332,7 @@ export function ChordChart({
                   >
                     <path
                       d={arc(group) || ""}
-                      fill={colorScale(group.index)}
+                      fill={groupFill(group.index)}
                       stroke={theme.palette.divider}
                       opacity={dimmed ? 0.35 : 1}
                       style={{ transition: "opacity 0.15s" }}
@@ -343,7 +379,7 @@ export function ChordChart({
                 >
                   <path
                     d={ribbonPath(chord)}
-                    fill={colorScale(chord.target.index)}
+                    fill={groupFill(chord.target.index)}
                     stroke="none"
                     opacity={visible ? 1 : 0.12}
                     style={{

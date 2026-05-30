@@ -7,6 +7,18 @@ export type ChordChartData = {
   value:  number;
 };
 
+/**
+ * Per-group color overrides for ChordChart.
+ * Key = group name (same as `source` / `target` in the data).
+ * Value = color config — null / omit keys = use chart default palette.
+ * Example: `{ Engineering: { fill: '#1565C0' }, Sales: { fill: '#6A1B9A' } }`
+ */
+export type ChordGroupColorConfigs = Record<string, {
+  fill?:      string;
+  textColor?: string;
+  stroke?:    string;
+} | null>;
+
 /** Callback payload for a click on a group arc */
 export type ChordGroupInfo = {
   /** Group name */
@@ -53,6 +65,8 @@ export type ChordChartProps = {
   sortChords?:              ChordSortBy;
   /** Custom color palette — falls back to MUI theme palette when omitted */
   chartColors?:             string[];
+  /** Per-group color overrides keyed by group name — overrides `chartColors` for specific groups */
+  groupColorConfigs?:       ChordGroupColorConfigs;
   /** Show group name labels outside the arc ring (default: true) */
   showGroupLabels?:         boolean;
   /** Gap between arc outer edge and label text in px (default: 6) */
@@ -73,6 +87,8 @@ export type ChordChartProps = {
   onGroupClick?:            (info: ChordGroupInfo, event: React.MouseEvent<SVGGElement>) => void;
   /** Fired on click of a ribbon */
   onChordClick?:            (info: ChordInfo, event: React.MouseEvent<SVGPathElement>) => void;
+  /** Enable Ctrl / Cmd ⌘ + Scroll visual zoom — clips content at `size` boundary (default: false) */
+  zoomable?:                boolean;
   /** Disables all interactions (default: false) */
   disabled?:                boolean;
   /** Override translation strings */

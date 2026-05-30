@@ -18,3 +18,5 @@ export * from "./components/chord-chart/ChordChart";
 export * from "./components/chord-chart/ChordChart.types";
 export * from "./components/radial-tree-chart/RadialTreeChart";
 export * from "./components/radial-tree-chart/RadialTreeChart.types";
+export * from "./components/circle-packing-chart/CirclePackingChart";
+export * from "./components/circle-packing-chart/CirclePackingChart.types";

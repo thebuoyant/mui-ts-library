@@ -1,10 +1,12 @@
 export type SunburstSortBy = 'value' | 'name';
 
 export type SunburstChartData = {
-  id:        string;
-  name:      string;
-  value?:    number;
-  children?: SunburstChartData[];
+  id:           string;
+  name:         string;
+  value?:       number;
+  /** Per-node color overrides — null / omit = use chart default palette */
+  colorConfig?: { fill?: string; textColor?: string; stroke?: string } | null;
+  children?:    SunburstChartData[];
 };
 
 export type SunburstSegmentInfo = {

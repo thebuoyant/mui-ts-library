@@ -248,6 +248,35 @@ function MyChart({ data }) {
 
 Farben werden den **Top-Level-Segmenten** (Tiefe 1) zugewiesen. Kind-Segmente erhalten automatisch eine transparentere Variante der Elternfarbe (fill-opacity 0.5 vs 0.75).
 
+### Farb-Override pro Knoten — `colorConfig`
+
+Jeder Knoten kann eigene Farben direkt in den Daten definieren und überschreibt damit die Chart-Palette:
+
+```tsx
+const data: SunburstChartData = {
+  id: "company", name: "Unternehmen",
+  children: [
+    {
+      id: "engineering", name: "Engineering",
+      colorConfig: { fill: "#1565C0" },   // Brand-Blau
+      children: [
+        { id: "fe", name: "Frontend", value: 480, colorConfig: { fill: "#1976D2" } },
+      ],
+    },
+    {
+      id: "sales", name: "Vertrieb",
+      // kein colorConfig → Chart-Palette greift
+    },
+  ],
+};
+```
+
+| Feld | Beschreibung |
+|---|---|
+| `fill` | Segment-Füllfarbe |
+| `textColor` | Label-Textfarbe (zukünftige Verwendung) |
+| `stroke` | Segment-Rahmenfarbe |
+
 ---
 
 ## Segment-Klick-Callback

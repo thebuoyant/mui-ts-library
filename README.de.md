@@ -18,8 +18,9 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 | [`SqlEditor`](#sqleditor) | SQL-Code-Editor (CodeMirror 6) mit Syntax-Highlighting, Multi-Dialekt, Autocomplete, Linting und `Cmd+Enter`-Ausführen-Shortcut | [Vollständiges Manual →](user-manuals/SqlEditor.de.md) |
 | [`JsonEditor`](#jsoneditor) | JSON-Code-Editor (CodeMirror 6) mit Echtzeit-Validierung, Format- und Komprimieren-Schaltfläche sowie optionaler Minimap | [Vollständiges Manual →](user-manuals/JsonEditor.de.md) |
 | [`SunburstChart`](#sunburstchart) | D3 v7 hierarchisches Chart — konzentrische Ringe, Ctrl / Cmd ⌘+Click Drill-Down, Ctrl / Cmd ⌘+Scroll Zoom, Donut-Modus, eigene Farben, MUI-Theme-Integration. Erste der D3-Chart-Familie. | [Vollständiges Manual →](user-manuals/SunburstChart.de.md) |
-| [`ChordChart`](#chordchart) | D3 v7 Fluss-Chart — Arc-Gruppen verbunden durch Bänder, Hover-Highlight, gerichtet/ungerichtet, MUI-Theme-Integration | [Vollständiges Manual →](user-manuals/ChordChart.de.md) |
+| [`ChordChart`](#chordchart) | D3 v7 Fluss-Chart — Arc-Gruppen, Bänder, Hover-Highlight, Ctrl / Cmd ⌘+Scroll-Zoom, gerichtet/ungerichtet, MUI-Theme-Integration | [Vollständiges Manual →](user-manuals/ChordChart.de.md) |
 | [`RadialTreeChart`](#radialtreedchart) | D3 v7 radialer Baum — Knoten auf konzentrischen Ringen, MUI-Icons, Ctrl / Cmd ⌘+Click Drill-Down, Ctrl / Cmd ⌘+Scroll Zoom, MUI-Theme-Integration | [Vollständiges Manual →](user-manuals/RadialTreeChart.de.md) |
+| [`CirclePackingChart`](#circlepackingchart) | D3 v7 Circle Packing — verschachtelte Kreise, animierter D3-Zoom, Ctrl / Cmd ⌘+Scroll-Zoom, Tiefen-Gradient oder Palette, MUI-Theme-Integration | [Vollständiges Manual →](user-manuals/CirclePackingChart.de.md) |
 
 ---
 
@@ -315,6 +316,9 @@ import type {
 
   // RadialTreeChart
   RadialTreeChartData, RadialTreeNodeInfo, RadialTreeNodeIconSpec, RadialTreeSortBy,
+
+  // CirclePackingChart
+  CirclePackingData, CirclePackingNodeInfo, CirclePackingZoomInfo, CirclePackingSortBy,
 } from '@thebuoyant-tsdev/mui-ts-library';
 ```
 

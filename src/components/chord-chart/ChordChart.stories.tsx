@@ -16,11 +16,13 @@ const meta: Meta<typeof ChordChart> = {
     directed:                { control: "boolean" },
     showGroupLabels:         { control: "boolean" },
     labelOffset:             { control: "number" },
+    zoomable:                { control: "boolean" },
     disabled:                { control: "boolean" },
     valueDecimalCount:       { control: "number" },
     valueDecimalSeparator:   { control: "text" },
     valueThousandsSeparator: { control: "text" },
-    chartColors:  { control: false },
+    chartColors:        { control: false },
+    groupColorConfigs:  { control: false },
     translation:  { control: false },
     data:         { control: false },
     onGroupClick: { control: false },
@@ -35,6 +37,7 @@ const meta: Meta<typeof ChordChart> = {
     directed:                true,
     showGroupLabels:         true,
     labelOffset:             8,
+    zoomable:                false,
     disabled:                false,
     valueDecimalCount:       0,
     valueDecimalSeparator:   ".",
@@ -119,6 +122,31 @@ export const CustomPalette: Story = {
   args: {
     data: TEAM_DATA,
     chartColors: ["#1565C0", "#6A1B9A", "#00695C", "#E65100", "#AD1457", "#37474F"],
+  },
+};
+
+export const WithColorConfig: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`groupColorConfigs` maps **group names** to color overrides — more granular than `chartColors`. ' +
+          'Each group can have its own `fill` color while others fall back to the palette. ' +
+          'Ribbons automatically use the target group\'s color.',
+      },
+    },
+  },
+  args: {
+    data: TEAM_DATA,
+    groupColorConfigs: {
+      "Frontend":  { fill: "#1565C0" },  // brand blue
+      "Backend":   { fill: "#0D47A1" },  // darker blue
+      "Design":    { fill: "#6A1B9A" },  // brand purple
+      "DevOps":    { fill: "#00695C" },  // brand teal
+      "Data":      { fill: "#E65100" },  // brand orange
+      "Analytics": { fill: "#AD1457" },  // brand pink
+      // "Sales" has no entry → uses default palette color
+    },
   },
 };
 

@@ -13,6 +13,21 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [2.5.0] — 2026-05-30
+
+### Hinzugefügt
+
+#### CirclePackingChart — Neue Komponente (MTL-22) · D3-Charts-Familie #4
+
+- **Hierarchische Daten als verschachtelte Kreise** — Größen proportional zu Werten; ideal für Budget-Aufschlüsselungen, Portfolio-Analysen und proportionale Hierarchien
+- **Animierter D3-Zoom** — `Doppelklick` auf Kreis → sanfte `d3.interpolateZoom`-Transition; `Doppelklick` auf Hintergrund → zurück; Labels blenden während der Transition ein/aus
+- **Alt+Doppelklick** → Zeitlupe (10× Dauer) für Präsentationen
+- **`data: CirclePackingData`** — rekursiv: `{ name, value?, children? }`
+- **Tiefenbasierte Farben** — zwei Modi: `chartColors` (Palette pro Tiefe) oder HCL-Gradient (`depthColorStart`/`depthColorEnd`, Standard: MUI-Theme-Palette)
+- **`size`** — einzelner Prop statt `width`/`height`; `onCircleClick`, `onZoomChange`, `disabled`
+
+---
+
 ## [2.4.0] — 2026-05-29
 
 ### Hinzugefügt

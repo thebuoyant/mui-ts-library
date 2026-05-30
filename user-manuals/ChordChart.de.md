@@ -97,6 +97,7 @@ function App() {
 | `valueThousandsSeparator` | `string` | `','` | Tausendertrennzeichen |
 | `onGroupClick` | `(info, event) => void` | — | Klick auf einen Arc |
 | `onChordClick` | `(info, event) => void` | — | Klick auf ein Band |
+| `zoomable` | `boolean` | `false` | `Ctrl / Cmd ⌘ + Scroll` visueller Zoom — clippt am `size`-Rand |
 | `disabled` | `boolean` | `false` | Deaktiviert alle Interaktionen, reduziert Opacity |
 | `translation` | `Partial<ChordChartTranslation>` | EN-Standard | Translation-Strings überschreiben |
 
@@ -207,6 +208,25 @@ function MyChart({ data }) {
   );
 }
 ```
+
+### Farb-Override pro Gruppe — `groupColorConfigs`
+
+```tsx
+<ChordChart
+  data={data}
+  groupColorConfigs={{
+    "Engineering": { fill: "#1565C0" },
+    "Sales":       { fill: "#6A1B9A" },
+    // Gruppen ohne Eintrag → chartColors oder MUI-Palette
+  }}
+/>
+```
+
+| Feld | Beschreibung |
+|---|---|
+| `fill` | Arc- und Band-Füllfarbe |
+| `textColor` | Label-Textfarbe |
+| `stroke` | Arc-Rahmenfarbe |
 
 ### Band-Opacity und Blend-Mode
 
