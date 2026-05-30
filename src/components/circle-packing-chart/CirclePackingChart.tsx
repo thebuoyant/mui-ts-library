@@ -8,13 +8,25 @@ import {
 } from "./CirclePackingChart.types";
 import type { CirclePackingData } from "./CirclePackingChart.types";
 
+// Truncate text to fit within availWidth pixels (same approach as SunburstChart)
+const AVG_CHAR_W = 0.52; // em factor for typical sans-serif
+function truncateLabel(name: string, availPx: number, fontSize: number): string {
+  const maxChars = Math.floor(availPx / (fontSize * AVG_CHAR_W));
+  if (maxChars <= 0) return "";
+  if (name.length <= maxChars) return name;
+  if (maxChars < 4) return "";
+  return name.slice(0, maxChars - 1) + "…";
+}
+
 export function CirclePackingChart({
   data,
   size = 600,
   padding = 3,
   sortBy = "value",
   showLabels = true,
-  labelFontSize = 11,
+  showAllLabels = false,
+  labelFontSize = 13,
+  innerLabelFontSize = 9,
   labelColor,
   chartColors,
   depthColorStart,
@@ -104,12 +116,18 @@ export function CirclePackingChart({
   );
 
   // ── Focus + view state ────────────────────────────────────────────────────
-  const svgRef  = useRef<SVGSVGElement | null>(null);
-  const viewRef = useRef<[number, number, number]>([root.x, root.y, root.r * 2]);
-  const [focus, setFocus] = useState<HierarchyCircularNode<CirclePackingData>>(root);
+  const svgRef   = useRef<SVGSVGElement | null>(null);
+  const viewRef  = useRef<[number, number, number]>([root.x, root.y, root.r * 2]);
+  const focusRef = useRef<HierarchyCircularNode<CirclePackingData>>(root);
+  const [focus, setFocusState] = useState<HierarchyCircularNode<CirclePackingData>>(root);
+
+  const setFocus = useCallback((node: HierarchyCircularNode<CirclePackingData>) => {
+    focusRef.current = node;
+    setFocusState(node);
+  }, []);
 
   const [prevData, setPrevData] = useState(data);
-  if (prevData !== data) { setPrevData(data); setFocus(root); }
+  if (prevData !== data) { setPrevData(data); setFocus(root); focusRef.current = root; }
 
   // ── Apply view to DOM (D3 imperative index-based) ─────────────────────────
   const applyView = useCallback(
@@ -118,10 +136,11 @@ export function CirclePackingChart({
       if (!el) return;
       viewRef.current = v;
       const k = size / v[2];
+      const currentFocus = focusRef.current;
 
+      // Update node group transforms + circle radii
       const groupNodes = el.querySelectorAll<SVGGElement>("g[data-role='nodes'] > g");
       const circles    = el.querySelectorAll<SVGCircleElement>("g[data-role='nodes'] > g > circle");
-
       for (let i = 0; i < nodes.length; i++) {
         const d = nodes[i];
         const g = groupNodes[i];
@@ -130,16 +149,47 @@ export function CirclePackingChart({
         if (j >= 0 && circles[j]) circles[j].setAttribute("r", String(d.r * k));
       }
 
+      // Outer-ring labels (direct children of focus) — managed by D3 transition fade
       if (showLabels) {
-        const labels = el.querySelectorAll<SVGTextElement>("g[data-role='labels'] > text");
+        const outerLabels = el.querySelectorAll<SVGTextElement>("g[data-role='labels'] > text");
         for (let i = 0; i < nodes.length; i++) {
           const d = nodes[i];
-          const txt = labels[i];
+          const txt = outerLabels[i];
           if (txt) txt.setAttribute("transform", `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`);
         }
       }
+
+      // Inner labels — shown when showAllLabels is true, updated imperatively
+      if (showAllLabels) {
+        const innerLabels = el.querySelectorAll<SVGTextElement>("g[data-role='inner-labels'] > text");
+        for (let i = 0; i < nodes.length; i++) {
+          const d   = nodes[i];
+          const txt = innerLabels[i];
+          if (!txt) continue;
+
+          const r          = d.r * k;
+          const availWidth = r * 1.5; // 75% of diameter for padding
+          const isDescendant = currentFocus !== root ? d.ancestors().includes(currentFocus) : d !== root;
+          const isDirectChild = d.parent === currentFocus;
+
+          // Show for descendants that are NOT direct children (those get outer labels)
+          // and only if the circle is big enough
+          if (isDescendant && !isDirectChild && r >= 6) {
+            const label = truncateLabel(d.data.name, availWidth, innerLabelFontSize);
+            if (label) {
+              txt.textContent = label;
+              txt.setAttribute("transform", `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`);
+              txt.style.display = "inline";
+            } else {
+              txt.style.display = "none";
+            }
+          } else {
+            txt.style.display = "none";
+          }
+        }
+      }
     },
-    [nodes, size, showLabels],
+    [nodes, size, showLabels, showAllLabels, innerLabelFontSize, root],
   );
 
   useLayoutEffect(() => {
@@ -187,7 +237,7 @@ export function CirclePackingChart({
         isRoot:        target === root,
       });
     },
-    [focus, nodes, root, applyView, onZoomChange],
+    [focus, nodes, root, applyView, onZoomChange, setFocus],
   );
 
   // ── Ctrl/Cmd+Click zoom-in timer (250ms to detect DblClick) ──────────────
@@ -323,16 +373,29 @@ export function CirclePackingChart({
           })}
         </g>
 
-        {/* ── Labels ── */}
+        {/* ── Outer-ring labels (direct children of focus) — bold, larger ── */}
         {showLabels && (
           <g data-role="labels" textAnchor="middle" dominantBaseline="middle"
-             pointerEvents="none" fontSize={labelFontSize} fill={resolvedLabelColor}>
+             pointerEvents="none" fontSize={labelFontSize} fontWeight="bold" fill={resolvedLabelColor}>
             {nodes.map((d, i) => (
               <text key={`lbl-${i}`}
                 transform={`translate(${d.x - size / 2},${d.y - size / 2})`}
                 style={{ display: d.parent === root ? "inline" : "none", fillOpacity: d.parent === root ? 1 : 0 }}>
                 {d.data.name}
               </text>
+            ))}
+          </g>
+        )}
+
+        {/* ── Inner labels (all nested circles) — smaller, truncated ── */}
+        {showAllLabels && (
+          <g data-role="inner-labels" textAnchor="middle" dominantBaseline="middle"
+             pointerEvents="none" fontSize={innerLabelFontSize} fill={resolvedLabelColor}>
+            {nodes.map((d, i) => (
+              <text key={`inner-lbl-${i}`}
+                transform={`translate(${d.x - size / 2},${d.y - size / 2})`}
+                style={{ display: "none" }}
+              />
             ))}
           </g>
         )}

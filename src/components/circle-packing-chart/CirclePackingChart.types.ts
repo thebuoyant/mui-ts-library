@@ -49,10 +49,18 @@ export type CirclePackingChartProps = {
   padding?:          number;
   /** Sort children by value or alphabetically (default: 'value') */
   sortBy?:           CirclePackingSortBy;
-  /** Show centered name labels on circles (default: true) */
+  /** Show name labels on the outer (focused) ring circles (default: true) */
   showLabels?:       boolean;
-  /** Label font size in px (default: 11) */
+  /**
+   * Show labels on ALL visible inner circles too — truncated with "…" when the
+   * text doesn't fit inside the circle. Outer-ring labels stay bold; inner labels
+   * use a smaller font. (default: false)
+   */
+  showAllLabels?:    boolean;
+  /** Outer-ring label font size in px (default: 13, bold) */
   labelFontSize?:    number;
+  /** Inner circle label font size in px — used when `showAllLabels` is true (default: 9) */
+  innerLabelFontSize?: number;
   /** Label text color — defaults to `theme.palette.text.primary` */
   labelColor?:       string;
   /**

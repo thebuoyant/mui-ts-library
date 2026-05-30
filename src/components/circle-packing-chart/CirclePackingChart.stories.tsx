@@ -10,8 +10,10 @@ const meta: Meta<typeof CirclePackingChart> = {
     size:           { control: "number" },
     padding:        { control: "number" },
     sortBy:         { control: "radio", options: ["value", "name"] },
-    showLabels:     { control: "boolean" },
-    labelFontSize:  { control: "number" },
+    showLabels:          { control: "boolean" },
+    showAllLabels:       { control: "boolean" },
+    labelFontSize:       { control: "number" },
+    innerLabelFontSize:  { control: "number" },
     labelColor:     { control: "color" },
     background:     { control: "color" },
     depthColorStart:{ control: "color" },
@@ -28,8 +30,10 @@ const meta: Meta<typeof CirclePackingChart> = {
     size:          600,
     padding:       3,
     sortBy:        "value",
-    showLabels:    true,
-    labelFontSize: 11,
+    showLabels:         true,
+    showAllLabels:      false,
+    labelFontSize:      13,
+    innerLabelFontSize: 9,
     duration:      750,
     disabled:      false,
     onCircleClick: fn(),
@@ -223,6 +227,24 @@ export const GradientMode: Story = {
     depthColorStart: "hsl(195, 100%, 85%)",
     depthColorEnd:   "hsl(250, 70%, 30%)",
     background:      "#F8F9FA",
+  },
+};
+
+export const WithAllLabels: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`showAllLabels={true}` shows labels on ALL visible inner circles — truncated with `…` if the text doesn\'t fit inside the circle. ' +
+          'Outer-ring labels stay **bold** and larger. Inner labels use `innerLabelFontSize` (default 9px). ' +
+          'Labels disappear automatically for circles that are too small.',
+      },
+    },
+  },
+  args: {
+    data:          GLOBAL_SOFTWARE,
+    showAllLabels: true,
+    size:          650,
   },
 };
 
