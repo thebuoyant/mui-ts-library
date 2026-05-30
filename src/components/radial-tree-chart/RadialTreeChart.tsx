@@ -308,7 +308,11 @@ export function RadialTreeChart({
         height={size}
         viewBox={viewBox}
         onWheel={handleWheel}
-        style={{ fontFamily: fontFamily ?? "sans-serif", overflow: "visible", cursor: zoomable ? "crosshair" : "default" }}
+        style={{
+          fontFamily: fontFamily ?? "sans-serif",
+          // clip content at SVG boundary when zoomed in
+          overflow: zoomable && zoomScale > 1 ? "hidden" : "visible",
+        }}
         role="img"
         aria-label={data.name}
       >

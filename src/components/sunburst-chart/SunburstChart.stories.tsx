@@ -12,6 +12,7 @@ const meta: Meta<typeof SunburstChart> = {
     innerRadius:             { control: "number" },
     sortBy:                  { control: "radio", options: ["value", "name"] },
     showRootLabel:           { control: "boolean" },
+    zoomable:                { control: "boolean" },
     disabled:                { control: "boolean" },
     valueDecimalCount:       { control: "number" },
     valueDecimalSeparator:   { control: "text" },
@@ -27,6 +28,7 @@ const meta: Meta<typeof SunburstChart> = {
     innerRadius:             0,
     sortBy:                  "value",
     showRootLabel:           true,
+    zoomable:                false,
     disabled:                false,
     valueDecimalCount:       0,
     valueDecimalSeparator:   ".",
@@ -232,10 +234,10 @@ export const DeepHierarchy: Story = {
     docs: {
       description: {
         story:
-          '**5 depth levels — shows how the Ctrl+Click drill-down handles deep hierarchies.** ' +
-          '`Ctrl+Click` any inner ring segment to zoom into that subtree. ' +
-          '`Ctrl+Double-click` to zoom out. `Escape` resets to root. ' +
-          'Deep trees are fully navigable — each drill-down reveals the next level in full detail.',
+          '**5 depth levels — combines Ctrl+Click drill-down with Ctrl+Scroll zoom.** ' +
+          '`Ctrl+Click` any ring segment → drill-down into that subtree. ' +
+          '`Ctrl+Scroll` → visual zoom (content outside `size` is clipped). ' +
+          '`Escape` resets both zoom and drill-down to root.',
       },
     },
   },
@@ -243,6 +245,7 @@ export const DeepHierarchy: Story = {
     data:      DEEP_DATA,
     size:      520,
     sortBy:    "value",
+    zoomable:  true,
     showSegmentLabels: true,
   },
 };
