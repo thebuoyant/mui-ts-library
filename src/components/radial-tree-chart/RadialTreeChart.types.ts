@@ -10,7 +10,9 @@ export type RadialTreeChartData = {
   specialValueA?: string | number;
   /** Custom field B — shown in the built-in node popover */
   specialValueB?: string | number;
-  children?:     RadialTreeChartData[];
+  /** Per-node color overrides — null / omit = use chart default palette */
+  colorConfig?: { fill?: string; textColor?: string; stroke?: string } | null;
+  children?:    RadialTreeChartData[];
 };
 
 

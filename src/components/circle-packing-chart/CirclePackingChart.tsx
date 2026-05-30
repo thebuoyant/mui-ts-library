@@ -8,14 +8,16 @@ import {
 } from "./CirclePackingChart.types";
 import type { CirclePackingData } from "./CirclePackingChart.types";
 
-// Truncate text to fit within availWidth pixels (same approach as SunburstChart)
-const AVG_CHAR_W = 0.52; // em factor for typical sans-serif
-function truncateLabel(name: string, availPx: number, fontSize: number): string {
-  const maxChars = Math.floor(availPx / (fontSize * AVG_CHAR_W));
-  if (maxChars <= 0) return "";
-  if (name.length <= maxChars) return name;
-  if (maxChars < 4) return "";
-  return name.slice(0, maxChars - 1) + "…";
+// Full label if it fits, "…" if circle is large enough to be worth it, otherwise nothing.
+// No partial text — either the full name or nothing/ellipsis.
+const AVG_CHAR_W = 0.56; // em factor for typical sans-serif
+
+function fitOrEllipsis(name: string, availPx: number, fontSize: number): string {
+  const fullWidth = name.length * fontSize * AVG_CHAR_W;
+  if (fullWidth <= availPx) return name;           // fits completely → show full
+  const ellipsisW = 3 * fontSize * AVG_CHAR_W;     // width of "…"
+  if (availPx >= ellipsisW + fontSize * 2) return "…"; // circle big enough for "…"
+  return "";                                        // too small → nothing
 }
 
 export function CirclePackingChart({
@@ -88,6 +90,8 @@ export function CirclePackingChart({
 
   const fillFor = useCallback(
     (d: HierarchyCircularNode<CirclePackingData>): string => {
+      // Per-node override takes priority
+      if (d.data.colorConfig?.fill) return d.data.colorConfig.fill;
       if (useGradient && colorGradient) {
         return d.children ? colorGradient(d.depth) : theme.palette.background.paper;
       }
@@ -175,7 +179,7 @@ export function CirclePackingChart({
           // Show for descendants that are NOT direct children (those get outer labels)
           // and only if the circle is big enough
           if (isDescendant && !isDirectChild && r >= 6) {
-            const label = truncateLabel(d.data.name, availWidth, innerLabelFontSize);
+            const label = fitOrEllipsis(d.data.name, availWidth, innerLabelFontSize);
             if (label) {
               txt.textContent = label;
               txt.setAttribute("transform", `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`);
@@ -334,7 +338,7 @@ export function CirclePackingChart({
                     <circle
                       r={d.r}
                       fill={fillFor(d)}
-                      stroke={theme.palette.background.paper}
+                      stroke={d.data.colorConfig?.stroke ?? theme.palette.background.paper}
                       strokeWidth={0.75}
                       style={{ cursor: disabled ? "not-allowed" : d.children ? "pointer" : "default", transition: "stroke-width 0.1s" }}
                       onMouseEnter={(e) => { if (!disabled) e.currentTarget.style.strokeWidth = "2"; }}

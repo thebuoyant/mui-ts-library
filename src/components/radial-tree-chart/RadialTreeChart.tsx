@@ -145,7 +145,7 @@ export function RadialTreeChart({
 
   const nodeColor = useCallback(
     (node: HierarchyPointNode<RadialTreeChartData>): string =>
-      palette[node.depth % palette.length],
+      node.data.colorConfig?.fill ?? palette[node.depth % palette.length],
     [palette],
   );
 

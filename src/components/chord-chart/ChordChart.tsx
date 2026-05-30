@@ -84,6 +84,7 @@ export function ChordChart({
   sortSubgroups = "descending",
   sortChords = "descending",
   chartColors,
+  groupColorConfigs,
   showGroupLabels = true,
   labelOffset = 8,
   ribbonOpacity = 0.75,
@@ -175,7 +176,7 @@ export function ChordChart({
     [ribbonGen, radiusInner],
   );
 
-  // ── color scale ─────────────────────────────────────────────────────────
+  // ── color scale — groupColorConfigs override takes priority ──────────────
   const colorScale = useMemo(
     () =>
       d3
@@ -186,6 +187,12 @@ export function ChordChart({
           : [...Array(Math.ceil(names.length / palette.length))].flatMap(() => palette).slice(0, names.length)
         ),
     [palette, names.length],
+  );
+
+  const groupFill = useCallback(
+    (index: number): string =>
+      groupColorConfigs?.[names[index]]?.fill ?? colorScale(index),
+    [groupColorConfigs, names, colorScale],
   );
 
   // ── viewBox auto-fit ────────────────────────────────────────────────────
@@ -296,7 +303,7 @@ export function ChordChart({
                   >
                     <path
                       d={arc(group) || ""}
-                      fill={colorScale(group.index)}
+                      fill={groupFill(group.index)}
                       stroke={theme.palette.divider}
                       opacity={dimmed ? 0.35 : 1}
                       style={{ transition: "opacity 0.15s" }}
@@ -343,7 +350,7 @@ export function ChordChart({
                 >
                   <path
                     d={ribbonPath(chord)}
-                    fill={colorScale(chord.target.index)}
+                    fill={groupFill(chord.target.index)}
                     stroke="none"
                     opacity={visible ? 1 : 0.12}
                     style={{

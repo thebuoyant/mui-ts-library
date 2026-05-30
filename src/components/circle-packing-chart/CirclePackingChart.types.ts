@@ -1,9 +1,25 @@
+/**
+ * Per-node color overrides — takes priority over the chart's depth palette.
+ * Set any key to override; omit or set to null to fall back to chart defaults.
+ * Shared across all D3 charts (SunburstChart, ChordChart, RadialTreeChart, CirclePackingChart).
+ */
+export type NodeColorConfig = {
+  /** Fill / background color of the circle or arc segment */
+  fill?:      string;
+  /** Label text color (overrides chart-level `labelColor`) */
+  textColor?: string;
+  /** Stroke / border color */
+  stroke?:    string;
+};
+
 export type CirclePackingData = {
   /** Optional ID for backend linking */
-  id?:       string;
-  name:      string;
-  value?:    number;
-  children?: CirclePackingData[];
+  id?:          string;
+  name:         string;
+  value?:       number;
+  /** Per-node color overrides — null / omit = use chart default palette */
+  colorConfig?: NodeColorConfig | null;
+  children?:    CirclePackingData[];
 };
 
 export type CirclePackingSortBy = 'value' | 'name';
