@@ -331,9 +331,11 @@ export function GanttChart({
   progressDraggable = false,
   showCriticalPath = false,
   virtualizeRows = false,
+  showAssigneeColumn = false,
   cascadeDependencies = false,
   statusColors,
   ganttTheme,
+  onExportCSV,
   onTaskClick,
   onMilestoneClick,
   onAddTask,
@@ -391,6 +393,8 @@ export function GanttChart({
           progressDraggable={progressDraggable}
           showCriticalPath={showCriticalPath}
           virtualizeRows={virtualizeRows}
+          showAssigneeColumn={showAssigneeColumn}
+          onExportCSV={onExportCSV}
           onTaskClick={onTaskClick}
           onMilestoneClick={onMilestoneClick}
           onAddTask={onAddTask}
