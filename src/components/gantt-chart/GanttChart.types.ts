@@ -19,6 +19,8 @@ export type GanttTask = {
   progress?: number;
   // Überschreibt die Status-Farbe für diesen einzelnen Task (höchste Priorität, CSS-Farbwert).
   color?: string;
+  /** Person or team responsible for this task — shown in the Assignee column */
+  assignee?: string;
 };
 
 // Interner Knoten für den aufgebauten Task-Baum — nicht Teil der öffentlichen API.
@@ -75,6 +77,8 @@ export type GanttTranslations = {
   dialogFieldDependenciesNone: string;
   // Task-Panel — Aktions-Spalten-Header
   columnActions: string;
+  /** Header label for the Assignee column — shown when showAssigneeColumn=true */
+  columnAssignee: string;
   // Task-Panel — Zeilen-Icon-Tooltips
   addTaskTooltip: string;
   editTaskTooltip: string;
@@ -84,6 +88,8 @@ export type GanttTranslations = {
   expandAllTooltip: string;
   collapseAllTooltip: string;
   resetViewTooltip: string;
+  /** Toolbar tooltip for the CSV export button */
+  exportCsvTooltip: string;
 };
 
 // Standardwerte entsprechen dem aktuell gerenderten Verhalten (DE Toolbar, EN Status).
@@ -125,6 +131,8 @@ export const DEFAULT_GANTT_TRANSLATIONS: GanttTranslations = {
   collapseAllTooltip: "Alle zuklappen",
   resetViewTooltip: "Ansicht zurücksetzen",
   columnActions: "Aktionen",
+  columnAssignee: "Assignee",
+  exportCsvTooltip: "Als CSV exportieren",
   addTaskTooltip: "Aufgabe hinzufügen",
   editTaskTooltip: "Aufgabe bearbeiten",
   deleteTaskTooltip: "Aufgabe löschen",
@@ -161,6 +169,8 @@ export type GanttToolbarConfig = {
   showDateRange?: boolean;   // Von/Bis-Inputs
   showRangeReset?: boolean;  // Restore-Button (erscheint wenn Bereich angepasst)
   showResetView?: boolean;   // Reset-Button (Skala + Bereich zurücksetzen)
+  /** Show CSV export button in the toolbar (default: false) */
+  showExportCSV?: boolean;
 };
 
 export type GanttChartProps = {
@@ -204,6 +214,8 @@ export type GanttChartProps = {
   translations?: Partial<GanttTranslations>;
   // Wenn true, werden nur sichtbare Zeilen gerendert (für 200+ Tasks empfohlen). Default: false.
   virtualizeRows?: boolean;
+  /** Show the Assignee column in the task panel (default: false) */
+  showAssigneeColumn?: boolean;
   /** Breite des Charts. "auto" = 100 % des Eltern-Containers. Standard: "100%". */
   width?: number | string;
   // Wenn true, ändert Strg+Mausrad die Zeitskala (days ↔ weeks ↔ months ↔ quarters).
@@ -222,5 +234,11 @@ export type GanttChartProps = {
   onTaskResized?: (task: GanttTask, newEnd: Date) => void;
   // Wird nach jeder CRUD-Aktion mit der vollständigen aktuellen Task-Liste aufgerufen.
   onTasksChange?: (tasks: GanttTask[]) => void;
+  /**
+   * Fired when the user clicks the CSV export button.
+   * The first argument is the ready-to-download CSV string.
+   * When not provided, the chart triggers a browser download automatically.
+   */
+  onExportCSV?: (csv: string, tasks: GanttTask[]) => void;
   onTaskUpdated?: (task: GanttTask) => void;
 };

@@ -42,6 +42,8 @@ const EN_TRANSLATIONS: GanttTranslations = {
   collapseAllTooltip: "Collapse all",
   resetViewTooltip: "Reset view",
   columnActions: "Actions",
+  columnAssignee: "Assignee",
+  exportCsvTooltip: "Export as CSV",
   addTaskTooltip: "Add task",
   editTaskTooltip: "Edit task",
   deleteTaskTooltip: "Delete task",
@@ -772,6 +774,71 @@ export const LargeDataset: Story = {
   },
   render: (args) => (
     <Box sx={{ width: "100%", height: args.height }}>
+      <GanttChart {...args} />
+    </Box>
+  ),
+};
+
+// ── Assignee-Spalte + CSV Export Demo-Daten ──────────────────────────────────
+
+const assigneeTasks: GanttTask[] = [
+  { id: "proj", name: "Website Relaunch", status: "in-progress", startDate: new Date("2026-06-01"), endDate: new Date("2026-08-31"), assignee: "Lisa Müller" },
+  { id: "ux",   parentId: "proj", name: "UX Design",     status: "done",        startDate: new Date("2026-06-01"), endDate: new Date("2026-06-30"), assignee: "Anna Schulz" },
+  { id: "dev",  parentId: "proj", name: "Development",   status: "in-progress", startDate: new Date("2026-07-01"), endDate: new Date("2026-08-15"), assignee: "Marc Weber" },
+  { id: "fe",   parentId: "dev",  name: "Frontend",      status: "in-progress", startDate: new Date("2026-07-01"), endDate: new Date("2026-08-01"), assignee: "Marc Weber" },
+  { id: "be",   parentId: "dev",  name: "Backend API",   status: "planned",     startDate: new Date("2026-07-15"), endDate: new Date("2026-08-15"), assignee: "Tim Fischer" },
+  { id: "qa",   parentId: "proj", name: "QA & Testing",  status: "planned",     startDate: new Date("2026-08-01"), endDate: new Date("2026-08-20"), assignee: "Sara Klein" },
+  { id: "go",   parentId: "proj", name: "Go Live",       status: "planned",     startDate: new Date("2026-08-31"), endDate: new Date("2026-08-31"), isMilestone: true, assignee: "Lisa Müller" },
+];
+
+export const WithAssigneeColumn: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`showAssigneeColumn={true}` — shows an Assignee column in the task panel. ' +
+          'Set `task.assignee` in the data to populate the column. ' +
+          'The assignee field also appears in the Add/Edit dialog.',
+      },
+    },
+  },
+  args: {
+    tasks: assigneeTasks,
+    showAssigneeColumn: true,
+    enableBuiltinDialogs: true,
+    initialExpandAll: true,
+    timeScale: "months",
+    height: 400,
+  },
+  render: (args) => (
+    <Box sx={{ width: "100%" }}>
+      <GanttChart {...args} />
+    </Box>
+  ),
+};
+
+export const WithCSVExport: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`toolbarConfig={{ showExportCSV: true }}` — shows a Download button in the toolbar. ' +
+          'Clicking it generates a CSV with all task fields (id, name, status, dates, assignee, etc.) ' +
+          'and triggers a browser download as `gantt-tasks.csv`. ' +
+          'Use `onExportCSV` to handle the CSV string yourself instead.',
+      },
+    },
+  },
+  args: {
+    tasks: assigneeTasks,
+    showAssigneeColumn: true,
+    toolbarConfig: { showExportCSV: true },
+    initialExpandAll: true,
+    timeScale: "months",
+    height: 400,
+  },
+  render: (args) => (
+    <Box sx={{ width: "100%" }}>
       <GanttChart {...args} />
     </Box>
   ),

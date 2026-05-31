@@ -13,6 +13,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.7.0] — 2026-05-31
+
+### Added
+
+#### GanttChart — Assignee Column + CSV Export (MTL-25)
+
+- **`task.assignee?: string`** — new optional field on `GanttTask`; shown in the panel column and in the Add/Edit dialog
+- **`showAssigneeColumn?: boolean`** (default `false`) — displays an "Assignee" column in the task panel between the task name and the actions column
+- **`toolbarConfig.showExportCSV?: boolean`** (default `false`) — adds a Download button to the toolbar; generates a CSV with all task fields (id, name, status, startDate, endDate, progress, assignee, parentId, isMilestone, dependencies, color) and triggers a browser download
+- **`onExportCSV?: (csv: string, tasks: GanttTask[]) => void`** — optional callback to handle the CSV string yourself instead of triggering the automatic download
+- New translation keys: `columnAssignee` (default `"Assignee"`), `exportCsvTooltip` (default `"Als CSV exportieren"`)
+- 2 new Storybook stories: `WithAssigneeColumn`, `WithCSVExport`
+
+---
+
 ## [2.6.0] — 2026-05-31
 
 ### Added

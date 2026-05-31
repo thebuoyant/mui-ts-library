@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { Box, IconButton, TextField, ToggleButton, ToggleButtonGroup, Tooltip } from "@mui/material";
+import DownloadIcon from "@mui/icons-material/Download";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import RestoreIcon from "@mui/icons-material/Restore";
 import TodayIcon from "@mui/icons-material/Today";
@@ -25,9 +26,10 @@ function parseDateInput(value: string): Date | null {
 type GanttToolbarProps = {
   onScrollToToday?: () => void;
   config: Required<GanttToolbarConfig>;
+  onExportCSV?: () => void;
 };
 
-export function GanttToolbar({ onScrollToToday, config }: GanttToolbarProps) {
+export function GanttToolbar({ onScrollToToday, config, onExportCSV }: GanttToolbarProps) {
   const t = useGanttTranslations();
   const timeScale = useGanttChartStore((s) => s.timeScale);
   const defaultTimeScale = useGanttChartStore((s) => s.defaultTimeScale);
@@ -177,6 +179,18 @@ export function GanttToolbar({ onScrollToToday, config }: GanttToolbarProps) {
               data-testid="gantt-range-reset"
             >
               <RestoreIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        )}
+
+        {config.showExportCSV && onExportCSV && (
+          <Tooltip title={t.exportCsvTooltip}>
+            <IconButton
+              size="small"
+              onClick={onExportCSV}
+              data-testid="gantt-export-csv"
+            >
+              <DownloadIcon fontSize="small" />
             </IconButton>
           </Tooltip>
         )}

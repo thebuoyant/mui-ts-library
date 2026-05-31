@@ -27,6 +27,7 @@ type TaskFormState = {
   isMilestone: boolean;
   parentId: string;
   dependencies: string[];
+  assignee: string;
 };
 
 function toDateString(date: Date): string {
@@ -113,6 +114,7 @@ export function GanttTaskDialog({
     isMilestone: false,
     parentId: "",
     dependencies: [],
+    assignee: "",
   });
 
   useEffect(() => {
@@ -128,6 +130,7 @@ export function GanttTaskDialog({
         isMilestone: initialTask.isMilestone ?? false,
         parentId: initialTask.parentId ?? "",
         dependencies: initialTask.dependencies ?? [],
+        assignee: initialTask.assignee ?? "",
       });
     } else {
       setForm({
@@ -138,6 +141,7 @@ export function GanttTaskDialog({
         isMilestone: false,
         parentId: defaultParentId ?? "",
         dependencies: [],
+        assignee: "",
       });
     }
   }, [open, mode, initialTask, defaultParentId, timelineRange]);
@@ -183,6 +187,7 @@ export function GanttTaskDialog({
       isMilestone: form.isMilestone || undefined,
       parentId: form.parentId || undefined,
       dependencies: form.dependencies.length > 0 ? form.dependencies : undefined,
+      assignee: form.assignee.trim() || undefined,
     });
   };
 
@@ -213,6 +218,15 @@ export function GanttTaskDialog({
           size="small"
           autoFocus
           slotProps={{ htmlInput: { "data-testid": "gantt-dialog-field-name" } }}
+        />
+        <TextField
+          label={t.columnAssignee}
+          value={form.assignee}
+          onChange={(e) => setForm((prev) => ({ ...prev, assignee: e.target.value }))}
+          fullWidth
+          size="small"
+          placeholder="e.g. Jane Smith"
+          slotProps={{ htmlInput: { "data-testid": "gantt-dialog-field-assignee" } }}
         />
         <TextField
           label={t.dialogFieldStartDate}

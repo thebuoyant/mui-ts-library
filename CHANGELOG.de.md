@@ -13,6 +13,20 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [2.7.0] — 2026-05-31
+
+### Hinzugefügt
+
+#### GanttChart — Assignee-Spalte + CSV-Export (MTL-25)
+
+- **`task.assignee?: string`** — neues optionales Feld in `GanttTask`; wird in der Panel-Spalte und im Add/Edit-Dialog angezeigt
+- **`showAssigneeColumn?: boolean`** (Standard `false`) — zeigt eine "Assignee"-Spalte im Task-Panel
+- **`toolbarConfig.showExportCSV?: boolean`** (Standard `false`) — Download-Button in der Toolbar; generiert CSV mit allen Task-Feldern und löst Browser-Download aus
+- **`onExportCSV?: (csv: string, tasks: GanttTask[]) => void`** — optionaler Callback für eigene CSV-Verarbeitung
+- Neue Translation-Keys: `columnAssignee`, `exportCsvTooltip`
+
+---
+
 ## [2.6.0] — 2026-05-31
 
 ### Hinzugefügt

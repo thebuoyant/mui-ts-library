@@ -8,7 +8,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { useGanttChartStore, useGanttTheme, useGanttTranslations, useRawGanttChartStore } from "./GanttChart";
 import type { GanttTask, GanttTaskNode, GanttTaskStatus, GanttTranslations } from "./GanttChart.types";
 import { getVisibleTasks } from "./util/gantt-chart.util";
-import { ROW_HEIGHT, HEADER_HEIGHT, ACTIONS_COL_WIDTH, STATUS_COL_WIDTH, STATUS_BAR_COLOR, STATUS_CHIP_COLOR } from "./GanttChart.constants";
+import { ROW_HEIGHT, HEADER_HEIGHT, ACTIONS_COL_WIDTH, STATUS_COL_WIDTH, ASSIGNEE_COL_WIDTH, STATUS_BAR_COLOR, STATUS_CHIP_COLOR } from "./GanttChart.constants";
 import { GanttTaskDialog } from "./GanttTaskDialog";
 import { GanttDeleteDialog } from "./GanttDeleteDialog";
 
@@ -31,6 +31,7 @@ type GanttTaskRowProps = {
   expandedIds: Set<string>;
   toggleExpand: (id: string) => void;
   hasActionsColumn: boolean;
+  showAssigneeColumn?: boolean;
   onTaskClick?: (task: GanttTask) => void;
   onAddTask?: (task: GanttTask) => void;
   onEditTask?: (task: GanttTask) => void;
@@ -45,6 +46,7 @@ function GanttTaskRow({
   expandedIds,
   toggleExpand,
   hasActionsColumn,
+  showAssigneeColumn,
   onTaskClick,
   onAddTask,
   onEditTask,
@@ -148,6 +150,24 @@ function GanttTaskRow({
           </Typography>
         )}
       </Box>
+
+      {/* Assignee-Spalte — opt-in, feste Breite */}
+      {showAssigneeColumn && (
+        <Box
+          sx={{
+            width: ASSIGNEE_COL_WIDTH,
+            flexShrink: 0,
+            display: "flex",
+            alignItems: "center",
+            px: 1,
+            overflow: "hidden",
+          }}
+        >
+          <Typography variant="caption" noWrap color={task.assignee ? "text.primary" : "text.disabled"}>
+            {task.assignee ?? "—"}
+          </Typography>
+        </Box>
+      )}
 
       {/* Aktions-Spalte — feste Breite, immer vorhanden wenn hasActionsColumn */}
       {hasActionsColumn && (
@@ -286,6 +306,7 @@ type GanttTaskPanelProps = {
   onTaskDeleted?: (taskId: string) => void;
   inlineEdit?: boolean;
   virtualizeRows?: boolean;
+  showAssigneeColumn?: boolean;
 };
 
 export function GanttTaskPanel({
@@ -304,6 +325,7 @@ export function GanttTaskPanel({
   onTaskDeleted,
   inlineEdit,
   virtualizeRows = false,
+  showAssigneeColumn = false,
 }: GanttTaskPanelProps) {
   const t = useGanttTranslations();
   const rawStore = useRawGanttChartStore();
@@ -427,6 +449,14 @@ export function GanttTaskPanel({
               {t.columnName}
             </Typography>
           </Box>
+          {/* Assignee-Spalten-Header */}
+          {showAssigneeColumn && (
+            <Box sx={{ width: ASSIGNEE_COL_WIDTH, flexShrink: 0, display: "flex", alignItems: "center", px: 1 }}>
+              <Typography variant="caption" color="text.secondary">
+                {t.columnAssignee}
+              </Typography>
+            </Box>
+          )}
           {/* Aktions-Spalten-Header */}
           {hasActionsColumn && (
             <Box sx={{ width: ACTIONS_COL_WIDTH, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -473,6 +503,7 @@ export function GanttTaskPanel({
                 expandedIds={expandedIds}
                 toggleExpand={toggleExpand}
                 hasActionsColumn={hasActionsColumn}
+                showAssigneeColumn={showAssigneeColumn}
                 onTaskClick={onTaskClick}
                 onAddTask={rowOnAdd}
                 onEditTask={rowOnEdit}
@@ -492,6 +523,7 @@ export function GanttTaskPanel({
             expandedIds={expandedIds}
             toggleExpand={toggleExpand}
             hasActionsColumn={hasActionsColumn}
+            showAssigneeColumn={showAssigneeColumn}
             onTaskClick={onTaskClick}
             onAddTask={rowOnAdd}
             onEditTask={rowOnEdit}

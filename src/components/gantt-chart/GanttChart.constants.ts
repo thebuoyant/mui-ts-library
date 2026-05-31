@@ -8,6 +8,7 @@ export const COLUMN_WIDTH_QUARTER = 360; // = 3 × COLUMN_WIDTH_MONTH
 export const BAR_HEIGHT = 16;
 export const STATUS_COL_WIDTH = 90;
 export const ACTIONS_COL_WIDTH = 96;
+export const ASSIGNEE_COL_WIDTH = 110;
 export const DIVIDER_WIDTH = 4;
 
 // ---------------------------------------------------------------------------

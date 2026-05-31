@@ -89,6 +89,7 @@ const DEFAULT_TOOLBAR_CONFIG: Required<GanttToolbarConfig> = {
   showDateRange: true,
   showRangeReset: true,
   showResetView: true,
+  showExportCSV: false,
 };
 
 function GanttChartInner({
@@ -117,6 +118,8 @@ function GanttChartInner({
   progressDraggable = false,
   showCriticalPath = false,
   virtualizeRows = false,
+  showAssigneeColumn = false,
+  onExportCSV,
   onTaskMoved,
   onTaskResized,
 }: GanttChartInnerProps) {
@@ -136,6 +139,38 @@ function GanttChartInner({
   const isSyncing = useRef(false);
 
   const [panelWidth, setPanelWidth] = useState(LEFT_PANEL_WIDTH);
+  const rawStore = useRawGanttChartStore();
+
+  const handleExportCSV = useCallback(() => {
+    const currentTasks = rawStore.getState().tasks;
+    const cols = ["id","name","status","startDate","endDate","progress","assignee","parentId","isMilestone","dependencies","color"];
+    const header = cols.join(",");
+    const rows = currentTasks.map((task) => [
+      task.id,
+      `"${task.name.replace(/"/g, '""')}"`,
+      task.status,
+      task.startDate.toISOString().split("T")[0],
+      task.endDate.toISOString().split("T")[0],
+      task.progress ?? "",
+      task.assignee ? `"${task.assignee.replace(/"/g, '""')}"` : "",
+      task.parentId ?? "",
+      task.isMilestone ? "true" : "false",
+      (task.dependencies ?? []).join(";"),
+      task.color ?? "",
+    ].join(","));
+    const csv = [header, ...rows].join("\n");
+    if (onExportCSV) {
+      onExportCSV(csv, currentTasks);
+    } else {
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "gantt-tasks.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  }, [rawStore, onExportCSV]);
 
   useEffect(() => {
     setTasks(tasks);
@@ -217,7 +252,13 @@ function GanttChartInner({
         overflow: "hidden",
       }}
     >
-      {showToolbar && <GanttToolbar onScrollToToday={scrollToToday} config={resolvedToolbarConfig} />}
+      {showToolbar && (
+        <GanttToolbar
+          onScrollToToday={scrollToToday}
+          config={resolvedToolbarConfig}
+          onExportCSV={resolvedToolbarConfig.showExportCSV ? handleExportCSV : undefined}
+        />
+      )}
 
       <Box sx={{ display: "flex", flex: 1, overflow: "hidden" }}>
         <GanttTaskPanel
@@ -236,6 +277,7 @@ function GanttChartInner({
           onTaskDeleted={onTaskDeleted}
           inlineEdit={inlineEdit}
           virtualizeRows={virtualizeRows}
+          showAssigneeColumn={showAssigneeColumn}
         />
         <Box
           data-testid="gantt-panel-divider"
