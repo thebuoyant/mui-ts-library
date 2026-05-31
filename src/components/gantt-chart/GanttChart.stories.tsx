@@ -223,11 +223,10 @@ const meta: Meta<typeof GanttChart> = {
     onTaskUpdated:    fn(),
   },
   argTypes: {
-    // A–Z
+    // Props A–Z
     cascadeDependencies:  { control: "boolean" },
-    // Date objects aren't directly controllable — use the CustomDateRange story instead.
-    defaultRangeEnd:   { control: false },
-    defaultRangeStart: { control: false },
+    defaultRangeEnd:      { control: false },  // Date — use CustomDateRange story
+    defaultRangeStart:    { control: false },  // Date — use CustomDateRange story
     draggable:            { control: "boolean" },
     enableBuiltinDialogs: { control: "boolean" },
     ganttTheme:           { control: false },
@@ -238,28 +237,31 @@ const meta: Meta<typeof GanttChart> = {
     minPanelWidth:        { control: "number" },
     progressDraggable:    { control: "boolean" },
     resizable:            { control: "boolean" },
+    showAssigneeColumn:   { control: "boolean" },
     showCriticalPath:     { control: "boolean" },
     showToolbar:          { control: "boolean" },
     statusColors:         { control: false },
-    timeScale: { control: "radio", options: ["days", "weeks", "months", "quarters"] },
+    tasks:                { control: false },
+    timeScale:            { control: "radio", options: ["days", "weeks", "months", "quarters"] },
     toolbarConfig:        { control: false },
     translations:         { control: false },
     virtualizeRows:       { control: "boolean" },
     width:                { control: "text" },
     zoomable:             { control: "boolean" },
-    // Callbacks
-    onAddTask:        { control: false },
-    onDeleteTask:     { control: false },
-    onEditTask:       { control: false },
-    onMilestoneClick: { control: false },
-    onStatusChange:   { control: false },
-    onTaskClick:      { control: false },
-    onTaskCreated:    { control: false },
-    onTaskDeleted:    { control: false },
-    onTaskMoved:      { control: false },
-    onTaskResized:    { control: false },
-    onTasksChange:    { control: false },
-    onTaskUpdated:    { control: false },
+    // Callbacks A–Z
+    onAddTask:            { control: false },
+    onDeleteTask:         { control: false },
+    onEditTask:           { control: false },
+    onExportCSV:          { control: false },
+    onMilestoneClick:     { control: false },
+    onStatusChange:       { control: false },
+    onTaskClick:          { control: false },
+    onTaskCreated:        { control: false },
+    onTaskDeleted:        { control: false },
+    onTaskMoved:          { control: false },
+    onTaskResized:        { control: false },
+    onTasksChange:        { control: false },
+    onTaskUpdated:        { control: false },
   },
 };
 

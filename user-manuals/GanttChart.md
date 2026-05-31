@@ -145,28 +145,29 @@ type GanttTask = {
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `cascadeDependencies` | `boolean` | `false` | When `true`, moving or resizing a task automatically shifts all finish-to-start successors (via `dependencies`) by the same amount. Works transitively across multiple levels. |
+| `cascadeDependencies` | `boolean` | `false` | When `true`, moving or resizing a task automatically shifts all finish-to-start successors by the same amount. Works transitively. |
 | `defaultRangeEnd` | `Date` | auto | Overrides the automatically calculated right boundary of the timeline. |
-| `defaultRangeStart` | `Date` | auto | Overrides the automatically calculated left boundary of the timeline. Useful for fixing a specific date range from the start. |
+| `defaultRangeStart` | `Date` | auto | Overrides the automatically calculated left boundary of the timeline. |
 | `draggable` | `boolean` | `false` | Allows horizontal dragging of task bars. Updates `startDate` and `endDate` in sync. |
-| `enableBuiltinDialogs` | `boolean` | `true` | When `true`, the action icons (Add, Edit, Delete) open built-in MUI dialogs. When `false`, only the callbacks `onAddTask`, `onEditTask`, `onDeleteTask` are called — for custom dialog implementations. |
-| `ganttTheme` | `GanttTheme` | — | Bundled theming object. Recommended way for visual customization. Individual keys override the defaults — unset keys keep their default appearance. See [GanttTheme](#gantttheme). |
-| `height` | `number \| string` | `400` | Total chart height in pixels or as a CSS value. `"auto"` adapts to the parent element. |
-| `initialExpandAll` | `boolean` | `false` | Starts the chart with all hierarchy levels expanded. Default: only root tasks are expanded, their direct children are visible. |
-| `inlineEdit` | `boolean` | `false` | Enables inline editing of the task name by double-clicking directly in the panel. |
-| `maxPanelWidth` | `number` | `600` | Maximum width of the left task panel in pixels. |
-| `minPanelWidth` | `number` | `200` | Minimum width of the left task panel in pixels. Prevents the user from making the panel too narrow. |
-| `progressDraggable` | `boolean` | `false` | Shows a progress handle on the task bar. The user can set the progress (0–100 %) by dragging directly in the chart. |
-| `resizable` | `boolean` | `false` | Allows changing the `endDate` by dragging the right edge of a bar. |
-| `showCriticalPath` | `boolean` | `false` | Highlights the critical path — the longest dependency chain that determines the project duration. |
-| `showToolbar` | `boolean` | `true` | Shows or hides the entire toolbar (scale buttons, date range, action buttons). |
-| `tasks` | `GanttTask[]` | — | **Required.** Flat array of all tasks. Hierarchy is built internally via `parentId`. Changes are reflected back via the `onTasksChange` callback. |
-| `timeScale` | `GanttTimeScale` | `"months"` | Initial time scale: `"days"` · `"weeks"` · `"months"` · `"quarters"`. The user can switch the scale via the toolbar at any time. |
-| `toolbarConfig` | `GanttToolbarConfig` | all `true` | Fine-grained control over individual toolbar elements. Only specify deviating keys — unset keys remain visible. See [GanttToolbarConfig](#gantttoolbarconfig). |
-| `translations` | `Partial<GanttTranslations>` | German/English | Texts for all UI elements. Only specify deviating keys. See [Translations](#translations). |
-| `virtualizeRows` | `boolean` | `false` | When `true`, only currently visible rows are rendered (virtual list). Recommended for ~200+ tasks as it drastically reduces DOM size. |
-| `width` | `number \| string` | `"100%"` | Total chart width. Default fills the available space. |
-| `zoomable` | `boolean` | `false` | Enables zoom via `Ctrl + mouse wheel`. Cycles through time scales (Days ↔ Weeks ↔ Months ↔ Quarters). |
+| `enableBuiltinDialogs` | `boolean` | `true` | `true` = built-in MUI dialogs for Add/Edit/Delete. `false` = only callbacks fire. |
+| `ganttTheme` | `GanttTheme` | — | Bundled theming object. See [GanttTheme](#gantttheme). |
+| `height` | `number \| string` | `400` | Total chart height. `"auto"` adapts to the parent element. |
+| `initialExpandAll` | `boolean` | `false` | Starts with all hierarchy levels expanded. |
+| `inlineEdit` | `boolean` | `false` | Double-click on a task name to rename inline. |
+| `maxPanelWidth` | `number` | `600` | Maximum width of the left task panel in px. |
+| `minPanelWidth` | `number` | `200` | Minimum width of the left task panel in px. |
+| `progressDraggable` | `boolean` | `false` | Shows a draggable progress handle on the task bar. |
+| `resizable` | `boolean` | `false` | Allows changing `endDate` by dragging the right edge of a bar. |
+| `showAssigneeColumn` | `boolean` | `false` | Shows an **Assignee** column in the task panel. Populate via `task.assignee`. |
+| `showCriticalPath` | `boolean` | `false` | Highlights the critical path — the longest dependency chain. |
+| `showToolbar` | `boolean` | `true` | Shows or hides the entire toolbar. |
+| `tasks` | `GanttTask[]` | — | **Required.** Flat task array — hierarchy built internally via `parentId`. |
+| `timeScale` | `GanttTimeScale` | `"months"` | Initial time scale: `"days"` · `"weeks"` · `"months"` · `"quarters"`. |
+| `toolbarConfig` | `GanttToolbarConfig` | — | Fine-grained toolbar control. See [GanttToolbarConfig](#gantttoolbarconfig). |
+| `translations` | `Partial<GanttTranslations>` | DE/EN mix | Override any UI text. See [Translations](#translations). |
+| `virtualizeRows` | `boolean` | `false` | Virtual list — recommended for 200+ tasks. |
+| `width` | `number \| string` | `"100%"` | Total chart width. |
+| `zoomable` | `boolean` | `false` | `Ctrl / Cmd ⌘+Scroll` cycles through time scales. |
 
 > **Note on `defaultRangeStart`/`defaultRangeEnd`:** When not set, the chart calculates the range automatically from the earliest and latest task dates and adds a 1-month buffer at both ends.
 
@@ -178,15 +179,16 @@ Allows selectively hiding individual toolbar elements. All fields are optional �
 
 | Field | Type | Default | Controls |
 |---|---|---|---|
+| `showDateRange` | `boolean` | `true` | From/To date inputs |
+| `showExpandCollapseAll` | `boolean` | `true` | Expand all / Collapse all |
+| `showExportCSV` | `boolean` | `false` | CSV download button — triggers `onExportCSV` or browser download |
+| `showRangeReset` | `boolean` | `true` | Reset button (appears when range was manually adjusted) |
+| `showResetView` | `boolean` | `true` | Reset view (scale + range back to defaults) |
 | `showScaleDays` | `boolean` | `true` | Days scale button |
-| `showScaleWeeks` | `boolean` | `true` | Weeks scale button |
 | `showScaleMonths` | `boolean` | `true` | Months scale button |
 | `showScaleQuarters` | `boolean` | `true` | Quarters scale button |
-| `showExpandCollapseAll` | `boolean` | `true` | Expand all / Collapse all |
+| `showScaleWeeks` | `boolean` | `true` | Weeks scale button |
 | `showScrollToToday` | `boolean` | `true` | "Scroll to today" button |
-| `showDateRange` | `boolean` | `true` | From/To date inputs |
-| `showRangeReset` | `boolean` | `true` | Reset button (only appears when range has been manually adjusted) |
-| `showResetView` | `boolean` | `true` | Reset view (scale + range back to defaults) |
 
 **TypeScript type:**
 
@@ -272,18 +274,19 @@ const ganttTheme: GanttTheme = {
 
 | Callback | Signature | When fired |
 |---|---|---|
-| `onTaskClick` | `(task: GanttTask) => void` | Click on a task bar in the timeline. |
+| `onAddTask` | `(parentTask?: GanttTask) => void` | "Add" icon clicked. Only when `enableBuiltinDialogs={false}`. |
+| `onDeleteTask` | `(task: GanttTask) => void` | "Delete" icon clicked. Only when `enableBuiltinDialogs={false}`. |
+| `onEditTask` | `(task: GanttTask) => void` | "Edit" icon clicked. Only when `enableBuiltinDialogs={false}`. |
+| `onExportCSV` | `(csv: string, tasks: GanttTask[]) => void` | CSV export button clicked. When not provided, the chart downloads `gantt-tasks.csv` automatically. |
 | `onMilestoneClick` | `(task: GanttTask) => void` | Click on a milestone diamond. |
-| `onAddTask` | `(parentTask?: GanttTask) => void` | Click on the "Add" icon in a task row. `parentTask` is set when the new task should be a child. Only fires when `enableBuiltinDialogs={false}`. |
-| `onEditTask` | `(task: GanttTask) => void` | Click on the "Edit" icon. Only fires when `enableBuiltinDialogs={false}`. |
-| `onDeleteTask` | `(task: GanttTask) => void` | Click on the "Delete" icon. Only fires when `enableBuiltinDialogs={false}`. |
-| `onStatusChange` | `(task: GanttTask, status: GanttTaskStatus) => void` | New status selected via the right-click context menu on the bar. |
-| `onTaskMoved` | `(task: GanttTask, newStart: Date, newEnd: Date) => void` | Task was horizontally moved by drag (`draggable={true}`). `task` contains the original metadata (id, name, status, etc.) with the **old** dates. The new dates are exclusively in `newStart` and `newEnd`. |
-| `onTaskResized` | `(task: GanttTask, newEnd: Date) => void` | Task bar was extended/shortened by dragging the right edge (`resizable={true}`). |
-| `onTasksChange` | `(tasks: GanttTask[]) => void` | Called after **every** CRUD action with the complete, current task list. Central callback for data-driven architectures (e.g. Redux, Zustand, React Query). |
-| `onTaskCreated` | `(task: GanttTask) => void` | New task was created via the built-in dialog (`enableBuiltinDialogs={true}`). |
-| `onTaskUpdated` | `(task: GanttTask) => void` | Task was edited via the built-in dialog (`enableBuiltinDialogs={true}`). |
-| `onTaskDeleted` | `(taskId: string) => void` | Task was deleted via the built-in confirmation dialog (`enableBuiltinDialogs={true}`). |
+| `onStatusChange` | `(task: GanttTask, status: GanttTaskStatus) => void` | New status selected via the context menu. |
+| `onTaskClick` | `(task: GanttTask) => void` | Click on a task bar in the timeline. |
+| `onTaskCreated` | `(task: GanttTask) => void` | Task created via built-in dialog (`enableBuiltinDialogs={true}`). |
+| `onTaskDeleted` | `(taskId: string) => void` | Task deleted via built-in dialog (`enableBuiltinDialogs={true}`). |
+| `onTaskMoved` | `(task: GanttTask, newStart: Date, newEnd: Date) => void` | Task dragged to a new position (`draggable={true}`). |
+| `onTaskResized` | `(task: GanttTask, newEnd: Date) => void` | Task bar resized (`resizable={true}`). |
+| `onTasksChange` | `(tasks: GanttTask[]) => void` | Called after every CRUD action with the full task list. |
+| `onTaskUpdated` | `(task: GanttTask) => void` | Task edited via built-in dialog (`enableBuiltinDialogs={true}`). |
 
 > **Tip — `onTasksChange` vs. specific callbacks:** For simple data persistence, `onTasksChange` alone is sufficient. The specific callbacks (`onTaskCreated`, `onTaskUpdated`, etc.) are intended for applications that need to react differently to specific actions (e.g. separate API calls for Create/Update/Delete).
 

@@ -12,7 +12,7 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 | Touch / Mobile Drag | Drag & Drop auf Touch-Geräten (Pointer Events API) | Hoch | — |
 | Export PNG/PDF | Timeline als Bild oder PDF exportieren | Hoch | — |
 | Keyboard Navigation | Pfeiltasten für Task-Auswahl, Enter zum Öffnen | Mittel | — |
-| Spalte: Assignee | Zusätzliche Spalte im Task-Panel für Verantwortliche | Mittel | — |
+| ~~Spalte: Assignee~~ | ~~Zusätzliche Spalte im Task-Panel für Verantwortliche~~ | ~~Mittel~~ | ✅ v2.7.0 (`showAssigneeColumn`) |
 | Resource View | Horizontale Ansicht: eine Zeile pro Person | Hoch | — |
 | Baseline-Vergleich | Ursprungsplanung vs. Ist-Stand visuell überlagern | Hoch | — |
 | ~~Zoom per Scroll~~ | ~~Ctrl / Cmd ⌘+Scroll ändert TimeScale~~ | ~~Mittel~~ | ✅ v1.5.0 |
@@ -21,7 +21,7 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 | ~~Heute-Chip~~ | ~~Chip an der gestrichelten Heute-Linie~~ | ~~Niedrig~~ | ✅ v1.5.0 |
 | Mini-Map | Kleine Übersichts-Timeline zum schnellen Navigieren | Hoch | — |
 | Undo / Redo | Ctrl+Z für Task-Moves | Hoch | — |
-| CSV / Excel Export | Tasks als Tabelle exportieren | Mittel | — |
+| ~~CSV / Excel Export~~ | ~~Tasks als Tabelle exportieren~~ | ~~Mittel~~ | ✅ v2.7.0 (`toolbarConfig.showExportCSV`) |
 
 ---
 

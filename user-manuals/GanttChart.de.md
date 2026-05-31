@@ -158,6 +158,7 @@ type GanttTask = {
 | `minPanelWidth` | `number` | `200` | Mindestbreite des linken Aufgaben-Panels in Pixeln. Verhindert, dass der Nutzer das Panel zu schmal zieht. |
 | `progressDraggable` | `boolean` | `false` | Zeigt einen Fortschritts-Handle am Task-Balken an. Der Nutzer kann den Fortschritt (0–100 %) per Drag direkt im Diagramm setzen. |
 | `resizable` | `boolean` | `false` | Erlaubt das Verändern des `endDate` durch Ziehen am rechten Balkenrand. |
+| `showAssigneeColumn` | `boolean` | `false` | Zeigt eine **Assignee**-Spalte im Task-Panel. Befüllung über `task.assignee`. |
 | `showCriticalPath` | `boolean` | `false` | Hebt den kritischen Pfad farbig hervor — die längste Abhängigkeitskette, die die Projektlaufzeit bestimmt. |
 | `showToolbar` | `boolean` | `true` | Blendet die gesamte Toolbar (Skalenbuttons, Datumsbereich, Aktionsbuttons) ein oder aus. |
 | `tasks` | `GanttTask[]` | — | **Pflichtfeld.** Flaches Array aller Tasks. Hierarchie wird intern über `parentId` aufgebaut. Änderungen werden über die `onTasksChange`-Callback nach oben gespiegelt. |
@@ -185,6 +186,7 @@ Erlaubt die selektive Ausblendung einzelner Toolbar-Elemente. Alle Felder sind o
 | `showExpandCollapseAll` | `boolean` | `true` | Alle aufklappen / Alle zuklappen |
 | `showScrollToToday` | `boolean` | `true` | „Zum heutigen Tag"-Button |
 | `showDateRange` | `boolean` | `true` | Von/Bis-Datumseingaben |
+| `showExportCSV` | `boolean` | `false` | CSV-Download-Button — löst `onExportCSV` aus oder Browser-Download |
 | `showRangeReset` | `boolean` | `true` | Zurücksetzen-Button (erscheint nur wenn Bereich manuell angepasst wurde) |
 | `showResetView` | `boolean` | `true` | Ansicht zurücksetzen (Skala + Bereich auf Standardwerte) |
 
@@ -272,6 +274,7 @@ const ganttTheme: GanttTheme = {
 
 | Callback | Signatur | Wann ausgelöst |
 |---|---|---|
+| `onExportCSV` | `(csv: string, tasks: GanttTask[]) => void` | CSV-Export-Button geklickt. Ohne Callback: automatischer Browser-Download `gantt-tasks.csv`. |
 | `onTaskClick` | `(task: GanttTask) => void` | Klick auf einen Task-Balken in der Zeitleiste. |
 | `onMilestoneClick` | `(task: GanttTask) => void` | Klick auf eine Meilenstein-Raute. |
 | `onAddTask` | `(parentTask?: GanttTask) => void` | Klick auf das „Hinzufügen"-Icon in einer Task-Zeile. `parentTask` ist gesetzt wenn der neue Task ein Kind sein soll. Wird nur ausgelöst wenn `enableBuiltinDialogs={false}`. |

@@ -13,7 +13,7 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 | Komponente | Beschreibung | Docs |
 |---|---|---|
 | [`ConfirmDialog`](#confirmdialog) | Deklarativer Async-Bestätigungs-Dialog — `await confirm({ title, severity })` von überall in der App. Unterstützt Countdown-Auto-Confirm und `Enter` = Bestätigen. | [Vollständiges Manual →](user-manuals/ConfirmDialog.de.md) |
-| [`GanttChart`](#ganttchart) | Projekt-Timeline mit hierarchischen Aufgaben, Meilensteinen, Drag & Drop, Ctrl / Cmd ⌘+Scroll-Zoom, Heute-Chip und integrierten CRUD-Dialogen | [Vollständiges Manual →](user-manuals/GanttChart.de.md) |
+| [`GanttChart`](#ganttchart) | Projekt-Timeline mit hierarchischen Aufgaben, Meilensteinen, Drag & Drop, Ctrl / Cmd ⌘+Scroll-Zoom, Heute-Chip, Assignee-Spalte, CSV-Export und integrierten CRUD-Dialogen | [Vollständiges Manual →](user-manuals/GanttChart.de.md) |
 | [`TagSelection`](#tagselection) | Multi-Tag-Auswahlfeld mit Autocomplete, freier Tag-Erstellung, Overflow-Chips und MUI-Theme-Farben | [Vollständiges Manual →](user-manuals/TagSelection.de.md) |
 | [`PasswordStrengthMeter`](#passwordstrengthmeter) | Passwort-Eingabe mit animiertem Stärke-Meter, segmentierter Balkenanzeige, eigenen Anforderungen und Anforderungsliste | [Vollständiges Manual →](user-manuals/PasswordStrengthMeter.de.md) |
 | [`RichTextEditor`](#richtexteditor) | WYSIWYG-Editor (TipTap v3) mit Toolbar, Link-Dialog, Textfarbe, Hervorhebung, Wörter-Zähler, Vollbild-Modus, Markdown-Einfügen, Tabellen-Bearbeitung, Bild-Embed und Emoji-Picker | [Vollständiges Manual →](user-manuals/RichTextEditor.de.md) |
