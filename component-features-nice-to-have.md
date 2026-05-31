@@ -5,6 +5,46 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 
 ---
 
+## 🚀 Nächste Aktion: Live-Storybook auf GitHub Pages
+
+**Ziel:** Jeder User kann die Komponenten online ausprobieren — ohne Installation, direkt im Browser.  
+**URL (nach Setup):** `https://thebuoyant.github.io/mui-ts-library/`  
+**Ansatz:** `peaceiris/actions-gh-pages@v4` — baut Storybook und pusht auf `gh-pages` Branch
+
+### Warum dieser Ansatz (und nicht der alte)?
+
+Der erste Versuch scheiterte an `actions/deploy-pages@v4` (OIDC 404-Fehler, GitHub-seitige Provisioning-Probleme).  
+`peaceiris/actions-gh-pages@v4` umgeht das komplett: baut Storybook → pusht HTML/JS in `gh-pages` Branch → GitHub Pages served daraus. Kein OIDC, kein Environment-Problem.
+
+### Setup-Schritte (einmalig, ~5 Minuten)
+
+**Schritt 1 — Workflow-Datei anlegen** *(Claude erledigt das)*  
+Datei: `.github/workflows/deploy-storybook.yml`  
+Trigger: jeder Push auf `main`  
+Action: `peaceiris/actions-gh-pages@v4` mit `publish_dir: ./storybook-static`
+
+**Schritt 2 — GitHub Repository Settings** *(du, 3 Klicks)*  
+`github.com/thebuoyant/mui-ts-library/settings/pages`  
+→ **Source:** "Deploy from a branch"  
+→ **Branch:** `gh-pages`  
+→ **Folder:** `/ (root)`  
+→ **Save**
+
+**Schritt 3 — Ersten Push machen** *(Claude)*  
+Commit + Push auf `main` → Workflow läuft → `gh-pages` Branch wird angelegt → Pages aktiv
+
+**Schritt 4 — URL in README + npm eintragen** *(Claude)*  
+`https://thebuoyant.github.io/mui-ts-library/` in README.md ergänzen
+
+### Wichtig: npm publish v2.5.0 vorher!
+Bevor das Storybook live geht, sollte v2.5.0 auf npm published sein.  
+`npm login` → `npm publish --access public`
+
+| Status | ⏳ Nächste Session — Implementierung ausstehend |
+|---|---|
+
+---
+
 ## GanttChart
 
 | Feature | Beschreibung | Aufwand | Status |
@@ -177,5 +217,53 @@ Hierarchische Daten als verschachtelte Rechtecke. Ideal für Proportionsvergleic
 
 Gleiche Konventionen wie alle D3-Charts: `chartColors`, `colorConfig`, `zoomable`, `disabled`, `translation`, MUI Tooltip.
 
-| Status | — (nach MTL-22 merge) |
+| Status | — (nach Storybook-Live, MTL-23) |
 |---|---|
+
+---
+
+## 💡 Ideen aus der Perspektive eines Dashboard-Entwicklers
+
+*Was würde mich als Nutzer dieser Library wirklich begeistern — und was fehlt noch, um die "Dashboards & Daten-Apps mit MUI"-Nische vollständig zu besetzen?*
+
+### Übergreifend — alle D3-Charts
+
+| Idee | Warum wertvoll | Aufwand |
+|---|---|---|
+| **Export PNG / SVG** | Jeder Dashboard-User will Charts in Präsentationen / Reports | Mittel |
+| **Responsive `size="auto"`** | Charts passen sich dem Container an — kein hardcoded `size={600}` | Mittel |
+| **Daten-Animation** | Wenn sich die Daten ändern, animiert das Chart — lebendig statt statisch | Hoch |
+| **Shared `D3ChartTheme`** | Ein zentrales Theming-Objekt für alle D3-Charts — konsistente Farben/Stile im Dashboard | Mittel |
+| **Linked Selection** | Klick in Chart A hebt dasselbe Element in Chart B hervor — "Linked Brushing" für Dashboards | Hoch |
+| **Loading Skeleton** | `loading={true}` zeigt einen animierten Platzhalter — kein weißes Aufflackern beim Datenladen | Niedrig |
+| **Empty State** | Eigene, hübsche Darstellung wenn `data` leer ist — statt leerem SVG | Niedrig |
+
+### Neue Komponenten — die die Nische vervollständigen
+
+| Idee | Beschreibung | Priorität |
+|---|---|---|
+| **HeatmapChart** | Matrix-Heatmap (z.B. GitHub Contribution Graph, Wochentag × Stunde) — D3 sehr gut geeignet | ⭐⭐⭐ |
+| **SankeyChart** | Flussdiagramm für Mengenverlauf (z.B. Sales Funnel, Budget-Verteilung) — mächtiger als ChordChart für sequentielle Flows | ⭐⭐⭐ |
+| **TimelineChart** | Ereignishistorie auf einer Achse (Audit-Log, Release-History, Incident-Timeline) — anders als GanttChart | ⭐⭐ |
+| **ForceGraph** | Netzwerk-/Abhängigkeitsgraph mit D3 Force Layout — ideal für Microservice-Maps, Beziehungsgraphen | ⭐⭐ |
+| **KPICard** | Einzelner Kennzahlen-Chip mit Trend-Indikator, Sparkline und Farb-Threshold — Dashboard-Grundbaustein | ⭐⭐⭐ |
+
+### Bestehende Komponenten — das Sahnehäubchen
+
+| Idee | Komponente | Warum jetzt noch nicht, aber bald | Aufwand |
+|---|---|---|---|
+| **Query History** | SqlEditor | localStorage-basierter Verlauf der letzten 20 Queries — Entwickler lieben das | Niedrig |
+| **Undo / Redo** | GanttChart | Ctrl+Z für Task-Moves — fehlt bei jedem Gantt-Tool und ist überraschend selten | Hoch |
+| **CSV/Excel Export** | GanttChart | Tasks als Tabelle exportieren — Brücke zu PM-Tools wie Excel/Jira | Mittel |
+| **AI-Autocomplete** | SqlEditor | Integration mit LLM-Endpoint für SQL-Vorschläge — Differenzierungsmerkmal | Hoch |
+| **Mentions (@)** | RichTextEditor | Users/Tags referenzieren — macht Editor für Team-Apps nutzbar | Hoch |
+| **Daten-Update-Animation** | Alle D3 Charts | Wenn `data` Prop sich ändert, smooth animieren statt hart neu rendern | Mittel |
+
+### Developer Experience — was Users dazu bringt, die Library zu wählen
+
+| Idee | Beschreibung | Aufwand |
+|---|---|---|
+| **StackBlitz / CodeSandbox Templates** | "Try it now"-Links direkt in README — kein `npm install` nötig zum Ausprobieren | Niedrig |
+| **VS Code Snippets** | `rte-basic`, `gantt-basic` → autovervollständigt ein fertiges Snippet | Niedrig |
+| **Storybook Live** | `https://thebuoyant.github.io/mui-ts-library/` — ⏳ MTL-23 in Arbeit | **Nächste Aktion** |
+| **Playwright Visual Tests** | Screenshot-Vergleiche für Chart-Rendering — keine Regressionen in Looks | Hoch |
