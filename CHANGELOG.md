@@ -13,6 +13,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.6.0] — 2026-05-31
+
+### Added
+
+#### HorizontalTreeChart — New Component (MTL-24) · D3 Charts family #5
+
+- **4 orientations** via `orientation?: 'LR' | 'RL' | 'TB' | 'BT'` — left→right (default), right→left, top→bottom, bottom→top
+- **Curved Bézier links** — `d3.linkHorizontal()` / vertical variant depending on orientation
+- **`data: HorizontalTreeData`** — same rich data model as RadialTreeChart: `id`, `name`, `subname`, `value`, `specialValueA`, `specialValueB`, `colorConfig`, `children`
+- **`colorConfig`** per node — consistent with all other D3 charts
+- **`drillable`** — `Ctrl / Cmd ⌘+Click` drill-down, `Ctrl / Cmd ⌘+DblClick` zoom out, breadcrumb bar
+- **`zoomable`** — `Ctrl / Cmd ⌘+Scroll` visual zoom with overflow clipping
+- **`showNodePopover`** — MUI Popover with Avatar, name, subname, specialValues
+- **`onNodeClick`** — `HorizontalTreeNodeInfo`: `id`, `name`, `subname`, `value`, `depth`, `path`, `childrenCount`, `data`
+- **`onFocusChange`** — fires when drill-down focus changes
+- **`levelSpacing`** — distance between depth levels in px (default: 200)
+- Bold labels for branch nodes, normal for leaves
+- MUI icons inside colored circles (FolderOutlined / PersonOutlined)
+- MUI `<Tooltip followCursor>` on every node — name, subname, data values, reports count
+- New exported types: `HorizontalTreeData`, `HorizontalTreeNodeInfo`, `HorizontalTreeZoomInfo`, `HorizontalTreeOrientation`
+
+---
+
 ## [2.5.0] — 2026-05-30
 
 ### Added

@@ -23,6 +23,7 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 | [`ChordChart`](#chordchart) | D3 v7 Fluss-Chart — Arc-Gruppen, Bänder, Hover-Highlight, Ctrl / Cmd ⌘+Scroll-Zoom, gerichtet/ungerichtet, MUI-Theme-Integration | [Vollständiges Manual →](user-manuals/ChordChart.de.md) |
 | [`RadialTreeChart`](#radialtreedchart) | D3 v7 radialer Baum — Knoten auf konzentrischen Ringen, MUI-Icons, Ctrl / Cmd ⌘+Click Drill-Down, Ctrl / Cmd ⌘+Scroll Zoom, MUI-Theme-Integration | [Vollständiges Manual →](user-manuals/RadialTreeChart.de.md) |
 | [`CirclePackingChart`](#circlepackingchart) | D3 v7 Circle Packing — verschachtelte Kreise, animierter D3-Zoom, Ctrl / Cmd ⌘+Scroll-Zoom, Tiefen-Gradient oder Palette, MUI-Theme-Integration | [Vollständiges Manual →](user-manuals/CirclePackingChart.de.md) |
+| [`HorizontalTreeChart`](#horizontaltreechart) | D3 v7 Baum-Chart — 4 Orientierungen (LR/RL/TB/BT), geschwungene Links, Drill-Down, Ctrl / Cmd ⌘+Scroll-Zoom, MUI-Icons und Theme-Integration | [Vollständiges Manual →](user-manuals/HorizontalTreeChart.de.md) |
 
 ---
 

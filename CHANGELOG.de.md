@@ -13,6 +13,20 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [2.6.0] — 2026-05-31
+
+### Hinzugefügt
+
+#### HorizontalTreeChart — Neue Komponente (MTL-24) · D3-Charts-Familie #5
+
+- **4 Orientierungen** via `orientation?: 'LR' | 'RL' | 'TB' | 'BT'` — links→rechts (Standard), rechts→links, oben→unten, unten→oben
+- **Geschwungene Bézier-Links** — `d3.linkHorizontal()` / vertikal je nach Orientierung
+- **`data: HorizontalTreeData`** — reiches Datenmodell wie RadialTreeChart: `id`, `name`, `subname`, `value`, `specialValueA/B`, `colorConfig`, `children`
+- **`drillable`** + **`zoomable`** — Ctrl / Cmd ⌘+Click/DblClick/Scroll wie alle anderen D3-Charts
+- Alle Konventionen: `chartColors`, `colorConfig`, `disabled`, `translation`, MUI Tooltip
+
+---
+
 ## [2.5.0] — 2026-05-30
 
 ### Hinzugefügt

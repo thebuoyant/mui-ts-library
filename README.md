@@ -23,6 +23,7 @@ A type-safe React component library built on **TypeScript** and **MUI (Material 
 | [`ChordChart`](#chordchart) | D3 v7 flow chart — arc groups, ribbons, hover highlight, Ctrl / Cmd ⌘+Scroll zoom, directed/undirected, MUI theme integration | [Full Manual →](user-manuals/ChordChart.md) |
 | [`RadialTreeChart`](#radialtreedchart) | D3 v7 radial tree — hierarchical nodes on concentric rings, MUI icons, Ctrl / Cmd ⌘+Click drill-down, Ctrl / Cmd ⌘+Scroll zoom, MUI theme integration | [Full Manual →](user-manuals/RadialTreeChart.md) |
 | [`CirclePackingChart`](#circlepackingchart) | D3 v7 circle packing — nested circles, animated D3 zoom, Ctrl / Cmd ⌘+Scroll zoom, depth gradient or palette, MUI theme integration | [Full Manual →](user-manuals/CirclePackingChart.md) |
+| [`HorizontalTreeChart`](#horizontaltreechart) | D3 v7 tree chart — 4 orientations (LR/RL/TB/BT), curved links, drill-down, Ctrl / Cmd ⌘+Scroll zoom, MUI icons and theme integration | [Full Manual →](user-manuals/HorizontalTreeChart.md) |
 
 ---
 
