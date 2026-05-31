@@ -322,6 +322,9 @@ import type {
 
   // CirclePackingChart
   CirclePackingData, CirclePackingNodeInfo, CirclePackingZoomInfo, CirclePackingSortBy,
+
+  // HorizontalTreeChart
+  HorizontalTreeData, HorizontalTreeNodeInfo, HorizontalTreeOrientation,
 } from '@thebuoyant-tsdev/mui-ts-library';
 ```
 
