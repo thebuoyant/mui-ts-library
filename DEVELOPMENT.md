@@ -32,6 +32,14 @@ npm run storybook
 npm run build-storybook
 ```
 
+### Live Storybook on GitHub Pages
+
+Every push to `main` automatically deploys the Storybook via `.github/workflows/deploy-storybook.yml`.
+
+**→ [https://thebuoyant.github.io/mui-ts-library/](https://thebuoyant.github.io/mui-ts-library/)**
+
+Uses `peaceiris/actions-gh-pages@v4` — builds and pushes to the `gh-pages` branch. GitHub Pages serves from there.
+
 ### Storybook Docker Distribution
 
 Share an interactive Storybook with non-developers (Product Owners, Designers) — only Docker required on their end.
