@@ -20,3 +20,5 @@ export * from "./components/radial-tree-chart/RadialTreeChart";
 export * from "./components/radial-tree-chart/RadialTreeChart.types";
 export * from "./components/circle-packing-chart/CirclePackingChart";
 export * from "./components/circle-packing-chart/CirclePackingChart.types";
+export * from "./components/horizontal-tree-chart/HorizontalTreeChart";
+export * from "./components/horizontal-tree-chart/HorizontalTreeChart.types";

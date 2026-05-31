@@ -5,46 +5,6 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 
 ---
 
-## 🚀 Nächste Aktion: Live-Storybook auf GitHub Pages
-
-**Ziel:** Jeder User kann die Komponenten online ausprobieren — ohne Installation, direkt im Browser.  
-**URL (nach Setup):** `https://thebuoyant.github.io/mui-ts-library/`  
-**Ansatz:** `peaceiris/actions-gh-pages@v4` — baut Storybook und pusht auf `gh-pages` Branch
-
-### Warum dieser Ansatz (und nicht der alte)?
-
-Der erste Versuch scheiterte an `actions/deploy-pages@v4` (OIDC 404-Fehler, GitHub-seitige Provisioning-Probleme).  
-`peaceiris/actions-gh-pages@v4` umgeht das komplett: baut Storybook → pusht HTML/JS in `gh-pages` Branch → GitHub Pages served daraus. Kein OIDC, kein Environment-Problem.
-
-### Setup-Schritte (einmalig, ~5 Minuten)
-
-**Schritt 1 — Workflow-Datei anlegen** *(Claude erledigt das)*  
-Datei: `.github/workflows/deploy-storybook.yml`  
-Trigger: jeder Push auf `main`  
-Action: `peaceiris/actions-gh-pages@v4` mit `publish_dir: ./storybook-static`
-
-**Schritt 2 — GitHub Repository Settings** *(du, 3 Klicks)*  
-`github.com/thebuoyant/mui-ts-library/settings/pages`  
-→ **Source:** "Deploy from a branch"  
-→ **Branch:** `gh-pages`  
-→ **Folder:** `/ (root)`  
-→ **Save**
-
-**Schritt 3 — Ersten Push machen** *(Claude)*  
-Commit + Push auf `main` → Workflow läuft → `gh-pages` Branch wird angelegt → Pages aktiv
-
-**Schritt 4 — URL in README + npm eintragen** *(Claude)*  
-`https://thebuoyant.github.io/mui-ts-library/` in README.md ergänzen
-
-### Wichtig: npm publish v2.5.0 vorher!
-Bevor das Storybook live geht, sollte v2.5.0 auf npm published sein.  
-`npm login` → `npm publish --access public`
-
-| Status | ⏳ Nächste Session — Implementierung ausstehend |
-|---|---|
-
----
-
 ## GanttChart
 
 | Feature | Beschreibung | Aufwand | Status |
@@ -55,11 +15,13 @@ Bevor das Storybook live geht, sollte v2.5.0 auf npm published sein.
 | Spalte: Assignee | Zusätzliche Spalte im Task-Panel für Verantwortliche | Mittel | — |
 | Resource View | Horizontale Ansicht: eine Zeile pro Person | Hoch | — |
 | Baseline-Vergleich | Ursprungsplanung vs. Ist-Stand visuell überlagern | Hoch | — |
-| ~~Zoom per Scroll~~ | ~~Ctrl / Cmd ⌘+Scroll ändert TimeScale~~ | ~~Mittel~~ | ✅ v1.5.0 (`zoomable={true}`) |
+| ~~Zoom per Scroll~~ | ~~Ctrl / Cmd ⌘+Scroll ändert TimeScale~~ | ~~Mittel~~ | ✅ v1.5.0 |
 | Multi-Select | Mehrere Tasks gleichzeitig verschieben | Hoch | — |
 | ~~Today-Button~~ | ~~Toolbar-Button scrollt zum heutigen Tag~~ | ~~Niedrig~~ | ✅ bereits implementiert |
 | ~~Heute-Chip~~ | ~~Chip an der gestrichelten Heute-Linie~~ | ~~Niedrig~~ | ✅ v1.5.0 |
 | Mini-Map | Kleine Übersichts-Timeline zum schnellen Navigieren | Hoch | — |
+| Undo / Redo | Ctrl+Z für Task-Moves | Hoch | — |
+| CSV / Excel Export | Tasks als Tabelle exportieren | Mittel | — |
 
 ---
 
@@ -88,6 +50,7 @@ Bevor das Storybook live geht, sollte v2.5.0 auf npm published sein.
 | Query-Verlauf | Letzte N Abfragen im Dropdown | Mittel | — |
 | Snippet-Bibliothek | Gespeicherte SQL-Bausteine einfügen | Mittel | — |
 | Hover-Doku | Spalten-/Tabellen-Kommentar als Tooltip beim Hover | Mittel | — |
+| AI-Autocomplete | LLM-Endpoint für SQL-Vorschläge — Differenzierungsmerkmal | Hoch | — |
 | ~~Keyboard Shortcut Execute~~ | ~~Cmd / Ctrl+Enter für `onExecute`~~ | ~~Niedrig~~ | ✅ v1.5.0 |
 | ~~Zeilennummern-Gutter anpassen~~ | ~~Breite auto an max. Zeilenzahl~~ | ~~Niedrig~~ | ✅ v1.5.0 |
 
@@ -140,130 +103,100 @@ Bevor das Storybook live geht, sollte v2.5.0 auf npm published sein.
 
 ---
 
+## Developer Experience
+
+| Feature | Beschreibung | Aufwand | Status |
+|---|---|---|---|
+| ~~Live Storybook~~ | ~~`https://thebuoyant.github.io/mui-ts-library/` — interaktive Demos ohne Installation~~ | ~~Mittel~~ | ✅ Aktiv — auto-deploy bei jedem Push auf `main` |
+| StackBlitz / CodeSandbox Templates | "Try it now"-Links direkt in README | Niedrig | — |
+| VS Code Snippets | `rte-basic`, `gantt-basic` → autovervollständigt ein fertiges Snippet | Niedrig | — |
+| Playwright Visual Tests | Screenshot-Vergleiche für Chart-Rendering | Hoch | — |
+
+---
+
 ## D3 Charts — Komponentenfamilie
 
 > **Quell-Projekt:** `/Users/thomasschlender/Development-PCF/skejlo-charts`  
-> Alle Charts: D3 v7 + React SVG + MUI-Theme-Integration.  
 > **Gemeinsame Konventionen aller D3-Charts:**
-> - `chartColors?: string[]` — eigene Palette; Fallback: MUI-Palette (primary → secondary → ...)
-> - `colorConfig?: { fill?, textColor?, stroke? }` **pro Daten-Knoten** — überschreibt Palette für diesen Knoten
-> - `zoomable?: boolean` — Ctrl / Cmd ⌘+Scroll visueller Zoom, Escape-Reset, overflow-Clipping
+> - `chartColors?: string[]` + `colorConfig?` pro Knoten — Palette oder Per-Node-Override
+> - `zoomable?: boolean` — Ctrl / Cmd ⌘+Scroll visueller Zoom, Escape-Reset
+> - `drillable?: boolean` (Hierarchie-Charts) — Ctrl / Cmd ⌘+Click Drill-Down
 > - `disabled?: boolean` — alle Interaktionen aus, Opacity 0.5
-> - `translation?: Partial<XxxTranslation>` — i18n wie überall in der Library
-> - MUI `<Tooltip followCursor>` — kein Browser-Delay, direkt am Mauszeiger
-> - Vollständige User Manuals EN + DE, CHANGELOG EN + DE, README EN + DE
+> - `translation?` — i18n, MUI `<Tooltip followCursor>`, User Manuals EN + DE
 
 ---
 
 ### ~~MTL-19 — SunburstChart~~ ✅ v2.2.0
 
-**Features:** Konzentrische Ringe, Ctrl / Cmd ⌘+Click Drill-Down, Ctrl / Cmd ⌘+DblClick Zoom-Out, Ctrl / Cmd ⌘+Scroll visueller Zoom, Label-Truncation (MIN_LABEL_L), `onSegmentClick` mit `id`/`percentage`/`pathIds`, `onZoomChange`, `innerRadius` (Donut), `sortBy`, `colorConfig` pro Knoten.
+Konzentrische Ringe, Ctrl / Cmd ⌘+Click Drill-Down + visueller Scroll-Zoom, Label-Truncation, `onSegmentClick` mit `id`/`percentage`/`pathIds`, `onZoomChange`, Donut-Modus, `colorConfig`.
 
 ---
 
 ### ~~MTL-20 — ChordChart~~ ✅ v2.3.0
 
-**Features:** Arc-Gruppen + Ribbon-Bänder, Hover-Highlight, `directed`/`undirected`, `onGroupClick`/`onChordClick` mit sauberen Infos, `groupColorConfigs` (Record<groupName, config>) für Gruppen-Farb-Override, Ctrl / Cmd ⌘+Scroll visueller Zoom.
+Arc-Gruppen + Ribbon-Bänder, Hover-Highlight, `directed`/`undirected`, `groupColorConfigs`, `zoomable`.
 
 ---
 
 ### ~~MTL-21 — RadialTreeChart~~ ✅ v2.4.0
 
-**Features:** Farbige Bubble-Nodes (Kreise mit weißem Icon), `drillable` (Ctrl / Cmd ⌘+Click Drill-Down / DblClick Zoom-Out), `zoomable` (Ctrl / Cmd ⌘+Scroll), Breadcrumb-Anzeige beim Drill-In, `onFocusChange`, `showNodePopover` (MUI Popover mit Avatar + Datenwerten), `colorConfig` pro Knoten, konfigurierbare Node-Radien/Farben/Abstände.
+Farbige Bubble-Nodes mit Icons, `drillable`, `zoomable`, `showNodePopover`, `colorConfig`, Breadcrumb.
 
 ---
 
-### ~~MTL-22 — CirclePackingChart~~ ✅ v2.5.0 — Branch MTL-22, merge ausstehend
+### ~~MTL-22 — CirclePackingChart~~ ✅ v2.5.0
 
-**Features:**
-| Feature | Beschreibung | Status |
-|---|---|---|
-| D3 pack-Layout | Kreise proportional zur Größe, automatisch verschachtelt | ✅ |
-| Animierter Zoom | Ctrl / Cmd ⌘+Click → smooth `d3.interpolateZoom`-Transition; Ctrl / Cmd ⌘+DblClick → zurück | ✅ |
-| Visueller Zoom | `zoomable`: Ctrl / Cmd ⌘+Scroll → ViewBox-Skalierung, Escape-Reset | ✅ |
-| `showAllLabels` | Inner-Circle Labels — voller Text wenn passt, `…` bei overflow, ab r≥14px | ✅ |
-| Outer-Labels | Fett für Eltern-Kreise, normal für Blätter | ✅ |
-| `colorConfig` | Per-Knoten Farb-Override im Datenmodell | ✅ |
-| Farb-Modi | MUI-Palette (default), `chartColors` (Palette), `depthColorStart`+`depthColorEnd` (HCL-Gradient) | ✅ |
-| `onCircleClick` | `CirclePackingNodeInfo`: `id`, `name`, `value`, `percentage`, `depth`, `path`, `childrenCount` | ✅ |
-| `onZoomChange` | `CirclePackingZoomInfo`: `previousName`, `currentName`, `currentDepth`, `isRoot` | ✅ |
-| Storybook | Default, DeepHierarchy, CustomColors, GradientMode, WithColorConfig, WithAllLabels, Disabled | ✅ |
+D3 pack-Layout, animierter `d3.interpolateZoom`-Zoom (DblClick), visueller Scroll-Zoom, `showAllLabels` (fit oder `…`), fette Eltern-Labels, `colorConfig`, HCL-Gradient-Modus.
 
 ---
 
-### D3 Charts — Feature-Ideen (nach v2.5.0, aus User-Sicht)
+### ~~MTL-23 — Live Storybook (GitHub Pages)~~ ✅ Deployed
 
-| Feature | Komponenten | Beschreibung | Aufwand |
-|---|---|---|---|
-| **Responsive `size`** | Alle 4 | `size="auto"` passt sich dem Container an — kein fixer Pixel-Wert | Mittel |
-| **Export PNG/SVG** | Alle 4 | Download-Button — Browser-nativer SVG/Canvas-Export | Mittel |
-| **Legende** | Sunburst, Chord | Farb-Legende mit Segment/Gruppen-Namen + Wert | Niedrig |
-| **`focusId` controlled** | Sunburst, RadialTree, CirclePacking | Parent steuert Drill-Down-Zustand (URL-persistierbar, Breadcrumb-Sync) | Mittel |
-| **Animierte Drill-Down-Übergänge** | SunburstChart | D3 arc interpolation beim Ctrl+Click — weiche Überblendung | Mittel |
-| **Prozentlabels** | SunburstChart | `labelMode: 'name' \| 'percent' \| 'both'` | Niedrig |
-| **Collapsible Nodes** | RadialTreeChart | Klick klappt Teilbaum zusammen/auf | Hoch |
-| **Suche / Highlight** | RadialTreeChart, CirclePacking | Knoten nach Name suchen — Treffer hervorheben | Mittel |
-| **"Sonstige"-Kollaps** | Sunburst, CirclePacking | Sehr kleine Segmente (< X%) → "Other"-Gruppe | Mittel |
-| **`colorConfig.gradient`** | Alle 4 | Pro-Knoten Gradient-Farben (Start → Ende) | Niedrig |
+`https://thebuoyant.github.io/mui-ts-library/` — auto-deploy bei jedem Push auf `main` via `peaceiris/actions-gh-pages@v4`.
 
 ---
 
-### MTL-23 — TreemapChart ⭐ Als nächstes
+### ~~MTL-24 — HorizontalTreeChart~~ ✅ v2.6.0 — Branch MTL-24, merge ausstehend
+
+4 Orientierungen (`LR` / `RL` / `TB` / `BT`), geschwungene Bézier-Links, Bubble-Nodes mit Icons, `drillable`, `zoomable`, `showNodePopover`, `colorConfig`, 7 Stories, 10 Tests.
+
+---
+
+### MTL-25 — TreemapChart ⭐ Als nächstes
 
 > Quelle: `skejlo-charts/src/components/_charts/treemap-chart/TreemapChart.tsx`  
 > **Aufwand: Niedrig** — kein Fluent UI, reines D3 + React SVG
 
-Hierarchische Daten als verschachtelte Rechtecke. Ideal für Proportionsvergleiche: Budgets, Speicherverbrauch, Marktanteile.
+Hierarchische Daten als verschachtelte Rechtecke. Ideal für Proportionsvergleiche: Budgets, Speicherverbrauch, Marktanteile. Gleiche Konventionen wie alle D3-Charts.
 
-Gleiche Konventionen wie alle D3-Charts: `chartColors`, `colorConfig`, `zoomable`, `disabled`, `translation`, MUI Tooltip.
-
-| Status | — (nach Storybook-Live, MTL-23) |
+| Status | — (nach MTL-24 merge) |
 |---|---|
 
 ---
 
-## 💡 Ideen aus der Perspektive eines Dashboard-Entwicklers
+### D3 Charts — Feature-Ideen (aus User-Sicht)
 
-*Was würde mich als Nutzer dieser Library wirklich begeistern — und was fehlt noch, um die "Dashboards & Daten-Apps mit MUI"-Nische vollständig zu besetzen?*
+| Feature | Komponenten | Beschreibung | Aufwand |
+|---|---|---|---|
+| **Responsive `size="auto"`** | Alle D3 Charts | Passt sich dem Container an | Mittel |
+| **Export PNG / SVG** | Alle D3 Charts | Download-Button für Präsentationen | Mittel |
+| **Daten-Animation** | Alle D3 Charts | Smooth animieren wenn `data` sich ändert | Hoch |
+| **Loading Skeleton** | Alle D3 Charts | `loading={true}` zeigt animierten Platzhalter | Niedrig |
+| **Empty State** | Alle D3 Charts | Hübsche Darstellung wenn `data` leer ist | Niedrig |
+| **Legende** | Sunburst, Chord | Farb-Legende mit Segment/Gruppen-Namen + Wert | Niedrig |
+| **`focusId` controlled** | Sunburst, RadialTree, HorizontalTree | Parent steuert Drill-Down (URL-persistierbar) | Mittel |
+| **Animierte Drill-Down-Übergänge** | SunburstChart | D3 arc interpolation beim Ctrl+Click | Mittel |
+| **Collapsible Nodes** | RadialTree, HorizontalTree | Klick klappt Teilbaum zusammen/auf | Hoch |
+| **Suche / Highlight** | RadialTree, HorizontalTree, CirclePacking | Knoten nach Name suchen + hervorheben | Mittel |
 
-### Übergreifend — alle D3-Charts
-
-| Idee | Warum wertvoll | Aufwand |
-|---|---|---|
-| **Export PNG / SVG** | Jeder Dashboard-User will Charts in Präsentationen / Reports | Mittel |
-| **Responsive `size="auto"`** | Charts passen sich dem Container an — kein hardcoded `size={600}` | Mittel |
-| **Daten-Animation** | Wenn sich die Daten ändern, animiert das Chart — lebendig statt statisch | Hoch |
-| **Shared `D3ChartTheme`** | Ein zentrales Theming-Objekt für alle D3-Charts — konsistente Farben/Stile im Dashboard | Mittel |
-| **Linked Selection** | Klick in Chart A hebt dasselbe Element in Chart B hervor — "Linked Brushing" für Dashboards | Hoch |
-| **Loading Skeleton** | `loading={true}` zeigt einen animierten Platzhalter — kein weißes Aufflackern beim Datenladen | Niedrig |
-| **Empty State** | Eigene, hübsche Darstellung wenn `data` leer ist — statt leerem SVG | Niedrig |
+---
 
 ### Neue Komponenten — die die Nische vervollständigen
 
 | Idee | Beschreibung | Priorität |
 |---|---|---|
-| **HeatmapChart** | Matrix-Heatmap (z.B. GitHub Contribution Graph, Wochentag × Stunde) — D3 sehr gut geeignet | ⭐⭐⭐ |
-| **SankeyChart** | Flussdiagramm für Mengenverlauf (z.B. Sales Funnel, Budget-Verteilung) — mächtiger als ChordChart für sequentielle Flows | ⭐⭐⭐ |
-| **TimelineChart** | Ereignishistorie auf einer Achse (Audit-Log, Release-History, Incident-Timeline) — anders als GanttChart | ⭐⭐ |
-| **ForceGraph** | Netzwerk-/Abhängigkeitsgraph mit D3 Force Layout — ideal für Microservice-Maps, Beziehungsgraphen | ⭐⭐ |
-| **KPICard** | Einzelner Kennzahlen-Chip mit Trend-Indikator, Sparkline und Farb-Threshold — Dashboard-Grundbaustein | ⭐⭐⭐ |
-
-### Bestehende Komponenten — das Sahnehäubchen
-
-| Idee | Komponente | Warum jetzt noch nicht, aber bald | Aufwand |
-|---|---|---|---|
-| **Query History** | SqlEditor | localStorage-basierter Verlauf der letzten 20 Queries — Entwickler lieben das | Niedrig |
-| **Undo / Redo** | GanttChart | Ctrl+Z für Task-Moves — fehlt bei jedem Gantt-Tool und ist überraschend selten | Hoch |
-| **CSV/Excel Export** | GanttChart | Tasks als Tabelle exportieren — Brücke zu PM-Tools wie Excel/Jira | Mittel |
-| **AI-Autocomplete** | SqlEditor | Integration mit LLM-Endpoint für SQL-Vorschläge — Differenzierungsmerkmal | Hoch |
-| **Mentions (@)** | RichTextEditor | Users/Tags referenzieren — macht Editor für Team-Apps nutzbar | Hoch |
-| **Daten-Update-Animation** | Alle D3 Charts | Wenn `data` Prop sich ändert, smooth animieren statt hart neu rendern | Mittel |
-
-### Developer Experience — was Users dazu bringt, die Library zu wählen
-
-| Idee | Beschreibung | Aufwand |
-|---|---|---|
-| **StackBlitz / CodeSandbox Templates** | "Try it now"-Links direkt in README — kein `npm install` nötig zum Ausprobieren | Niedrig |
-| **VS Code Snippets** | `rte-basic`, `gantt-basic` → autovervollständigt ein fertiges Snippet | Niedrig |
-| **Storybook Live** | `https://thebuoyant.github.io/mui-ts-library/` — ⏳ MTL-23 in Arbeit | **Nächste Aktion** |
-| **Playwright Visual Tests** | Screenshot-Vergleiche für Chart-Rendering — keine Regressionen in Looks | Hoch |
+| **HeatmapChart** | Matrix-Heatmap (GitHub Contribution Graph, Wochentag × Stunde) | ⭐⭐⭐ |
+| **SankeyChart** | Flussdiagramm für Mengenverlauf (Sales Funnel, Budget-Verteilung) | ⭐⭐⭐ |
+| **KPICard** | Kennzahlen-Chip mit Trend-Indikator, Sparkline, Farb-Threshold | ⭐⭐⭐ |
+| **TimelineChart** | Ereignishistorie auf einer Achse (Audit-Log, Incident-Timeline) | ⭐⭐ |
+| **ForceGraph** | Netzwerk-/Abhängigkeitsgraph (D3 Force Layout) | ⭐⭐ |

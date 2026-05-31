@@ -1,8 +1,8 @@
 {
   "name": "@thebuoyant-tsdev/mui-ts-library",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "private": false,
-  "description": "Type-safe React component library for MUI v9. Gantt chart with drag & drop, WYSIWYG rich text editor (TipTap), SQL & JSON code editors (CodeMirror 6), D3 data visualizations (Sunburst, Chord, RadialTree, CirclePacking), confirm dialog, tag selector, and password strength meter. Full TypeScript, dark mode, i18n.",
+  "description": "Type-safe React component library for MUI v9. Gantt chart with drag & drop, WYSIWYG rich text editor (TipTap), SQL & JSON code editors (CodeMirror 6), D3 data visualizations (Sunburst, Chord, RadialTree, CirclePacking, HorizontalTree), confirm dialog, tag selector, and password strength meter. Full TypeScript, dark mode, i18n.",
   "author": {
     "name": "Thomas Schlender",
     "email": "thebuoyant@gmail.com"
@@ -134,6 +134,8 @@
     "radial-tree",
     "radial-chart",
     "tree-chart",
+    "horizontal-tree",
+    "tree-diagram",
     "org-chart",
     "dashboard",
     "analytics"

@@ -1,0 +1,231 @@
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
+import { HorizontalTreeChart } from "./HorizontalTreeChart";
+import type { HorizontalTreeData } from "./HorizontalTreeChart.types";
+
+const meta: Meta<typeof HorizontalTreeChart> = {
+  title: "Components/HorizontalTreeChart",
+  component: HorizontalTreeChart,
+  argTypes: {
+    orientation:       { control: "radio", options: ["LR", "RL", "TB", "BT"] },
+    width:             { control: "number" },
+    height:            { control: "number" },
+    levelSpacing:      { control: "number" },
+    nodeRadius:        { control: "number" },
+    sortBy:            { control: "radio", options: ["name", "value"] },
+    showLabels:        { control: "boolean" },
+    showIcons:         { control: "boolean" },
+    labelFontSize:     { control: "number" },
+    labelColor:        { control: "color" },
+    linkColor:         { control: "color" },
+    linkStrokeOpacity: { control: { type: "range", min: 0, max: 1, step: 0.05 } },
+    linkStrokeWidth:   { control: "number" },
+    zoomable:          { control: "boolean" },
+    drillable:         { control: "boolean" },
+    showNodePopover:   { control: "boolean" },
+    disabled:          { control: "boolean" },
+    chartColors:              { control: false },
+    translation:              { control: false },
+    data:                     { control: false },
+    onNodeClick:              { control: false },
+    onFocusChange:            { control: false },
+    renderNodePopoverContent: { control: false },
+  },
+  args: {
+    orientation:       "LR",
+    width:             800,
+    height:            500,
+    levelSpacing:      200,
+    nodeRadius:        10,
+    sortBy:            "name",
+    showLabels:        true,
+    showIcons:         true,
+    labelFontSize:     12,
+    linkStrokeOpacity: 0.4,
+    linkStrokeWidth:   1.5,
+    zoomable:          false,
+    drillable:         false,
+    showNodePopover:   false,
+    disabled:          false,
+    onNodeClick:       fn(),
+    onFocusChange:     fn(),
+  },
+};
+
+export default meta;
+type Story = StoryObj<typeof HorizontalTreeChart>;
+
+// ── Demo data: Software Architecture ─────────────────────────────────────────
+
+const ARCH_DATA: HorizontalTreeData = {
+  id: "platform", name: "Platform",
+  subname: "v2.5 Architecture",
+  children: [
+    {
+      id: "frontend", name: "Frontend",
+      subname: "React / TypeScript",
+      specialValueA: "React 19", specialValueB: "TypeScript 5",
+      children: [
+        { id: "web",     name: "Web App",      subname: "Next.js 15",   specialValueA: "SSR",   specialValueB: "18 screens" },
+        { id: "mobile",  name: "Mobile",       subname: "React Native", specialValueA: "iOS/Android", specialValueB: "12 screens" },
+        { id: "desktop", name: "Desktop",      subname: "Electron",     specialValueA: "Win/Mac/Linux", specialValueB: "8 screens" },
+      ],
+    },
+    {
+      id: "backend", name: "Backend",
+      subname: "Node.js / Go",
+      specialValueA: "Node 22 + Go 1.22", specialValueB: "REST + gRPC",
+      children: [
+        { id: "api-gw",  name: "API Gateway",  subname: "Kong",         specialValueA: "Rate limiting", specialValueB: "5k req/s" },
+        { id: "auth",    name: "Auth Service", subname: "OAuth 2.0",    specialValueA: "JWT + OIDC", specialValueB: "SSO" },
+        { id: "core",    name: "Core API",     subname: "Node.js",      specialValueA: "REST",       specialValueB: "220 endpoints",
+          children: [
+            { id: "users",    name: "Users",    subname: "CRUD",  specialValueA: "PostgreSQL" },
+            { id: "billing",  name: "Billing",  subname: "Stripe",specialValueA: "PCI DSS" },
+            { id: "notifications", name: "Notifications", subname: "Email/Push", specialValueA: "AWS SES" },
+          ],
+        },
+        { id: "search",  name: "Search",       subname: "Elasticsearch", specialValueA: "Full-text", specialValueB: "< 50ms" },
+      ],
+    },
+    {
+      id: "data", name: "Data",
+      subname: "Analytics & ML",
+      specialValueA: "Python 3.12", specialValueB: "Snowflake",
+      children: [
+        { id: "pipeline", name: "Pipeline",   subname: "Apache Kafka", specialValueA: "Streaming", specialValueB: "1M events/h" },
+        { id: "warehouse",name: "Warehouse",  subname: "Snowflake",    specialValueA: "Batch",     specialValueB: "10TB" },
+        { id: "ml",       name: "ML Platform",subname: "PyTorch",      specialValueA: "Training",  specialValueB: "GPU cluster" },
+      ],
+    },
+    {
+      id: "infra", name: "Infrastructure",
+      subname: "AWS / Kubernetes",
+      specialValueA: "EKS + ECS", specialValueB: "Multi-region",
+      children: [
+        { id: "k8s",       name: "Kubernetes",  subname: "EKS",       specialValueA: "3 clusters" },
+        { id: "ci-cd",     name: "CI/CD",       subname: "GitHub Actions", specialValueA: "500 builds/d" },
+        { id: "monitoring",name: "Monitoring",  subname: "Datadog",   specialValueA: "Metrics + Traces" },
+      ],
+    },
+  ],
+};
+
+// ── Stories ───────────────────────────────────────────────────────────────────
+
+export const Default: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '**Left → Right** (default) — classic horizontal tree layout. ' +
+          '**Click** any node → `onNodeClick`. ' +
+          '**Hover** → MUI tooltip with name, subname, and data values. ' +
+          'Bold labels for branch nodes, normal for leaves.',
+      },
+    },
+  },
+  args: { data: ARCH_DATA },
+};
+
+export const RightToLeft: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: '`orientation="RL"` — tree grows right → left. Root on the right, leaves on the left.',
+      },
+    },
+  },
+  args: { data: ARCH_DATA, orientation: "RL" },
+};
+
+export const TopToBottom: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: '`orientation="TB"` — classic top-down org chart layout. Root at the top.',
+      },
+    },
+  },
+  args: { data: ARCH_DATA, orientation: "TB", width: 900, height: 600 },
+};
+
+export const BottomToTop: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: '`orientation="BT"` — tree grows bottom → top. Useful for dependency pyramids.',
+      },
+    },
+  },
+  args: { data: ARCH_DATA, orientation: "BT", width: 900, height: 600 },
+};
+
+export const WithDrillDown: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`drillable={true}` + `zoomable={true}`. ' +
+          '`Ctrl / Cmd ⌘+Click` on a branch node → drill into that subtree. ' +
+          '`Ctrl / Cmd ⌘+DblClick` → zoom out. `Escape` → reset. ' +
+          'Breadcrumb shows current position.',
+      },
+    },
+  },
+  args: { data: ARCH_DATA, drillable: true, zoomable: true },
+};
+
+export const WithColorConfig: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`colorConfig: { fill }` per node overrides the default depth palette. ' +
+          'Frontend = blue, Backend = purple, Data = teal, Infrastructure = orange.',
+      },
+    },
+  },
+  args: {
+    data: {
+      ...ARCH_DATA,
+      children: [
+        { ...ARCH_DATA.children![0], colorConfig: { fill: "#1565C0" },
+          children: ARCH_DATA.children![0].children?.map(c => ({ ...c, colorConfig: { fill: "#42A5F5" } })) },
+        { ...ARCH_DATA.children![1], colorConfig: { fill: "#6A1B9A" },
+          children: ARCH_DATA.children![1].children?.map(c => ({ ...c, colorConfig: { fill: "#AB47BC" } })) },
+        { ...ARCH_DATA.children![2], colorConfig: { fill: "#00695C" },
+          children: ARCH_DATA.children![2].children?.map(c => ({ ...c, colorConfig: { fill: "#26A69A" } })) },
+        { ...ARCH_DATA.children![3], colorConfig: { fill: "#E65100" },
+          children: ARCH_DATA.children![3].children?.map(c => ({ ...c, colorConfig: { fill: "#FFA726" } })) },
+      ],
+    },
+  },
+};
+
+export const WithPopover: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`showNodePopover={true}` — clicking a node opens a MUI Popover with name, subname, and data values.',
+      },
+    },
+  },
+  args: {
+    data: ARCH_DATA,
+    showNodePopover: true,
+    translation: { specialValueA: "Tech Stack", specialValueB: "Details" },
+  },
+};
+
+export const Disabled: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: '`disabled={true}` mutes all interactions and reduces opacity.',
+      },
+    },
+  },
+  args: { data: ARCH_DATA, disabled: true },
+};
