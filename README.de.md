@@ -15,7 +15,7 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 | [`ConfirmDialog`](#confirmdialog) | Deklarativer Async-Bestätigungs-Dialog — `await confirm({ title, severity })` von überall in der App. Unterstützt Countdown-Auto-Confirm und `Enter` = Bestätigen. | [Vollständiges Manual →](user-manuals/ConfirmDialog.de.md) |
 | [`GanttChart`](#ganttchart) | Projekt-Timeline mit hierarchischen Aufgaben, Meilensteinen, Drag & Drop, Ctrl / Cmd ⌘+Scroll-Zoom, Heute-Chip, Assignee-Spalte, CSV-Export und integrierten CRUD-Dialogen | [Vollständiges Manual →](user-manuals/GanttChart.de.md) |
 | [`TagSelection`](#tagselection) | Multi-Tag-Auswahlfeld mit Autocomplete, freier Tag-Erstellung, Overflow-Chips und MUI-Theme-Farben | [Vollständiges Manual →](user-manuals/TagSelection.de.md) |
-| [`PasswordStrengthMeter`](#passwordstrengthmeter) | Passwort-Eingabe mit animiertem Stärke-Meter, segmentierter Balkenanzeige, eigenen Anforderungen und Anforderungsliste | [Vollständiges Manual →](user-manuals/PasswordStrengthMeter.de.md) |
+| [`PasswordStrengthMeter`](#passwordstrengthmeter) | Passwort-Eingabe mit animiertem Stärke-Meter, segmentierter Balkenanzeige, eigenen Anforderungen, Anforderungsliste und eingebautem sicheren Passwort-Generator | [Vollständiges Manual →](user-manuals/PasswordStrengthMeter.de.md) |
 | [`RichTextEditor`](#richtexteditor) | WYSIWYG-Editor (TipTap v3) mit Toolbar, Link-Dialog, Textfarbe, Hervorhebung, Wörter-Zähler, Vollbild-Modus, Markdown-Einfügen, Tabellen-Bearbeitung, Bild-Embed und Emoji-Picker | [Vollständiges Manual →](user-manuals/RichTextEditor.de.md) |
 | [`SqlEditor`](#sqleditor) | SQL-Code-Editor (CodeMirror 6) mit Syntax-Highlighting, Multi-Dialekt, Autocomplete, Linting und `Cmd+Enter`-Ausführen-Shortcut | [Vollständiges Manual →](user-manuals/SqlEditor.de.md) |
 | [`JsonEditor`](#jsoneditor) | JSON-Code-Editor (CodeMirror 6) mit Echtzeit-Validierung, Format- und Komprimieren-Schaltfläche sowie optionaler Minimap | [Vollständiges Manual →](user-manuals/JsonEditor.de.md) |
@@ -121,7 +121,7 @@ const tags: TagSelectionItem[] = [
 
 ### PasswordStrengthMeter
 
-Passwort-Eingabe mit Echtzeit-Stärke-Feedback. Konzipiert für Registrierungs- und Passwort-Änderungs-Flows, bei denen Nutzer zu sicheren Passwörtern geführt werden sollen — mit animiertem Stärke-Meter, segmentierten Balken und einer Live-Anforderungs-Checkliste.
+Passwort-Eingabe mit Echtzeit-Stärke-Feedback und eingebautem sicheren Passwort-Generator. Konzipiert für Registrierungs- und Passwort-Änderungs-Flows — Nutzer zu starken Passwörtern führen oder per Klick eines generieren lassen.
 
 ```tsx
 import { PasswordStrengthMeter } from '@thebuoyant-tsdev/mui-ts-library';
@@ -129,7 +129,10 @@ import { PasswordStrengthMeter } from '@thebuoyant-tsdev/mui-ts-library';
 <PasswordStrengthMeter
   passwordMinLength={10}
   showSegmentedBar
+  showPasswordGenerator            // generiert ein kryptographisch sicheres Passwort
+  generatorOptions={{ length: 20 }}
   onPasswordChange={(password, result) => console.log(result.score)}
+  onPasswordGenerated={(pw) => console.log('Generiert:', pw)}
 />
 ```
 
