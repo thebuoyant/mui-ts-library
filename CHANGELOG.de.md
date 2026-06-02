@@ -17,6 +17,12 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Hinzugefügt
 
+#### PasswordStrengthMeter — Passwort-Generator (MTL-25)
+
+- **`showPasswordGenerator?: boolean`** (Standard `false`) — zeigt "Sicheres Passwort generieren"-Button; nutzt `window.crypto.getRandomValues`
+- **`generatorOptions?: PasswordGeneratorOptions`** — `length`, `upper`, `lower`, `numbers`, `symbols` konfigurierbar; garantiert mindestens ein Zeichen jeder aktiven Klasse
+- **`onPasswordGenerated?: (password: string) => void`** — Callback mit generiertem Passwort
+
 #### GanttChart — Assignee-Spalte + CSV-Export (MTL-25)
 
 - **`task.assignee?: string`** — neues optionales Feld in `GanttTask`; wird in der Panel-Spalte und im Add/Edit-Dialog angezeigt

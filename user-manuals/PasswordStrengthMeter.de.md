@@ -88,12 +88,15 @@ function App() {
 | `name` | `string` | — | Natives `name`-Attribut des `<input>`-Elements. Benötigt von `register()` in React Hook Form und Formik. |
 | `passwordMinLength` | `number` | `8` | Mindestlänge des Passworts. Steuert die Anforderungscheckliste und den Scoring-Algorithmus. Passwörter unter dieser Länge erhalten immer den Score `weak`. |
 | `showMeter` | `boolean` | `true` | Zeigt den animierten Stärke-Balken unterhalb des Eingabefelds an. |
+| `generatorOptions` | `PasswordGeneratorOptions` | — | Konfiguriert den eingebauten Generator (bei `showPasswordGenerator=true`). Felder: `length`, `upper`, `lower`, `numbers`, `symbols`. |
 | `showPasswordAdornment` | `boolean` | `true` | Zeigt einen Button zum Sichtbar-Machen des Passworts im Klartext. |
+| `showPasswordGenerator` | `boolean` | `false` | Zeigt einen "Sicheres Passwort generieren"-Button — generiert ein starkes Passwort und füllt das Eingabefeld. Das generierte Passwort wird automatisch sichtbar gemacht. |
 | `showSegmentedBar` | `boolean` | `false` | Zeigt den Stärke-Balken als 4 separate animierte Segmente statt als einen wachsenden Balken. |
 | `showSummary` | `boolean` | `true` | Zeigt die Anforderungscheckliste unterhalb des Stärke-Balkens an. |
 | `translation` | `Partial<PasswordStrengthMeterTranslation>` | — | UI-Texte überschreiben — nur abweichende Keys angeben. |
 | `value` | `string` | — | Setzt die Komponente in den **kontrollierten Modus**: Das Passwort wird von außen gesteuert. Änderungen werden über `onPasswordChange` nach oben gegeben. |
 | `onPasswordChange` | `(password: string, strengthResult: StrengthResult) => void` | — | Wird bei jedem Tastendruck mit dem aktuellen Passwort und dem Stärke-Ergebnis aufgerufen. |
+| `onPasswordGenerated` | `(password: string) => void` | — | Wird ausgelöst wenn der Generator-Button geklickt wird — mit dem generierten Passwort. |
 
 **`MeterColors` — Struktur und Standardwerte:**
 

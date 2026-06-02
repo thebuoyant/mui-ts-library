@@ -78,23 +78,44 @@ function App() {
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `autoComplete` | `string` | — | Native `autocomplete` attribute. Recommended: `"new-password"` (registration) or `"current-password"` (login). |
-| `checkColors` | `CheckColors` | Red / Green | Colors of the checkmark and warning symbols in the requirements checklist. Both fields must be provided when the object is set. |
-| `customRequirements` | `CustomRequirement[]` | — | Additional requirements shown in the summary alongside the built-in ones. Each entry has a `label` and a `fulfilled` value (boolean or function). |
-| `disabled` | `boolean` | `false` | Disables the input field and the visibility toggle. Strength bar and requirements list remain visible. |
-| `error` | `boolean` | `false` | Puts the input field into error state (red border). The `helperText` is also displayed in red. |
-| `helperText` | `string` | — | Helper or error message text below the input field. Appears in red when `error={true}`. |
-| `inputRef` | `React.Ref<HTMLInputElement>` | — | Ref to the native `<input>` element. Used by React Hook Form (`register().ref`) and Formik (`innerRef`). |
-| `inputSize` | `"small" \| "medium"` | `"medium"` | Size of the input field per MUI standard. Affects font size, padding, and height. |
-| `meterColors` | `Partial<MeterColors>` | Red → Green | Colors of the strength bar for each of the four strength levels. Only specify deviating keys — unset keys keep the default colors. |
-| `name` | `string` | — | Native `name` attribute of the `<input>` element. Required by `register()` in React Hook Form and Formik. |
-| `passwordMinLength` | `number` | `8` | Minimum password length. Controls the requirements checklist ("At least {n} characters") and influences the scoring algorithm. Passwords below this length always receive a `weak` score. |
-| `showMeter` | `boolean` | `true` | Shows the animated strength bar below the input field. |
-| `showPasswordAdornment` | `boolean` | `true` | Shows a toggle button to reveal the password in plain text. |
-| `showSegmentedBar` | `boolean` | `false` | Renders the strength bar as 4 separate animated segments instead of a single growing bar. Each segment fills with color as strength increases. |
+| `checkColors` | `CheckColors` | Red / Green | Colors of the checkmark and warning symbols in the requirements checklist. |
+| `customRequirements` | `CustomRequirement[]` | — | Additional requirements shown in the summary. Each entry has a `label` and `fulfilled` (boolean or function). |
+| `disabled` | `boolean` | `false` | Disables the input field and all interactive buttons. |
+| `error` | `boolean` | `false` | Puts the input field into error state (red border). |
+| `generatorOptions` | `PasswordGeneratorOptions` | — | Customize the built-in generator (used when `showPasswordGenerator=true`). See below. |
+| `helperText` | `string` | — | Helper or error message below the input. Red when `error={true}`. |
+| `inputRef` | `React.Ref<HTMLInputElement>` | — | Ref to the native `<input>` element. For React Hook Form / Formik. |
+| `inputSize` | `"small" \| "medium"` | `"medium"` | MUI input size. |
+| `meterColors` | `Partial<MeterColors>` | Red → Green | Strength bar colors per level. Only specify deviating keys. |
+| `name` | `string` | — | Native `name` attribute of the `<input>`. For form libraries. |
+| `passwordMinLength` | `number` | `8` | Minimum length for the "At least {n} characters" requirement. |
+| `showMeter` | `boolean` | `true` | Shows the animated strength bar below the input. |
+| `showPasswordAdornment` | `boolean` | `true` | Shows the show/hide password toggle button. |
+| `showPasswordGenerator` | `boolean` | `false` | Shows a "Generate secure password" button — generates a strong password and fills the input. The generated password is revealed automatically. |
+| `showSegmentedBar` | `boolean` | `false` | Renders 4 separate animated segments instead of a single bar. |
 | `showSummary` | `boolean` | `true` | Shows the requirements checklist below the strength bar. |
-| `translation` | `Partial<PasswordStrengthMeterTranslation>` | — | Override UI labels — only specify deviating keys. |
-| `value` | `string` | — | Puts the component into **controlled mode**: the password is managed externally. Changes are passed up via `onPasswordChange`. |
-| `onPasswordChange` | `(password: string, strengthResult: StrengthResult) => void` | — | Called on every keystroke with the current password and strength result. |
+| `translation` | `Partial<PasswordStrengthMeterTranslation>` | — | Override any UI label. |
+| `value` | `string` | — | Controlled mode — password managed externally, changes via `onPasswordChange`. |
+| `onPasswordChange` | `(password, strengthResult) => void` | — | Called on every keystroke with password and strength result. |
+| `onPasswordGenerated` | `(password: string) => void` | — | Fired when the generator button is clicked with the generated password. |
+
+**`PasswordGeneratorOptions` — customize the built-in generator:**
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `length` | `number` | `max(16, passwordMinLength)` | Total password length |
+| `upper` | `boolean` | `true` | Include uppercase letters A–Z |
+| `lower` | `boolean` | `true` | Include lowercase letters a–z |
+| `numbers` | `boolean` | `true` | Include digits 0–9 |
+| `symbols` | `boolean` | `true` | Include symbols `!@#$%^&*...` |
+
+```tsx
+<PasswordStrengthMeter
+  showPasswordGenerator
+  generatorOptions={{ length: 24, symbols: false }}
+  onPasswordGenerated={(pw) => console.log('Generated:', pw)}
+/>
+```
 
 **`MeterColors` — Structure and defaults:**
 

@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   FormControl,
   FormHelperText,
   IconButton,
@@ -7,8 +8,10 @@ import {
   InputLabel,
   OutlinedInput,
   Stack,
+  Tooltip,
   Typography,
 } from "@mui/material";
+import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutlined";
@@ -20,6 +23,7 @@ import type {
   CheckColors,
   CustomRequirement,
   MeterColors,
+  PasswordGeneratorOptions,
   PasswordStrengthMeterProps,
   PasswordStrengthMeterTranslation,
   StrengthResult,
@@ -29,6 +33,38 @@ import {
   DEFAULT_METER_COLORS,
   DEFAULT_PASSWORD_TRANSLATIONS,
 } from "./PasswordStrengthMeter.types";
+
+// ── Cryptographically secure password generator ───────────────────────────────
+function generateSecurePassword(opts: Required<PasswordGeneratorOptions>): string {
+  const charSets: string[] = [];
+  if (opts.upper)   charSets.push("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+  if (opts.lower)   charSets.push("abcdefghijklmnopqrstuvwxyz");
+  if (opts.numbers) charSets.push("0123456789");
+  if (opts.symbols) charSets.push("!@#$%^&*()-_=+[]{}|;:,.<>?");
+  if (charSets.length === 0) charSets.push("abcdefghijklmnopqrstuvwxyz");
+
+  const allChars = charSets.join("");
+  const array    = new Uint32Array(opts.length);
+  crypto.getRandomValues(array);
+
+  // Guarantee at least one char from each active class
+  const guaranteed = charSets.map((set) => {
+    const idx = crypto.getRandomValues(new Uint32Array(1))[0] % set.length;
+    return set[idx];
+  });
+
+  const remaining = Array.from(array.slice(guaranteed.length)).map(
+    (n) => allChars[n % allChars.length],
+  );
+
+  // Shuffle the result so the guaranteed chars aren't always at the start
+  const combined = [...guaranteed, ...remaining];
+  for (let i = combined.length - 1; i > 0; i--) {
+    const j = crypto.getRandomValues(new Uint32Array(1))[0] % (i + 1);
+    [combined[i], combined[j]] = [combined[j], combined[i]];
+  }
+  return combined.join("");
+}
 
 type RequirementItemProps = {
   label: string;
@@ -68,8 +104,10 @@ export function PasswordStrengthMeter({
   helperText,
   autoComplete,
   customRequirements,
+  generatorOptions,
   showPasswordAdornment = true,
   showMeter = true,
+  showPasswordGenerator = false,
   showSegmentedBar = false,
   showSummary = true,
   inputSize = "medium",
@@ -78,6 +116,7 @@ export function PasswordStrengthMeter({
   passwordMinLength = 8,
   checkColors = DEFAULT_CHECK_COLORS,
   onPasswordChange,
+  onPasswordGenerated,
 }: PasswordStrengthMeterProps) {
   const t: PasswordStrengthMeterTranslation = { ...DEFAULT_PASSWORD_TRANSLATIONS, ...translation };
   const resolvedMeterColors: MeterColors = { ...DEFAULT_METER_COLORS, ...meterColors };
@@ -130,6 +169,22 @@ export function PasswordStrengthMeter({
     }
   };
 
+  const handleGenerate = () => {
+    const opts: Required<PasswordGeneratorOptions> = {
+      length:  generatorOptions?.length  ?? Math.max(16, passwordMinLength),
+      upper:   generatorOptions?.upper   ?? true,
+      lower:   generatorOptions?.lower   ?? true,
+      numbers: generatorOptions?.numbers ?? true,
+      symbols: generatorOptions?.symbols ?? true,
+    };
+    const generated = generateSecurePassword(opts);
+    if (value === undefined) setInternalPassword(generated);
+    onPasswordChange?.(generated, scorePassword(generated, passwordMinLength));
+    onPasswordGenerated?.(generated);
+    // Show the generated password so the user can see it
+    setShowPassword(true);
+  };
+
   const calculateStrengthColor = (result: StrengthResult): string => {
     switch (result.meterStatus) {
       case "weak":    return resolvedMeterColors.weak;
@@ -178,6 +233,24 @@ export function PasswordStrengthMeter({
         />
         {helperText && <FormHelperText>{helperText}</FormHelperText>}
       </FormControl>
+
+      {showPasswordGenerator && (
+        <Tooltip title={t.generatePasswordLabel} arrow>
+          <span>
+            <Button
+              data-testid="psm-generate"
+              size="small"
+              variant="text"
+              startIcon={<AutoFixHighIcon fontSize="small" />}
+              disabled={disabled}
+              onClick={handleGenerate}
+              sx={{ mt: 0.5, alignSelf: "flex-start", textTransform: "none" }}
+            >
+              {t.generatePasswordLabel}
+            </Button>
+          </span>
+        </Tooltip>
+      )}
 
       {showMeter && (
         <PasswordStrengthBar

@@ -39,6 +39,25 @@ export type PasswordStrengthMeterTranslation = {
   showPasswordLabel: string;
   hidePasswordLabel: string;
   meterAriaLabel: string;
+  /** Tooltip for the password generator button */
+  generatePasswordLabel: string;
+};
+
+/**
+ * Options for the built-in password generator.
+ * All character classes are included by default.
+ */
+export type PasswordGeneratorOptions = {
+  /** Total password length (default: 16) */
+  length?:  number;
+  /** Include uppercase letters A–Z (default: true) */
+  upper?:   boolean;
+  /** Include lowercase letters a–z (default: true) */
+  lower?:   boolean;
+  /** Include digits 0–9 (default: true) */
+  numbers?: boolean;
+  /** Include symbols !@#$%^&*... (default: true) */
+  symbols?: boolean;
 };
 
 export const DEFAULT_PASSWORD_TRANSLATIONS: PasswordStrengthMeterTranslation = {
@@ -52,6 +71,7 @@ export const DEFAULT_PASSWORD_TRANSLATIONS: PasswordStrengthMeterTranslation = {
   showPasswordLabel: "Show password",
   hidePasswordLabel: "Hide password",
   meterAriaLabel: "Password strength",
+  generatePasswordLabel: "Generate secure password",
 };
 
 export const DEFAULT_METER_COLORS: MeterColors = {
@@ -76,30 +96,36 @@ export type CustomRequirement = {
 };
 
 export type PasswordStrengthMeterProps = {
-  autoComplete?:          string;
-  checkColors?:           CheckColors;
+  autoComplete?:            string;
+  checkColors?:             CheckColors;
   /** Additional custom requirements shown alongside the built-in ones. */
-  customRequirements?:    CustomRequirement[];
-  disabled?:              boolean;
-  error?:                 boolean;
-  helperText?:            string;
-  inputRef?:              React.Ref<HTMLInputElement>;
-  inputSize?:             "small" | "medium";
+  customRequirements?:      CustomRequirement[];
+  disabled?:                boolean;
+  error?:                   boolean;
+  /** Options for the built-in password generator (used when showPasswordGenerator=true). */
+  generatorOptions?:        PasswordGeneratorOptions;
+  helperText?:              string;
+  inputRef?:                React.Ref<HTMLInputElement>;
+  inputSize?:               "small" | "medium";
   // Nur abweichende Keys angeben — Rest fällt auf DEFAULT_METER_COLORS zurück.
-  meterColors?:           Partial<MeterColors>;
+  meterColors?:             Partial<MeterColors>;
   // Form-Integration: kompatibel mit React Hook Form register(), Formik und nativen Forms.
-  name?:                  string;
-  passwordMinLength?:     number;
-  showMeter?:             boolean;
-  showPasswordAdornment?: boolean;
-  showSummary?:           boolean;
+  name?:                    string;
+  passwordMinLength?:       number;
+  showMeter?:               boolean;
+  showPasswordAdornment?:   boolean;
+  /** Show a "Generate secure password" button — generates and fills a strong password on click. */
+  showPasswordGenerator?:   boolean;
+  showSummary?:             boolean;
   /** Render the strength bar as 4 animated segments instead of a single growing bar. */
-  showSegmentedBar?:      boolean;
+  showSegmentedBar?:        boolean;
   // Nur abweichende Keys angeben — Rest fällt auf DEFAULT_PASSWORD_TRANSLATIONS zurück.
-  translation?:           Partial<PasswordStrengthMeterTranslation>;
+  translation?:             Partial<PasswordStrengthMeterTranslation>;
   // Wenn gesetzt, wird die Komponente kontrolliert: das Passwort kommt von außen,
   // Änderungen werden über onPasswordChange nach oben gegeben.
-  value?:                 string;
-  // Callback
-  onPasswordChange?: (password: string, strengthResult: StrengthResult) => void;
+  value?:                   string;
+  // Callbacks
+  onPasswordChange?:        (password: string, strengthResult: StrengthResult) => void;
+  /** Fired when a password was generated — receives the generated password. */
+  onPasswordGenerated?:     (password: string) => void;
 };

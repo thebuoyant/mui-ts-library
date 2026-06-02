@@ -85,7 +85,7 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
-| Passwort-Generator | Button generiert ein sicheres Passwort | Mittel | — |
+| ~~Passwort-Generator~~ | ~~Button generiert ein sicheres Passwort~~ | ~~Mittel~~ | ✅ v2.7.0 (`showPasswordGenerator`) |
 | Confirm-Feld | Zweites Eingabefeld mit Match-Validierung | Mittel | — |
 | ~~Custom Requirements~~ | ~~Eigene Anforderungen als Array-Prop~~ | ~~Niedrig~~ | ✅ v1.5.0 |
 | ~~Animated Segments~~ | ~~Strength-Bar als 4 separate Segmente~~ | ~~Niedrig~~ | ✅ v1.5.0 |

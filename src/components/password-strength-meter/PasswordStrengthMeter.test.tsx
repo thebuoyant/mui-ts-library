@@ -250,3 +250,60 @@ describe("PasswordStrengthMeter", () => {
     ).not.toBeInTheDocument();
   });
 });
+
+describe("Password Generator", () => {
+  it("Should not render the generator button by default", () => {
+    render(<PasswordStrengthMeter />);
+    expect(screen.queryByTestId("psm-generate")).not.toBeInTheDocument();
+  });
+
+  it("Should render the generator button when showPasswordGenerator is true", () => {
+    render(<PasswordStrengthMeter showPasswordGenerator />);
+    expect(screen.getByTestId("psm-generate")).toBeInTheDocument();
+  });
+
+  it("Should fill the input with a non-empty password on click", async () => {
+    const user = userEvent.setup();
+    render(<PasswordStrengthMeter showPasswordGenerator />);
+    await user.click(screen.getByTestId("psm-generate"));
+    const input = screen.getByTestId("psm-input") as HTMLInputElement;
+    expect(input.value.length).toBeGreaterThan(0);
+  });
+
+  it("Should call onPasswordChange and onPasswordGenerated on click", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const onGenerated = vi.fn();
+    render(
+      <PasswordStrengthMeter
+        showPasswordGenerator
+        onPasswordChange={onChange}
+        onPasswordGenerated={onGenerated}
+      />,
+    );
+    await user.click(screen.getByTestId("psm-generate"));
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onGenerated).toHaveBeenCalledTimes(1);
+    expect(typeof onGenerated.mock.calls[0][0]).toBe("string");
+    expect(onGenerated.mock.calls[0][0].length).toBeGreaterThan(0);
+  });
+
+  it("Should disable the generator button when disabled is true", () => {
+    render(<PasswordStrengthMeter showPasswordGenerator disabled />);
+    expect(screen.getByTestId("psm-generate")).toBeDisabled();
+  });
+
+  it("Should respect generatorOptions.length", async () => {
+    const user = userEvent.setup();
+    const onGenerated = vi.fn();
+    render(
+      <PasswordStrengthMeter
+        showPasswordGenerator
+        generatorOptions={{ length: 24 }}
+        onPasswordGenerated={onGenerated}
+      />,
+    );
+    await user.click(screen.getByTestId("psm-generate"));
+    expect(onGenerated.mock.calls[0][0].length).toBe(24);
+  });
+});

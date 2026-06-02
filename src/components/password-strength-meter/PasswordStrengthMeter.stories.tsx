@@ -9,38 +9,43 @@ const meta: Meta<typeof PasswordStrengthMeter> = {
   component: PasswordStrengthMeter,
   args: {
     // A–Z
-    disabled:              false,
-    error:                 false,
-    inputSize:             "medium",
-    passwordMinLength:     8,
-    showMeter:             true,
-    showPasswordAdornment: true,
-    showSegmentedBar:      false,
-    showSummary:           true,
-    // Callback
-    onPasswordChange: fn(),
+    disabled:               false,
+    error:                  false,
+    inputSize:              "medium",
+    passwordMinLength:      8,
+    showMeter:              true,
+    showPasswordAdornment:  true,
+    showPasswordGenerator:  false,
+    showSegmentedBar:       false,
+    showSummary:            true,
+    // Callbacks
+    onPasswordChange:       fn(),
+    onPasswordGenerated:    fn(),
   },
   argTypes: {
-    // A–Z: kontrollierbare Props
-    disabled:              { control: "boolean" },
-    error:                 { control: "boolean" },
-    helperText:            { control: "text" },
-    inputSize:             { control: "radio", options: ["small", "medium"] },
-    passwordMinLength:     { control: "number" },
-    showMeter:             { control: "boolean" },
-    showPasswordAdornment: { control: "boolean" },
-    showSegmentedBar:      { control: "boolean" },
-    showSummary:           { control: "boolean" },
-    // Komplexe Objekte / Form-Props — dedizierte Stories oder render verwenden
-    autoComplete:         { control: false },
-    checkColors:          { control: false },
-    customRequirements:   { control: false },
-    inputRef:             { control: false },
-    meterColors:          { control: false },
-    name:                 { control: false },
-    translation:          { control: false },
-    value:                { control: false },
-    onPasswordChange:     { control: false },
+    // Props A–Z
+    autoComplete:           { control: false },
+    checkColors:            { control: false },
+    customRequirements:     { control: false },
+    disabled:               { control: "boolean" },
+    error:                  { control: "boolean" },
+    generatorOptions:       { control: false },
+    helperText:             { control: "text" },
+    inputRef:               { control: false },
+    inputSize:              { control: "radio", options: ["small", "medium"] },
+    meterColors:            { control: false },
+    name:                   { control: false },
+    passwordMinLength:      { control: "number" },
+    showMeter:              { control: "boolean" },
+    showPasswordAdornment:  { control: "boolean" },
+    showPasswordGenerator:  { control: "boolean" },
+    showSegmentedBar:       { control: "boolean" },
+    showSummary:            { control: "boolean" },
+    translation:            { control: false },
+    value:                  { control: false },
+    // Callbacks A–Z
+    onPasswordChange:       { control: false },
+    onPasswordGenerated:    { control: false },
   },
 };
 
@@ -113,6 +118,7 @@ export const GermanTranslation: Story = {
       showPasswordLabel: "Passwort anzeigen",
       hidePasswordLabel: "Passwort verbergen",
       meterAriaLabel: "Passwortstärke",
+      generatePasswordLabel: "Sicheres Passwort generieren",
     },
   },
   render: (args) => (
@@ -241,6 +247,31 @@ export const WithCustomRequirements: Story = {
       { label: "No spaces allowed",        fulfilled: (pw) => !pw.includes(" ") },
       { label: "Must start with a letter", fulfilled: (pw) => /^[a-zA-Z]/.test(pw) },
     ],
+  },
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <PasswordStrengthMeter {...args} />
+    </Box>
+  ),
+};
+
+export const WithPasswordGenerator: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`showPasswordGenerator={true}` — shows a "Generate secure password" button below the input. ' +
+          'Clicking it fills the field with a cryptographically strong password (16 chars by default: ' +
+          'uppercase + lowercase + digits + symbols). The password is revealed automatically. ' +
+          '`generatorOptions` lets you customize length and character classes. ' +
+          '`onPasswordGenerated` fires with the generated password.',
+      },
+    },
+  },
+  args: {
+    showPasswordGenerator: true,
+    showSegmentedBar: true,
+    generatorOptions: { length: 20, upper: true, lower: true, numbers: true, symbols: true },
   },
   render: (args) => (
     <Box sx={{ maxWidth: 420 }}>
