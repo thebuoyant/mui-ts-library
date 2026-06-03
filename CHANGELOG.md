@@ -23,6 +23,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`generatorOptions?: PasswordGeneratorOptions`** — customize `length` (default: `max(16, passwordMinLength)`), `upper`, `lower`, `numbers`, `symbols` (all `true` by default); guarantees at least one character from each active class
 - **`onPasswordGenerated?: (password: string) => void`** — callback fires with the generated password
 - On generation: fills the input, reveals the password (shows plain text), fires `onPasswordChange`
+- **`showConfirmField?: boolean`** (default `false`) — adds a second "Confirm password" input with match validation; shows green ✓ / red ✗ icon and helper text; works in controlled (`confirmValue`) and uncontrolled mode
+- **`confirmValue?: string`** — controlled value for the confirm field
+- **`onConfirmChange?: (confirmValue: string, matches: boolean) => void`** — fires on every keystroke with the confirm value and whether it matches the main password
+- New translation keys: `confirmLabel`, `confirmMatchLabel`, `confirmMismatchLabel`
 
 #### GanttChart — Assignee Column + CSV Export (MTL-25)
 

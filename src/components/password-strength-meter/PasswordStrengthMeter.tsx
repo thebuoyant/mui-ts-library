@@ -12,6 +12,8 @@ import {
   Typography,
 } from "@mui/material";
 import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutlined";
@@ -97,6 +99,7 @@ function RequirementItem({
 
 export function PasswordStrengthMeter({
   value,
+  confirmValue,
   name,
   inputRef,
   disabled = false,
@@ -105,6 +108,7 @@ export function PasswordStrengthMeter({
   autoComplete,
   customRequirements,
   generatorOptions,
+  showConfirmField = false,
   showPasswordAdornment = true,
   showMeter = true,
   showPasswordGenerator = false,
@@ -116,6 +120,7 @@ export function PasswordStrengthMeter({
   passwordMinLength = 8,
   checkColors = DEFAULT_CHECK_COLORS,
   onPasswordChange,
+  onConfirmChange,
   onPasswordGenerated,
 }: PasswordStrengthMeterProps) {
   const t: PasswordStrengthMeterTranslation = { ...DEFAULT_PASSWORD_TRANSLATIONS, ...translation };
@@ -126,11 +131,16 @@ export function PasswordStrengthMeter({
   const inputId = `${uniqueId}-password`;
 
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [internalPassword, setInternalPassword] = useState("");
+  const [internalConfirm, setInternalConfirm] = useState("");
 
   // Im kontrollierten Modus kommt der Wert von außen (value-Prop),
   // im unkontrollierten Modus wird der interne State genutzt.
   const password = value !== undefined ? value : internalPassword;
+  const confirmPassword = confirmValue !== undefined ? confirmValue : internalConfirm;
+  const confirmFilled  = showConfirmField && confirmPassword.length > 0;
+  const passwordsMatch = confirmFilled && password === confirmPassword;
 
   const strengthResult = useMemo(
     () => scorePassword(password, passwordMinLength),
@@ -169,6 +179,12 @@ export function PasswordStrengthMeter({
     }
   };
 
+  const handleConfirmChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    if (confirmValue === undefined) setInternalConfirm(val);
+    onConfirmChange?.(val, val === password);
+  };
+
   const handleGenerate = () => {
     const opts: Required<PasswordGeneratorOptions> = {
       length:  generatorOptions?.length  ?? Math.max(16, passwordMinLength),
@@ -179,6 +195,7 @@ export function PasswordStrengthMeter({
     };
     const generated = generateSecurePassword(opts);
     if (value === undefined) setInternalPassword(generated);
+    if (confirmValue === undefined) setInternalConfirm("");
     onPasswordChange?.(generated, scorePassword(generated, passwordMinLength));
     onPasswordGenerated?.(generated);
     // Show the generated password so the user can see it
@@ -250,6 +267,49 @@ export function PasswordStrengthMeter({
             </Button>
           </span>
         </Tooltip>
+      )}
+
+      {showConfirmField && (
+        <FormControl variant="outlined" fullWidth error={confirmFilled && !passwordsMatch} sx={{ mt: 1 }}>
+          <InputLabel htmlFor={`${uniqueId}-confirm`} size={inputSize}>
+            {t.confirmLabel}
+          </InputLabel>
+          <OutlinedInput
+            id={`${uniqueId}-confirm`}
+            type={showConfirm ? "text" : "password"}
+            fullWidth
+            size={inputSize}
+            value={confirmPassword}
+            onChange={handleConfirmChange}
+            disabled={disabled}
+            inputProps={{ "data-testid": "psm-confirm-input" }}
+            endAdornment={
+              <InputAdornment position="end">
+                {confirmFilled && (
+                  passwordsMatch
+                    ? <CheckCircleIcon data-testid="psm-confirm-match" sx={{ color: checkColors.success, mr: 0.5 }} fontSize="small" />
+                    : <CancelIcon data-testid="psm-confirm-mismatch" sx={{ color: checkColors.failure, mr: 0.5 }} fontSize="small" />
+                )}
+                <IconButton
+                  size="small"
+                  disabled={disabled}
+                  onClick={() => setShowConfirm((s) => !s)}
+                  onMouseDown={(e) => e.preventDefault()}
+                  edge="end"
+                  aria-label={showConfirm ? t.hidePasswordLabel : t.showPasswordLabel}
+                >
+                  {showConfirm ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            }
+            label={t.confirmLabel}
+          />
+          {confirmFilled && (
+            <FormHelperText sx={{ color: passwordsMatch ? checkColors.success : checkColors.failure }}>
+              {passwordsMatch ? t.confirmMatchLabel : t.confirmMismatchLabel}
+            </FormHelperText>
+          )}
+        </FormControl>
       )}
 
       {showMeter && (

@@ -11,6 +11,7 @@ const meta: Meta<typeof PasswordStrengthMeter> = {
     // A–Z
     disabled:               false,
     error:                  false,
+    showConfirmField:       false,
     inputSize:              "medium",
     passwordMinLength:      8,
     showMeter:              true,
@@ -26,6 +27,7 @@ const meta: Meta<typeof PasswordStrengthMeter> = {
     // Props A–Z
     autoComplete:           { control: false },
     checkColors:            { control: false },
+    confirmValue:           { control: false },
     customRequirements:     { control: false },
     disabled:               { control: "boolean" },
     error:                  { control: "boolean" },
@@ -36,6 +38,7 @@ const meta: Meta<typeof PasswordStrengthMeter> = {
     meterColors:            { control: false },
     name:                   { control: false },
     passwordMinLength:      { control: "number" },
+    showConfirmField:       { control: "boolean" },
     showMeter:              { control: "boolean" },
     showPasswordAdornment:  { control: "boolean" },
     showPasswordGenerator:  { control: "boolean" },
@@ -44,6 +47,7 @@ const meta: Meta<typeof PasswordStrengthMeter> = {
     translation:            { control: false },
     value:                  { control: false },
     // Callbacks A–Z
+    onConfirmChange:        { control: false },
     onPasswordChange:       { control: false },
     onPasswordGenerated:    { control: false },
   },
@@ -272,6 +276,31 @@ export const WithPasswordGenerator: Story = {
     showPasswordGenerator: true,
     showSegmentedBar: true,
     generatorOptions: { length: 20, upper: true, lower: true, numbers: true, symbols: true },
+  },
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <PasswordStrengthMeter {...args} />
+    </Box>
+  ),
+};
+
+export const WithConfirmField: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`showConfirmField={true}` adds a second "Confirm password" input. ' +
+          'A green ✓ + "Passwords match" appears when both values are identical. ' +
+          'A red ✗ + "Passwords do not match" appears when they differ. ' +
+          'Works in controlled (`confirmValue`) and uncontrolled mode. ' +
+          '`onConfirmChange(value, matches)` fires on every keystroke.',
+      },
+    },
+  },
+  args: {
+    showConfirmField: true,
+    showSegmentedBar: true,
+    showPasswordGenerator: true,
   },
   render: (args) => (
     <Box sx={{ maxWidth: 420 }}>

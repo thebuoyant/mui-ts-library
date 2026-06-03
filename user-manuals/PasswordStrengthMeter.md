@@ -78,6 +78,7 @@ function App() {
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `autoComplete` | `string` | — | Native `autocomplete` attribute. Recommended: `"new-password"` (registration) or `"current-password"` (login). |
+| `confirmValue` | `string` | — | Controlled value for the confirm field (used with `showConfirmField`). |
 | `checkColors` | `CheckColors` | Red / Green | Colors of the checkmark and warning symbols in the requirements checklist. |
 | `customRequirements` | `CustomRequirement[]` | — | Additional requirements shown in the summary. Each entry has a `label` and `fulfilled` (boolean or function). |
 | `disabled` | `boolean` | `false` | Disables the input field and all interactive buttons. |
@@ -89,6 +90,7 @@ function App() {
 | `meterColors` | `Partial<MeterColors>` | Red → Green | Strength bar colors per level. Only specify deviating keys. |
 | `name` | `string` | — | Native `name` attribute of the `<input>`. For form libraries. |
 | `passwordMinLength` | `number` | `8` | Minimum length for the "At least {n} characters" requirement. |
+| `showConfirmField` | `boolean` | `false` | Shows a second "Confirm password" input — green ✓ / red ✗ with helper text when typing. Works controlled (`confirmValue`) and uncontrolled. |
 | `showMeter` | `boolean` | `true` | Shows the animated strength bar below the input. |
 | `showPasswordAdornment` | `boolean` | `true` | Shows the show/hide password toggle button. |
 | `showPasswordGenerator` | `boolean` | `false` | Shows a "Generate secure password" button — generates a strong password and fills the input. The generated password is revealed automatically. |
@@ -96,6 +98,7 @@ function App() {
 | `showSummary` | `boolean` | `true` | Shows the requirements checklist below the strength bar. |
 | `translation` | `Partial<PasswordStrengthMeterTranslation>` | — | Override any UI label. |
 | `value` | `string` | — | Controlled mode — password managed externally, changes via `onPasswordChange`. |
+| `onConfirmChange` | `(confirmValue: string, matches: boolean) => void` | — | Fires on every keystroke in the confirm field — includes whether passwords match. |
 | `onPasswordChange` | `(password, strengthResult) => void` | — | Called on every keystroke with password and strength result. |
 | `onPasswordGenerated` | `(password: string) => void` | — | Fired when the generator button is clicked with the generated password. |
 

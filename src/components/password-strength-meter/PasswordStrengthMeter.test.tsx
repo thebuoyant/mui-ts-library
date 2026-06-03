@@ -307,3 +307,58 @@ describe("Password Generator", () => {
     expect(onGenerated.mock.calls[0][0].length).toBe(24);
   });
 });
+
+describe("Confirm Field", () => {
+  it("Should not render the confirm input by default", () => {
+    render(<PasswordStrengthMeter />);
+    expect(screen.queryByTestId("psm-confirm-input")).not.toBeInTheDocument();
+  });
+
+  it("Should render the confirm input when showConfirmField is true", () => {
+    render(<PasswordStrengthMeter showConfirmField />);
+    expect(screen.getByTestId("psm-confirm-input")).toBeInTheDocument();
+  });
+
+  it("Should show match icon when passwords are identical", async () => {
+    const user = userEvent.setup();
+    render(<PasswordStrengthMeter showConfirmField value="MySecret1!" />);
+    await user.type(screen.getByTestId("psm-confirm-input"), "MySecret1!");
+    expect(screen.getByTestId("psm-confirm-match")).toBeInTheDocument();
+  });
+
+  it("Should show mismatch icon when passwords differ", async () => {
+    const user = userEvent.setup();
+    render(<PasswordStrengthMeter showConfirmField value="MySecret1!" />);
+    await user.type(screen.getByTestId("psm-confirm-input"), "Other");
+    expect(screen.getByTestId("psm-confirm-mismatch")).toBeInTheDocument();
+  });
+
+  it("Should call onConfirmChange with matches=true when passwords match", async () => {
+    const user = userEvent.setup();
+    const handler = vi.fn();
+    render(
+      <PasswordStrengthMeter showConfirmField value="Abc123!" onConfirmChange={handler} />,
+    );
+    await user.type(screen.getByTestId("psm-confirm-input"), "Abc123!");
+    const lastCall = handler.mock.calls.at(-1);
+    expect(lastCall?.[0]).toBe("Abc123!");
+    expect(lastCall?.[1]).toBe(true);
+  });
+
+  it("Should call onConfirmChange with matches=false when passwords differ", async () => {
+    const user = userEvent.setup();
+    const handler = vi.fn();
+    render(
+      <PasswordStrengthMeter showConfirmField value="Abc123!" onConfirmChange={handler} />,
+    );
+    await user.type(screen.getByTestId("psm-confirm-input"), "Wrong");
+    const lastCall = handler.mock.calls.at(-1);
+    expect(lastCall?.[1]).toBe(false);
+  });
+
+  it("Should not show match/mismatch icon when confirm field is empty", () => {
+    render(<PasswordStrengthMeter showConfirmField value="Abc123!" />);
+    expect(screen.queryByTestId("psm-confirm-match")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("psm-confirm-mismatch")).not.toBeInTheDocument();
+  });
+});

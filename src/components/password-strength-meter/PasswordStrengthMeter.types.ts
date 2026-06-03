@@ -41,6 +41,12 @@ export type PasswordStrengthMeterTranslation = {
   meterAriaLabel: string;
   /** Tooltip for the password generator button */
   generatePasswordLabel: string;
+  /** Label for the confirm password input */
+  confirmLabel: string;
+  /** Shown when passwords match */
+  confirmMatchLabel: string;
+  /** Shown when passwords do not match */
+  confirmMismatchLabel: string;
 };
 
 /**
@@ -72,6 +78,9 @@ export const DEFAULT_PASSWORD_TRANSLATIONS: PasswordStrengthMeterTranslation = {
   hidePasswordLabel: "Hide password",
   meterAriaLabel: "Password strength",
   generatePasswordLabel: "Generate secure password",
+  confirmLabel: "Confirm password",
+  confirmMatchLabel: "Passwords match",
+  confirmMismatchLabel: "Passwords do not match",
 };
 
 export const DEFAULT_METER_COLORS: MeterColors = {
@@ -102,6 +111,8 @@ export type PasswordStrengthMeterProps = {
   customRequirements?:      CustomRequirement[];
   disabled?:                boolean;
   error?:                   boolean;
+  /** Value of the confirm input in controlled mode. */
+  confirmValue?:            string;
   /** Options for the built-in password generator (used when showPasswordGenerator=true). */
   generatorOptions?:        PasswordGeneratorOptions;
   helperText?:              string;
@@ -114,6 +125,8 @@ export type PasswordStrengthMeterProps = {
   passwordMinLength?:       number;
   showMeter?:               boolean;
   showPasswordAdornment?:   boolean;
+  /** Show a second "Confirm password" input with match validation indicator. */
+  showConfirmField?:        boolean;
   /** Show a "Generate secure password" button — generates and fills a strong password on click. */
   showPasswordGenerator?:   boolean;
   showSummary?:             boolean;
@@ -126,6 +139,8 @@ export type PasswordStrengthMeterProps = {
   value?:                   string;
   // Callbacks
   onPasswordChange?:        (password: string, strengthResult: StrengthResult) => void;
+  /** Fired when the confirm field value changes — includes whether the passwords match. */
+  onConfirmChange?:         (confirmValue: string, matches: boolean) => void;
   /** Fired when a password was generated — receives the generated password. */
   onPasswordGenerated?:     (password: string) => void;
 };
