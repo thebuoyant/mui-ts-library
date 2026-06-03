@@ -15,7 +15,7 @@ A type-safe React component library built on **TypeScript** and **MUI (Material 
 | [`ConfirmDialog`](#confirmdialog) | Declarative async confirmation dialog — `await confirm({ title, severity })` from anywhere in the app. Supports countdown auto-confirm and `Enter` = confirm shortcut. | [Full Manual →](user-manuals/ConfirmDialog.md) |
 | [`GanttChart`](#ganttchart) | Project timeline with hierarchical tasks, milestones, drag & drop, Ctrl / Cmd ⌘+Scroll zoom, today chip, assignee column, CSV export, and built-in CRUD dialogs | [Full Manual →](user-manuals/GanttChart.md) |
 | [`TagSelection`](#tagselection) | Multi-tag selector with autocomplete, free tag creation, overflow chips, and MUI theme colors | [Full Manual →](user-manuals/TagSelection.md) |
-| [`PasswordStrengthMeter`](#passwordstrengthmeter) | Password input with animated strength meter, segmented bar, custom requirements, requirements checklist, and built-in secure password generator | [Full Manual →](user-manuals/PasswordStrengthMeter.md) |
+| [`PasswordStrengthMeter`](#passwordstrengthmeter) | Password input with animated strength meter, segmented bar, custom requirements, confirm field with match validation, and built-in secure password generator | [Full Manual →](user-manuals/PasswordStrengthMeter.md) |
 | [`RichTextEditor`](#richtexteditor) | WYSIWYG editor (TipTap v3) with toolbar, link dialog, text color, highlight, word count, fullscreen mode, Markdown paste, table editing, image embed, and emoji picker | [Full Manual →](user-manuals/RichTextEditor.md) |
 | [`SqlEditor`](#sqleditor) | SQL code editor (CodeMirror 6) with syntax highlighting, multi-dialect, autocomplete, linting, and `Cmd+Enter` execute shortcut | [Full Manual →](user-manuals/SqlEditor.md) |
 | [`JsonEditor`](#jsoneditor) | JSON code editor (CodeMirror 6) with real-time validation, Format, Compact buttons, and optional minimap | [Full Manual →](user-manuals/JsonEditor.md) |
@@ -121,7 +121,7 @@ const tags: TagSelectionItem[] = [
 
 ### PasswordStrengthMeter
 
-Password input with real-time strength feedback and a built-in secure password generator. Designed for registration flows and password-change screens — guide users toward strong passwords or let them generate one with a single click.
+Password input with real-time strength feedback, a confirm field with match validation, and a built-in secure password generator. Designed for registration flows and password-change screens.
 
 ```tsx
 import { PasswordStrengthMeter } from '@thebuoyant-tsdev/mui-ts-library';
@@ -129,9 +129,11 @@ import { PasswordStrengthMeter } from '@thebuoyant-tsdev/mui-ts-library';
 <PasswordStrengthMeter
   passwordMinLength={10}
   showSegmentedBar
+  showConfirmField                 // second input with ✓/✗ match validation
   showPasswordGenerator            // generates a cryptographically secure password
   generatorOptions={{ length: 20 }}
   onPasswordChange={(password, result) => console.log(result.score)}
+  onConfirmChange={(value, matches) => console.log('Matches:', matches)}
   onPasswordGenerated={(pw) => console.log('Generated:', pw)}
 />
 ```
