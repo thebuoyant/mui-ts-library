@@ -228,7 +228,21 @@ const data: CirclePackingData = {
 
 This is consistent with `SunburstChart`, `RadialTreeChart`, and `ChordChart` — all D3 charts support per-node color overrides.
 
-## Callbacks
+## Callbacks / Events
+
+> **Which callbacks fire for which action?**
+>
+> | Action | Callbacks fired |
+> |---|---|
+> | Regular click on a circle | `onCircleClick` |
+> | Ctrl / Cmd ⌘+Click to zoom in | `onZoomChange` |
+> | Ctrl / Cmd ⌘+DblClick to zoom out | `onZoomChange` |
+> | Escape key pressed (reset to root) | `onZoomChange` |
+
+| Callback | Signature | When it fires | Use it when... |
+|---|---|---|---|
+| `onCircleClick` | `(info: CirclePackingNodeInfo, event: React.MouseEvent) => void` | Regular click on a circle (not Ctrl/Cmd) | Showing node details, filtering a dashboard |
+| `onZoomChange` | `(zoom: CirclePackingZoomInfo) => void` | Focus changes: Ctrl/Cmd+Click zoom-in, Ctrl/Cmd+DblClick zoom-out, Escape reset | Tracking drill-down state, breadcrumb navigation |
 
 ```tsx
 <CirclePackingChart

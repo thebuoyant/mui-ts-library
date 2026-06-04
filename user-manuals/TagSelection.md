@@ -137,13 +137,24 @@ type TagSelectionItem = {
 
 ## Callbacks / Events
 
-| Callback | Signature | When fired |
-|---|---|---|
-| `onTagSelect` | `(tag: TagSelectionItem, selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | An available tag was selected from the dropdown list. `tag` contains the selected tag with `selected: true`. `selectedTags` is the complete list of now selected tags. `allTags` is the complete tag array including disabled tags. |
-| `onTagDelete` | `(tag: TagSelectionItem, selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | The delete icon of a selected chip was clicked. `tag` contains the removed tag with `selected: false`. `selectedTags` is the remaining selection. `allTags` is the complete array after removal. |
-| `onTagsChange` | `(selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | Called after **every** selection change — both after Select and Delete. Central callback for data-driven architectures. |
-| `onSearchChange` | `(searchValue: string) => void` | Called on every change of the search text in the autocomplete field. Useful for server-side filtering or search. |
-| `onTagCreate` | `(label: string, color: TagColor, customColors?: { backgroundColor: string; foregroundColor: string }) => void` | Fired when the user confirms a new tag in create mode (`allowCreate={true}`). `label` is the typed text, `color` is the selected MUI theme color. When a custom hex color was picked, `color` is `"default"` and `customColors` contains `backgroundColor` (hex) and `foregroundColor` (auto-contrast black/white). |
+> **Which callbacks fire for which action?**
+>
+> | Action | Callbacks fired |
+> |---|---|
+> | Select existing tag | `onTagSelect` · `onTagsChange` |
+> | Delete selected tag | `onTagDelete` · `onTagsChange` |
+> | Create new tag | `onTagCreate` · `onTagsChange` |
+> | Type in search field | `onSearchChange` |
+>
+> **Recommendation:** Use `onTagsChange` for simple state sync. Add specific callbacks only when you need to react differently per action type.
+
+| Callback | Signature | When it fires | Use it when... |
+|---|---|---|---|
+| `onTagsChange` | `(selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | After every selection change (select, delete, create) | Simple state sync — this is all most apps need |
+| `onTagSelect` | `(tag: TagSelectionItem, selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | An existing tag was selected from the dropdown | You need to react differently to select vs. create vs. delete |
+| `onTagDelete` | `(tag: TagSelectionItem, selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | A selected chip's delete icon was clicked | You need to react to tag removal specifically |
+| `onTagCreate` | `(tag: TagSelectionItem) => void` | User confirmed a new tag (✓ or Enter) | You need to persist new tags to a backend |
+| `onSearchChange` | `(value: string) => void` | Every keystroke in the search field | Server-side filtering / async tag loading |
 
 > **Important about `onTagCreate`:** The new tag is immediately inserted into the store by the component with `selected: true`. `onTagCreate` is then fired so the caller can synchronize their external state (`tags` prop). **`selected: true` must be set**, otherwise the next re-render will overwrite the internal state:
 >

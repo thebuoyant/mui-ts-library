@@ -276,6 +276,36 @@ Both shortcuts work regardless of where focus is within the dialog.
 
 ---
 
+## Callbacks / Events
+
+> **ConfirmDialog uses a Promise API — not React callbacks.**
+>
+> | User action | Promise resolves to |
+> |---|---|
+> | Click Confirm button | `true` |
+> | Click Cancel button | `false` |
+> | Press `Enter` | `true` |
+> | Press `Escape` | `false` |
+> | Click backdrop | `false` |
+> | `countdown` reaches 0 | `true` (auto-confirm) |
+> | New `confirm()` call while dialog is open | Previous promise resolves `false` immediately |
+
+| API | Signature | Description |
+|---|---|---|
+| `useConfirm()` | `() => ConfirmFn` | Hook — returns the `confirm` function. Call inside any component below `ConfirmDialogProvider`. |
+| `confirm(options)` | `(options: ConfirmDialogOptions) => Promise<boolean>` | Opens the dialog. Resolves `true` when the user confirms, `false` when the user cancels or dismisses. |
+
+```tsx
+// Minimal usage
+const confirm = useConfirm();
+const ok = await confirm({ title: 'Delete item?', description: 'This cannot be undone.' });
+if (ok) deleteItem();
+```
+
+> **Recommendation:** Always `await` the returned `Promise`. The component does not expose any imperative `onConfirm`/`onCancel` props — the Promise return value is the only way to know the user's choice.
+
+---
+
 ## Behavior Details
 
 | Scenario | Result |

@@ -335,6 +335,24 @@ The default popover shows an Avatar with the name initial, the node name and sub
 
 ---
 
+## Callbacks / Events
+
+> **Which callbacks fire for which action?**
+>
+> | Action | Callbacks fired |
+> |---|---|
+> | Regular click on a node | `onNodeClick` |
+> | Ctrl / Cmd ⌘+Click to drill into a branch node | `onFocusChange` |
+> | Ctrl / Cmd ⌘+DblClick to drill out | `onFocusChange` |
+> | Escape key pressed (reset drill-down and zoom) | `onFocusChange` |
+
+| Callback | Signature | When it fires | Use it when... |
+|---|---|---|---|
+| `onNodeClick` | `(info: RadialTreeNodeInfo, event: React.MouseEvent) => void` | Regular click on any node (not Ctrl/Cmd) | Showing a detail panel or popover for the clicked node |
+| `onFocusChange` | `(info: RadialTreeNodeInfo \| null) => void` | Drill-down focus changes via Ctrl/Cmd+Click or Escape. `null` when reset to root | Tracking drill-down depth, breadcrumb navigation |
+
+---
+
 ## Disabled State
 
 ```tsx

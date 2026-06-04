@@ -564,13 +564,22 @@ Der Editor-Rahmen erscheint in `error.main` (MUI-Fehlerfarbe), der `helperText` 
 
 ---
 
-## API-Callbacks
+## Callbacks / Events
 
-| Callback | Signatur | Auslöser |
-|---|---|---|
-| `onChange` | `(value: string) => void` | Jede Inhaltsänderung (Tippen, Formatieren, Einfügen) |
-| `onBlur` | `() => void` | Editor verliert den Fokus |
-| `onFocus` | `() => void` | Editor erhält den Fokus |
+> **Welcher Callback feuert bei welcher Aktion?**
+>
+> | Aktion | Ausgelöste Callbacks |
+> |---|---|
+> | Tippen, Formatieren, Einfügen, Toolbar-Aktion | `onChange` |
+> | Editor erhält Fokus | `onFocus` |
+> | Editor verliert Fokus | `onBlur` |
+> | `value`-Prop von außen aktualisiert | *(keiner — verhindert Endlosschleifen)* |
+
+| Callback | Signatur | Wann ausgelöst | Verwenden wenn... |
+|---|---|---|---|
+| `onChange` | `(value: string) => void` | Jede nutzerseitige Inhaltsänderung (Tippen, Formatieren, Einfügen, Toolbar) | State-Sync im kontrollierten Modus — `value`-State hier aktualisieren |
+| `onFocus` | `() => void` | Der Editor-Bereich erhält Tastatur-Fokus | Aktiven Editor hervorheben, Toolbar bedingt anzeigen |
+| `onBlur` | `() => void` | Der Editor-Bereich verliert Tastatur-Fokus | Validierung auslösen, Auto-Save beim Verlassen |
 
 **Wichtig:** `onChange` feuert NICHT wenn `value` von außen über die Prop gesetzt wird (externer Sync via `setContent`). Dies verhindert Endlosschleifen im kontrollierten Modus.
 

@@ -272,21 +272,40 @@ const ganttTheme: GanttTheme = {
 
 ## Callbacks / Events
 
-| Callback | Signatur | Wann ausgelöst |
-|---|---|---|
-| `onExportCSV` | `(csv: string, tasks: GanttTask[]) => void` | CSV-Export-Button geklickt. Ohne Callback: automatischer Browser-Download `gantt-tasks.csv`. |
-| `onTaskClick` | `(task: GanttTask) => void` | Klick auf einen Task-Balken in der Zeitleiste. |
-| `onMilestoneClick` | `(task: GanttTask) => void` | Klick auf eine Meilenstein-Raute. |
-| `onAddTask` | `(parentTask?: GanttTask) => void` | Klick auf das „Hinzufügen"-Icon in einer Task-Zeile. `parentTask` ist gesetzt wenn der neue Task ein Kind sein soll. Wird nur ausgelöst wenn `enableBuiltinDialogs={false}`. |
-| `onEditTask` | `(task: GanttTask) => void` | Klick auf das „Bearbeiten"-Icon. Wird nur ausgelöst wenn `enableBuiltinDialogs={false}`. |
-| `onDeleteTask` | `(task: GanttTask) => void` | Klick auf das „Löschen"-Icon. Wird nur ausgelöst wenn `enableBuiltinDialogs={false}`. |
-| `onStatusChange` | `(task: GanttTask, status: GanttTaskStatus) => void` | Auswahl eines neuen Status im Rechtsklick-Kontextmenü des Balkens. |
-| `onTaskMoved` | `(task: GanttTask, newStart: Date, newEnd: Date) => void` | Task wurde per Drag horizontal verschoben (`draggable={true}`). `task` enthält die ursprünglichen Metadaten (id, name, status etc.) mit den **alten** Datumsangaben. Die neuen Daten befinden sich ausschließlich in `newStart` und `newEnd`. |
-| `onTaskResized` | `(task: GanttTask, newEnd: Date) => void` | Task-Balken wurde am rechten Rand per Drag verlängert/verkürzt (`resizable={true}`). |
-| `onTasksChange` | `(tasks: GanttTask[]) => void` | Wird nach **jeder** CRUD-Aktion mit der vollständigen, aktuellen Task-Liste aufgerufen. Zentraler Callback für datengetriebene Architekturen (z. B. Redux, Zustand, React Query). |
-| `onTaskCreated` | `(task: GanttTask) => void` | Neuer Task wurde über den eingebauten Dialog angelegt (`enableBuiltinDialogs={true}`). |
-| `onTaskUpdated` | `(task: GanttTask) => void` | Task wurde über den eingebauten Dialog bearbeitet (`enableBuiltinDialogs={true}`). |
-| `onTaskDeleted` | `(taskId: string) => void` | Task wurde über den eingebauten Bestätigungs-Dialog gelöscht (`enableBuiltinDialogs={true}`). |
+> **Welcher Callback feuert bei welcher Aktion?**
+>
+> | Aktion | Ausgelöste Callbacks |
+> |---|---|
+> | Klick auf Task-Balken (Timeline) | `onTaskClick` |
+> | Klick auf Meilenstein-Raute | `onMilestoneClick` |
+> | Status über Kontextmenü geändert | `onStatusChange` · `onTasksChange` |
+> | Task über eingebauten Dialog erstellt (`enableBuiltinDialogs={true}`) | `onTaskCreated` · `onTasksChange` |
+> | Task über eingebauten Dialog bearbeitet (`enableBuiltinDialogs={true}`) | `onTaskUpdated` · `onTasksChange` |
+> | Task über eingebauten Dialog gelöscht (`enableBuiltinDialogs={true}`) | `onTaskDeleted` · `onTasksChange` |
+> | Hinzufügen-Icon geklickt (`enableBuiltinDialogs={false}`) | `onAddTask` |
+> | Bearbeiten-Icon geklickt (`enableBuiltinDialogs={false}`) | `onEditTask` |
+> | Löschen-Icon geklickt (`enableBuiltinDialogs={false}`) | `onDeleteTask` |
+> | Task-Balken per Drag verschoben (`draggable={true}`) | `onTaskMoved` · `onTasksChange` |
+> | Rechter Balkenrand per Drag geändert (`resizable={true}`) | `onTaskResized` · `onTasksChange` |
+> | CSV-Export-Button geklickt | `onExportCSV` (oder Browser-Download wenn nicht angegeben) |
+>
+> **Empfehlung:** `onTasksChange` für einfache Datenspeicherung verwenden. `onTaskCreated`/`onTaskUpdated`/`onTaskDeleted` nur hinzufügen wenn das Backend separate API-Calls pro Aktionstyp benötigt.
+
+| Callback | Signatur | Wann ausgelöst | Verwenden wenn... |
+|---|---|---|---|
+| `onTasksChange` | `(tasks: GanttTask[]) => void` | Nach jeder CRUD-Aktion mit der vollständigen aktuellen Task-Liste | Einfache State-Synchronisation — für die meisten Apps ausreichend |
+| `onTaskClick` | `(task: GanttTask) => void` | Klick auf einen Task-Balken in der Zeitleiste | Detail-Panel oder eigener Dialog geöffnet werden soll |
+| `onMilestoneClick` | `(task: GanttTask) => void` | Klick auf eine Meilenstein-Raute | Speziell auf Meilenstein-Interaktionen reagiert werden soll |
+| `onStatusChange` | `(task: GanttTask, status: GanttTaskStatus) => void` | Neuer Status im Rechtsklick-Kontextmenü des Balkens gewählt | Statusänderungen sofort ins Backend synchronisiert werden sollen |
+| `onTaskCreated` | `(task: GanttTask) => void` | Task im eingebauten Hinzufügen-Dialog bestätigt (`enableBuiltinDialogs={true}`) | Separater API-Call für Create vs. Update vs. Delete |
+| `onTaskUpdated` | `(task: GanttTask) => void` | Task im eingebauten Bearbeiten-Dialog gespeichert (`enableBuiltinDialogs={true}`) | Separater API-Call für Updates |
+| `onTaskDeleted` | `(taskId: string) => void` | Task im eingebauten Löschen-Dialog bestätigt (`enableBuiltinDialogs={true}`) | Separater API-Call für Deletes |
+| `onAddTask` | `(parentTask?: GanttTask) => void` | Hinzufügen-Icon geklickt — **nur** wenn `enableBuiltinDialogs={false}` | Eigener Hinzufügen-Dialog / Drawer |
+| `onEditTask` | `(task: GanttTask) => void` | Bearbeiten-Icon geklickt — **nur** wenn `enableBuiltinDialogs={false}` | Eigener Bearbeiten-Dialog / Drawer |
+| `onDeleteTask` | `(task: GanttTask) => void` | Löschen-Icon geklickt — **nur** wenn `enableBuiltinDialogs={false}` | Eigene Löschbestätigung |
+| `onTaskMoved` | `(task: GanttTask, newStart: Date, newEnd: Date) => void` | Task-Balken per Drag horizontal verschoben (`draggable={true}`). `task` enthält die ursprünglichen Metadaten; neue Daten in `newStart`/`newEnd` | Drag-Ergebnisse ins Backend persistieren |
+| `onTaskResized` | `(task: GanttTask, newEnd: Date) => void` | Rechter Balkenrand per Drag verändert (`resizable={true}`) | Resize-Ergebnisse persistieren |
+| `onExportCSV` | `(csv: string, tasks: GanttTask[]) => void` | CSV-Export-Button geklickt — ohne Callback: automatischer Browser-Download `gantt-tasks.csv` | Eigener Export (Server-Upload, eigener Dateiname) |
 
 > **Tipp — `onTasksChange` vs. spezifische Callbacks:** Für einfache Datenspeicherung reicht `onTasksChange` allein aus. Die spezifischen Callbacks (`onTaskCreated`, `onTaskUpdated` etc.) sind für Anwendungen gedacht, die auf bestimmte Aktionen unterschiedlich reagieren müssen (z. B. separate API-Calls für Create/Update/Delete).
 

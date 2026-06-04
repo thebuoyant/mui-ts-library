@@ -532,6 +532,28 @@ Die Platzhalter `{line}`, `{col}` und `{count}` werden zur Laufzeit ersetzt.
 
 ---
 
+## Callbacks / Events
+
+> **Welcher Callback feuert bei welcher Aktion?**
+>
+> | Aktion | Ausgelöste Callbacks |
+> |---|---|
+> | SQL-Inhalt tippen / bearbeiten | `onChange` |
+> | Ausführen-Button oder `Strg / Cmd ⌘+Enter` | `onExecute` |
+> | Linting-Diagnosen ändern sich | `onLint` |
+> | Editor erhält Fokus | `onFocus` |
+> | Editor verliert Fokus | `onBlur` |
+
+| Callback | Signatur | Wann ausgelöst | Verwenden wenn... |
+|---|---|---|---|
+| `onChange` | `(value: string) => void` | Jede Inhaltsänderung (Tippen, Einfügen, Formatieren, Toolbar) | State-Sync im kontrollierten Modus |
+| `onExecute` | `(value: string) => void` | Ausführen-Button geklickt oder `Strg / Cmd ⌘+Enter` gedrückt | Abfrage gegen eine Datenbank ausführen |
+| `onLint` | `(diagnostics: Diagnostic[]) => void` | Linting-Ergebnisse ändern sich (erfordert Dialekt mit Lint-Support) | Fehlerzähler anzeigen, Ausführung bei Syntaxfehlern sperren |
+| `onFocus` | `() => void` | Editor erhält Tastatur-Fokus | Visuelle Rückmeldung, bedingte UI |
+| `onBlur` | `() => void` | Editor verliert Tastatur-Fokus | Validierung auslösen, Auto-Save |
+
+---
+
 ## Storybook-Stories
 
 | Story | Beschreibung |

@@ -193,9 +193,21 @@ type PasswordStrengthMeterTranslation = {
 
 ## Callbacks / Events
 
-| Callback | Signature | When fired |
-|---|---|---|
-| `onPasswordChange` | `(password: string, result: StrengthResult) => void` | Called on every input change — i.e. on every keystroke. `password` is the current raw text. `result` contains the complete strength analysis (see [`StrengthResult`](#strengthresult)). |
+> **Which callbacks fire for which action?**
+>
+> | Action | Callbacks fired |
+> |---|---|
+> | Keystroke in password field | `onPasswordChange` |
+> | Keystroke in confirm field (`showConfirmField`) | `onConfirmChange` |
+> | Generator button clicked (`showPasswordGenerator`) | `onPasswordChange` · `onPasswordGenerated` |
+>
+> **Note on the generator:** When the "Generate" button is clicked, **both** `onPasswordChange` and `onPasswordGenerated` fire — `onPasswordChange` first (with the generated password and its strength result), then `onPasswordGenerated` (with the password only). Use `onPasswordChange` to update your controlled `value` state; use `onPasswordGenerated` when you need a dedicated hook for generator events (e.g. logging or showing a toast).
+
+| Callback | Signature | When it fires | Use it when... |
+|---|---|---|---|
+| `onPasswordChange` | `(password: string, result: StrengthResult) => void` | Every keystroke in the password field, and also when the generator creates a password | Controlled mode state sync, strength-based form validation |
+| `onConfirmChange` | `(confirmValue: string, matches: boolean) => void` | Every keystroke in the confirm field (`showConfirmField={true}`) | Controlled mode for the confirm field, enabling/disabling submit based on match |
+| `onPasswordGenerated` | `(password: string) => void` | Generator button clicked — fires **after** `onPasswordChange` | Reacting specifically to generated passwords (logging, clipboard copy, toast) |
 
 ---
 

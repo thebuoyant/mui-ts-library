@@ -506,6 +506,28 @@ The value is submitted via a hidden `<input type="hidden" name="query">` in the 
 
 ---
 
+## Callbacks / Events
+
+> **Which callbacks fire for which action?**
+>
+> | Action | Callbacks fired |
+> |---|---|
+> | Typing / editing SQL content | `onChange` |
+> | Execute button clicked or `Ctrl / Cmd ⌘+Enter` pressed | `onExecute` |
+> | Linting diagnostics change | `onLint` |
+> | Editor gains focus | `onFocus` |
+> | Editor loses focus | `onBlur` |
+
+| Callback | Signature | When it fires | Use it when... |
+|---|---|---|---|
+| `onChange` | `(value: string) => void` | Every content change (typing, paste, format, toolbar) | Controlled mode state sync |
+| `onExecute` | `(value: string) => void` | Execute button clicked or `Ctrl / Cmd ⌘+Enter` pressed | Running a query against a database |
+| `onLint` | `(diagnostics: Diagnostic[]) => void` | Linting results change (requires `dialect` with lint support) | Showing error counts, blocking execution on syntax errors |
+| `onFocus` | `() => void` | Editor gains keyboard focus | Visual feedback, conditional UI |
+| `onBlur` | `() => void` | Editor loses keyboard focus | Triggering validation, auto-save |
+
+---
+
 ## i18n — Translations
 
 Only specify the keys you want to override — all others retain their default value:

@@ -241,7 +241,19 @@ Ribbon appearance can be further tuned with `ribbonOpacity` (default `0.75`) and
 
 ---
 
-## Callbacks
+## Callbacks / Events
+
+> **Which callbacks fire for which action?**
+>
+> | Action | Callbacks fired |
+> |---|---|
+> | Click on a group arc | `onGroupClick` |
+> | Click on a ribbon (chord) | `onChordClick` |
+
+| Callback | Signature | When it fires | Use it when... |
+|---|---|---|---|
+| `onGroupClick` | `(info: ChordGroupInfo, event: React.MouseEvent) => void` | Click on a group arc segment | Filtering a view by the clicked group, showing group details |
+| `onChordClick` | `(info: ChordInfo, event: React.MouseEvent) => void` | Click on a ribbon connecting two groups | Showing the flow details between source and target |
 
 ```tsx
 <ChordChart

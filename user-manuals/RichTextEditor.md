@@ -564,13 +564,22 @@ The editor border appears in `error.main` (MUI error color), and the `helperText
 
 ---
 
-## API Callbacks
+## Callbacks / Events
 
-| Callback | Signature | Trigger |
-|---|---|---|
-| `onChange` | `(value: string) => void` | Every content change (typing, formatting, pasting) |
-| `onBlur` | `() => void` | Editor loses focus |
-| `onFocus` | `() => void` | Editor gains focus |
+> **Which callbacks fire for which action?**
+>
+> | Action | Callbacks fired |
+> |---|---|
+> | Typing, formatting, pasting, toolbar action | `onChange` |
+> | Editor gains focus | `onFocus` |
+> | Editor loses focus | `onBlur` |
+> | `value` prop updated externally | *(none — prevents infinite loops)* |
+
+| Callback | Signature | When it fires | Use it when... |
+|---|---|---|---|
+| `onChange` | `(value: string) => void` | Every user-driven content change (typing, formatting, paste, toolbar buttons) | Controlled mode state sync — update your `value` state here |
+| `onFocus` | `() => void` | The editor area gains keyboard focus | Highlighting an active editor, showing toolbars conditionally |
+| `onBlur` | `() => void` | The editor area loses keyboard focus | Triggering validation, auto-saving on leave |
 
 **Important:** `onChange` does NOT fire when `value` is set externally via the prop (external sync via `setContent`). This prevents infinite loops in controlled mode.
 

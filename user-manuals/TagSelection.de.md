@@ -137,13 +137,24 @@ type TagSelectionItem = {
 
 ## Callbacks / Events
 
-| Callback | Signatur | Wann ausgelöst |
-|---|---|---|
-| `onTagSelect` | `(tag: TagSelectionItem, selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | Ein verfügbarer Tag wurde aus der Dropdown-Liste ausgewählt. `tag` enthält den ausgewählten Tag mit `selected: true`. `selectedTags` ist die vollständige Liste der nun ausgewählten Tags. `allTags` ist das vollständige Tag-Array inklusive deaktivierter Tags. |
-| `onTagDelete` | `(tag: TagSelectionItem, selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | Das Lösch-Icon eines ausgewählten Chips wurde geklickt. `tag` enthält den entfernten Tag mit `selected: false`. `selectedTags` ist die verbleibende Auswahl. `allTags` ist das vollständige Array nach dem Entfernen. |
-| `onTagsChange` | `(selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | Wird nach **jeder** Änderung der Auswahl aufgerufen — sowohl nach Select als auch nach Delete. Zentraler Callback für datengetriebene Architekturen. |
-| `onSearchChange` | `(searchValue: string) => void` | Wird bei jeder Änderung des Suchtexts im Autocomplete-Feld aufgerufen. Nützlich für serverseitige Filterung oder Suche. |
-| `onTagCreate` | `(label: string, color: TagColor, customColors?: { backgroundColor: string; foregroundColor: string }) => void` | Wird ausgelöst wenn der Nutzer im Create-Mode bestätigt (`allowCreate={true}`). `label` ist der eingetippte Text, `color` die gewählte MUI-Theme-Farbe. Bei Hex-Farbe ist `color` `"default"` und `customColors` enthält `backgroundColor` (Hex) sowie `foregroundColor` (automatischer Kontrast schwarz/weiß). |
+> **Welcher Callback feuert bei welcher Aktion?**
+>
+> | Aktion | Ausgelöste Callbacks |
+> |---|---|
+> | Vorhandenen Tag auswählen | `onTagSelect` · `onTagsChange` |
+> | Ausgewählten Tag löschen | `onTagDelete` · `onTagsChange` |
+> | Neuen Tag erstellen | `onTagCreate` · `onTagsChange` |
+> | Im Suchfeld tippen | `onSearchChange` |
+>
+> **Empfehlung:** `onTagsChange` für einfache State-Synchronisation verwenden. Spezifische Callbacks nur hinzufügen, wenn auf unterschiedliche Aktionstypen verschieden reagiert werden muss.
+
+| Callback | Signatur | Wann ausgelöst | Verwenden wenn... |
+|---|---|---|---|
+| `onTagsChange` | `(selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | Nach jeder Auswahländerung (Auswählen, Löschen, Erstellen) | Einfache State-Synchronisation — für die meisten Apps ausreichend |
+| `onTagSelect` | `(tag: TagSelectionItem, selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | Ein vorhandener Tag wurde aus dem Dropdown ausgewählt | Auf Auswählen vs. Erstellen vs. Löschen unterschiedlich reagiert werden soll |
+| `onTagDelete` | `(tag: TagSelectionItem, selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | Das Lösch-Icon eines ausgewählten Chips wurde geklickt | Speziell auf das Entfernen von Tags reagiert werden soll |
+| `onTagCreate` | `(tag: TagSelectionItem) => void` | Nutzer hat neuen Tag bestätigt (✓ oder Enter) | Neue Tags im Backend persistiert werden sollen |
+| `onSearchChange` | `(value: string) => void` | Jeder Tastendruck im Suchfeld | Serverseitige Filterung / asynchrones Tag-Laden |
 
 > **Wichtig zu `onTagCreate`:** Der neue Tag wird von der Komponente intern sofort mit `selected: true` in den Store eingefügt. `onTagCreate` wird danach ausgelöst damit der Aufrufer seinen externen State (`tags`-Prop) synchronisieren kann. Dabei **muss `selected: true`** gesetzt werden, sonst überschreibt das nächste Re-Render den internen Zustand:
 >

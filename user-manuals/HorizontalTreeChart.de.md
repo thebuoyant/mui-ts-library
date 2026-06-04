@@ -61,6 +61,24 @@ Der `HorizontalTreeChart` stellt hierarchische Daten mit D3 v7's Tree-Layout und
 
 ---
 
+## Callbacks / Events
+
+> **Welcher Callback feuert bei welcher Aktion?**
+>
+> | Aktion | Ausgelöste Callbacks |
+> |---|---|
+> | Normaler Klick auf einen Knoten | `onNodeClick` |
+> | Strg / Cmd ⌘+Klick zum Drill-in eines Branch-Knotens | `onFocusChange` |
+> | Strg / Cmd ⌘+Klick auf Blatt oder Strg / Cmd ⌘+Doppelklick zum Drill-out | `onFocusChange` |
+> | Escape-Taste (Drill-down und Zoom zurücksetzen) | `onFocusChange` |
+
+| Callback | Signatur | Wann ausgelöst | Verwenden wenn... |
+|---|---|---|---|
+| `onNodeClick` | `(info: HorizontalTreeNodeInfo, event: React.MouseEvent) => void` | Normaler Klick auf einen Knoten (ohne Strg/Cmd) | Detail-Panel oder Popover für den geklickten Knoten anzeigen |
+| `onFocusChange` | `(state: { focusedNode: HorizontalTreeNodeInfo; isRoot: boolean }) => void` | Drill-Down-Fokus wechselt via Strg/Cmd+Klick, Strg/Cmd+Doppelklick oder Escape | Drill-Down-Tiefe verfolgen, Breadcrumb-Navigation |
+
+---
+
 ## D3-Charts-Roadmap
 
 | Komponente | Status |

@@ -290,6 +290,24 @@ Das Standard-Popover zeigt Avatar mit Namenskürzel, Namen, Subname und beide So
 
 ---
 
+## Callbacks / Events
+
+> **Welcher Callback feuert bei welcher Aktion?**
+>
+> | Aktion | Ausgelöste Callbacks |
+> |---|---|
+> | Normaler Klick auf einen Knoten | `onNodeClick` |
+> | Strg / Cmd ⌘+Klick zum Drill-in eines Branch-Knotens | `onFocusChange` |
+> | Strg / Cmd ⌘+Doppelklick zum Drill-out | `onFocusChange` |
+> | Escape-Taste (Drill-down und Zoom zurücksetzen) | `onFocusChange` |
+
+| Callback | Signatur | Wann ausgelöst | Verwenden wenn... |
+|---|---|---|---|
+| `onNodeClick` | `(info: RadialTreeNodeInfo, event: React.MouseEvent) => void` | Normaler Klick auf einen Knoten (ohne Strg/Cmd) | Detail-Panel oder Popover für den geklickten Knoten anzeigen |
+| `onFocusChange` | `(info: RadialTreeNodeInfo \| null) => void` | Drill-Down-Fokus wechselt via Strg/Cmd+Klick oder Escape. `null` bei Reset auf Root | Drill-Down-Tiefe verfolgen, Breadcrumb-Navigation |
+
+---
+
 ## D3-Charts-Roadmap
 
 | Komponente | Beschreibung | Status |

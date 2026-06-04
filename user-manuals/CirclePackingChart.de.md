@@ -185,6 +185,26 @@ const data: CirclePackingData = {
 
 Konsistent mit `SunburstChart`, `RadialTreeChart` und `ChordChart` — alle D3-Charts unterstützen Per-Knoten-Farb-Overrides.
 
+---
+
+## Callbacks / Events
+
+> **Welcher Callback feuert bei welcher Aktion?**
+>
+> | Aktion | Ausgelöste Callbacks |
+> |---|---|
+> | Normaler Klick auf einen Kreis | `onCircleClick` |
+> | Strg / Cmd ⌘+Klick zum Zoom-in | `onZoomChange` |
+> | Strg / Cmd ⌘+Doppelklick zum Zoom-out | `onZoomChange` |
+> | Escape-Taste (auf Root zurücksetzen) | `onZoomChange` |
+
+| Callback | Signatur | Wann ausgelöst | Verwenden wenn... |
+|---|---|---|---|
+| `onCircleClick` | `(info: CirclePackingNodeInfo, event: React.MouseEvent) => void` | Normaler Klick auf einen Kreis (ohne Strg/Cmd) | Knoten-Details anzeigen, Dashboard filtern |
+| `onZoomChange` | `(zoom: CirclePackingZoomInfo) => void` | Fokus wechselt: Strg/Cmd+Klick Zoom-in, Strg/Cmd+Doppelklick Zoom-out, Escape-Reset | Drill-Down-State verfolgen, Breadcrumb-Navigation |
+
+---
+
 ## D3-Charts-Roadmap
 
 | Komponente | Beschreibung | Status |

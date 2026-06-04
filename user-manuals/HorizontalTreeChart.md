@@ -177,6 +177,24 @@ const data: HorizontalTreeData = {
 
 ---
 
+## Callbacks / Events
+
+> **Which callbacks fire for which action?**
+>
+> | Action | Callbacks fired |
+> |---|---|
+> | Regular click on a node | `onNodeClick` |
+> | Ctrl / Cmd ⌘+Click to drill into a branch node | `onFocusChange` |
+> | Ctrl / Cmd ⌘+Click on leaf or Ctrl / Cmd ⌘+DblClick to drill out | `onFocusChange` |
+> | Escape key pressed (reset drill-down and zoom) | `onFocusChange` |
+
+| Callback | Signature | When it fires | Use it when... |
+|---|---|---|---|
+| `onNodeClick` | `(info: HorizontalTreeNodeInfo, event: React.MouseEvent) => void` | Regular click on any node (not Ctrl/Cmd) | Showing a detail panel or popover for the clicked node |
+| `onFocusChange` | `(state: { focusedNode: HorizontalTreeNodeInfo; isRoot: boolean }) => void` | Drill-down focus changes via Ctrl/Cmd+Click, Ctrl/Cmd+DblClick or Escape | Tracking drill-down depth, breadcrumb navigation |
+
+---
+
 ## D3 Charts Roadmap
 
 | Component | Status |

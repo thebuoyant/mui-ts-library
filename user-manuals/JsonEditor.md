@@ -369,14 +369,25 @@ const colors: JsonEditorHighlightColors = {
 
 ---
 
-## API Callbacks
+## Callbacks / Events
 
-| Callback | Signature | Trigger |
-|---|---|---|
-| `onChange` | `(json: string) => void` | Every content change (typing, formatting, paste) |
-| `onValidChange` | `(isValid: boolean) => void` | Whenever JSON validity changes |
-| `onBlur` | `() => void` | Editor loses focus |
-| `onFocus` | `() => void` | Editor gains focus |
+> **Which callbacks fire for which action?**
+>
+> | Action | Callbacks fired |
+> |---|---|
+> | Typing / editing JSON content | `onChange` · `onValidChange` (when validity changes) |
+> | Toolbar: Format or Compact button | `onChange` · `onValidChange` (when validity changes) |
+> | Editor gains focus | `onFocus` |
+> | Editor loses focus | `onBlur` |
+>
+> **Note on `onValidChange`:** This callback fires only when validity **changes** — not on every keystroke. It fires once when valid JSON becomes invalid (and vice versa).
+
+| Callback | Signature | When it fires | Use it when... |
+|---|---|---|---|
+| `onChange` | `(json: string) => void` | Every content change (typing, paste, format, toolbar) | Controlled mode state sync |
+| `onValidChange` | `(isValid: boolean) => void` | JSON validity transitions (valid → invalid or invalid → valid) | Enabling/disabling submit button, showing validation badge |
+| `onFocus` | `() => void` | Editor gains keyboard focus | Visual feedback, conditional UI |
+| `onBlur` | `() => void` | Editor loses keyboard focus | Triggering validation, auto-save |
 
 ---
 

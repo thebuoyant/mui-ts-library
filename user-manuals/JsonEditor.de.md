@@ -369,14 +369,25 @@ const colors: JsonEditorHighlightColors = {
 
 ---
 
-## API-Callbacks
+## Callbacks / Events
 
-| Callback | Signatur | Auslöser |
-|---|---|---|
-| `onChange` | `(json: string) => void` | Jede Inhaltsänderung (Tippen, Formatieren, Einfügen) |
-| `onValidChange` | `(isValid: boolean) => void` | Wenn die JSON-Gültigkeit wechselt |
-| `onBlur` | `() => void` | Editor verliert den Fokus |
-| `onFocus` | `() => void` | Editor erhält den Fokus |
+> **Welcher Callback feuert bei welcher Aktion?**
+>
+> | Aktion | Ausgelöste Callbacks |
+> |---|---|
+> | JSON-Inhalt tippen / bearbeiten | `onChange` · `onValidChange` (wenn Gültigkeit wechselt) |
+> | Toolbar: Formatieren oder Komprimieren | `onChange` · `onValidChange` (wenn Gültigkeit wechselt) |
+> | Editor erhält Fokus | `onFocus` |
+> | Editor verliert Fokus | `onBlur` |
+>
+> **Hinweis zu `onValidChange`:** Dieser Callback feuert nur wenn die Gültigkeit **wechselt** — nicht bei jedem Tastendruck. Er feuert einmalig wenn gültiges JSON ungültig wird (und umgekehrt).
+
+| Callback | Signatur | Wann ausgelöst | Verwenden wenn... |
+|---|---|---|---|
+| `onChange` | `(json: string) => void` | Jede Inhaltsänderung (Tippen, Einfügen, Formatieren, Toolbar) | State-Sync im kontrollierten Modus |
+| `onValidChange` | `(isValid: boolean) => void` | JSON-Gültigkeit wechselt (gültig → ungültig oder umgekehrt) | Submit-Button aktivieren/deaktivieren, Validierungsanzeige |
+| `onFocus` | `() => void` | Editor erhält Tastatur-Fokus | Visuelle Rückmeldung, bedingte UI |
+| `onBlur` | `() => void` | Editor verliert Tastatur-Fokus | Validierung auslösen, Auto-Save |
 
 ---
 

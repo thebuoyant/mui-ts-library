@@ -272,21 +272,40 @@ const ganttTheme: GanttTheme = {
 
 ## Callbacks / Events
 
-| Callback | Signature | When fired |
-|---|---|---|
-| `onAddTask` | `(parentTask?: GanttTask) => void` | "Add" icon clicked. Only when `enableBuiltinDialogs={false}`. |
-| `onDeleteTask` | `(task: GanttTask) => void` | "Delete" icon clicked. Only when `enableBuiltinDialogs={false}`. |
-| `onEditTask` | `(task: GanttTask) => void` | "Edit" icon clicked. Only when `enableBuiltinDialogs={false}`. |
-| `onExportCSV` | `(csv: string, tasks: GanttTask[]) => void` | CSV export button clicked. When not provided, the chart downloads `gantt-tasks.csv` automatically. |
-| `onMilestoneClick` | `(task: GanttTask) => void` | Click on a milestone diamond. |
-| `onStatusChange` | `(task: GanttTask, status: GanttTaskStatus) => void` | New status selected via the context menu. |
-| `onTaskClick` | `(task: GanttTask) => void` | Click on a task bar in the timeline. |
-| `onTaskCreated` | `(task: GanttTask) => void` | Task created via built-in dialog (`enableBuiltinDialogs={true}`). |
-| `onTaskDeleted` | `(taskId: string) => void` | Task deleted via built-in dialog (`enableBuiltinDialogs={true}`). |
-| `onTaskMoved` | `(task: GanttTask, newStart: Date, newEnd: Date) => void` | Task dragged to a new position (`draggable={true}`). |
-| `onTaskResized` | `(task: GanttTask, newEnd: Date) => void` | Task bar resized (`resizable={true}`). |
-| `onTasksChange` | `(tasks: GanttTask[]) => void` | Called after every CRUD action with the full task list. |
-| `onTaskUpdated` | `(task: GanttTask) => void` | Task edited via built-in dialog (`enableBuiltinDialogs={true}`). |
+> **Which callbacks fire for which action?**
+>
+> | Action | Callbacks fired |
+> |---|---|
+> | Click task bar (timeline) | `onTaskClick` |
+> | Click milestone diamond | `onMilestoneClick` |
+> | Status changed via context menu | `onStatusChange` · `onTasksChange` |
+> | Task created via built-in dialog (`enableBuiltinDialogs={true}`) | `onTaskCreated` · `onTasksChange` |
+> | Task edited via built-in dialog (`enableBuiltinDialogs={true}`) | `onTaskUpdated` · `onTasksChange` |
+> | Task deleted via built-in dialog (`enableBuiltinDialogs={true}`) | `onTaskDeleted` · `onTasksChange` |
+> | Add icon clicked (`enableBuiltinDialogs={false}`) | `onAddTask` |
+> | Edit icon clicked (`enableBuiltinDialogs={false}`) | `onEditTask` |
+> | Delete icon clicked (`enableBuiltinDialogs={false}`) | `onDeleteTask` |
+> | Task bar dragged (`draggable={true}`) | `onTaskMoved` · `onTasksChange` |
+> | Task bar right edge resized (`resizable={true}`) | `onTaskResized` · `onTasksChange` |
+> | CSV export button clicked | `onExportCSV` (or browser download if not provided) |
+>
+> **Recommendation:** Use `onTasksChange` for simple data persistence. Add `onTaskCreated`/`onTaskUpdated`/`onTaskDeleted` only when your backend needs separate API calls per action type.
+
+| Callback | Signature | When it fires | Use it when... |
+|---|---|---|---|
+| `onTasksChange` | `(tasks: GanttTask[]) => void` | After every CRUD action with the full current task list | Simple state sync — this is all most apps need |
+| `onTaskClick` | `(task: GanttTask) => void` | Click on a task bar in the timeline | Opening a detail panel or custom dialog |
+| `onMilestoneClick` | `(task: GanttTask) => void` | Click on a milestone diamond | Reacting to milestone interactions specifically |
+| `onStatusChange` | `(task: GanttTask, status: GanttTaskStatus) => void` | New status selected via the right-click context menu on a bar | Syncing status changes to a backend immediately |
+| `onTaskCreated` | `(task: GanttTask) => void` | Task confirmed in the built-in Add dialog (`enableBuiltinDialogs={true}`) | Separate API call for create vs. update vs. delete |
+| `onTaskUpdated` | `(task: GanttTask) => void` | Task saved in the built-in Edit dialog (`enableBuiltinDialogs={true}`) | Separate API call for updates |
+| `onTaskDeleted` | `(taskId: string) => void` | Task confirmed in the built-in Delete dialog (`enableBuiltinDialogs={true}`) | Separate API call for deletes |
+| `onAddTask` | `(parentTask?: GanttTask) => void` | Add icon clicked — **only** when `enableBuiltinDialogs={false}` | Custom Add dialog / drawer |
+| `onEditTask` | `(task: GanttTask) => void` | Edit icon clicked — **only** when `enableBuiltinDialogs={false}` | Custom Edit dialog / drawer |
+| `onDeleteTask` | `(task: GanttTask) => void` | Delete icon clicked — **only** when `enableBuiltinDialogs={false}` | Custom Delete confirmation |
+| `onTaskMoved` | `(task: GanttTask, newStart: Date, newEnd: Date) => void` | Task bar dragged to a new position (`draggable={true}`). `task` carries the original metadata; new dates are in `newStart`/`newEnd` | Persisting drag results to a backend |
+| `onTaskResized` | `(task: GanttTask, newEnd: Date) => void` | Task bar right edge dragged (`resizable={true}`) | Persisting resize results |
+| `onExportCSV` | `(csv: string, tasks: GanttTask[]) => void` | CSV export button clicked — when not provided, the chart triggers a browser download of `gantt-tasks.csv` automatically | Custom export handling (upload to server, custom filename) |
 
 > **Tip — `onTasksChange` vs. specific callbacks:** For simple data persistence, `onTasksChange` alone is sufficient. The specific callbacks (`onTaskCreated`, `onTaskUpdated`, etc.) are intended for applications that need to react differently to specific actions (e.g. separate API calls for Create/Update/Delete).
 

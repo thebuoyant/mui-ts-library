@@ -276,6 +276,36 @@ Beide Shortcuts funktionieren unabhängig davon, wo im Dialog der Fokus liegt.
 
 ---
 
+## Callbacks / Events
+
+> **ConfirmDialog verwendet eine Promise-API — keine React-Callbacks.**
+>
+> | Nutzeraktion | Promise löst auf |
+> |---|---|
+> | Klick auf Bestätigen-Button | `true` |
+> | Klick auf Abbrechen-Button | `false` |
+> | `Enter` drücken | `true` |
+> | `Escape` drücken | `false` |
+> | Klick auf Backdrop | `false` |
+> | `countdown` erreicht 0 | `true` (Auto-Bestätigung) |
+> | Neuer `confirm()`-Aufruf während Dialog offen | Vorheriges Promise löst sofort mit `false` auf |
+
+| API | Signatur | Beschreibung |
+|---|---|---|
+| `useConfirm()` | `() => ConfirmFn` | Hook — gibt die `confirm`-Funktion zurück. Innerhalb jeder Komponente unterhalb des `ConfirmDialogProvider` aufrufbar. |
+| `confirm(options)` | `(options: ConfirmDialogOptions) => Promise<boolean>` | Öffnet den Dialog. Löst mit `true` auf wenn der Nutzer bestätigt, mit `false` wenn abgebrochen oder geschlossen. |
+
+```tsx
+// Minimale Verwendung
+const confirm = useConfirm();
+const ok = await confirm({ title: 'Element löschen?', description: 'Dies kann nicht rückgängig gemacht werden.' });
+if (ok) deleteItem();
+```
+
+> **Empfehlung:** Den Rückgabewert immer per `await` auswerten. Die Komponente bietet keine imperativen `onConfirm`/`onCancel`-Props — der Promise-Rückgabewert ist der einzige Weg, die Entscheidung des Nutzers zu kennen.
+
+---
+
 ## Verhalten im Detail
 
 | Szenario | Ergebnis |

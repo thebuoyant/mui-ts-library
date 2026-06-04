@@ -286,7 +286,21 @@ const data: SunburstChartData = {
 
 ---
 
-## Segment Click Callback
+## Callbacks / Events
+
+> **Which callbacks fire for which action?**
+>
+> | Action | Callbacks fired |
+> |---|---|
+> | Click on a segment | `onSegmentClick` |
+> | Ctrl / Cmd ⌘+Click to zoom into a segment | `onZoomChange` |
+> | Click center label / donut hole to zoom out | `onZoomChange` |
+> | Escape key pressed (reset zoom) | `onZoomChange` |
+
+| Callback | Signature | When it fires | Use it when... |
+|---|---|---|---|
+| `onSegmentClick` | `(info: SunburstSegmentInfo, event: React.MouseEvent) => void` | Regular click on a segment arc or center label | Showing a detail panel, navigating to a filtered view |
+| `onZoomChange` | `(zoom: SunburstZoomInfo) => void` | Focus changes: Ctrl/Cmd+Click zoom-in, center click zoom-out, or Escape reset | Tracking drill-down state, breadcrumb navigation |
 
 ```tsx
 <SunburstChart

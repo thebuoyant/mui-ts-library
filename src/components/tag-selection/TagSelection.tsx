@@ -153,12 +153,8 @@ function TagSelectionInner({
     addTag(newTag);
 
     const nextTags = [...storeTags, newTag];
-    const nextSelectedTags = nextTags.filter((t) => t.selected);
 
-    if (onTagSelect) {
-      onTagSelect(newTag, nextSelectedTags, nextTags);
-    }
-
+    // Nur onTagCreate + onTagsChange — NICHT onTagSelect (anderer Event-Typ).
     emitTagsChange(nextTags);
 
     if (onTagCreate) {

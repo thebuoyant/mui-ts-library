@@ -238,7 +238,19 @@ function MyChart({ data }) {
 
 ---
 
-## Callbacks
+## Callbacks / Events
+
+> **Welcher Callback feuert bei welcher Aktion?**
+>
+> | Aktion | Ausgelöste Callbacks |
+> |---|---|
+> | Klick auf einen Gruppen-Bogen | `onGroupClick` |
+> | Klick auf ein Ribbon (Chord) | `onChordClick` |
+
+| Callback | Signatur | Wann ausgelöst | Verwenden wenn... |
+|---|---|---|---|
+| `onGroupClick` | `(info: ChordGroupInfo, event: React.MouseEvent) => void` | Klick auf einen Gruppen-Bogen | Ansicht nach geklickter Gruppe filtern, Gruppendetails anzeigen |
+| `onChordClick` | `(info: ChordInfo, event: React.MouseEvent) => void` | Klick auf ein Ribbon zwischen zwei Gruppen | Flussdetails zwischen Quelle und Ziel anzeigen |
 
 ```tsx
 <ChordChart

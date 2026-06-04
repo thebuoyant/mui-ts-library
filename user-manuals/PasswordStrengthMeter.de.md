@@ -174,9 +174,21 @@ type PasswordStrengthMeterTranslation = {
 
 ## Callbacks / Events
 
-| Callback | Signatur | Wann ausgelöst |
-|---|---|---|
-| `onPasswordChange` | `(password: string, result: StrengthResult) => void` | Wird bei jeder Eingabe-Änderung aufgerufen — also bei jedem Tastendruck. `password` ist der aktuelle Rohtext. `result` enthält die vollständige Stärkeanalyse (siehe [`StrengthResult`](#strengthresult)). |
+> **Welcher Callback feuert bei welcher Aktion?**
+>
+> | Aktion | Ausgelöste Callbacks |
+> |---|---|
+> | Tastendruck im Passwort-Feld | `onPasswordChange` |
+> | Tastendruck im Bestätigungs-Feld (`showConfirmField`) | `onConfirmChange` |
+> | Generator-Button geklickt (`showPasswordGenerator`) | `onPasswordChange` · `onPasswordGenerated` |
+>
+> **Hinweis zum Generator:** Wenn der „Generieren"-Button geklickt wird, feuern **beide** Callbacks — zuerst `onPasswordChange` (mit dem generierten Passwort und dessen Stärke-Ergebnis), dann `onPasswordGenerated` (nur mit dem Passwort). `onPasswordChange` für die State-Aktualisierung im kontrollierten Modus verwenden; `onPasswordGenerated` wenn ein dedizierter Hook für Generator-Ereignisse benötigt wird (z. B. Logging oder Toast).
+
+| Callback | Signatur | Wann ausgelöst | Verwenden wenn... |
+|---|---|---|---|
+| `onPasswordChange` | `(password: string, result: StrengthResult) => void` | Jeder Tastendruck im Passwort-Feld sowie wenn der Generator ein Passwort erzeugt | State-Sync im kontrollierten Modus, stärkebasierte Formularvalidierung |
+| `onConfirmChange` | `(confirmValue: string, matches: boolean) => void` | Jeder Tastendruck im Bestätigungs-Feld (`showConfirmField={true}`) | Kontrollierter Modus für das Bestätigungs-Feld, Aktivieren/Deaktivieren des Submit-Buttons |
+| `onPasswordGenerated` | `(password: string) => void` | Generator-Button geklickt — feuert **nach** `onPasswordChange` | Speziell auf generierte Passwörter reagieren (Logging, Clipboard-Kopie, Toast) |
 
 ---
 
