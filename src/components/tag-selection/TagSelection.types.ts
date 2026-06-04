@@ -32,6 +32,9 @@ export type TagSelectionTranslation = {
   loadingText: string;
   maxTagsReachedText: string;
   colorPickerLabel: string;
+  backgroundColorLabel: string;
+  textColorLabel: string;
+  autoTextColorLabel: string;
 };
 
 export const DEFAULT_TAG_SELECTION_TRANSLATION: TagSelectionTranslation = {
@@ -43,6 +46,9 @@ export const DEFAULT_TAG_SELECTION_TRANSLATION: TagSelectionTranslation = {
   loadingText: "Loading...",
   maxTagsReachedText: "Maximum number of tags reached.",
   colorPickerLabel: "Custom color",
+  backgroundColorLabel: "Background color",
+  textColorLabel: "Text color",
+  autoTextColorLabel: "Auto",
 };
 
 export type TagSelectionProps = {
@@ -69,7 +75,7 @@ export type TagSelectionProps = {
   translation?: Partial<TagSelectionTranslation>;
   // Callbacks
   onSearchChange?: (searchValue: string) => void;
-  onTagCreate?: (label: string, color: TagColor) => void;
+  onTagCreate?: (tag: TagSelectionItem) => void;
   onTagDelete?: (
     tag: TagSelectionItem,
     selectedTags: TagSelectionItem[],

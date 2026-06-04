@@ -143,7 +143,7 @@ type TagSelectionItem = {
 | `onTagDelete` | `(tag: TagSelectionItem, selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | Das Lösch-Icon eines ausgewählten Chips wurde geklickt. `tag` enthält den entfernten Tag mit `selected: false`. `selectedTags` ist die verbleibende Auswahl. `allTags` ist das vollständige Array nach dem Entfernen. |
 | `onTagsChange` | `(selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | Wird nach **jeder** Änderung der Auswahl aufgerufen — sowohl nach Select als auch nach Delete. Zentraler Callback für datengetriebene Architekturen. |
 | `onSearchChange` | `(searchValue: string) => void` | Wird bei jeder Änderung des Suchtexts im Autocomplete-Feld aufgerufen. Nützlich für serverseitige Filterung oder Suche. |
-| `onTagCreate` | `(label: string, color: TagColor) => void` | Wird ausgelöst wenn der Nutzer im Create-Mode bestätigt (`allowCreate={true}`). `label` ist der eingetippte Text, `color` die gewählte MUI-Theme-Farbe (`"default"` wenn eine Hex-Farbe gewählt wurde — für die vollständigen `backgroundColor`/`foregroundColor`-Werte `onTagsChange` verwenden). |
+| `onTagCreate` | `(label: string, color: TagColor, customColors?: { backgroundColor: string; foregroundColor: string }) => void` | Wird ausgelöst wenn der Nutzer im Create-Mode bestätigt (`allowCreate={true}`). `label` ist der eingetippte Text, `color` die gewählte MUI-Theme-Farbe. Bei Hex-Farbe ist `color` `"default"` und `customColors` enthält `backgroundColor` (Hex) sowie `foregroundColor` (automatischer Kontrast schwarz/weiß). |
 
 > **Wichtig zu `onTagCreate`:** Der neue Tag wird von der Komponente intern sofort mit `selected: true` in den Store eingefügt. `onTagCreate` wird danach ausgelöst damit der Aufrufer seinen externen State (`tags`-Prop) synchronisieren kann. Dabei **muss `selected: true`** gesetzt werden, sonst überschreibt das nächste Re-Render den internen Zustand:
 >
@@ -190,7 +190,8 @@ type TagSelectionTranslation = {
 | `placeholder` | `"Type to search..."` | Platzhaltertext im Autocomplete-Eingabefeld. |
 | `loadingText` | `"Loading..."` | Text in der Dropdown-Liste während des Ladevorgangs (`loading={true}`). |
 | `maxTagsReachedText` | `"Maximum number of tags reached."` | Hilfstext unterhalb des Eingabefelds wenn das Tag-Limit erreicht ist (`maxTags` gesetzt). |
-| `colorPickerLabel` | `"Custom color"` | Tooltip für den Farbkreis (nativer Hex-Farbwähler) der Farb-Zeile im Create-Mode (`allowCreate={true}`). |
+| `colorPickerLabel` | `"Custom color"` | Tooltip für den Palette-Icon-Button der Farb-Zeile im Create-Mode (`allowCreate={true}`). |
+| `backgroundColorLabel` | `"Background color"` | Überschrift im Farbwähler-Panel — macht klar dass die gewählte Farbe die **Hintergrundfarbe** des Tags ist (Textfarbe wird automatisch per WCAG-Kontrast berechnet). |
 
 **Vollständige deutsche Übersetzung:**
 
@@ -206,6 +207,7 @@ type TagSelectionTranslation = {
     loadingText:         'Wird geladen...',
     maxTagsReachedText:  'Maximale Anzahl an Tags erreicht.',
     colorPickerLabel:    'Eigene Farbe',
+    backgroundColorLabel: 'Hintergrundfarbe',
   }}
 />
 ```

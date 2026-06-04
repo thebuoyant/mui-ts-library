@@ -128,6 +128,7 @@ export const GermanTranslation: Story = {
       loadingText: "Laden...",
       maxTagsReachedText: "Maximale Anzahl an Tags erreicht.",
       colorPickerLabel: "Eigene Farbe",
+      backgroundColorLabel: "Hintergrundfarbe",
     },
   },
   render: (args) => (
@@ -199,12 +200,9 @@ function CreatableStory(args: ComponentProps<typeof TagSelection>) {
       <TagSelection
         {...args}
         tags={localTags}
-        onTagCreate={(label, color) => {
-          args.onTagCreate?.(label, color);
-          setLocalTags((prev) => [
-            ...prev,
-            { id: label.toLowerCase().replace(/\s+/g, "-"), label, color, selected: true },
-          ]);
+        onTagCreate={(tag) => {
+          args.onTagCreate?.(tag);
+          setLocalTags((prev) => [...prev, tag]);
         }}
       />
     </Box>
@@ -233,12 +231,9 @@ function CustomColorCreationStory(args: ComponentProps<typeof TagSelection>) {
       <TagSelection
         {...args}
         tags={localTags}
-        onTagCreate={(label, color) => {
-          args.onTagCreate?.(label, color);
-          setLocalTags((prev) => [
-            ...prev,
-            { id: label.toLowerCase().replace(/\s+/g, "-"), label, color, selected: true },
-          ]);
+        onTagCreate={(tag) => {
+          args.onTagCreate?.(tag);
+          setLocalTags((prev) => [...prev, tag]);
         }}
         onTagsChange={(selected, all) => {
           args.onTagsChange?.(selected, all);

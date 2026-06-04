@@ -13,6 +13,9 @@ const translation: TagSelectionTranslation = {
   loadingText: "Loading...",
   maxTagsReachedText: "Maximum number of tags reached.",
   colorPickerLabel: "Custom color",
+  backgroundColorLabel: "Background color",
+  textColorLabel: "Text color",
+  autoTextColorLabel: "Auto",
 };
 
 describe("TagSelectionSelectedTags", () => {

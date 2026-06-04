@@ -224,7 +224,7 @@ describe("TagSelection", () => {
     expect(screen.getByText("Maximum number of tags reached.")).toBeInTheDocument();
   });
 
-  it("Should call onTagCreate with label and color when checkmark is clicked", async () => {
+  it("Should call onTagCreate with the full TagSelectionItem when checkmark is clicked", async () => {
     const user = userEvent.setup();
     const handleTagCreate = vi.fn();
 
@@ -237,7 +237,9 @@ describe("TagSelection", () => {
 
     await user.click(await screen.findByTestId("CheckIcon"));
 
-    expect(handleTagCreate).toHaveBeenCalledWith("Vue", "default");
+    expect(handleTagCreate).toHaveBeenCalledWith(
+      expect.objectContaining({ label: "Vue", color: "default", selected: true }),
+    );
   });
 
   it("Should auto-select the newly created tag and clear the input", async () => {

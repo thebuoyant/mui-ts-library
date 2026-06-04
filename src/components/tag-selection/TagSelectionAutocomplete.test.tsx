@@ -4,7 +4,6 @@ import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { TagSelectionAutocomplete } from "./TagSelectionAutocomplete";
 import type {
-  TagColor,
   TagSelectionItem,
   TagSelectionTranslation,
 } from "./TagSelection.types";
@@ -18,6 +17,9 @@ const translation: TagSelectionTranslation = {
   loadingText: "Loading...",
   maxTagsReachedText: "Maximum number of tags reached.",
   colorPickerLabel: "Custom color",
+  backgroundColorLabel: "Background color",
+  textColorLabel: "Text color",
+  autoTextColorLabel: "Auto",
 };
 
 const availableTags: TagSelectionItem[] = [
@@ -28,7 +30,7 @@ const availableTags: TagSelectionItem[] = [
 type TestWrapperProps = {
   onSearchChange?: (value: string) => void;
   onTagSelect?: (tag: TagSelectionItem) => void;
-  onTagCreate?: (label: string, color: TagColor) => void;
+  onTagCreate?: (tag: TagSelectionItem) => void;
   availableTags?: TagSelectionItem[];
   allowCreate?: boolean;
 };
@@ -145,7 +147,7 @@ describe("TagSelectionAutocomplete", () => {
     expect(screen.getByText("primary")).toBeInTheDocument();
   });
 
-  it("Should call onTagCreate with label and selected color when checkmark is clicked", async () => {
+  it("Should call onTagCreate with the full TagSelectionItem when checkmark is clicked", async () => {
     const user = userEvent.setup();
     const handleCreate = vi.fn();
 
@@ -154,7 +156,9 @@ describe("TagSelectionAutocomplete", () => {
     await user.type(screen.getByLabelText("Search and add tags"), "Vue");
     await user.click(await screen.findByTestId("CheckIcon"));
 
-    expect(handleCreate).toHaveBeenCalledWith("Vue", "default");
+    expect(handleCreate).toHaveBeenCalledWith(
+      expect.objectContaining({ label: "Vue", color: "default", selected: true }),
+    );
   });
 
   it("Should disable the input and show helper text when isMaxReached is true", () => {
