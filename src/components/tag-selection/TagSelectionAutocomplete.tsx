@@ -430,7 +430,8 @@ export function TagSelectionAutocomplete({
                   <Typography variant="caption" sx={{ fontWeight: 700, color: "text.primary", display: "block", mb: 0.5 }}>
                     {translation.backgroundColorLabel}
                   </Typography>
-                  <Box sx={{ display: "grid", gridTemplateColumns: "repeat(5, 24px)", gap: 0.5, mb: 0.5 }}>
+                  {/* Swatches + HexInput im selben Grid → gleiche Breite garantiert */}
+                  <Box sx={{ display: "grid", gridTemplateColumns: "repeat(5, 24px)", gap: 0.5 }}>
                     {PALETTE_COLORS.map((color) => (
                       <ColorSwatch
                         key={color}
@@ -439,8 +440,10 @@ export function TagSelectionAutocomplete({
                         onClick={() => handleBgSwatchClick(color)}
                       />
                     ))}
+                    <Box sx={{ gridColumn: "span 5", mt: 0.25 }}>
+                      <HexInput value={hexBg} onChange={handleBgHexChange} />
+                    </Box>
                   </Box>
-                  <HexInput value={hexBg} onChange={handleBgHexChange} />
                 </Box>
 
                 {/* Spalte B: Textfarbe — Auto-Toggle unterhalb des Hex-Inputs */}
@@ -448,12 +451,12 @@ export function TagSelectionAutocomplete({
                   <Typography variant="caption" sx={{ fontWeight: 700, color: "text.primary", display: "block", mb: 0.5 }}>
                     {translation.textColorLabel}
                   </Typography>
+                  {/* Swatches + HexInput im selben Grid → gleiche Breite garantiert */}
                   <Box
                     sx={{
                       display: "grid",
                       gridTemplateColumns: "repeat(5, 24px)",
                       gap: 0.5,
-                      mb: 0.5,
                       opacity: autoFg ? 0.3 : 1,
                       pointerEvents: autoFg ? "none" : "auto",
                       transition: "opacity 0.15s",
@@ -467,13 +470,15 @@ export function TagSelectionAutocomplete({
                         onClick={() => handleFgSwatchClick(color)}
                       />
                     ))}
+                    <Box sx={{ gridColumn: "span 5", mt: 0.25 }}>
+                      <HexInput
+                        value={autoFg ? (resolvedFgColor ?? "#000000") : hexFg}
+                        onChange={handleFgHexChange}
+                        disabled={autoFg}
+                      />
+                    </Box>
                   </Box>
-                  <HexInput
-                    value={autoFg ? (resolvedFgColor ?? "#000000") : hexFg}
-                    onChange={handleFgHexChange}
-                    disabled={autoFg}
-                  />
-                  {/* Auto-Toggle unterhalb des Inputs */}
+                  {/* Auto-Toggle rechtsbündig unterhalb des Grids */}
                   <Stack direction="row" sx={{ alignItems: "center", justifyContent: "flex-end", gap: 0.5, mt: 0.5 }}>
                     <Typography variant="caption" color="text.secondary">
                       {translation.autoTextColorLabel}
