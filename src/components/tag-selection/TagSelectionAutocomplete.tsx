@@ -477,18 +477,27 @@ export function TagSelectionAutocomplete({
                         disabled={autoFg}
                       />
                     </Box>
+                    {/* Auto-Toggle als span-5-Grid-Item → fluchtet mit rechtem Kachelrand */}
+                    <Stack
+                      direction="row"
+                      sx={{
+                        gridColumn: "span 5",
+                        alignItems: "center",
+                        justifyContent: "flex-end",
+                        gap: 0.5,
+                        mt: 0.25,
+                      }}
+                    >
+                      <Typography variant="caption" color="text.secondary">
+                        {translation.autoTextColorLabel}
+                      </Typography>
+                      <Switch
+                        size="small"
+                        checked={autoFg}
+                        onChange={(e) => handleAutoFgToggle(e.target.checked)}
+                      />
+                    </Stack>
                   </Box>
-                  {/* Auto-Toggle rechtsbündig unterhalb des Grids */}
-                  <Stack direction="row" sx={{ alignItems: "center", justifyContent: "flex-end", gap: 0.5, mt: 0.5 }}>
-                    <Typography variant="caption" color="text.secondary">
-                      {translation.autoTextColorLabel}
-                    </Typography>
-                    <Switch
-                      size="small"
-                      checked={autoFg}
-                      onChange={(e) => handleAutoFgToggle(e.target.checked)}
-                    />
-                  </Stack>
                 </Box>
               </Box>
             </Box>
