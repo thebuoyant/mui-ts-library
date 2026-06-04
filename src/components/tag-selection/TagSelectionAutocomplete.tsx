@@ -408,7 +408,7 @@ export function TagSelectionAutocomplete({
                 borderRadius: 1,
                 boxShadow: 8,
                 p: 1.5,
-                minWidth: 220,
+                minWidth: 420,
               }}
             >
               {/* Preview */}
@@ -431,61 +431,55 @@ export function TagSelectionAutocomplete({
 
               <Divider sx={{ mb: 1.5 }} />
 
-              {/* Sektion A: Hintergrundfarbe */}
-              <Typography variant="caption" sx={{ fontWeight: 700, color: "text.primary", display: "block", mb: 0.75 }}>
-                {translation.backgroundColorLabel}
-              </Typography>
-              <Box sx={{ display: "grid", gridTemplateColumns: "repeat(5, 24px)", gap: 0.5, mb: 0.75 }}>
-                {PALETTE_COLORS.map((color) => (
-                  <ColorSwatch
-                    key={color}
-                    color={color}
-                    selected={customBgColor === color}
-                    onClick={() => handleBgSwatchClick(color)}
-                  />
-                ))}
-              </Box>
-              <HexInput value={hexBg} onChange={handleBgHexChange} />
+              {/* Zwei Spalten: Background color | Text color */}
+              <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
 
-              <Divider sx={{ my: 1.5 }} />
-
-              {/* Sektion B: Textfarbe */}
-              <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between", mb: 0.75 }}>
-                <Typography variant="caption" sx={{ fontWeight: 700, color: "text.primary" }}>
-                  {translation.textColorLabel}
-                </Typography>
-                <Stack direction="row" sx={{ alignItems: "center", gap: 0.25 }}>
-                  <Typography variant="caption" color="text.secondary">
-                    {translation.autoTextColorLabel}
+                {/* Spalte A: Hintergrundfarbe */}
+                <Box>
+                  <Typography variant="caption" sx={{ fontWeight: 700, color: "text.primary", display: "block", mb: 0.75 }}>
+                    {translation.backgroundColorLabel}
                   </Typography>
-                  <Switch
-                    size="small"
-                    checked={autoFg}
-                    onChange={(e) => handleAutoFgToggle(e.target.checked)}
-                  />
-                </Stack>
-              </Stack>
-              {autoFg && customBgColor && (
-                <Stack direction="row" sx={{ alignItems: "center", gap: 0.75, mb: 0.5 }}>
+                  <Box sx={{ display: "grid", gridTemplateColumns: "repeat(5, 24px)", gap: 0.5, mb: 0.75 }}>
+                    {PALETTE_COLORS.map((color) => (
+                      <ColorSwatch
+                        key={color}
+                        color={color}
+                        selected={customBgColor === color}
+                        onClick={() => handleBgSwatchClick(color)}
+                      />
+                    ))}
+                  </Box>
+                  <HexInput value={hexBg} onChange={handleBgHexChange} />
+                </Box>
+
+                {/* Spalte B: Textfarbe — identisches Layout, Auto-Toggle im Header */}
+                <Box>
+                  <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between", mb: 0.75 }}>
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: "text.primary" }}>
+                      {translation.textColorLabel}
+                    </Typography>
+                    <Stack direction="row" sx={{ alignItems: "center", gap: 0.25 }}>
+                      <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.65rem" }}>
+                        {translation.autoTextColorLabel}
+                      </Typography>
+                      <Switch
+                        size="small"
+                        checked={autoFg}
+                        onChange={(e) => handleAutoFgToggle(e.target.checked)}
+                      />
+                    </Stack>
+                  </Stack>
                   <Box
                     sx={{
-                      width: 16,
-                      height: 16,
-                      borderRadius: 0.5,
-                      backgroundColor: resolvedFgColor,
-                      border: "1px solid",
-                      borderColor: "divider",
-                      flexShrink: 0,
+                      display: "grid",
+                      gridTemplateColumns: "repeat(5, 24px)",
+                      gap: 0.5,
+                      mb: 0.75,
+                      opacity: autoFg ? 0.35 : 1,
+                      pointerEvents: autoFg ? "none" : "auto",
+                      transition: "opacity 0.15s",
                     }}
-                  />
-                  <Typography variant="caption" sx={{ fontFamily: "monospace", color: "text.secondary" }}>
-                    {resolvedFgColor}
-                  </Typography>
-                </Stack>
-              )}
-              {!autoFg && (
-                <>
-                  <Box sx={{ display: "grid", gridTemplateColumns: "repeat(5, 24px)", gap: 0.5, mb: 0.75 }}>
+                  >
                     {PALETTE_COLORS.map((color) => (
                       <ColorSwatch
                         key={color}
@@ -495,9 +489,14 @@ export function TagSelectionAutocomplete({
                       />
                     ))}
                   </Box>
-                  <HexInput value={hexFg} onChange={handleFgHexChange} />
-                </>
-              )}
+                  <Box sx={{ opacity: autoFg ? 0.35 : 1, transition: "opacity 0.15s", pointerEvents: autoFg ? "none" : "auto" }}>
+                    <HexInput
+                      value={autoFg ? (resolvedFgColor ?? "#000000") : hexFg}
+                      onChange={handleFgHexChange}
+                    />
+                  </Box>
+                </Box>
+              </Box>
             </Box>
           )}
         </Box>
