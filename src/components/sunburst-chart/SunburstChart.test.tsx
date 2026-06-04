@@ -102,11 +102,11 @@ describe("SunburstChart", () => {
     expect(box).toBeTruthy();
   });
 
-  it("Should use custom translation for ctrlClickToZoomIn", () => {
+  it("Should use custom translation for noData", () => {
     render(
       <SunburstChart
         data={SIMPLE_DATA}
-        translation={{ ctrlClickToZoomIn: "Ctrl+Klick zum Hineinzoomen" }}
+        translation={{ noData: "Keine Daten vorhanden" }}
       />,
     );
     expect(document.querySelector("svg")).toBeInTheDocument();

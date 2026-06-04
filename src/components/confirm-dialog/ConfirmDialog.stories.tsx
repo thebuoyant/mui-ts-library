@@ -11,6 +11,8 @@ const meta: Meta<typeof ConfirmDialogProvider> = {
   title: "Components/ConfirmDialog",
   component: ConfirmDialogProvider,
   argTypes: {
+    // Props A–Z
+    children:    { control: false },
     translation: { control: false },
   },
 };
