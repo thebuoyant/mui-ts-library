@@ -419,11 +419,11 @@ export function TagSelectionAutocomplete({
                 borderRadius: 1,
                 boxShadow: 8,
                 p: 1.25,
-                minWidth: 400,
+                width: "max-content",
               }}
             >
               {/* Zwei Spalten: Background color | Text color */}
-              <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
+              <Box sx={{ display: "grid", gridTemplateColumns: "auto auto", gap: 2 }}>
 
                 {/* Spalte A: Hintergrundfarbe */}
                 <Box>
