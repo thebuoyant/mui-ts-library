@@ -50,6 +50,9 @@ const meta: Meta<typeof RichTextEditor> = {
     onChange:           fn(),
     onFocus:            fn(),
   },
+  parameters: {
+    controls: { sort: 'alpha' },
+  },
 };
 
 export default meta;

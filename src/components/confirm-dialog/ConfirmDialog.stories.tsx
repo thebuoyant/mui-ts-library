@@ -15,6 +15,9 @@ const meta: Meta<typeof ConfirmDialogProvider> = {
     children:    { control: false },
     translation: { control: false },
   },
+  parameters: {
+    controls: { sort: 'alpha' },
+  },
 };
 
 export default meta;

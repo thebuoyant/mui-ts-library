@@ -67,6 +67,9 @@ const meta: Meta<typeof TagSelection> = {
     onTagSelect:    { control: false },
     onTagsChange:   { control: false },
   },
+  parameters: {
+    controls: { sort: 'alpha' },
+  },
 };
 
 export default meta;

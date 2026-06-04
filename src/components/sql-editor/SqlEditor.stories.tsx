@@ -52,6 +52,9 @@ const meta: Meta<typeof SqlEditor> = {
     onChange:        fn(),
     onFocus:         fn(),
   },
+  parameters: {
+    controls: { sort: 'alpha' },
+  },
 };
 
 export default meta;

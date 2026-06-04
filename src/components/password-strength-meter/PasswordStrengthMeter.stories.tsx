@@ -11,9 +11,10 @@ const meta: Meta<typeof PasswordStrengthMeter> = {
     // A–Z
     disabled:               false,
     error:                  false,
-    showConfirmField:       false,
+    helperText:             "",
     inputSize:              "medium",
     passwordMinLength:      8,
+    showConfirmField:       false,
     showMeter:              true,
     showPasswordAdornment:  true,
     showPasswordGenerator:  false,
@@ -50,6 +51,9 @@ const meta: Meta<typeof PasswordStrengthMeter> = {
     onConfirmChange:        { control: false },
     onPasswordChange:       { control: false },
     onPasswordGenerated:    { control: false },
+  },
+  parameters: {
+    controls: { sort: 'alpha' },
   },
 };
 

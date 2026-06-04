@@ -53,6 +53,9 @@ const meta: Meta<typeof JsonEditor> = {
     onFocus:         fn(),
     onValidChange:   fn(),
   },
+  parameters: {
+    controls: { sort: 'alpha' },
+  },
 };
 
 export default meta;

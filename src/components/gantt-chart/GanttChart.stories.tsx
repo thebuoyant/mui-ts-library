@@ -203,8 +203,10 @@ const meta: Meta<typeof GanttChart> = {
     minPanelWidth:        200,
     progressDraggable:    true,
     resizable:            true,
+    showAssigneeColumn:   false,
     showCriticalPath:     false,
     showToolbar:          true,
+    timeScale:            "months",
     virtualizeRows:       false,
     width:                "auto",
     zoomable:             true,
@@ -262,6 +264,9 @@ const meta: Meta<typeof GanttChart> = {
     onTaskResized:        { control: false },
     onTasksChange:        { control: false },
     onTaskUpdated:        { control: false },
+  },
+  parameters: {
+    controls: { sort: 'alpha' },
   },
 };
 
