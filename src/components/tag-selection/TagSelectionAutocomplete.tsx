@@ -2,7 +2,6 @@ import {
   Autocomplete,
   Box,
   Chip,
-  Divider,
   IconButton,
   Stack,
   Switch,
@@ -92,9 +91,11 @@ function ColorSwatch({
 function HexInput({
   value,
   onChange,
+  disabled = false,
 }: {
   value: string;
   onChange: (val: string) => void;
+  disabled?: boolean;
 }) {
   return (
     <TextField
@@ -103,15 +104,25 @@ function HexInput({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder="#rrggbb"
-      error={value.length > 1 && !isValidHex(value)}
+      disabled={disabled}
+      error={!disabled && value.length > 1 && !isValidHex(value)}
+      sx={{
+        "& .MuiInputBase-root": { height: 28 },
+        "& .MuiInputBase-input": {
+          py: 0,
+          px: 0.5,
+          fontSize: "0.72rem",
+          fontFamily: "monospace",
+        },
+      }}
       slotProps={{
         input: {
           startAdornment: (
             <Box
               sx={{
-                width: 14,
-                height: 14,
-                borderRadius: 0.5,
+                width: 12,
+                height: 12,
+                borderRadius: 0.25,
                 flexShrink: 0,
                 mr: 0.5,
                 backgroundColor: isValidHex(value) ? value : "action.disabledBackground",
@@ -407,39 +418,19 @@ export function TagSelectionAutocomplete({
                 borderColor: "divider",
                 borderRadius: 1,
                 boxShadow: 8,
-                p: 1.5,
-                minWidth: 420,
+                p: 1.25,
+                minWidth: 400,
               }}
             >
-              {/* Preview */}
-              <Stack direction="row" sx={{ alignItems: "center", gap: 1, mb: 1 }}>
-                <Typography variant="caption" color="text.secondary">
-                  Preview
-                </Typography>
-                <Chip
-                  size="small"
-                  label={searchValue}
-                  sx={
-                    customBgColor
-                      ? { backgroundColor: customBgColor, color: resolvedFgColor, border: "none" }
-                      : undefined
-                  }
-                  color={!customBgColor ? "default" : undefined}
-                  variant="filled"
-                />
-              </Stack>
-
-              <Divider sx={{ mb: 1.5 }} />
-
               {/* Zwei Spalten: Background color | Text color */}
               <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
 
                 {/* Spalte A: Hintergrundfarbe */}
                 <Box>
-                  <Typography variant="caption" sx={{ fontWeight: 700, color: "text.primary", display: "block", mb: 0.75 }}>
+                  <Typography variant="caption" sx={{ fontWeight: 700, color: "text.primary", display: "block", mb: 0.5 }}>
                     {translation.backgroundColorLabel}
                   </Typography>
-                  <Box sx={{ display: "grid", gridTemplateColumns: "repeat(5, 24px)", gap: 0.5, mb: 0.75 }}>
+                  <Box sx={{ display: "grid", gridTemplateColumns: "repeat(5, 24px)", gap: 0.5, mb: 0.5 }}>
                     {PALETTE_COLORS.map((color) => (
                       <ColorSwatch
                         key={color}
@@ -452,30 +443,18 @@ export function TagSelectionAutocomplete({
                   <HexInput value={hexBg} onChange={handleBgHexChange} />
                 </Box>
 
-                {/* Spalte B: Textfarbe — identisches Layout, Auto-Toggle im Header */}
+                {/* Spalte B: Textfarbe — Auto-Toggle unterhalb des Hex-Inputs */}
                 <Box>
-                  <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between", mb: 0.75 }}>
-                    <Typography variant="caption" sx={{ fontWeight: 700, color: "text.primary" }}>
-                      {translation.textColorLabel}
-                    </Typography>
-                    <Stack direction="row" sx={{ alignItems: "center", gap: 0.25 }}>
-                      <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.65rem" }}>
-                        {translation.autoTextColorLabel}
-                      </Typography>
-                      <Switch
-                        size="small"
-                        checked={autoFg}
-                        onChange={(e) => handleAutoFgToggle(e.target.checked)}
-                      />
-                    </Stack>
-                  </Stack>
+                  <Typography variant="caption" sx={{ fontWeight: 700, color: "text.primary", display: "block", mb: 0.5 }}>
+                    {translation.textColorLabel}
+                  </Typography>
                   <Box
                     sx={{
                       display: "grid",
                       gridTemplateColumns: "repeat(5, 24px)",
                       gap: 0.5,
-                      mb: 0.75,
-                      opacity: autoFg ? 0.35 : 1,
+                      mb: 0.5,
+                      opacity: autoFg ? 0.3 : 1,
                       pointerEvents: autoFg ? "none" : "auto",
                       transition: "opacity 0.15s",
                     }}
@@ -489,12 +468,22 @@ export function TagSelectionAutocomplete({
                       />
                     ))}
                   </Box>
-                  <Box sx={{ opacity: autoFg ? 0.35 : 1, transition: "opacity 0.15s", pointerEvents: autoFg ? "none" : "auto" }}>
-                    <HexInput
-                      value={autoFg ? (resolvedFgColor ?? "#000000") : hexFg}
-                      onChange={handleFgHexChange}
+                  <HexInput
+                    value={autoFg ? (resolvedFgColor ?? "#000000") : hexFg}
+                    onChange={handleFgHexChange}
+                    disabled={autoFg}
+                  />
+                  {/* Auto-Toggle unterhalb des Inputs */}
+                  <Stack direction="row" sx={{ alignItems: "center", justifyContent: "flex-end", gap: 0.5, mt: 0.5 }}>
+                    <Typography variant="caption" color="text.secondary">
+                      {translation.autoTextColorLabel}
+                    </Typography>
+                    <Switch
+                      size="small"
+                      checked={autoFg}
+                      onChange={(e) => handleAutoFgToggle(e.target.checked)}
                     />
-                  </Box>
+                  </Stack>
                 </Box>
               </Box>
             </Box>
