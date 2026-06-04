@@ -451,7 +451,7 @@ export function TagSelectionAutocomplete({
                   <Typography variant="caption" sx={{ fontWeight: 700, color: "text.primary", display: "block", mb: 0.5 }}>
                     {translation.textColorLabel}
                   </Typography>
-                  {/* Swatches + HexInput im selben Grid → gleiche Breite garantiert */}
+                  {/* Swatches + HexInput gedimmt — Auto-Toggle ist NICHT drin */}
                   <Box
                     sx={{
                       display: "grid",
@@ -477,27 +477,27 @@ export function TagSelectionAutocomplete({
                         disabled={autoFg}
                       />
                     </Box>
-                    {/* Auto-Toggle als span-5-Grid-Item → fluchtet mit rechtem Kachelrand */}
-                    <Stack
-                      direction="row"
-                      sx={{
-                        gridColumn: "span 5",
-                        alignItems: "center",
-                        justifyContent: "flex-end",
-                        gap: 0.5,
-                        mt: 0.25,
-                      }}
-                    >
-                      <Typography variant="caption" color="text.secondary">
-                        {translation.autoTextColorLabel}
-                      </Typography>
-                      <Switch
-                        size="small"
-                        checked={autoFg}
-                        onChange={(e) => handleAutoFgToggle(e.target.checked)}
-                      />
-                    </Stack>
                   </Box>
+                  {/* Auto-Toggle außerhalb der gedimmten Box → immer klickbar */}
+                  <Stack
+                    direction="row"
+                    sx={{
+                      width: "100%",
+                      alignItems: "center",
+                      justifyContent: "flex-end",
+                      gap: 0.5,
+                      mt: 0.25,
+                    }}
+                  >
+                    <Typography variant="caption" color="text.secondary">
+                      {translation.autoTextColorLabel}
+                    </Typography>
+                    <Switch
+                      size="small"
+                      checked={autoFg}
+                      onChange={(e) => handleAutoFgToggle(e.target.checked)}
+                    />
+                  </Stack>
                 </Box>
               </Box>
             </Box>
