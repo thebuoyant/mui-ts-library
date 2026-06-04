@@ -118,7 +118,7 @@ type TagSelectionItem = {
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `allowCreate` | `boolean` | `false` | Enables free text input mode. When the user types text that does not match any existing tag (including no partial match), the input switches to create mode: a CheckIcon (confirm) and CloseIcon (cancel) appear in the input, and 7 theme color chips for color selection appear below. The new tag is immediately marked as selected internally. Confirmation is possible by clicking the CheckIcon **or pressing Enter**. `onTagCreate` informs the caller about the created tag. |
+| `allowCreate` | `boolean` | `false` | Enables free text input mode. When the user types text that does not match any existing tag, the input switches to create mode: a CheckIcon (confirm) and CloseIcon (cancel) appear in the input, and a color row appears below — 7 semantic theme color chips (dark-mode-compatible) plus a **rainbow circle** that opens the native browser color picker for any hex color. The new tag is immediately marked as selected internally. Confirmation by CheckIcon or **Enter**. |
 | `chipSize` | `"small" \| "medium"` | `"small"` | Size of all chips — both in the selection area and in the dropdown list. Should match `inputSize` (`"small"` + `"small"` or `"medium"` + `"medium"`). |
 | `disabled` | `boolean` | `false` | Disables the entire component. The autocomplete input is locked; selected chips are grayed out and cannot be deleted. Useful during form submissions or in read-only views. |
 | `inputSize` | `"small" \| "medium"` | `"medium"` | Size of the autocomplete input per MUI standard. Affects font size, padding, and input height. |
@@ -143,7 +143,7 @@ type TagSelectionItem = {
 | `onTagDelete` | `(tag: TagSelectionItem, selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | The delete icon of a selected chip was clicked. `tag` contains the removed tag with `selected: false`. `selectedTags` is the remaining selection. `allTags` is the complete array after removal. |
 | `onTagsChange` | `(selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | Called after **every** selection change — both after Select and Delete. Central callback for data-driven architectures. |
 | `onSearchChange` | `(searchValue: string) => void` | Called on every change of the search text in the autocomplete field. Useful for server-side filtering or search. |
-| `onTagCreate` | `(label: string, color: TagColor) => void` | Fired when the user clicks the CheckIcon **or presses Enter** in create mode (`allowCreate={true}`). `label` is the typed text, `color` is the selected MUI theme color (default: `"default"`). The new tag is already internally marked as selected — `onTagCreate` serves to synchronize the external state. |
+| `onTagCreate` | `(label: string, color: TagColor) => void` | Fired when the user confirms a new tag in create mode (`allowCreate={true}`). `label` is the typed text, `color` is the selected MUI theme color (`"default"` when a custom hex color was chosen — use `onTagsChange` to get the full `TagSelectionItem` including `backgroundColor`/`foregroundColor`). |
 
 > **Important about `onTagCreate`:** The new tag is immediately inserted into the store by the component with `selected: true`. `onTagCreate` is then fired so the caller can synchronize their external state (`tags` prop). **`selected: true` must be set**, otherwise the next re-render will overwrite the internal state:
 >
@@ -155,6 +155,8 @@ type TagSelectionItem = {
 >   ]);
 > }}
 > ```
+>
+> When a **custom hex color** is used, `onTagsChange` delivers the full `TagSelectionItem` with `backgroundColor`/`foregroundColor` — recommended for persisting custom-color tags.
 
 ---
 
@@ -175,6 +177,7 @@ type TagSelectionTranslation = {
   placeholder:         string;
   loadingText:         string;
   maxTagsReachedText:  string;
+  colorPickerLabel:    string;
 };
 ```
 
@@ -187,6 +190,7 @@ type TagSelectionTranslation = {
 | `placeholder` | `"Type to search..."` | Placeholder text in the autocomplete input field. |
 | `loadingText` | `"Loading..."` | Text in the dropdown list during loading (`loading={true}`). |
 | `maxTagsReachedText` | `"Maximum number of tags reached."` | Helper text below the input field when the tag limit is reached (`maxTags` set). |
+| `colorPickerLabel` | `"Custom color"` | Tooltip for the rainbow circle (custom hex color picker) shown in the color row during tag creation (`allowCreate={true}`). |
 
 **Full German translation:**
 
@@ -201,6 +205,7 @@ type TagSelectionTranslation = {
     placeholder:         'Suchen...',
     loadingText:         'Wird geladen...',
     maxTagsReachedText:  'Maximale Anzahl an Tags erreicht.',
+    colorPickerLabel:    'Eigene Farbe',
   }}
 />
 ```

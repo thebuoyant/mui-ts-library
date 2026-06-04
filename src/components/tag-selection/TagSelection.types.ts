@@ -31,6 +31,7 @@ export type TagSelectionTranslation = {
   placeholder: string;
   loadingText: string;
   maxTagsReachedText: string;
+  colorPickerLabel: string;
 };
 
 export const DEFAULT_TAG_SELECTION_TRANSLATION: TagSelectionTranslation = {
@@ -41,6 +42,7 @@ export const DEFAULT_TAG_SELECTION_TRANSLATION: TagSelectionTranslation = {
   placeholder: "Type to search...",
   loadingText: "Loading...",
   maxTagsReachedText: "Maximum number of tags reached.",
+  colorPickerLabel: "Custom color",
 };
 
 export type TagSelectionProps = {

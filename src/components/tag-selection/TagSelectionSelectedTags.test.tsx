@@ -12,6 +12,7 @@ const translation: TagSelectionTranslation = {
   placeholder: "Type to search...",
   loadingText: "Loading...",
   maxTagsReachedText: "Maximum number of tags reached.",
+  colorPickerLabel: "Custom color",
 };
 
 describe("TagSelectionSelectedTags", () => {

@@ -149,12 +149,18 @@ function TagSelectionInner({
     }
   };
 
-  const handleTagCreate = (label: string, color: TagColor) => {
+  const handleTagCreate = (
+    label: string,
+    color: TagColor,
+    customColors?: { backgroundColor: string; foregroundColor: string },
+  ) => {
     const newTag: TagSelectionItem = {
       id: label.toLowerCase().replace(/\s+/g, "-"),
       label,
-      color,
       selected: true,
+      ...(customColors
+        ? { color: "default", ...customColors }
+        : { color }),
     };
 
     addTag(newTag);
@@ -169,7 +175,7 @@ function TagSelectionInner({
     emitTagsChange(nextTags);
 
     if (onTagCreate) {
-      onTagCreate(label, color);
+      onTagCreate(label, customColors ? "default" : color);
     }
   };
 

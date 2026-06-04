@@ -127,6 +127,7 @@ export const GermanTranslation: Story = {
       placeholder: "Suchen...",
       loadingText: "Laden...",
       maxTagsReachedText: "Maximale Anzahl an Tags erreicht.",
+      colorPickerLabel: "Eigene Farbe",
     },
   },
   render: (args) => (
@@ -215,6 +216,50 @@ function CreatableStory(args: ComponentProps<typeof TagSelection>) {
 // ein (hier per lokalem State demonstriert). Der neue Tag muss selected: true haben.
 export const Creatable: Story = {
   render: (args) => <CreatableStory {...args} />,
+};
+
+// Beim Anlegen eines neuen Tags erscheint unter dem Input eine Farb-Auswahl:
+// 7 semantische MUI-Theme-Farben (Dark-Mode-kompatibel) plus ein Farbkreis
+// für beliebige Hex-Farben. Der Farbkreis öffnet den nativen Browser-Farbwähler.
+// Benutzerdefinierte Farben werden als foregroundColor/backgroundColor gespeichert;
+// der Kontrast (schwarz/weiß) wird automatisch berechnet.
+function CustomColorCreationStory(args: ComponentProps<typeof TagSelection>) {
+  const [localTags, setLocalTags] = useState<TagSelectionItem[]>([
+    { id: "design", label: "Design", color: "secondary" },
+  ]);
+
+  return (
+    <Box sx={{ maxWidth: 420 }}>
+      <TagSelection
+        {...args}
+        tags={localTags}
+        onTagCreate={(label, color) => {
+          args.onTagCreate?.(label, color);
+          setLocalTags((prev) => [
+            ...prev,
+            { id: label.toLowerCase().replace(/\s+/g, "-"), label, color, selected: true },
+          ]);
+        }}
+        onTagsChange={(selected, all) => {
+          args.onTagsChange?.(selected, all);
+          setLocalTags(all);
+        }}
+      />
+    </Box>
+  );
+}
+
+export const WithCustomColorCreation: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Type a new tag name that does not match any existing tag, then pick from the **7 semantic theme colors** or click the **rainbow circle** to open the native color picker for any hex color. ' +
+          'Custom hex colors are stored as `backgroundColor`/`foregroundColor` on the tag with auto-contrast text (black or white).',
+      },
+    },
+  },
+  render: (args) => <CustomColorCreationStory {...args} />,
 };
 
 // maxVisibleChips begrenzt die sichtbaren Chips. Überzählige Chips werden hinter

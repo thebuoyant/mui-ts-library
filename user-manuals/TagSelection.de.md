@@ -118,7 +118,7 @@ type TagSelectionItem = {
 
 | Prop | Typ | Standard | Beschreibung |
 |---|---|---|---|
-| `allowCreate` | `boolean` | `false` | Aktiviert den freien Texteingabe-Modus. Wenn der Nutzer einen Text eintippt, der keinem bestehenden Tag entspricht (auch keine Teilübereinstimmung), wechselt das Eingabefeld in den Create-Mode: Im Input erscheinen ein CheckIcon (bestätigen) und ein CloseIcon (abbrechen), darunter werden 7 Theme-Farb-Chips zur Farbauswahl angezeigt. Der neue Tag wird intern sofort als selektiert markiert. Bestätigen ist per Klick auf das CheckIcon **oder** per **Enter**-Taste möglich. `onTagCreate` informiert den Aufrufer über den erstellten Tag. |
+| `allowCreate` | `boolean` | `false` | Aktiviert den freien Texteingabe-Modus. Wenn der Nutzer einen Text eintippt, der keinem bestehenden Tag entspricht, wechselt das Eingabefeld in den Create-Mode: Im Input erscheinen ein CheckIcon (bestätigen) und ein CloseIcon (abbrechen), darunter wird eine Farb-Zeile angezeigt — 7 semantische Theme-Farb-Chips (Dark-Mode-kompatibel) plus ein **Farbkreis** der den nativen Browser-Farbwähler für beliebige Hex-Farben öffnet. Der neue Tag wird intern sofort als selektiert markiert. Bestätigen per CheckIcon oder **Enter**. |
 | `chipSize` | `"small" \| "medium"` | `"small"` | Größe aller Chips — sowohl im Auswahl-Bereich als auch in der Dropdown-Liste. Sollte zur `inputSize` passen (`"small"` + `"small"` oder `"medium"` + `"medium"`). |
 | `disabled` | `boolean` | `false` | Deaktiviert die gesamte Komponente. Das Autocomplete-Eingabefeld wird gesperrt; ausgewählte Chips werden grau dargestellt und sind nicht löschbar. Nützlich während Formular-Submissions oder in reinen Lese-Ansichten. |
 | `inputSize` | `"small" \| "medium"` | `"medium"` | Größe der Autocomplete-Eingabe gemäß MUI-Standard. Beeinflusst Schriftgröße, Innenabstand und Höhe des Eingabefelds. |
@@ -143,7 +143,7 @@ type TagSelectionItem = {
 | `onTagDelete` | `(tag: TagSelectionItem, selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | Das Lösch-Icon eines ausgewählten Chips wurde geklickt. `tag` enthält den entfernten Tag mit `selected: false`. `selectedTags` ist die verbleibende Auswahl. `allTags` ist das vollständige Array nach dem Entfernen. |
 | `onTagsChange` | `(selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | Wird nach **jeder** Änderung der Auswahl aufgerufen — sowohl nach Select als auch nach Delete. Zentraler Callback für datengetriebene Architekturen. |
 | `onSearchChange` | `(searchValue: string) => void` | Wird bei jeder Änderung des Suchtexts im Autocomplete-Feld aufgerufen. Nützlich für serverseitige Filterung oder Suche. |
-| `onTagCreate` | `(label: string, color: TagColor) => void` | Wird ausgelöst wenn der Nutzer im Create-Mode das CheckIcon klickt **oder Enter drückt** (`allowCreate={true}`). `label` ist der eingetippte Text, `color` die gewählte MUI-Theme-Farbe (Standard: `"default"`). Der neue Tag wird intern bereits als selektiert markiert — `onTagCreate` dient der Synchronisation des externen States. |
+| `onTagCreate` | `(label: string, color: TagColor) => void` | Wird ausgelöst wenn der Nutzer im Create-Mode bestätigt (`allowCreate={true}`). `label` ist der eingetippte Text, `color` die gewählte MUI-Theme-Farbe (`"default"` wenn eine Hex-Farbe gewählt wurde — für die vollständigen `backgroundColor`/`foregroundColor`-Werte `onTagsChange` verwenden). |
 
 > **Wichtig zu `onTagCreate`:** Der neue Tag wird von der Komponente intern sofort mit `selected: true` in den Store eingefügt. `onTagCreate` wird danach ausgelöst damit der Aufrufer seinen externen State (`tags`-Prop) synchronisieren kann. Dabei **muss `selected: true`** gesetzt werden, sonst überschreibt das nächste Re-Render den internen Zustand:
 >
@@ -155,6 +155,8 @@ type TagSelectionItem = {
 >   ]);
 > }}
 > ```
+>
+> Bei **eigener Hex-Farbe** liefert `onTagsChange` das vollständige `TagSelectionItem` mit `backgroundColor`/`foregroundColor` — empfohlen zum Persistieren von Custom-Color-Tags.
 
 ---
 
@@ -175,6 +177,7 @@ type TagSelectionTranslation = {
   placeholder:         string;
   loadingText:         string;
   maxTagsReachedText:  string;
+  colorPickerLabel:    string;
 };
 ```
 
@@ -187,6 +190,7 @@ type TagSelectionTranslation = {
 | `placeholder` | `"Type to search..."` | Platzhaltertext im Autocomplete-Eingabefeld. |
 | `loadingText` | `"Loading..."` | Text in der Dropdown-Liste während des Ladevorgangs (`loading={true}`). |
 | `maxTagsReachedText` | `"Maximum number of tags reached."` | Hilfstext unterhalb des Eingabefelds wenn das Tag-Limit erreicht ist (`maxTags` gesetzt). |
+| `colorPickerLabel` | `"Custom color"` | Tooltip für den Farbkreis (nativer Hex-Farbwähler) der Farb-Zeile im Create-Mode (`allowCreate={true}`). |
 
 **Vollständige deutsche Übersetzung:**
 
@@ -201,6 +205,7 @@ type TagSelectionTranslation = {
     placeholder:         'Suchen...',
     loadingText:         'Wird geladen...',
     maxTagsReachedText:  'Maximale Anzahl an Tags erreicht.',
+    colorPickerLabel:    'Eigene Farbe',
   }}
 />
 ```

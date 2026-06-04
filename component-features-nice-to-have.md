@@ -84,7 +84,7 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 | Drag to Reorder | Ausgewählte Tags per Drag neu sortieren | Mittel | — |
 | Tag Groups | Tags in Kategorien einteilen (Group-Header im Dropdown) | Mittel | — |
 | Async Search | `onSearch`-Callback mit Debounce für Server-seitige Tags | Mittel | — |
-| Farbe bei Tag-Erstellung | Beim Anlegen neuer Tags direkt eine Farbe wählen (Color Picker) | Niedrig | — |
+| ~~Farbe bei Tag-Erstellung~~ | ~~Beim Anlegen neuer Tags direkt eine Farbe wählen (Color Picker)~~ | ~~Niedrig~~ | ✅ v2.8.0 |
 | Suchergebnis-Highlighting | Matching-Text im Dropdown-Ergebnis farbig hervorheben | Niedrig | — |
 
 ---
