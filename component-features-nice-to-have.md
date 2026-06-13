@@ -122,6 +122,8 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
 | ~~Live Storybook~~ | ~~`https://thebuoyant.github.io/mui-ts-library/`~~ | ~~Mittel~~ | ✅ aktiv — auto-deploy |
+| ~~npm-app Showcase/Playground~~ | ~~Eigenständige Vite-React-App (`npm-app/`), konsumiert das veröffentlichte npm-Paket; pro Komponente ein Accordion mit Live-Preview links und Storybook-ähnlicher Controls-Sidebar rechts (Switches, Slider, Select, Color-Picker), inkl. Light/Dark-Theme-Toggle~~ | ~~Hoch~~ | ✅ implementiert |
+| npm-app auf neue Version aktualisieren | `npm-app` nutzt aktuell `@thebuoyant-tsdev/mui-ts-library@2.6.0` (npm), lokaler Stand ist bereits v2.7.0+. Nach nächstem Publish: Dependency bumpen und neue Features (z.B. TagSelection Custom-Color bei Erstellung, PasswordStrengthMeter-Generator) in den jeweiligen Demos ergänzen | Niedrig | — |
 | StackBlitz / CodeSandbox Templates | "Try it now"-Links direkt in README | Niedrig | — |
 | VS Code Snippets | `rte-basic`, `gantt-basic` → autovervollständigt fertiges Snippet | Niedrig | — |
 | Playwright Visual Tests | Screenshot-Vergleiche für Chart-Rendering | Hoch | — |
