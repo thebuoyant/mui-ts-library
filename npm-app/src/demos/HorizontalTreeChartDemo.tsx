@@ -4,6 +4,7 @@ import type { HorizontalTreeOrientation } from "@thebuoyant-tsdev/mui-ts-library
 import { HORIZONTAL_TREE_DATA } from "../fixtures/horizontalTreeData";
 import { ControlsPanel } from "../controls/ControlsPanel";
 import { DemoLayout } from "../controls/DemoLayout";
+import { colorProp } from "../controls/types";
 import type { ControlDef, ControlValues } from "../controls/types";
 
 const CONTROLS: ControlDef[] = [
@@ -61,10 +62,10 @@ export function HorizontalTreeChartDemo() {
           disabled={values.disabled as boolean}
           drillable={values.drillable as boolean}
           height={values.height as number}
-          labelColor={values.labelColor as string}
+          labelColor={colorProp(values.labelColor)}
           labelFontSize={values.labelFontSize as number}
           levelSpacing={values.levelSpacing as number}
-          linkColor={values.linkColor as string}
+          linkColor={colorProp(values.linkColor)}
           linkStrokeOpacity={values.linkStrokeOpacity as number}
           linkStrokeWidth={values.linkStrokeWidth as number}
           nodeRadius={values.nodeRadius as number}

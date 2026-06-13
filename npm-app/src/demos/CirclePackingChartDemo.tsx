@@ -4,6 +4,7 @@ import type { CirclePackingSortBy } from "@thebuoyant-tsdev/mui-ts-library";
 import { CIRCLE_PACKING_DATA } from "../fixtures/circlePackingData";
 import { ControlsPanel } from "../controls/ControlsPanel";
 import { DemoLayout } from "../controls/DemoLayout";
+import { colorProp } from "../controls/types";
 import type { ControlDef, ControlValues } from "../controls/types";
 
 const CONTROLS: ControlDef[] = [
@@ -52,13 +53,13 @@ export function CirclePackingChartDemo() {
       preview={
         <CirclePackingChart
           data={CIRCLE_PACKING_DATA}
-          background={values.background as string}
-          depthColorEnd={values.depthColorEnd as string}
-          depthColorStart={values.depthColorStart as string}
+          background={colorProp(values.background)}
+          depthColorEnd={colorProp(values.depthColorEnd)}
+          depthColorStart={colorProp(values.depthColorStart)}
           disabled={values.disabled as boolean}
           duration={values.duration as number}
           innerLabelFontSize={values.innerLabelFontSize as number}
-          labelColor={values.labelColor as string}
+          labelColor={colorProp(values.labelColor)}
           labelFontSize={values.labelFontSize as number}
           padding={values.padding as number}
           showAllLabels={values.showAllLabels as boolean}

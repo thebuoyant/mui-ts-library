@@ -4,6 +4,7 @@ import type { RadialTreeSortBy } from "@thebuoyant-tsdev/mui-ts-library";
 import { RADIAL_TREE_DATA } from "../fixtures/radialTreeData";
 import { ControlsPanel } from "../controls/ControlsPanel";
 import { DemoLayout } from "../controls/DemoLayout";
+import { colorProp } from "../controls/types";
 import type { ControlDef, ControlValues } from "../controls/types";
 
 const CONTROLS: ControlDef[] = [
@@ -66,10 +67,10 @@ export function RadialTreeChartDemo() {
           branchNodeRadius={values.branchNodeRadius as number}
           disabled={values.disabled as boolean}
           drillable={values.drillable as boolean}
-          labelColor={values.labelColor as string}
+          labelColor={colorProp(values.labelColor)}
           labelFontSize={values.labelFontSize as number}
           leafNodeRadius={values.leafNodeRadius as number}
-          linkColor={values.linkColor as string}
+          linkColor={colorProp(values.linkColor)}
           linkStrokeOpacity={values.linkStrokeOpacity as number}
           linkStrokeWidth={values.linkStrokeWidth as number}
           rootNodeRadius={values.rootNodeRadius as number}
