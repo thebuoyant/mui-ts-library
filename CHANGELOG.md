@@ -36,6 +36,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The "rainbow chip" in creatable mode (`allowCreate={true}`) now opens a custom color picker panel with background-color and text-color swatches, hex inputs, and an "Auto" WCAG-contrast toggle for the text color.
 - New translation keys: `backgroundColorLabel`, `textColorLabel`, `autoTextColorLabel`.
 
+### Fixed
+
+#### Chart and Gantt color overrides — empty-string fallback (MTL-25)
+
+- `RadialTreeChart`, `HorizontalTreeChart`, `CirclePackingChart`, and `GanttChart` color override props (e.g. `linkColor`, `labelColor`, `todayColor`, `todayLineColor`, `weekendColor`, `milestoneColor`, `criticalPathColor`) now fall back to their theme defaults when set to an empty string `""`, not just `undefined`/`null`.
+- Previously, an empty string (e.g. the default value of a Storybook color-picker control) was passed straight through to `stroke`/`fill`/`bgcolor`, causing the browser to silently fall back to the SVG initial value — most visibly, `stroke=""` resolves to `stroke: none`, making chart links invisible by default.
+
 ---
 
 ## [2.7.0] — 2026-05-31

@@ -109,8 +109,8 @@ export function HorizontalTreeChart({
     theme.palette.info.main,
   ];
   const palette         = chartColors && chartColors.length > 0 ? chartColors : defaultColors;
-  const resolvedLabel   = labelColor ?? theme.palette.text.primary;
-  const resolvedLink    = linkColor  ?? theme.palette.text.secondary;
+  const resolvedLabel   = labelColor || theme.palette.text.primary;
+  const resolvedLink    = linkColor  || theme.palette.text.secondary;
   const bgColor         = theme.palette.background.paper;
   const fontFamily      = theme.typography.fontFamily;
 

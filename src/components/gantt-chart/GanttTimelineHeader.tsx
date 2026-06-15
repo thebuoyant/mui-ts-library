@@ -71,7 +71,7 @@ export function GanttTimelineHeader({
   const totalHeight = groups ? HEADER_HEIGHT * 2 : HEADER_HEIGHT;
 
   // Resolved color für Chip und Linie.
-  const resolvedColor = todayColor ?? theme.palette.primary.main;
+  const resolvedColor = todayColor || theme.palette.primary.main;
 
   // Kontrastfarbe für den Chip-Text — helle Farbe auf dunklem Hintergrund und umgekehrt.
   const chipTextColor = theme.palette.getContrastText(resolvedColor);

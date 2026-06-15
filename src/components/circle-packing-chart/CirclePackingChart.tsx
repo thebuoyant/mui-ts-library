@@ -52,8 +52,8 @@ export function CirclePackingChart({
     theme.palette.info.main,
   ];
 
-  const resolvedLabelColor = labelColor  ?? theme.palette.text.primary;
-  const resolvedBackground = background  ?? theme.palette.background.default;
+  const resolvedLabelColor = labelColor  || theme.palette.text.primary;
+  const resolvedBackground = background  || theme.palette.background.default;
   const fontFamily         = theme.typography.fontFamily;
 
   // ── D3 Pack layout ────────────────────────────────────────────────────────

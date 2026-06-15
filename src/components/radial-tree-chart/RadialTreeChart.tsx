@@ -325,8 +325,8 @@ export function RadialTreeChart({
     onNodeClick?.(info, e);
   };
 
-  const textColor    = labelColor ?? theme.palette.text.primary;
-  const resolvedLink = linkColor  ?? theme.palette.text.secondary;
+  const textColor    = labelColor || theme.palette.text.primary;
+  const resolvedLink = linkColor  || theme.palette.text.secondary;
   const bgColor      = theme.palette.background.paper;
   const fontFamily   = theme.typography.fontFamily;
 

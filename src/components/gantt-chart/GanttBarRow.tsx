@@ -163,11 +163,11 @@ function GanttMilestoneBar({ task, left, milestoneColor, criticalPathColor, isCr
         top:       "50%",
         width:     12,
         height:    12,
-        bgcolor:   milestoneColor ?? "warning.main",
+        bgcolor:   milestoneColor || "warning.main",
         transform: "translate(-50%, -50%) rotate(45deg)",
         cursor:    onMilestoneClick ? "pointer" : "default",
         boxShadow: isCritical
-          ? `0 0 0 2.5px ${criticalPathColor ?? theme.palette.error.main}`
+          ? `0 0 0 2.5px ${criticalPathColor || theme.palette.error.main}`
           : undefined,
         "&:hover": onMilestoneClick ? { opacity: 0.8 } : undefined,
       }}
@@ -247,7 +247,7 @@ function GanttTaskBar({
           overflow:     "hidden",
           opacity:      isDragging ? 0.75 : 1,
           boxShadow:    isCritical
-            ? `inset 0 0 0 2.5px ${criticalPathColor ?? theme.palette.error.main}`
+            ? `inset 0 0 0 2.5px ${criticalPathColor || theme.palette.error.main}`
             : undefined,
           cursor: isDragging ? "grabbing" : draggable ? "grab" : onTaskClick ? "pointer" : "default",
           userSelect: "none",

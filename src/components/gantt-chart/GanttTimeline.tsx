@@ -271,7 +271,7 @@ export function GanttTimeline({
   );
 
   // Farbe der Heute-Linie und des Chips — aus ganttTheme oder MUI primary.
-  const resolvedTodayColor = todayLineColor ?? muiTheme.palette.primary.main;
+  const resolvedTodayColor = todayLineColor || muiTheme.palette.primary.main;
 
   // Beim ersten Rendern den heutigen Tag horizontal in die Mitte scrollen.
   useEffect(() => {

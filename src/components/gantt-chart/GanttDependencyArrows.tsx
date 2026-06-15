@@ -89,7 +89,7 @@ export function GanttDependencyArrows({
           y1={0}
           x2={todayX}
           y2={height}
-          stroke={todayLineColor ?? theme.palette.primary.main}
+          stroke={todayLineColor || theme.palette.primary.main}
           strokeWidth={1.5}
           strokeDasharray="4 2"
         />

@@ -36,6 +36,13 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Der "Regenbogen-Chip" im Create-Mode (`allowCreate={true}`) öffnet jetzt ein Custom-Color-Picker-Panel mit Hintergrund- und Textfarb-Swatches, Hex-Eingaben und einem "Auto"-WCAG-Kontrast-Umschalter für die Textfarbe.
 - Neue Translation-Keys: `backgroundColorLabel`, `textColorLabel`, `autoTextColorLabel`.
 
+### Behoben
+
+#### Chart- und Gantt-Farb-Overrides — Fallback bei leerem String (MTL-25)
+
+- Die Farb-Override-Props von `RadialTreeChart`, `HorizontalTreeChart`, `CirclePackingChart` und `GanttChart` (z. B. `linkColor`, `labelColor`, `todayColor`, `todayLineColor`, `weekendColor`, `milestoneColor`, `criticalPathColor`) fallen jetzt auch bei einem leeren String `""` auf ihre Theme-Standardwerte zurück, nicht nur bei `undefined`/`null`.
+- Vorher wurde ein leerer String (z. B. der Default-Wert eines Storybook-Color-Picker-Controls) direkt an `stroke`/`fill`/`bgcolor` durchgereicht — der Browser fällt dann stillschweigend auf den SVG-Initialwert zurück. Am sichtbarsten bei `stroke=""`, das zu `stroke: none` wird, wodurch Chart-Links standardmäßig unsichtbar waren.
+
 ---
 
 ## [2.7.0] — 2026-05-31

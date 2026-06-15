@@ -50,7 +50,7 @@ export function GanttWeekendStrips({ strips, totalWidth, height, top }: GanttWee
             width:    COLUMN_WIDTH_DAY,
             top:      0,
             height:   "100%",
-            bgcolor:  weekendColor ?? "action.hover",
+            bgcolor:  weekendColor || "action.hover",
           }}
         />
       ))}
