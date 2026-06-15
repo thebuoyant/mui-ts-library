@@ -8,7 +8,6 @@ import {
 import { TagSelectionAutocomplete } from "./TagSelectionAutocomplete";
 import { TagSelectionSelectedTags } from "./TagSelectionSelectedTags";
 import type {
-  TagColor,
   TagSelectionItem,
   TagSelectionProps,
   TagSelectionTranslation,

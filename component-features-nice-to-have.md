@@ -104,19 +104,6 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 
 ---
 
-## ConfirmDialog
-
-| Feature | Beschreibung | Aufwand | Status |
-|---|---|---|---|
-| ~~Countdown~~ | ~~Auto-Close nach n Sekunden~~ | ~~Niedrig~~ | ✅ v1.5.0 |
-| ~~Keyboard Shortcut~~ | ~~Enter = Confirm, Escape = Cancel~~ | ~~Niedrig~~ | ✅ v1.5.0 |
-| Loading State | `confirm()` bleibt offen mit Spinner während async Action läuft | Mittel | — |
-| Dritter Button | Optionaler Extra-Button (z.B. "Als Entwurf speichern") via `extraAction` Prop | Niedrig | — |
-| Stacked Dialogs | Mehrere Dialoge in einer Queue statt auto-cancel | Mittel | — |
-| ESC konfigurierbar | Option: ESC-Taste bei kritischen Aktionen deaktivieren | Niedrig | — |
-
----
-
 ## Developer Experience
 
 | Feature | Beschreibung | Aufwand | Status |

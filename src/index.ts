@@ -1,5 +1,3 @@
-export * from "./components/confirm-dialog/ConfirmDialogProvider";
-export * from "./components/confirm-dialog/ConfirmDialog.types";
 export * from "./components/json-editor/JsonEditor";
 export * from "./components/json-editor/JsonEditor.types";
 export * from "./components/gantt-chart/GanttChart";

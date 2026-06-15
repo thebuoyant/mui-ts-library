@@ -12,7 +12,6 @@ A type-safe React component library built on **TypeScript** and **MUI (Material 
 
 | Component | Description | Docs |
 |---|---|---|
-| [`ConfirmDialog`](#confirmdialog) | Declarative async confirmation dialog — `await confirm({ title, severity })` from anywhere in the app. Supports countdown auto-confirm and `Enter` = confirm shortcut. | [Full Manual →](user-manuals/ConfirmDialog.md) |
 | [`GanttChart`](#ganttchart) | Project timeline with hierarchical tasks, milestones, drag & drop, Ctrl / Cmd ⌘+Scroll zoom, today chip, assignee column, CSV export, and built-in CRUD dialogs | [Full Manual →](user-manuals/GanttChart.md) |
 | [`TagSelection`](#tagselection) | Multi-tag selector with autocomplete, free tag creation, overflow chips, and MUI theme colors | [Full Manual →](user-manuals/TagSelection.md) |
 | [`PasswordStrengthMeter`](#passwordstrengthmeter) | Password input with animated strength meter, segmented bar, custom requirements, confirm field with match validation, and built-in secure password generator | [Full Manual →](user-manuals/PasswordStrengthMeter.md) |
@@ -21,7 +20,7 @@ A type-safe React component library built on **TypeScript** and **MUI (Material 
 | [`JsonEditor`](#jsoneditor) | JSON code editor (CodeMirror 6) with real-time validation, Format, Compact buttons, and optional minimap | [Full Manual →](user-manuals/JsonEditor.md) |
 | [`SunburstChart`](#sunburstchart) | D3 v7 hierarchical chart — concentric rings, Ctrl / Cmd ⌘+Click drill-down, Ctrl / Cmd ⌘+Scroll zoom, donut mode, MUI theme integration | [Full Manual →](user-manuals/SunburstChart.md) |
 | [`ChordChart`](#chordchart) | D3 v7 flow chart — arc groups, ribbons, hover highlight, Ctrl / Cmd ⌘+Scroll zoom, directed/undirected, MUI theme integration | [Full Manual →](user-manuals/ChordChart.md) |
-| [`RadialTreeChart`](#radialtreedchart) | D3 v7 radial tree — hierarchical nodes on concentric rings, MUI icons, Ctrl / Cmd ⌘+Click drill-down, Ctrl / Cmd ⌘+Scroll zoom, MUI theme integration | [Full Manual →](user-manuals/RadialTreeChart.md) |
+| [`RadialTreeChart`](#radialtreechart) | D3 v7 radial tree — hierarchical nodes on concentric rings, MUI icons, Ctrl / Cmd ⌘+Click drill-down, Ctrl / Cmd ⌘+Scroll zoom, MUI theme integration | [Full Manual →](user-manuals/RadialTreeChart.md) |
 | [`CirclePackingChart`](#circlepackingchart) | D3 v7 circle packing — nested circles, animated D3 zoom, Ctrl / Cmd ⌘+Scroll zoom, depth gradient or palette, MUI theme integration | [Full Manual →](user-manuals/CirclePackingChart.md) |
 | [`HorizontalTreeChart`](#horizontaltreechart) | D3 v7 tree chart — 4 orientations (LR/RL/TB/BT), curved links, drill-down, Ctrl / Cmd ⌘+Scroll zoom, MUI icons and theme integration | [Full Manual →](user-manuals/HorizontalTreeChart.md) |
 
@@ -55,29 +54,7 @@ import { GanttChart, JsonEditor, useConfirm } from '@thebuoyant-tsdev/mui-ts-lib
 
 ## Quick Start
 
-Wrap your app in MUI's `ThemeProvider` as usual. `ConfirmDialog` additionally requires a `ConfirmDialogProvider` near the app root — all other components work without a provider.
-
-### ConfirmDialog
-
-Replace every manual `open/setOpen` state pattern with a single `await confirm(...)` call. Eliminates boilerplate from delete confirmations, destructive actions, and any flow that needs user approval before proceeding — with optional countdown auto-confirm and `Enter` = confirm shortcut.
-
-```tsx
-import { ConfirmDialogProvider, useConfirm } from '@thebuoyant-tsdev/mui-ts-library';
-
-// App root — once
-<ConfirmDialogProvider>
-  <App />
-</ConfirmDialogProvider>
-
-// Anywhere inside
-const confirm = useConfirm();
-const ok = await confirm({ title: 'Delete entry?', severity: 'error', confirmLabel: 'Delete', countdown: 10 });
-if (ok) handleDelete();
-```
-
-→ [Full documentation](user-manuals/ConfirmDialog.md)
-
----
+Wrap your app in MUI's `ThemeProvider` as usual — all components work without an additional provider.
 
 ### GanttChart
 
@@ -295,9 +272,6 @@ All types and defaults are exported directly — no separate `@types/...` packag
 
 ```tsx
 import type {
-  // ConfirmDialog
-  ConfirmDialogOptions, ConfirmDialogSeverity,
-
   // GanttChart
   GanttTask, GanttTranslations, GanttTheme, GanttToolbarConfig,
 

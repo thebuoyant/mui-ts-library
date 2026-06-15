@@ -1,8 +1,8 @@
 {
   "name": "@thebuoyant-tsdev/mui-ts-library",
-  "version": "2.7.0",
+  "version": "3.0.0",
   "private": false,
-  "description": "Type-safe React component library for MUI v9. Gantt chart with drag & drop, WYSIWYG rich text editor (TipTap), SQL & JSON code editors (CodeMirror 6), D3 data visualizations (Sunburst, Chord, RadialTree, CirclePacking, HorizontalTree), confirm dialog, tag selector, and password strength meter. Full TypeScript, dark mode, i18n.",
+  "description": "Type-safe React component library for MUI v9. Gantt chart with drag & drop, WYSIWYG rich text editor (TipTap), SQL & JSON code editors (CodeMirror 6), D3 data visualizations (Sunburst, Chord, RadialTree, CirclePacking, HorizontalTree), tag selector, and password strength meter. Full TypeScript, dark mode, i18n.",
   "author": {
     "name": "Thomas Schlender",
     "email": "thebuoyant@gmail.com"
@@ -99,12 +99,6 @@
     "json-validator",
     "json-schema",
 
-    "confirm-dialog",
-    "dialog",
-    "modal",
-    "alert-dialog",
-    "countdown",
-
     "tag-input",
     "tag-selector",
     "multi-select",
@@ -159,10 +153,10 @@
   "peerDependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-    "@mui/icons-material": "^9.0.1",
-    "@mui/material": "^9.0.1",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "@mui/icons-material": "^9.0.0",
+    "@mui/material": "^9.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.20.2",

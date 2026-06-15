@@ -15,11 +15,9 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
-import { ConfirmDialogProvider } from "@thebuoyant-tsdev/mui-ts-library";
 import { createAppTheme } from "./theme";
 import { ChordChartDemo } from "./demos/ChordChartDemo";
 import { CirclePackingChartDemo } from "./demos/CirclePackingChartDemo";
-import { ConfirmDialogDemo } from "./demos/ConfirmDialogDemo";
 import { GanttChartDemo } from "./demos/GanttChartDemo";
 import { HorizontalTreeChartDemo } from "./demos/HorizontalTreeChartDemo";
 import { JsonEditorDemo } from "./demos/JsonEditorDemo";
@@ -49,12 +47,6 @@ const SECTIONS: ComponentSection[] = [
     name: "CirclePackingChart",
     description: "Hierarchische Kreis-Packing-Visualisierung mit Drill-Down (D3).",
     render: () => <CirclePackingChartDemo />,
-  },
-  {
-    id: "confirm-dialog",
-    name: "ConfirmDialog",
-    description: "Promise-basierter Bestätigungsdialog über den useConfirm()-Hook.",
-    render: () => <ConfirmDialogDemo />,
   },
   {
     id: "gantt-chart",
@@ -119,34 +111,32 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <ConfirmDialogProvider>
-        <AppBar position="static" color="default" elevation={0}>
-          <Toolbar>
-            <Typography variant="h6" sx={{ flexGrow: 1 }}>
-              @thebuoyant-tsdev/mui-ts-library — Showcase
-            </Typography>
-            <IconButton onClick={() => setMode((m) => (m === "light" ? "dark" : "light"))}>
-              {mode === "light" ? <DarkModeIcon /> : <LightModeIcon />}
-            </IconButton>
-          </Toolbar>
-        </AppBar>
+      <AppBar position="static" color="default" elevation={0}>
+        <Toolbar>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            @thebuoyant-tsdev/mui-ts-library — Showcase
+          </Typography>
+          <IconButton onClick={() => setMode((m) => (m === "light" ? "dark" : "light"))}>
+            {mode === "light" ? <DarkModeIcon /> : <LightModeIcon />}
+          </IconButton>
+        </Toolbar>
+      </AppBar>
 
-        <Container maxWidth="xl" sx={{ py: 3 }}>
-          {SECTIONS.map((section) => (
-            <Accordion key={section.id}>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Box>
-                  <Typography variant="h6">{section.name}</Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {section.description}
-                  </Typography>
-                </Box>
-              </AccordionSummary>
-              <AccordionDetails>{section.render()}</AccordionDetails>
-            </Accordion>
-          ))}
-        </Container>
-      </ConfirmDialogProvider>
+      <Container maxWidth="xl" sx={{ py: 3 }}>
+        {SECTIONS.map((section) => (
+          <Accordion key={section.id}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Box>
+                <Typography variant="h6">{section.name}</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {section.description}
+                </Typography>
+              </Box>
+            </AccordionSummary>
+            <AccordionDetails>{section.render()}</AccordionDetails>
+          </Accordion>
+        ))}
+      </Container>
     </ThemeProvider>
   );
 }

@@ -6,7 +6,7 @@ import reactRefresh from "eslint-plugin-react-refresh";
 
 export default [
   {
-    ignores: ["dist", "storybook-static", "node_modules"],
+    ignores: ["dist", "storybook-static", "node_modules", "npm-app"],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,

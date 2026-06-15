@@ -12,7 +12,6 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 
 | Komponente | Beschreibung | Docs |
 |---|---|---|
-| [`ConfirmDialog`](#confirmdialog) | Deklarativer Async-Bestätigungs-Dialog — `await confirm({ title, severity })` von überall in der App. Unterstützt Countdown-Auto-Confirm und `Enter` = Bestätigen. | [Vollständiges Manual →](user-manuals/ConfirmDialog.de.md) |
 | [`GanttChart`](#ganttchart) | Projekt-Timeline mit hierarchischen Aufgaben, Meilensteinen, Drag & Drop, Ctrl / Cmd ⌘+Scroll-Zoom, Heute-Chip, Assignee-Spalte, CSV-Export und integrierten CRUD-Dialogen | [Vollständiges Manual →](user-manuals/GanttChart.de.md) |
 | [`TagSelection`](#tagselection) | Multi-Tag-Auswahlfeld mit Autocomplete, freier Tag-Erstellung, Overflow-Chips und MUI-Theme-Farben | [Vollständiges Manual →](user-manuals/TagSelection.de.md) |
 | [`PasswordStrengthMeter`](#passwordstrengthmeter) | Passwort-Eingabe mit animiertem Stärke-Meter, Confirm-Feld mit Match-Validierung, eigenen Anforderungen und eingebautem sicheren Passwort-Generator | [Vollständiges Manual →](user-manuals/PasswordStrengthMeter.de.md) |
@@ -21,7 +20,7 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 | [`JsonEditor`](#jsoneditor) | JSON-Code-Editor (CodeMirror 6) mit Echtzeit-Validierung, Format- und Komprimieren-Schaltfläche sowie optionaler Minimap | [Vollständiges Manual →](user-manuals/JsonEditor.de.md) |
 | [`SunburstChart`](#sunburstchart) | D3 v7 hierarchisches Chart — konzentrische Ringe, Ctrl / Cmd ⌘+Click Drill-Down, Ctrl / Cmd ⌘+Scroll Zoom, Donut-Modus, eigene Farben, MUI-Theme-Integration. Erste der D3-Chart-Familie. | [Vollständiges Manual →](user-manuals/SunburstChart.de.md) |
 | [`ChordChart`](#chordchart) | D3 v7 Fluss-Chart — Arc-Gruppen, Bänder, Hover-Highlight, Ctrl / Cmd ⌘+Scroll-Zoom, gerichtet/ungerichtet, MUI-Theme-Integration | [Vollständiges Manual →](user-manuals/ChordChart.de.md) |
-| [`RadialTreeChart`](#radialtreedchart) | D3 v7 radialer Baum — Knoten auf konzentrischen Ringen, MUI-Icons, Ctrl / Cmd ⌘+Click Drill-Down, Ctrl / Cmd ⌘+Scroll Zoom, MUI-Theme-Integration | [Vollständiges Manual →](user-manuals/RadialTreeChart.de.md) |
+| [`RadialTreeChart`](#radialtreechart) | D3 v7 radialer Baum — Knoten auf konzentrischen Ringen, MUI-Icons, Ctrl / Cmd ⌘+Click Drill-Down, Ctrl / Cmd ⌘+Scroll Zoom, MUI-Theme-Integration | [Vollständiges Manual →](user-manuals/RadialTreeChart.de.md) |
 | [`CirclePackingChart`](#circlepackingchart) | D3 v7 Circle Packing — verschachtelte Kreise, animierter D3-Zoom, Ctrl / Cmd ⌘+Scroll-Zoom, Tiefen-Gradient oder Palette, MUI-Theme-Integration | [Vollständiges Manual →](user-manuals/CirclePackingChart.de.md) |
 | [`HorizontalTreeChart`](#horizontaltreechart) | D3 v7 Baum-Chart — 4 Orientierungen (LR/RL/TB/BT), geschwungene Links, Drill-Down, Ctrl / Cmd ⌘+Scroll-Zoom, MUI-Icons und Theme-Integration | [Vollständiges Manual →](user-manuals/HorizontalTreeChart.de.md) |
 
@@ -55,29 +54,7 @@ import { GanttChart, JsonEditor, useConfirm } from '@thebuoyant-tsdev/mui-ts-lib
 
 ## Schnellstart
 
-Die App wie gewohnt in MUI's `ThemeProvider` einschließen. `ConfirmDialog` benötigt zusätzlich einen `ConfirmDialogProvider` nahe der App-Wurzel — alle anderen Komponenten funktionieren ohne Provider.
-
-### ConfirmDialog
-
-Ersetzt jedes manuelle `open/setOpen`-State-Muster durch einen einzigen `await confirm(...)`-Aufruf. Eliminiert Boilerplate bei Lösch-Bestätigungen, destruktiven Aktionen und allen Flows, die vor dem Fortfahren eine Nutzerzustimmung benötigen — mit optionalem Countdown-Auto-Confirm und Enter = Bestätigen.
-
-```tsx
-import { ConfirmDialogProvider, useConfirm } from '@thebuoyant-tsdev/mui-ts-library';
-
-// App-Wurzel — einmalig
-<ConfirmDialogProvider>
-  <App />
-</ConfirmDialogProvider>
-
-// Überall innerhalb der App
-const confirm = useConfirm();
-const ok = await confirm({ title: 'Eintrag löschen?', severity: 'error', confirmLabel: 'Löschen', countdown: 10 });
-if (ok) handleDelete();
-```
-
-→ [Vollständige Dokumentation](user-manuals/ConfirmDialog.de.md)
-
----
+Die App wie gewohnt in MUI's `ThemeProvider` einschließen — alle Komponenten funktionieren ohne zusätzlichen Provider.
 
 ### GanttChart
 
@@ -295,9 +272,6 @@ Alle Typen und Defaults werden direkt exportiert — kein separates `@types/...`
 
 ```tsx
 import type {
-  // ConfirmDialog
-  ConfirmDialogOptions, ConfirmDialogSeverity,
-
   // GanttChart
   GanttTask, GanttTranslations, GanttTheme, GanttToolbarConfig,
 

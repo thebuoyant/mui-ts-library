@@ -50,8 +50,6 @@ npm install react@^19 @mui/material@^9 @emotion/react @emotion/styled
 
 ```tsx
 import {
-  ConfirmDialogProvider,
-  useConfirm,
   GanttChart,
   TagSelection,
   PasswordStrengthMeter,

@@ -13,6 +13,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.0.0] — 2026-06-15
+
+### Removed
+
+#### ConfirmDialog — Component Removed (MTL-25)
+
+- **Breaking:** `ConfirmDialog`, `ConfirmDialogProvider`, `useConfirm`, and the types `ConfirmDialogOptions`/`ConfirmDialogSeverity` have been removed from the package entirely, along with the corresponding user manual.
+- Migration: implement confirmation dialogs with MUI's `Dialog` directly, or stay on a `2.x` release if you depend on this component.
+
+### Changed
+
+#### TagSelection — `onTagCreate` Signature (Breaking) (MTL-25)
+
+- **Breaking:** `onTagCreate` now receives the fully-constructed `TagSelectionItem` (already including `selected: true` and the chosen `color` or `backgroundColor`/`foregroundColor`) instead of the old `(label: string, color: TagColor)`.
+- Migration: replace `onTagCreate={(label, color) => { ... }}` with `onTagCreate={(tag) => setTags((prev) => [...prev, tag])}`.
+
+### Added
+
+#### TagSelection — Custom Color Picker on Tag Creation (MTL-25)
+
+- The "rainbow chip" in creatable mode (`allowCreate={true}`) now opens a custom color picker panel with background-color and text-color swatches, hex inputs, and an "Auto" WCAG-contrast toggle for the text color.
+- New translation keys: `backgroundColorLabel`, `textColorLabel`, `autoTextColorLabel`.
+
+---
+
 ## [2.7.0] — 2026-05-31
 
 ### Added

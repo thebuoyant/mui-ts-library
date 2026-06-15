@@ -118,7 +118,7 @@ type TagSelectionItem = {
 
 | Prop | Typ | Standard | Beschreibung |
 |---|---|---|---|
-| `allowCreate` | `boolean` | `false` | Aktiviert den freien Texteingabe-Modus. Wenn der Nutzer einen Text eintippt, der keinem bestehenden Tag entspricht, wechselt das Eingabefeld in den Create-Mode: Im Input erscheinen ein CheckIcon (bestätigen) und ein CloseIcon (abbrechen), darunter wird eine Farb-Zeile angezeigt — 7 semantische Theme-Farb-Chips (Dark-Mode-kompatibel) plus ein **Farbkreis** der den nativen Browser-Farbwähler für beliebige Hex-Farben öffnet. Der neue Tag wird intern sofort als selektiert markiert. Bestätigen per CheckIcon oder **Enter**. |
+| `allowCreate` | `boolean` | `false` | Aktiviert den freien Texteingabe-Modus. Wenn der Nutzer einen Text eintippt, der keinem bestehenden Tag entspricht, wechselt das Eingabefeld in den Create-Mode: Im Input erscheinen ein CheckIcon (bestätigen) und ein CloseIcon (abbrechen), darunter wird eine Farb-Zeile angezeigt — 7 semantische Theme-Farb-Chips (Dark-Mode-kompatibel) plus ein **Regenbogen-Chip**, der ein Custom-Color-Picker-Panel öffnet (Hintergrundfarbe + Textfarbe, mit Hex-Eingaben und "Auto"-Kontrast-Umschalter). Der neue Tag wird intern sofort als selektiert markiert. Bestätigen per CheckIcon oder **Enter**. |
 | `chipSize` | `"small" \| "medium"` | `"small"` | Größe aller Chips — sowohl im Auswahl-Bereich als auch in der Dropdown-Liste. Sollte zur `inputSize` passen (`"small"` + `"small"` oder `"medium"` + `"medium"`). |
 | `disabled` | `boolean` | `false` | Deaktiviert die gesamte Komponente. Das Autocomplete-Eingabefeld wird gesperrt; ausgewählte Chips werden grau dargestellt und sind nicht löschbar. Nützlich während Formular-Submissions oder in reinen Lese-Ansichten. |
 | `inputSize` | `"small" \| "medium"` | `"medium"` | Größe der Autocomplete-Eingabe gemäß MUI-Standard. Beeinflusst Schriftgröße, Innenabstand und Höhe des Eingabefelds. |
@@ -156,18 +156,13 @@ type TagSelectionItem = {
 | `onTagCreate` | `(tag: TagSelectionItem) => void` | Nutzer hat neuen Tag bestätigt (✓ oder Enter) | Neue Tags im Backend persistiert werden sollen |
 | `onSearchChange` | `(value: string) => void` | Jeder Tastendruck im Suchfeld | Serverseitige Filterung / asynchrones Tag-Laden |
 
-> **Wichtig zu `onTagCreate`:** Der neue Tag wird von der Komponente intern sofort mit `selected: true` in den Store eingefügt. `onTagCreate` wird danach ausgelöst damit der Aufrufer seinen externen State (`tags`-Prop) synchronisieren kann. Dabei **muss `selected: true`** gesetzt werden, sonst überschreibt das nächste Re-Render den internen Zustand:
+> **Wichtig zu `onTagCreate`:** Der neue Tag wird von der Komponente intern sofort mit `selected: true` und der vom Nutzer gewählten Farbe in den Store eingefügt — entweder `color` (Theme-Farbe) oder `backgroundColor`/`foregroundColor` (Custom-Farbe). `onTagCreate` wird danach mit diesem vollständigen `TagSelectionItem`-Objekt ausgelöst, damit der Aufrufer es persistieren / seinen externen State synchronisieren kann:
 >
 > ```tsx
-> onTagCreate={(label, color) => {
->   setTags((prev) => [
->     ...prev,
->     { id: label.toLowerCase().replace(/\s+/g, '-'), label, color, selected: true },
->   ]);
+> onTagCreate={(tag) => {
+>   setTags((prev) => [...prev, tag]);
 > }}
 > ```
->
-> Bei **eigener Hex-Farbe** liefert `onTagsChange` das vollständige `TagSelectionItem` mit `backgroundColor`/`foregroundColor` — empfohlen zum Persistieren von Custom-Color-Tags.
 
 ---
 
@@ -189,6 +184,9 @@ type TagSelectionTranslation = {
   loadingText:         string;
   maxTagsReachedText:  string;
   colorPickerLabel:    string;
+  backgroundColorLabel: string;
+  textColorLabel:      string;
+  autoTextColorLabel:  string;
 };
 ```
 
@@ -201,8 +199,10 @@ type TagSelectionTranslation = {
 | `placeholder` | `"Type to search..."` | Platzhaltertext im Autocomplete-Eingabefeld. |
 | `loadingText` | `"Loading..."` | Text in der Dropdown-Liste während des Ladevorgangs (`loading={true}`). |
 | `maxTagsReachedText` | `"Maximum number of tags reached."` | Hilfstext unterhalb des Eingabefelds wenn das Tag-Limit erreicht ist (`maxTags` gesetzt). |
-| `colorPickerLabel` | `"Custom color"` | Tooltip für den Palette-Icon-Button der Farb-Zeile im Create-Mode (`allowCreate={true}`). |
-| `backgroundColorLabel` | `"Background color"` | Überschrift im Farbwähler-Panel — macht klar dass die gewählte Farbe die **Hintergrundfarbe** des Tags ist (Textfarbe wird automatisch per WCAG-Kontrast berechnet). |
+| `colorPickerLabel` | `"Custom color"` | Tooltip für den Regenbogen-Chip, der das Custom-Color-Picker-Panel im Create-Mode öffnet (`allowCreate={true}`). |
+| `backgroundColorLabel` | `"Background color"` | Überschrift über den Hintergrundfarb-Swatches und dem Hex-Input im Custom-Color-Picker-Panel. |
+| `textColorLabel` | `"Text color"` | Überschrift über den Textfarb-Swatches und dem Hex-Input im Custom-Color-Picker-Panel. Gedimmt solange der "Auto"-Schalter aktiv ist. |
+| `autoTextColorLabel` | `"Auto"` | Label neben dem Schalter, der zwischen automatischer (WCAG-Kontrast-basierter) und manueller Textfarbe umschaltet. |
 
 **Vollständige deutsche Übersetzung:**
 
@@ -219,6 +219,8 @@ type TagSelectionTranslation = {
     maxTagsReachedText:  'Maximale Anzahl an Tags erreicht.',
     colorPickerLabel:    'Eigene Farbe',
     backgroundColorLabel: 'Hintergrundfarbe',
+    textColorLabel:      'Textfarbe',
+    autoTextColorLabel:  'Automatisch',
   }}
 />
 ```
@@ -304,8 +306,10 @@ const handleSearchChange = async (query: string) => {
 
 Wenn `allowCreate={true}` und der Suchbegriff keinem bestehenden Tag entspricht, wechselt
 die Komponente in den Create-Mode: CheckIcon (bestätigen) und CloseIcon (abbrechen) erscheinen
-im Eingabefeld, darunter 7 Theme-Farb-Chips zur Farbauswahl. Der Tag kann per Klick auf das
-CheckIcon **oder mit der Enter-Taste** bestätigt werden.
+im Eingabefeld, darunter eine Farb-Zeile — 7 semantische Theme-Farb-Chips, plus ein
+Regenbogen-Chip, der ein Custom-Color-Picker-Panel öffnet (Hintergrundfarbe + Textfarbe, mit
+Hex-Eingaben und "Auto"-Kontrast-Umschalter). Der Tag kann per Klick auf das CheckIcon
+**oder mit der Enter-Taste** bestätigt werden.
 
 ```tsx
 const [tags, setTags] = useState<TagSelectionItem[]>(initialTags);
@@ -313,39 +317,17 @@ const [tags, setTags] = useState<TagSelectionItem[]>(initialTags);
 <TagSelection
   tags={tags}
   allowCreate={true}
-  onTagCreate={(label, color) => {
-    // selected: true ist wichtig — sonst überschreibt das nächste Re-Render den internen Zustand
-    setTags((prev) => [
-      ...prev,
-      {
-        id: label.toLowerCase().replace(/\s+/g, '-'),
-        label,
-        color,         // vom User gewählte Theme-Farbe
-        selected: true,
-      },
-    ]);
+  onTagCreate={(tag) => {
+    // tag hat bereits selected: true und die vom User gewählte(n) Farbe(n)
+    setTags((prev) => [...prev, tag]);
   }}
   onTagsChange={(_, allTags) => setTags(allTags)}
 />
 ```
 
-Wer eigene Hex-Farben vergeben möchte, ignoriert einfach das `color`-Argument und setzt
-`backgroundColor`/`foregroundColor` nach eigener Logik:
-
-```tsx
-onTagCreate={(label) => {
-  setTags((prev) => [
-    ...prev,
-    {
-      id: label.toLowerCase().replace(/\s+/g, '-'),
-      label,
-      selected: true,
-      foregroundColor: '#ffffff',
-      backgroundColor: computeBrandColor(label), // eigene Logik
-    },
-  ]);
-}}
-```
+Hat der User eine Theme-Farbe gewählt, ist `tag.color` gesetzt (z.B. `"primary"`). Hat der
+User eine eigene Farbe über den Regenbogen-Chip gewählt, sind stattdessen
+`tag.backgroundColor`/`tag.foregroundColor` gesetzt und `tag.color` ist `"default"`.
 
 ### Overflow-Chips begrenzen
 
@@ -425,7 +407,7 @@ const [submitting, setSubmitting] = useState(false);
 | Thema | Hinweis |
 |---|---|
 | **Externer State erforderlich** | Die Komponente verwaltet ihren internen Auswahlzustand selbst (via Zustand-Store). Gleichzeitig spiegelt sie alle Änderungen über Callbacks nach oben. Für persistente Datenspeicherung immer `onTagsChange` oder `onTagSelect`/`onTagDelete` verwenden und den State im übergeordneten Komponent halten. |
-| **`onTagCreate` und externer State** | Der neue Tag wird intern sofort als selektiert markiert. `onTagCreate` dient der Synchronisation des externen `tags`-Arrays. Dabei `selected: true` setzen — sonst fällt der Tag beim nächsten Re-Render aus der Auswahl. Die Komponente entscheidet nicht ob ein neuer Tag valide ist — API-Validierung oder andere Checks sind Aufgabe des `onTagCreate`-Handlers. |
+| **`onTagCreate` und externer State** | Der neue Tag wird intern sofort als selektiert markiert und `onTagCreate` wird mit dem vollständigen `TagSelectionItem` ausgelöst (bereits inkl. `selected: true` und der gewählten `color`/`backgroundColor`/`foregroundColor`) — direkt in den eigenen `tags`-State übernehmen. Die Komponente entscheidet nicht ob ein neuer Tag valide ist — API-Validierung oder andere Checks sind Aufgabe des `onTagCreate`-Handlers. |
 | **`loading` ohne Optionen** | Der `loadingText` ist nur sichtbar wenn das Autocomplete geöffnet ist **und** das `tags`-Array keine verfügbaren (nicht-ausgewählten, nicht-deaktivierten) Tags enthält. Mit verfügbaren Tags zeigt MUI Autocomplete diese und nicht den Ladetext. |
 | **`color` vs. Custom Colors** | `color` und `foregroundColor`/`backgroundColor` schließen sich gegenseitig aus. Wenn Custom Colors gesetzt sind, wird `color` vollständig ignoriert — auch für den Dark-Mode-Kontrast. |
 | **`maxTags` und Deaktivierung** | Wenn `maxTags` erreicht ist, werden bestehende Chips **nicht** deaktiviert — der Nutzer kann Tags entfernen um wieder Platz zu schaffen. Nur das Hinzufügen neuer Tags wird gesperrt. |
