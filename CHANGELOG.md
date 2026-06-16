@@ -13,6 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.1.1] — 2026-06-16
+
+### Changed
+
+- README.md (EN+DE): last two versions' changelog entries embedded directly — visible on npm without clicking a separate link.
+
+---
+
 ## [3.1.0] — 2026-06-16
 
 ### Added
