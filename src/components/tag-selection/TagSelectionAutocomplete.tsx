@@ -41,6 +41,20 @@ function getContrastColor(hex: string): string {
   return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.5 ? "#000000" : "#ffffff";
 }
 
+function highlightMatch(text: string, query: string) {
+  const trimmed = query.trim();
+  if (!trimmed) return text;
+  const idx = text.toLowerCase().indexOf(trimmed.toLowerCase());
+  if (idx === -1) return text;
+  return (
+    <>
+      {text.slice(0, idx)}
+      <strong>{text.slice(idx, idx + trimmed.length)}</strong>
+      {text.slice(idx + trimmed.length)}
+    </>
+  );
+}
+
 type TagSelectionAutocompleteProps = {
   inputSize: "medium" | "small";
   chipSize: "medium" | "small";
@@ -329,7 +343,7 @@ export function TagSelectionAutocomplete({
             <li key={key} {...props} style={{ width: "auto", padding: 0, margin: 0 }}>
               <Chip
                 size={chipSize}
-                label={option.label}
+                label={highlightMatch(option.label, searchValue)}
                 color={!hasCustomColors ? (option.color ?? "default") : undefined}
                 sx={
                   hasCustomColors

@@ -13,6 +13,18 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [3.1.0] — 2026-06-16
+
+### Hinzugefügt
+
+#### TagSelection — Suchergebnis-Highlighting
+
+- Übereinstimmende Teile von Tag-Labels im Dropdown werden jetzt **fett** dargestellt, während der Nutzer einen Suchbegriff tippt (z. B. zeigt `"Reac"` → **Reac**t im Options-Chip).
+- Highlighting ist case-insensitive und markiert immer das erste übereinstimmende Segment pro Label.
+- Keine API-Änderungen — rein visuelles Enhancement, vollständig abwärtskompatibel.
+
+---
+
 ## [3.0.0] — 2026-06-15
 
 ### Entfernt

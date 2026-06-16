@@ -85,7 +85,7 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 | Tag Groups | Tags in Kategorien einteilen (Group-Header im Dropdown) | Mittel | — |
 | Async Search | `onSearch`-Callback mit Debounce für Server-seitige Tags | Mittel | — |
 | ~~Farbe bei Tag-Erstellung~~ | ~~Beim Anlegen neuer Tags direkt eine Farbe wählen (Color Picker)~~ | ~~Niedrig~~ | ✅ v2.8.0 |
-| Suchergebnis-Highlighting | Matching-Text im Dropdown-Ergebnis farbig hervorheben | Niedrig | — |
+| ~~Suchergebnis-Highlighting~~ | ~~Matching-Text im Dropdown-Ergebnis farbig hervorheben~~ | ~~Niedrig~~ | ✅ v3.1.0 |
 
 ---
 
@@ -110,7 +110,12 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 |---|---|---|---|
 | ~~Live Storybook~~ | ~~`https://thebuoyant.github.io/mui-ts-library/`~~ | ~~Mittel~~ | ✅ aktiv — auto-deploy |
 | ~~npm-app Showcase/Playground~~ | ~~Eigenständige Vite-React-App (`npm-app/`), konsumiert das veröffentlichte npm-Paket; pro Komponente ein Accordion mit Live-Preview links und Storybook-ähnlicher Controls-Sidebar rechts (Switches, Slider, Select, Color-Picker), inkl. Light/Dark-Theme-Toggle~~ | ~~Hoch~~ | ✅ implementiert |
-| npm-app auf neue Version aktualisieren | `npm-app` nutzt aktuell `@thebuoyant-tsdev/mui-ts-library@2.6.0` (npm), lokaler Stand ist bereits v2.7.0+. Nach nächstem Publish: Dependency bumpen und neue Features (z.B. TagSelection Custom-Color bei Erstellung, PasswordStrengthMeter-Generator) in den jeweiligen Demos ergänzen | Niedrig | — |
-| StackBlitz / CodeSandbox Templates | "Try it now"-Links direkt in README | Niedrig | — |
+| ~~npm-app auf neue Version aktualisieren~~ | ~~`npm-app` nutzt aktuell `@thebuoyant-tsdev/mui-ts-library@2.6.0` (npm), lokaler Stand ist bereits v2.7.0+. Nach nächstem Publish: Dependency bumpen und neue Features (z.B. TagSelection Custom-Color bei Erstellung, PasswordStrengthMeter-Generator) in den jeweiligen Demos ergänzen~~ | ~~Niedrig~~ | ✅ v3.1.0 (auf 3.0.0 gebumpt) |
+| **🔴 StackBlitz / CodeSandbox Templates** | "Try it now"-Links direkt in README — **Adoption-Stopper**: Entwickler wollen in 30 Sekunden sehen ob die Komponente ihren Fall abdeckt, ohne zu installieren. Ohne diesen Link verlieren wir potenzielle Nutzer sofort. | Niedrig | ⚡ NÄCHSTER SCHRITT |
+| **🔴 Bundle-Bloat / Tree-Shaking** | D3 + CodeMirror + Tiptap landen im Bundle, egal ob der Nutzer nur `TagSelection` will. Lösung: separate Entry-Points pro Komponente (`"exports"` in package.json) oder Paket aufteilen. **Adoption-Stopper** für größere Projekte. | Hoch | ⚡ NÄCHSTER SCHRITT |
+| **🟡 ChordChart Dark-Mode** | `mixBlendMode: "multiply"` macht Ribbons auf dunklem Hintergrund fast unsichtbar (Math: `source × 0.07 = black`). Fix: theme-aware blend-mode (`normal` im dark mode). | Niedrig | ⚡ NÄCHSTER SCHRITT |
+| **🟡 HorizontalTreeChart Link-Opacity** | `linkStrokeOpacity`-Default ist `0.4` (Links zu blass), RadialTreeChart hat `1.0`. Inkonsistenz — sollte auf `1.0` vereinheitlicht werden. | Niedrig | ⚡ NÄCHSTER SCHRITT |
+| **🟡 Storybook Charts — play-Funktionen** | D3-Charts zeigen bei Story-Öffnung nur einen leeren Container bis der Nutzer selbst interagiert. `play`-Funktionen würden die Charts sofort rendern und Features demonstrieren (wie bei TagSelection SearchHighlight). | Mittel | ⚡ NÄCHSTER SCHRITT |
+| **🟡 Adoption-Signal** | 0 Dependents / 77 Downloads — sichtbares Qualitäts-Signal für neue Entwickler. Organisch schwer zu erzwingen, aber StackBlitz-Template + fixe Dark-Mode-Bugs helfen direkt. | — | offen |
 | VS Code Snippets | `rte-basic`, `gantt-basic` → autovervollständigt fertiges Snippet | Niedrig | — |
 | Playwright Visual Tests | Screenshot-Vergleiche für Chart-Rendering | Hoch | — |

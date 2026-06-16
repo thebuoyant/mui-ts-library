@@ -47,7 +47,7 @@ describe("TagSelection", () => {
     expect(handleSearchChange).toHaveBeenCalled();
 
     await user.click(input);
-    await user.click(await screen.findByText("TypeScript"));
+    await user.click(await screen.findByRole("option", { name: "TypeScript" }));
 
     expect(handleTagSelect).toHaveBeenCalledWith(
       expect.objectContaining({ id: "typescript", selected: true }),
@@ -83,7 +83,7 @@ describe("TagSelection", () => {
 
     expect(input).toHaveValue("Type");
 
-    await user.click(await screen.findByText("TypeScript"));
+    await user.click(await screen.findByRole("option", { name: "TypeScript" }));
 
     expect(input).toHaveValue("");
   });

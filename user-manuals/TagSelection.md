@@ -413,4 +413,5 @@ const [submitting, setSubmitting] = useState(false);
 | **`maxTags` and disabling** | When `maxTags` is reached, existing chips are **not** disabled — the user can remove tags to make room. Only adding new tags is blocked. |
 | **Sorting of selected tags** | Selected tags are always displayed in **ascending alphabetical order** in the chip area — regardless of the order in the `tags` array or the order in which they were selected. |
 | **Sorting of available tags** | The autocomplete dropdown list also shows available tags in **ascending alphabetical order** — regardless of the order in the `tags` array. |
+| **Search result highlighting** | While the user types, the matching portion of each tag label in the dropdown is rendered **bold**. The match is case-insensitive and only the first occurrence per label is highlighted. |
 | **Overflow popover and `disabled`** | In the `disabled` state, chips in the overflow popover are shown without a delete icon. The `+N` chip itself remains clickable (view only, no deleting possible). |

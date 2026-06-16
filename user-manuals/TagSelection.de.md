@@ -413,4 +413,5 @@ const [submitting, setSubmitting] = useState(false);
 | **`maxTags` und Deaktivierung** | Wenn `maxTags` erreicht ist, werden bestehende Chips **nicht** deaktiviert — der Nutzer kann Tags entfernen um wieder Platz zu schaffen. Nur das Hinzufügen neuer Tags wird gesperrt. |
 | **Sortierung der ausgewählten Tags** | Ausgewählte Tags werden im Chip-Bereich immer **alphabetisch aufsteigend** sortiert angezeigt — unabhängig von der Reihenfolge im `tags`-Array oder der Reihenfolge in der sie ausgewählt wurden. |
 | **Sortierung der verfügbaren Tags** | Die Autocomplete-Dropdown-Liste zeigt verfügbare Tags ebenfalls **alphabetisch aufsteigend** sortiert — unabhängig von der Reihenfolge im `tags`-Array. |
+| **Suchergebnis-Highlighting** | Während der Nutzer tippt, wird der übereinstimmende Teil jedes Tag-Labels im Dropdown **fett** dargestellt. Die Übereinstimmung ist case-insensitiv; nur das erste Vorkommen pro Label wird hervorgehoben. |
 | **Overflow-Popover und `disabled`** | Im `disabled`-Zustand werden Chips im Overflow-Popover ohne Lösch-Icon angezeigt. Der `+N`-Chip selbst bleibt klickbar (nur Ansicht, kein Löschen möglich). |

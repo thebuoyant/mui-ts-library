@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { fn, userEvent, within } from "storybook/test";
 import { Box } from "@mui/material";
 import { useState, type ComponentProps } from "react";
 import { TagSelection } from "./TagSelection";
@@ -255,6 +255,32 @@ export const WithCustomColorCreation: Story = {
     },
   },
   render: (args) => <CustomColorCreationStory {...args} />,
+};
+
+// Zeigt das Suchergebnis-Highlighting: Der übereinstimmende Teil jedes Tag-Labels
+// wird fett hervorgehoben während der Nutzer tippt. Die play-Funktion tippt
+// automatisch "Reac" — im Dropdown erscheint "Reac" fett + "t" normal.
+export const SearchHighlight: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'While typing, the matching portion of each tag label is rendered **bold**. ' +
+          'The match is case-insensitive. This story auto-types `"Reac"` to show the effect immediately.',
+      },
+    },
+  },
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <TagSelection {...args} />
+    </Box>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole("combobox");
+    await userEvent.click(input);
+    await userEvent.type(input, "Reac", { delay: 80 });
+  },
 };
 
 // maxVisibleChips begrenzt die sichtbaren Chips. Überzählige Chips werden hinter

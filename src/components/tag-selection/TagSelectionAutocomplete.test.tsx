@@ -121,7 +121,7 @@ describe("TagSelectionAutocomplete", () => {
 
     expect(input).toHaveValue("Rea");
 
-    await user.click(await screen.findByText("React"));
+    await user.click(await screen.findByRole("option", { name: "React" }));
 
     expect(input).toHaveValue("");
   });

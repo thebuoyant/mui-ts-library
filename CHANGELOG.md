@@ -13,6 +13,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.1.0] — 2026-06-16
+
+### Added
+
+#### TagSelection — Search Result Highlighting
+
+- Matching portions of tag labels in the dropdown are now rendered in **bold** while the user types a search term (e.g. typing `"Reac"` shows **Reac**t in the option chip).
+- Highlighting is case-insensitive and applies only to the first matching segment per label.
+- No API changes — purely visual enhancement, fully backwards-compatible.
+
+---
+
 ## [3.0.0] — 2026-06-15
 
 ### Removed
