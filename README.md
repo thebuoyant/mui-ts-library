@@ -309,6 +309,37 @@ import type {
 
 ---
 
+## Changelog
+
+### [3.1.0] — 2026-06-16
+
+**TagSelection — Search Result Highlighting**
+- Matching portions of tag labels in the dropdown are now rendered in **bold** while the user types (e.g. `"Reac"` → **Reac**t).
+- Case-insensitive, no API changes.
+
+---
+
+### [3.0.0] — 2026-06-15 — Breaking Changes
+
+**Removed**
+- `ConfirmDialog`, `ConfirmDialogProvider`, `useConfirm` removed entirely. Migration: use MUI `Dialog` directly, or stay on `2.x`.
+
+**TagSelection — `onTagCreate` signature changed**
+- Before: `(label: string, color: TagColor) => void`
+- After: `(tag: TagSelectionItem) => void` — tag is fully constructed, already includes `selected: true` and chosen colors.
+
+**TagSelection — Custom Color Picker**
+- New color picker panel on tag creation: background + text color swatches, hex input, auto WCAG-contrast toggle.
+
+**Chart & Gantt — color prop fix**
+- `linkColor`, `labelColor`, `todayColor` and other color props now correctly fall back to theme defaults when set to `""` (empty string). Previously caused invisible chart links in Storybook.
+
+---
+
+[→ Full changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md)
+
+---
+
 ## License
 
 MIT © Thomas Schlender

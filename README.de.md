@@ -309,6 +309,37 @@ import type {
 
 ---
 
+## Changelog
+
+### [3.1.0] — 2026-06-16
+
+**TagSelection — Suchergebnis-Highlighting**
+- Übereinstimmende Teile von Tag-Labels im Dropdown werden beim Tippen **fett** hervorgehoben (z. B. `"Reac"` → **Reac**t).
+- Case-insensitiv, keine API-Änderungen.
+
+---
+
+### [3.0.0] — 2026-06-15 — Breaking Changes
+
+**Entfernt**
+- `ConfirmDialog`, `ConfirmDialogProvider`, `useConfirm` komplett entfernt. Migration: MUI `Dialog` direkt verwenden oder bei `2.x` bleiben.
+
+**TagSelection — `onTagCreate`-Signatur geändert**
+- Vorher: `(label: string, color: TagColor) => void`
+- Nachher: `(tag: TagSelectionItem) => void` — Tag ist vollständig konstruiert, enthält bereits `selected: true` und gewählte Farben.
+
+**TagSelection — Custom-Color-Picker**
+- Neues Farb-Picker-Panel bei Tag-Erstellung: Hintergrund- und Textfarb-Swatches, Hex-Eingabe, Auto-WCAG-Kontrast-Toggle.
+
+**Chart & Gantt — Farb-Prop-Fix**
+- `linkColor`, `labelColor`, `todayColor` und weitere Farb-Props fallen jetzt korrekt auf Theme-Defaults zurück wenn sie `""` (leerer String) sind. Vorher verursachte das unsichtbare Chart-Links in Storybook.
+
+---
+
+[→ Vollständiger Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md)
+
+---
+
 ## Lizenz
 
 MIT © Thomas Schlender
