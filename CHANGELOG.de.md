@@ -13,6 +13,18 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [3.2.0] — 2026-06-16
+
+### Hinzugefügt
+
+#### StackBlitz Live Demo
+
+- Neues `stackblitz-demo/`-Verzeichnis im Repository — das Projekt direkt im Browser öffnen via [StackBlitz](https://stackblitz.com/github/thebuoyant/mui-ts-library/tree/main/stackblitz-demo?startScript=dev), ohne lokale Installation.
+- Zeigt `TagSelection` (Search-Highlighting, Creatable), `PasswordStrengthMeter` (Generator + Confirm-Feld) und `GanttChart` (Drag & Drop, Resize, Fortschritt).
+- README.md (EN+DE): Prominenter "Im Browser ausprobieren"-Link direkt unter dem Storybook-Link ergänzt.
+
+---
+
 ## [3.1.1] — 2026-06-16
 
 ### Geändert
