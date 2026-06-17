@@ -13,8 +13,8 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 |---|---|---|---|
 | ~~**🔴 StackBlitz / CodeSandbox Template**~~ | ~~"Try it now"-Link in README — Entwickler entscheiden in 30 Sek. ohne Installation.~~ | ~~Niedrig~~ | ✅ v3.2.0 |
 | **🔴 Bundle-Bloat / Tree-Shaking** | D3 + CodeMirror + Tiptap landen im Bundle auch wenn nur `TagSelection` genutzt wird. Lösung: separate `"exports"`-Entry-Points pro Komponente in package.json. | Hoch | ⚡ offen |
-| **🟡 ChordChart Dark-Mode** | `mixBlendMode: "multiply"` macht Ribbons auf dunklem Hintergrund fast unsichtbar. Fix: theme-aware blend-mode (`normal` im dark mode, `multiply` im light mode). | Niedrig | ⚡ offen |
-| **🟡 HorizontalTreeChart Link-Opacity** | `linkStrokeOpacity`-Default `0.4` (zu blass) vs. RadialTreeChart `1.0` — inkonsistent. Fix: Default auf `1.0`. | Niedrig | ⚡ offen |
+| ~~**🟡 ChordChart Dark-Mode**~~ | ~~`mixBlendMode: "multiply"` → theme-aware: `normal` im dark mode, `multiply` im light mode.~~ | ~~Niedrig~~ | ✅ v3.2.1 |
+| ~~**🟡 HorizontalTreeChart Link-Opacity**~~ | ~~`linkStrokeOpacity`-Default `0.4` → `1.0`, konsistent mit RadialTreeChart.~~ | ~~Niedrig~~ | ✅ v3.2.1 |
 | **🟡 Storybook Charts — play-Funktionen** | D3-Charts zeigen bei Story-Öffnung nur leeren Container. `play`-Funktionen rendern Charts sofort (wie TagSelection SearchHighlight). Betrifft: SunburstChart, ChordChart, RadialTreeChart, CirclePackingChart, HorizontalTreeChart. | Mittel | ⚡ offen |
 
 ---
