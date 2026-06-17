@@ -190,26 +190,19 @@ const HORIZONTAL_TREE_DATA: HorizontalTreeData = {
 function DemoCard({
   title,
   subtitle,
-  tag,
   children,
 }: {
   title: string;
   subtitle?: string;
-  tag?: string;
   children: React.ReactNode;
 }) {
   const id = title.replace(/\s+/g, "-").toLowerCase();
   return (
     <Card id={id} variant="outlined" sx={{ borderRadius: 3, scrollMarginTop: 72 }}>
       <CardContent sx={{ p: 3 }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5, flexWrap: "wrap" }}>
-          <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.3 }}>
-            {title}
-          </Typography>
-          {tag && (
-            <Chip label={tag} size="small" color="primary" variant="outlined" sx={{ fontSize: 11 }} />
-          )}
-        </Box>
+        <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.3, mb: 0.5 }}>
+          {title}
+        </Typography>
         {subtitle && (
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5 }}>
             {subtitle}
@@ -217,6 +210,16 @@ function DemoCard({
         )}
         {!subtitle && <Box sx={{ mb: 2 }} />}
         {children}
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
+          <Typography
+            variant="caption"
+            color="text.disabled"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            sx={{ cursor: "pointer", userSelect: "none", "&:hover": { color: "primary.main" } }}
+          >
+            ↑ back to top
+          </Typography>
+        </Box>
       </CardContent>
     </Card>
   );
@@ -312,7 +315,6 @@ export default function App() {
           {/* ChordChart */}
           <DemoCard
             title="ChordChart"
-            tag="D3 v7"
             subtitle="Flow relationships between groups. Hover to highlight connections, click for details."
           >
             <Box sx={{ display: "flex", justifyContent: "center" }}>
@@ -323,7 +325,6 @@ export default function App() {
           {/* CirclePackingChart */}
           <DemoCard
             title="CirclePackingChart"
-            tag="D3 v7"
             subtitle="Nested circles with D3 zoom animation. Click any circle to zoom in, DblClick root to reset."
           >
             <Box sx={{ display: "flex", justifyContent: "center" }}>
@@ -342,7 +343,6 @@ export default function App() {
           {/* HorizontalTreeChart */}
           <DemoCard
             title="HorizontalTreeChart"
-            tag="D3 v7"
             subtitle="Component hierarchy as a left-to-right tree. Ctrl+Click to drill down, click nodes for a popover."
           >
             <Box sx={{ overflowX: "auto" }}>
@@ -361,7 +361,6 @@ export default function App() {
           {/* JsonEditor */}
           <DemoCard
             title="JsonEditor"
-            tag="CodeMirror 6"
             subtitle="JSON editor with real-time validation, Format / Compact buttons, and optional minimap."
           >
             <JsonEditor
@@ -393,7 +392,6 @@ export default function App() {
           {/* RadialTreeChart */}
           <DemoCard
             title="RadialTreeChart"
-            tag="D3 v7"
             subtitle="Org chart as a radial tree. Ctrl+Click to drill into a subtree, Ctrl+DblClick to go back."
           >
             <Box sx={{ display: "flex", justifyContent: "center" }}>
@@ -404,7 +402,6 @@ export default function App() {
           {/* RichTextEditor */}
           <DemoCard
             title="RichTextEditor"
-            tag="TipTap v3"
             subtitle="WYSIWYG editor with toolbar, tables, image embed, emoji picker, word count, and fullscreen mode."
           >
             <RichTextEditor value={html} onChange={setHtml} height={260} showWordCount />
@@ -413,7 +410,6 @@ export default function App() {
           {/* SqlEditor */}
           <DemoCard
             title="SqlEditor"
-            tag="CodeMirror 6"
             subtitle="SQL editor with syntax highlighting, dialect-aware autocomplete, linting, and Cmd+Enter to execute."
           >
             <SqlEditor
@@ -430,7 +426,6 @@ export default function App() {
           {/* SunburstChart */}
           <DemoCard
             title="SunburstChart"
-            tag="D3 v7"
             subtitle="Hierarchical data as concentric rings. Ctrl+Click to drill into a segment, Escape to reset."
           >
             <Box sx={{ display: "flex", justifyContent: "center" }}>
