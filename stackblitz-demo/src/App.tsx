@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import {
   AppBar, Box, Card, CardContent, Chip, Container,
-  CssBaseline, Divider, Fab, IconButton, Stack, ThemeProvider,
+  CssBaseline, Fab, IconButton, Stack, ThemeProvider,
   Toolbar, Tooltip, Typography, createTheme, Zoom,
 } from "@mui/material";
 import Brightness4Icon from "@mui/icons-material/Brightness4";

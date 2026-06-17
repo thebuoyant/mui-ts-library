@@ -88,7 +88,7 @@ export function ChordChart({
   showGroupLabels = true,
   labelOffset = 8,
   ribbonOpacity = 0.75,
-  ribbonBlendMode = "multiply",
+  ribbonBlendMode,
   directed = true,
   valueDecimalCount = 0,
   valueDecimalSeparator = ".",
@@ -99,6 +99,7 @@ export function ChordChart({
   disabled = false,
 }: ChordChartProps) {
   const theme = useTheme();
+  const resolvedBlendMode = ribbonBlendMode ?? (theme.palette.mode === "dark" ? "normal" : "multiply");
 
   const defaultColors = [
     theme.palette.primary.main,
@@ -356,7 +357,7 @@ export function ChordChart({
           </g>
 
           {/* Ribbons */}
-          <g fillOpacity={ribbonOpacity} style={{ mixBlendMode: ribbonBlendMode }}>
+          <g fillOpacity={ribbonOpacity} style={{ mixBlendMode: resolvedBlendMode }}>
             {chords.map((chord: D3Chord, ci: number) => {
               const info    = serializeChord(chord);
               const visible = hoverGroup === null

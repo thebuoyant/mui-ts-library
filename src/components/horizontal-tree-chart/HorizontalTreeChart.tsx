@@ -85,7 +85,7 @@ export function HorizontalTreeChart({
   labelColor,
   showIcons = true,
   chartColors,
-  linkStrokeOpacity = 0.4,
+  linkStrokeOpacity = 1,
   linkStrokeWidth = 1.5,
   linkColor,
   zoomable = false,

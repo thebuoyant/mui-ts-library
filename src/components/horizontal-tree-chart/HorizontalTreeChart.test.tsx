@@ -94,4 +94,16 @@ describe("HorizontalTreeChart", () => {
     render(<HorizontalTreeChart data={dataWithColor} />);
     expect(document.querySelector("svg")).toBeInTheDocument();
   });
+
+  it("Should default linkStrokeOpacity to 1", () => {
+    render(<HorizontalTreeChart data={SIMPLE_DATA} />);
+    const linkGroup = document.querySelector<SVGGElement>("g[fill='none']");
+    expect(linkGroup?.getAttribute("stroke-opacity")).toBe("1");
+  });
+
+  it("Should respect explicit linkStrokeOpacity prop", () => {
+    render(<HorizontalTreeChart data={SIMPLE_DATA} linkStrokeOpacity={0.4} />);
+    const linkGroup = document.querySelector<SVGGElement>("g[fill='none']");
+    expect(linkGroup?.getAttribute("stroke-opacity")).toBe("0.4");
+  });
 });

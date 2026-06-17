@@ -1,5 +1,6 @@
 import { render, fireEvent } from "@testing-library/react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
+import { ThemeProvider, createTheme } from "@mui/material";
 import { ChordChart } from "./ChordChart";
 import type { ChordChartData } from "./ChordChart.types";
 
@@ -82,5 +83,33 @@ describe("ChordChart", () => {
   it("Should render undirected chart without crash", () => {
     render(<ChordChart data={SIMPLE_DATA} directed={false} />);
     expect(document.querySelector("svg")).toBeInTheDocument();
+  });
+
+  it("Should default ribbonBlendMode to 'multiply' in light mode", () => {
+    render(<ChordChart data={SIMPLE_DATA} />);
+    const ribbonGroup = document.querySelector<SVGGElement>("g[fill-opacity]");
+    expect(ribbonGroup?.style.mixBlendMode).toBe("multiply");
+  });
+
+  it("Should default ribbonBlendMode to 'normal' in dark mode", () => {
+    const darkTheme = createTheme({ palette: { mode: "dark" } });
+    render(
+      <ThemeProvider theme={darkTheme}>
+        <ChordChart data={SIMPLE_DATA} />
+      </ThemeProvider>
+    );
+    const ribbonGroup = document.querySelector<SVGGElement>("g[fill-opacity]");
+    expect(ribbonGroup?.style.mixBlendMode).toBe("normal");
+  });
+
+  it("Should respect explicit ribbonBlendMode prop regardless of theme", () => {
+    const darkTheme = createTheme({ palette: { mode: "dark" } });
+    render(
+      <ThemeProvider theme={darkTheme}>
+        <ChordChart data={SIMPLE_DATA} ribbonBlendMode="multiply" />
+      </ThemeProvider>
+    );
+    const ribbonGroup = document.querySelector<SVGGElement>("g[fill-opacity]");
+    expect(ribbonGroup?.style.mixBlendMode).toBe("multiply");
   });
 });

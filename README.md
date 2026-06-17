@@ -313,6 +313,14 @@ import type {
 
 ## Changelog
 
+### [3.2.1] — 2026-06-17
+
+**Bug Fixes**
+- **ChordChart** — ribbons now visible in dark mode (`mixBlendMode` auto-switches to `"normal"` on dark backgrounds).
+- **HorizontalTreeChart** — link opacity default raised from `0.4` to `1.0`, consistent with RadialTreeChart.
+
+---
+
 ### [3.2.0] — 2026-06-16
 
 **StackBlitz Live Demo**

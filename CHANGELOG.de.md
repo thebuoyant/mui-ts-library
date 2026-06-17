@@ -13,6 +13,15 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [3.2.1] — 2026-06-17
+
+### Behoben
+
+- **ChordChart** — `ribbonBlendMode` ist jetzt theme-aware: Standard `"normal"` im Dark Mode, `"multiply"` im Light Mode. Zuvor waren Ribbons auf dunklem Hintergrund kaum sichtbar.
+- **HorizontalTreeChart** — `linkStrokeOpacity`-Default von `0.4` auf `1.0` angehoben, konsistent mit `RadialTreeChart`.
+
+---
+
 ## [3.2.0] — 2026-06-16
 
 ### Hinzugefügt

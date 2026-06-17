@@ -313,6 +313,14 @@ import type {
 
 ## Changelog
 
+### [3.2.1] — 2026-06-17
+
+**Bugfixes**
+- **ChordChart** — Ribbons jetzt im Dark Mode sichtbar (`mixBlendMode` wechselt automatisch auf `"normal"` bei dunklem Hintergrund).
+- **HorizontalTreeChart** — Link-Deckkraft-Standard von `0.4` auf `1.0` erhöht, konsistent mit RadialTreeChart.
+
+---
+
 ### [3.2.0] — 2026-06-16
 
 **StackBlitz Live Demo**
