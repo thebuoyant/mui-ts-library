@@ -11,7 +11,7 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
-| **🔴 StackBlitz / CodeSandbox Template** | "Try it now"-Link in README — Entwickler entscheiden in 30 Sek. ohne Installation. Ohne diesen Link verlieren wir potenzielle Nutzer sofort. | Niedrig | ⚡ offen |
+| ~~**🔴 StackBlitz / CodeSandbox Template**~~ | ~~"Try it now"-Link in README — Entwickler entscheiden in 30 Sek. ohne Installation.~~ | ~~Niedrig~~ | ✅ v3.2.0 |
 | **🔴 Bundle-Bloat / Tree-Shaking** | D3 + CodeMirror + Tiptap landen im Bundle auch wenn nur `TagSelection` genutzt wird. Lösung: separate `"exports"`-Entry-Points pro Komponente in package.json. | Hoch | ⚡ offen |
 | **🟡 ChordChart Dark-Mode** | `mixBlendMode: "multiply"` macht Ribbons auf dunklem Hintergrund fast unsichtbar. Fix: theme-aware blend-mode (`normal` im dark mode, `multiply` im light mode). | Niedrig | ⚡ offen |
 | **🟡 HorizontalTreeChart Link-Opacity** | `linkStrokeOpacity`-Default `0.4` (zu blass) vs. RadialTreeChart `1.0` — inkonsistent. Fix: Default auf `1.0`. | Niedrig | ⚡ offen |
@@ -123,10 +123,9 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
 | ~~Live Storybook~~ | ~~`https://thebuoyant.github.io/mui-ts-library/`~~ | ~~Mittel~~ | ✅ aktiv — auto-deploy |
-| ~~npm-app Showcase/Playground~~ | ~~Eigenständige Vite-React-App, konsumiert veröffentlichtes npm-Paket~~ | ~~Hoch~~ | ✅ implementiert |
-| ~~npm-app auf aktuelle Version~~ | ~~Dependency auf `^3.0.0` gebumpt~~ | ~~Niedrig~~ | ✅ v3.1.0 |
+| ~~npm-app Showcase/Playground~~ | ~~Eigenständige Vite-React-App~~ — ~~ersetzt durch stackblitz-demo~~ | ~~Hoch~~ | ✅ entfernt v3.2.0 |
 | ~~Changelog in README sichtbar~~ | ~~Letzte 2 Versionen direkt in README.md eingebettet (EN+DE) — auf npm ohne Link-Klick lesbar~~ | ~~Niedrig~~ | ✅ v3.1.1 |
 | ⭐ GitHub Releases anlegen | Für `v3.0.0`, `v3.1.0`, `v3.1.1` — GitHub zeigt Releases prominent in der Sidebar; aktuell nur nackte Tags ohne Beschreibung | Niedrig | ⚡ offen |
-| ⭐ npm-app Demo für Highlighting | TagSelectionDemo zeigt v3.1.0-Feature (Search Highlight) noch nicht — nach nächstem Publish nachziehen | Niedrig | ⚡ offen |
+| ~~⭐ npm-app Demo für Highlighting~~ | ~~npm-app entfernt — stackblitz-demo zeigt Highlighting~~ | ~~Niedrig~~ | ✅ v3.2.0 |
 | VS Code Snippets | `rte-basic`, `gantt-basic` → autovervollständigt fertiges Snippet | Niedrig | — |
 | Playwright Visual Tests | Screenshot-Vergleiche für Chart-Rendering | Hoch | — |

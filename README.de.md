@@ -6,6 +6,8 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 
 **[→ Live-Storybook](https://thebuoyant.github.io/mui-ts-library/)** — alle Komponenten interaktiv erkunden, ohne Installation.
 
+**[→ Im Browser ausprobieren (StackBlitz)](https://stackblitz.com/github/thebuoyant/mui-ts-library/tree/main/stackblitz-demo?startScript=dev)** — live bearbeitbare Demo, keine Installation nötig.
+
 ---
 
 ## Komponenten
@@ -310,6 +312,14 @@ import type {
 ---
 
 ## Changelog
+
+### [3.2.0] — 2026-06-16
+
+**StackBlitz Live Demo**
+- Neue interaktive Demo — direkt im Browser öffnen, keine lokale Installation nötig: [→ Im Browser ausprobieren](https://stackblitz.com/github/thebuoyant/mui-ts-library/tree/main/stackblitz-demo?startScript=dev)
+- Zeigt TagSelection (mit Search-Highlighting), PasswordStrengthMeter (mit Generator) und GanttChart (Drag & Resize).
+
+---
 
 ### [3.1.0] — 2026-06-16
 

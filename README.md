@@ -6,6 +6,8 @@ A type-safe React component library built on **TypeScript** and **MUI (Material 
 
 **[→ Live Storybook](https://thebuoyant.github.io/mui-ts-library/)** — explore all components interactively, no installation needed.
 
+**[→ Try it on StackBlitz](https://stackblitz.com/github/thebuoyant/mui-ts-library/tree/main/stackblitz-demo?startScript=dev)** — live editable demo in your browser, no installation required.
+
 ---
 
 ## Components
@@ -310,6 +312,14 @@ import type {
 ---
 
 ## Changelog
+
+### [3.2.0] — 2026-06-16
+
+**StackBlitz Live Demo**
+- New interactive demo — open in your browser in seconds, no local setup needed: [→ Try it on StackBlitz](https://stackblitz.com/github/thebuoyant/mui-ts-library/tree/main/stackblitz-demo?startScript=dev)
+- Showcases TagSelection (with search highlighting), PasswordStrengthMeter (with generator), and GanttChart (draggable, resizable).
+
+---
 
 ### [3.1.0] — 2026-06-16
 
