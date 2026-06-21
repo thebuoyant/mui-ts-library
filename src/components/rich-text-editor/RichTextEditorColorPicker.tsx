@@ -45,6 +45,8 @@ function ColorSwatch({
         component="button"
         type="button"
         onClick={() => onClick(color)}
+        aria-label={color}
+        aria-pressed={active}
         sx={{
           width:        22,
           height:       22,
@@ -133,6 +135,7 @@ export function RichTextEditorColorPicker({
             component="button"
             type="button"
             onClick={() => customInputRef.current?.click()}
+            aria-label="Custom color"
             sx={{
               width:        22,
               height:       22,
@@ -161,6 +164,7 @@ export function RichTextEditorColorPicker({
           <IconButton
             size="small"
             onClick={() => { onRemoveColor(); onClose(); }}
+            aria-label={removeLabel}
             sx={{ borderRadius: 1, ml: "auto" }}
           >
             <FormatColorResetIcon fontSize="small" />

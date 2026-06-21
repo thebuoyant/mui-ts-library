@@ -318,6 +318,7 @@ export function TagSelectionAutocomplete({
                           sx={{ color: "success.main" }}
                           onMouseDown={preventBlur}
                           onClick={handleConfirmCreate}
+                          aria-label={translation.confirmCreateLabel}
                         >
                           <CheckIcon fontSize="small" />
                         </IconButton>
@@ -325,6 +326,7 @@ export function TagSelectionAutocomplete({
                           size="small"
                           onMouseDown={preventBlur}
                           onClick={handleCancelCreate}
+                          aria-label={translation.cancelCreateLabel}
                         >
                           <CloseIcon fontSize="small" />
                         </IconButton>

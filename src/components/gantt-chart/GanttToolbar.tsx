@@ -122,6 +122,7 @@ export function GanttToolbar({ onScrollToToday, config, onExportCSV }: GanttTool
             <IconButton
               size="small"
               onClick={allExpanded ? collapseAll : expandAll}
+              aria-label={allExpanded ? t.collapseAllTooltip : t.expandAllTooltip}
               data-testid="gantt-expand-collapse-all"
             >
               {allExpanded ? (
@@ -140,6 +141,7 @@ export function GanttToolbar({ onScrollToToday, config, onExportCSV }: GanttTool
                 size="small"
                 onClick={onScrollToToday}
                 disabled={!isTodayInRange}
+                aria-label={t.scrollToTodayTooltip}
                 data-testid="gantt-scroll-to-today"
               >
                 <TodayIcon fontSize="small" />
@@ -176,6 +178,7 @@ export function GanttToolbar({ onScrollToToday, config, onExportCSV }: GanttTool
             <IconButton
               size="small"
               onClick={resetTimelineRange}
+              aria-label={t.rangeResetTooltip}
               data-testid="gantt-range-reset"
             >
               <RestoreIcon fontSize="small" />
@@ -188,6 +191,7 @@ export function GanttToolbar({ onScrollToToday, config, onExportCSV }: GanttTool
             <IconButton
               size="small"
               onClick={onExportCSV}
+              aria-label={t.exportCsvTooltip}
               data-testid="gantt-export-csv"
             >
               <DownloadIcon fontSize="small" />
@@ -202,6 +206,7 @@ export function GanttToolbar({ onScrollToToday, config, onExportCSV }: GanttTool
                 size="small"
                 onClick={resetView}
                 disabled={!isViewChanged}
+                aria-label={t.resetViewTooltip}
                 data-testid="gantt-reset-view"
               >
                 <RestartAltIcon fontSize="small" />

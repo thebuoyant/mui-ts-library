@@ -13,6 +13,27 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [3.4.0] — 2026-06-21
+
+### Hinzugefügt
+
+- **TagSelection** — zwei neue Translation-Keys, `confirmCreateLabel` und `cancelCreateLabel`, als `aria-label` für die Bestätigen-/Abbrechen-Icon-Buttons beim Anlegen eines neuen Tags.
+
+### Behoben
+
+#### Accessibility
+
+- Fehlendes `aria-label` an 13 Icon-only-Buttons ergänzt: `GanttTaskPanel`, `GanttToolbar`, `TagSelectionAutocomplete`, `RichTextEditorColorPicker` (Farb-Swatches + Custom-Color-Trigger), `RichTextEditorEmojiPicker`. Diese verließen sich bisher nur auf `Tooltip`, was eine Beschreibung (`aria-describedby`) liefert, aber keinen Accessible Name.
+
+#### Test-Coverage
+
+- `SqlEditor` hatte keine Tests — 21 Tests ergänzt (Toolbar-Interaktionen: Format, Copy, Clear, Undo, Redo, Execute; alle 5 SQL-Dialekte; Schema-Prop; Disabled-State). Coverage: 0% → 82% Lines.
+- `RichTextEditorImageDialog` (17% → 94%) und `RichTextEditorTableMenu` (20% → 96%) — eigene Testdateien ergänzt.
+- `gantt-chart.util.ts` — Tests für `cascadeDateUpdate` und `computeCriticalPath` ergänzt, die zuvor einzigen ungetesteten Funktionen. 99% Lines.
+- Gesamt-Coverage der Library: 68% → 74% Lines, 65% → 70% Branches.
+
+---
+
 ## [3.3.0] — 2026-06-21
 
 ### Hinzugefügt

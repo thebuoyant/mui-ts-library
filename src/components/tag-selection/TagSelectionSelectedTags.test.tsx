@@ -16,6 +16,8 @@ const translation: TagSelectionTranslation = {
   backgroundColorLabel: "Background color",
   textColorLabel: "Text color",
   autoTextColorLabel: "Auto",
+  confirmCreateLabel: "Confirm new tag",
+  cancelCreateLabel: "Cancel new tag",
 };
 
 describe("TagSelectionSelectedTags", () => {

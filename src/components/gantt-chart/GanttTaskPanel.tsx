@@ -186,6 +186,7 @@ function GanttTaskRow({
             <Tooltip title={t.editTaskTooltip}>
               <IconButton
                 size="small"
+                aria-label={t.editTaskTooltip}
                 data-testid={`gantt-edit-task-${task.id}`}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -200,6 +201,7 @@ function GanttTaskRow({
             <Tooltip title={t.addTaskTooltip}>
               <IconButton
                 size="small"
+                aria-label={t.addTaskTooltip}
                 data-testid={`gantt-add-task-${task.id}`}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -214,6 +216,7 @@ function GanttTaskRow({
             <Tooltip title={t.deleteTaskTooltip}>
               <IconButton
                 size="small"
+                aria-label={t.deleteTaskTooltip}
                 data-testid={`gantt-delete-task-${task.id}`}
                 onClick={(e) => {
                   e.stopPropagation();

@@ -84,6 +84,7 @@ export function RichTextEditorEmojiPicker({
                   key={entry.emoji}
                   component="button"
                   title={entry.name}
+                  aria-label={entry.name}
                   onClick={() => handleSelect(entry.emoji)}
                   sx={{
                     border:       "none",

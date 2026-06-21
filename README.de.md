@@ -313,6 +313,14 @@ import type {
 
 ## Changelog
 
+### [3.4.0] — 2026-06-21
+
+**Accessibility & Test-Coverage**
+- Fehlendes `aria-label` an 13 Icon-only-Buttons in GanttChart, TagSelection und RichTextEditor ergänzt — diese verließen sich bisher nur auf `Tooltip`, was Screenreadern keinen Accessible Name liefert.
+- `SqlEditor`: 0 Tests → 82% Line-Coverage. Gesamt-Coverage der Library: 68% → 74% Lines.
+
+---
+
 ### [3.3.0] — 2026-06-21
 
 **Tree-Shaking — Build-Output pro Komponente**
