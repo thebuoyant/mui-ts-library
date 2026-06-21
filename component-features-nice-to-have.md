@@ -16,6 +16,9 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 | ~~**🟡 ChordChart Dark-Mode**~~ | ~~`mixBlendMode: "multiply"` → theme-aware: `normal` im dark mode, `multiply` im light mode.~~ | ~~Niedrig~~ | ✅ v3.2.1 |
 | ~~**🟡 HorizontalTreeChart Link-Opacity**~~ | ~~`linkStrokeOpacity`-Default `0.4` → `1.0`, konsistent mit RadialTreeChart.~~ | ~~Niedrig~~ | ✅ v3.2.1 |
 | **🟡 Storybook Charts — play-Funktionen** | D3-Charts zeigen bei Story-Öffnung nur leeren Container. `play`-Funktionen rendern Charts sofort (wie TagSelection SearchHighlight). Betrifft: SunburstChart, ChordChart, RadialTreeChart, CirclePackingChart, HorizontalTreeChart. | Mittel | ⚡ offen |
+| **🔴 SqlEditor — keine Tests** | `sql-editor/*.test.tsx` existiert nicht. Einzige Komponente der Lib ohne jegliche Testdatei — realer Regressions-Risiko-Hotspot. | Mittel | ⚡ offen |
+| **🟡 Test-Coverage-Lücken** | Gesamt 68% Lines / 65% Branches, aber ungleich verteilt: `RichTextEditorImageDialog` (17%), `RichTextEditorTableMenu` (20%), `gantt-chart.util.ts` (0%) ungetestet. | Mittel | ⚡ offen |
+| **🟡 Accessibility-Audit** | `aria-*` nur in 23 von ~60 Source-Dateien — bei `a11y` als beworbenem npm-Keyword eine Lücke zwischen Anspruch und Umsetzung. Gezielter Audit pro Komponente nötig. | Mittel | ⚡ offen |
 
 ---
 
