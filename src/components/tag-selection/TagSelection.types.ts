@@ -35,6 +35,8 @@ export type TagSelectionTranslation = {
   backgroundColorLabel: string;
   textColorLabel: string;
   autoTextColorLabel: string;
+  confirmCreateLabel: string;
+  cancelCreateLabel: string;
 };
 
 export const DEFAULT_TAG_SELECTION_TRANSLATION: TagSelectionTranslation = {
@@ -49,6 +51,8 @@ export const DEFAULT_TAG_SELECTION_TRANSLATION: TagSelectionTranslation = {
   backgroundColorLabel: "Background color",
   textColorLabel: "Text color",
   autoTextColorLabel: "Auto",
+  confirmCreateLabel: "Confirm new tag",
+  cancelCreateLabel: "Cancel new tag",
 };
 
 export type TagSelectionProps = {

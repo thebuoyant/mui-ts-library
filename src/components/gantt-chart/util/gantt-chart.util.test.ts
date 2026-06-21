@@ -3,6 +3,8 @@ import type { GanttTask } from "../GanttChart.types";
 import {
   buildTaskTree,
   calculateTaskPosition,
+  cascadeDateUpdate,
+  computeCriticalPath,
   getDaysInRange,
   getISOWeekNumber,
   getMonthsInRange,
@@ -421,5 +423,128 @@ describe("getVisibleTasks", () => {
     const visible = getVisibleTasks(tree, new Set(["root", "child"]));
 
     expect(visible.map((t) => t.id)).toEqual(["root", "child", "grandchild"]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Cascade Date Update
+// ---------------------------------------------------------------------------
+
+describe("cascadeDateUpdate", () => {
+  it("Should return the same array reference when delta is 0", () => {
+    const tasks = [makeTask({ id: "a" })];
+
+    expect(cascadeDateUpdate(tasks, "a", 0)).toBe(tasks);
+  });
+
+  it("Should shift a direct finish-to-start successor by the delta", () => {
+    const dayMs = 24 * 60 * 60 * 1000;
+    const tasks = [
+      makeTask({ id: "a", startDate: new Date("2025-01-01"), endDate: new Date("2025-01-05") }),
+      makeTask({ id: "b", startDate: new Date("2025-01-06"), endDate: new Date("2025-01-10"), dependencies: ["a"] }),
+    ];
+
+    const result = cascadeDateUpdate(tasks, "a", dayMs);
+    const b = result.find((t) => t.id === "b")!;
+
+    expect(b.startDate).toEqual(new Date("2025-01-07"));
+    expect(b.endDate).toEqual(new Date("2025-01-11"));
+  });
+
+  it("Should shift transitive successors across multiple levels", () => {
+    const dayMs = 24 * 60 * 60 * 1000;
+    const tasks = [
+      makeTask({ id: "a", endDate: new Date("2025-01-05") }),
+      makeTask({ id: "b", startDate: new Date("2025-01-06"), dependencies: ["a"] }),
+      makeTask({ id: "c", startDate: new Date("2025-01-11"), dependencies: ["b"] }),
+    ];
+
+    const result = cascadeDateUpdate(tasks, "a", dayMs);
+    const c = result.find((t) => t.id === "c")!;
+
+    expect(c.startDate).toEqual(new Date("2025-01-12"));
+  });
+
+  it("Should leave tasks unrelated to the changed task untouched", () => {
+    const tasks = [
+      makeTask({ id: "a" }),
+      makeTask({ id: "unrelated", startDate: new Date("2025-06-01") }),
+    ];
+
+    const result = cascadeDateUpdate(tasks, "a", 24 * 60 * 60 * 1000);
+    const unrelated = result.find((t) => t.id === "unrelated")!;
+
+    expect(unrelated.startDate).toEqual(new Date("2025-06-01"));
+  });
+
+  it("Should not loop forever when dependencies form a cycle", () => {
+    const tasks = [
+      makeTask({ id: "a", dependencies: ["b"] }),
+      makeTask({ id: "b", dependencies: ["a"] }),
+    ];
+
+    expect(() => cascadeDateUpdate(tasks, "a", 1000)).not.toThrow();
+  });
+
+  it("Should preserve the original task order in the result", () => {
+    const tasks = [
+      makeTask({ id: "a" }),
+      makeTask({ id: "b", dependencies: ["a"] }),
+      makeTask({ id: "c" }),
+    ];
+
+    const result = cascadeDateUpdate(tasks, "a", 1000);
+
+    expect(result.map((t) => t.id)).toEqual(["a", "b", "c"]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Kritischer Pfad
+// ---------------------------------------------------------------------------
+
+describe("computeCriticalPath", () => {
+  it("Should return an empty set for an empty task list", () => {
+    expect(computeCriticalPath([])).toEqual(new Set());
+  });
+
+  it("Should mark a task with no dependencies as critical when it is the only task", () => {
+    const tasks = [makeTask({ id: "a" })];
+
+    expect(computeCriticalPath(tasks)).toEqual(new Set(["a"]));
+  });
+
+  it("Should mark the chain leading to the latest project end as critical", () => {
+    const tasks = [
+      makeTask({ id: "a", endDate: new Date("2025-01-05") }),
+      makeTask({ id: "b", endDate: new Date("2025-01-20"), dependencies: ["a"] }),
+      makeTask({ id: "side", endDate: new Date("2025-01-08"), dependencies: ["a"] }),
+    ];
+
+    const critical = computeCriticalPath(tasks);
+
+    expect(critical.has("a")).toBe(true);
+    expect(critical.has("b")).toBe(true);
+    expect(critical.has("side")).toBe(false);
+  });
+
+  it("Should mark multiple independent chains as critical when they tie for the latest end", () => {
+    const tasks = [
+      makeTask({ id: "a", endDate: new Date("2025-02-01") }),
+      makeTask({ id: "b", endDate: new Date("2025-02-01") }),
+    ];
+
+    const critical = computeCriticalPath(tasks);
+
+    expect(critical).toEqual(new Set(["a", "b"]));
+  });
+
+  it("Should not loop forever when dependencies form a cycle", () => {
+    const tasks = [
+      makeTask({ id: "a", dependencies: ["b"] }),
+      makeTask({ id: "b", dependencies: ["a"] }),
+    ];
+
+    expect(() => computeCriticalPath(tasks)).not.toThrow();
   });
 });

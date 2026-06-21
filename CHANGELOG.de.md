@@ -13,6 +13,39 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [3.4.0] — 2026-06-21
+
+### Hinzugefügt
+
+- **TagSelection** — zwei neue Translation-Keys, `confirmCreateLabel` und `cancelCreateLabel`, als `aria-label` für die Bestätigen-/Abbrechen-Icon-Buttons beim Anlegen eines neuen Tags.
+
+### Behoben
+
+#### Accessibility
+
+- Fehlendes `aria-label` an 13 Icon-only-Buttons ergänzt: `GanttTaskPanel`, `GanttToolbar`, `TagSelectionAutocomplete`, `RichTextEditorColorPicker` (Farb-Swatches + Custom-Color-Trigger), `RichTextEditorEmojiPicker`. Diese verließen sich bisher nur auf `Tooltip`, was eine Beschreibung (`aria-describedby`) liefert, aber keinen Accessible Name.
+
+#### Test-Coverage
+
+- `SqlEditor` hatte keine Tests — 21 Tests ergänzt (Toolbar-Interaktionen: Format, Copy, Clear, Undo, Redo, Execute; alle 5 SQL-Dialekte; Schema-Prop; Disabled-State). Coverage: 0% → 82% Lines.
+- `RichTextEditorImageDialog` (17% → 94%) und `RichTextEditorTableMenu` (20% → 96%) — eigene Testdateien ergänzt.
+- `gantt-chart.util.ts` — Tests für `cascadeDateUpdate` und `computeCriticalPath` ergänzt, die zuvor einzigen ungetesteten Funktionen. 99% Lines.
+- Gesamt-Coverage der Library: 68% → 74% Lines, 65% → 70% Branches.
+
+---
+
+## [3.3.0] — 2026-06-21
+
+### Hinzugefügt
+
+#### Tree-Shaking — Build-Output pro Komponente
+
+- Der ESM-Build bündelt nicht mehr alle Komponenten in eine `dist/index.js`-Datei, sondern erhält die Modul-Grenzen — jede Komponente wird als eigene Datei ausgeliefert, analog zur `src/`-Struktur.
+- **Der Import einer Komponente zieht keine Abhängigkeiten fremder Komponenten mehr mit.** Z.B. zieht `import { TagSelection } from '@thebuoyant-tsdev/mui-ts-library'` jetzt kein D3, TipTap oder CodeMirror mehr ins Bundle — gemessener Rückgang von 1.1 MB auf 22 KB in einem minimalen esbuild-Testbundle.
+- Keine API-Änderungen — bestehende Imports funktionieren unverändert. Der CJS-Build (`require()`) bleibt eine gebündelte Datei, da CommonJS-Konsumenten ohnehin nicht tree-shaken.
+
+---
+
 ## [3.2.1] — 2026-06-17
 
 ### Behoben
