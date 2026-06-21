@@ -19,13 +19,30 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
       name: "MuiTsLibrary",
-      fileName: "index",
-      formats: ["es", "cjs"],
     },
     rollupOptions: {
       // Alle dependencies + peerDependencies externalisieren — nicht in dist bundeln
       external: (id) =>
         externalPackages.some((dep) => id === dep || id.startsWith(dep + "/")),
+      output: [
+        // ESM — ein File pro Quell-Modul, damit Bundler beim Konsumenten nur die
+        // tatsächlich importierten Komponenten (und ihre Dependencies) einschließen.
+        {
+          format: "es",
+          dir: "dist",
+          preserveModules: true,
+          preserveModulesRoot: "src",
+          entryFileNames: "[name].js",
+        },
+        // CJS — ein gebündeltes File, da require()-Konsumenten ohnehin nicht
+        // tree-shaken.
+        {
+          format: "cjs",
+          dir: "dist",
+          entryFileNames: "index.cjs",
+          exports: "named",
+        },
+      ],
     },
   },
   test: {

@@ -13,6 +13,18 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [3.3.0] — 2026-06-21
+
+### Hinzugefügt
+
+#### Tree-Shaking — Build-Output pro Komponente
+
+- Der ESM-Build bündelt nicht mehr alle Komponenten in eine `dist/index.js`-Datei, sondern erhält die Modul-Grenzen — jede Komponente wird als eigene Datei ausgeliefert, analog zur `src/`-Struktur.
+- **Der Import einer Komponente zieht keine Abhängigkeiten fremder Komponenten mehr mit.** Z.B. zieht `import { TagSelection } from '@thebuoyant-tsdev/mui-ts-library'` jetzt kein D3, TipTap oder CodeMirror mehr ins Bundle — gemessener Rückgang von 1.1 MB auf 22 KB in einem minimalen esbuild-Testbundle.
+- Keine API-Änderungen — bestehende Imports funktionieren unverändert. Der CJS-Build (`require()`) bleibt eine gebündelte Datei, da CommonJS-Konsumenten ohnehin nicht tree-shaken.
+
+---
+
 ## [3.2.1] — 2026-06-17
 
 ### Behoben

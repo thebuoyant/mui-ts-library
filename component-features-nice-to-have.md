@@ -12,7 +12,7 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
 | ~~**🔴 StackBlitz / CodeSandbox Template**~~ | ~~"Try it now"-Link in README — Entwickler entscheiden in 30 Sek. ohne Installation.~~ | ~~Niedrig~~ | ✅ v3.2.0 |
-| **🔴 Bundle-Bloat / Tree-Shaking** | D3 + CodeMirror + Tiptap landen im Bundle auch wenn nur `TagSelection` genutzt wird. Lösung: separate `"exports"`-Entry-Points pro Komponente in package.json. | Hoch | ⚡ offen |
+| ~~**🔴 Bundle-Bloat / Tree-Shaking**~~ | ~~D3 + CodeMirror + Tiptap landen im Bundle auch wenn nur `TagSelection` genutzt wird.~~ Gelöst via Rollup `preserveModules` — ESM-Build liefert ein File pro Komponente statt einer Bundle-Datei. Kein API-Change, gemessen: 1.1 MB → 22 KB für Single-Component-Import. | ~~Hoch~~ | ✅ v3.3.0 |
 | ~~**🟡 ChordChart Dark-Mode**~~ | ~~`mixBlendMode: "multiply"` → theme-aware: `normal` im dark mode, `multiply` im light mode.~~ | ~~Niedrig~~ | ✅ v3.2.1 |
 | ~~**🟡 HorizontalTreeChart Link-Opacity**~~ | ~~`linkStrokeOpacity`-Default `0.4` → `1.0`, konsistent mit RadialTreeChart.~~ | ~~Niedrig~~ | ✅ v3.2.1 |
 | **🟡 Storybook Charts — play-Funktionen** | D3-Charts zeigen bei Story-Öffnung nur leeren Container. `play`-Funktionen rendern Charts sofort (wie TagSelection SearchHighlight). Betrifft: SunburstChart, ChordChart, RadialTreeChart, CirclePackingChart, HorizontalTreeChart. | Mittel | ⚡ offen |

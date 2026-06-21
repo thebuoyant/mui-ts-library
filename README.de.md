@@ -313,6 +313,13 @@ import type {
 
 ## Changelog
 
+### [3.3.0] — 2026-06-21
+
+**Tree-Shaking — Build-Output pro Komponente**
+- `import { TagSelection } from '@thebuoyant-tsdev/mui-ts-library'` zieht kein D3, TipTap oder CodeMirror mehr ins Bundle — gemessener Rückgang von 1.1 MB auf 22 KB in einem minimalen Testbundle. Keine API-Änderungen.
+
+---
+
 ### [3.2.1] — 2026-06-17
 
 **Bugfixes**
