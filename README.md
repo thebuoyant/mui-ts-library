@@ -313,6 +313,14 @@ import type {
 
 ## Changelog
 
+### [3.5.0] — 2026-06-22
+
+**SqlEditor — Query History**
+- New `toolbarConfig.showHistory` option saves every executed query to `localStorage` and lets you reload it with one click. New props: `queryHistoryKey`, `queryHistoryMaxEntries`.
+- D3 chart Storybook stories now auto-demonstrate drill-down, zoom, and hover-highlight on load.
+
+---
+
 ### [3.4.0] — 2026-06-21
 
 **Accessibility & Test Coverage**

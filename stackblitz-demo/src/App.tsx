@@ -410,7 +410,7 @@ export default function App() {
           {/* SqlEditor */}
           <DemoCard
             title="SqlEditor"
-            subtitle="SQL editor with syntax highlighting, dialect-aware autocomplete, linting, and Cmd+Enter to execute."
+            subtitle="SQL editor with syntax highlighting, dialect-aware autocomplete, linting, query history, and Cmd+Enter to execute."
           >
             <SqlEditor
               value={sql}
@@ -420,6 +420,7 @@ export default function App() {
               height={200}
               showLineNumbers
               showLineColumn
+              toolbarConfig={{ showExecute: true, showHistory: true }}
             />
           </DemoCard>
 

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { fn, fireEvent } from "storybook/test";
 import { CirclePackingChart } from "./CirclePackingChart";
 import type { CirclePackingData } from "./CirclePackingChart.types";
 
@@ -187,11 +187,16 @@ export const Default: Story = {
           '`Ctrl / Cmd ⌘+Click` any circle with children → animated zoom in. ' +
           '`Ctrl / Cmd ⌘+Double-click` → zoom out one level. ' +
           '`Escape` → reset to root. ' +
-          'Regular click fires `onCircleClick` with name, value, percentage, and path.',
+          'Regular click fires `onCircleClick` with name, value, percentage, and path. ' +
+          'This story auto-runs a Ctrl+Click on the first eligible circle so you see the zoom animation.',
       },
     },
   },
   args: { data: GLOBAL_SOFTWARE },
+  play: async ({ canvasElement }) => {
+    const firstZoomable = canvasElement.querySelector<SVGCircleElement>('circle[style*="cursor: pointer"]');
+    if (firstZoomable) fireEvent.click(firstZoomable, { ctrlKey: true });
+  },
 };
 
 export const DeepHierarchy: Story = {

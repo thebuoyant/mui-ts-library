@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { fn, fireEvent } from "storybook/test";
 import { RadialTreeChart } from "./RadialTreeChart";
 import type { RadialTreeChartData } from "./RadialTreeChart.types";
 
@@ -377,9 +377,14 @@ export const DeepTree: Story = {
           '`Ctrl+Click` on any branch node → drill down into that subtree. ' +
           '`Ctrl+Double-click` → zoom out one level. ' +
           '`Ctrl+Scroll` → visual zoom (content clipped at SVG boundary). ' +
-          '`Escape` resets everything. Breadcrumb shown at top when drilled in.',
+          '`Escape` resets everything. Breadcrumb shown at top when drilled in. ' +
+          'This story auto-runs a Ctrl+Click on the first branch node so you land already drilled in.',
       },
     },
+  },
+  play: async ({ canvasElement }) => {
+    const firstBranchNode = canvasElement.querySelector<SVGGElement>('g[data-idx="1"]');
+    if (firstBranchNode) fireEvent.click(firstBranchNode, { ctrlKey: true });
   },
   args: {
     data:             DEEP_TREE_DATA,

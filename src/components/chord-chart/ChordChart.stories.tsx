@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { fn, userEvent } from "storybook/test";
 import { ChordChart } from "./ChordChart";
 import type { ChordChartData } from "./ChordChart.types";
 
@@ -87,11 +87,16 @@ export const Default: Story = {
           'Chord chart showing team dependency flows. **Hover** any arc group to highlight its ribbons and dim the rest. ' +
           '**Click** a group arc → `onGroupClick` with `{ name, valueOut, valueIn }`. ' +
           '**Click** a ribbon → `onChordClick` with `{ source, target }`. ' +
-          'Tooltip appears near the cursor with name and flow values.',
+          'Tooltip appears near the cursor with name and flow values. ' +
+          'This story auto-hovers the first group so you can see the highlight effect immediately.',
       },
     },
   },
   args: { data: TEAM_DATA },
+  play: async ({ canvasElement }) => {
+    const firstGroup = canvasElement.querySelector<SVGGElement>("g[style*='cursor']");
+    if (firstGroup) await userEvent.hover(firstGroup);
+  },
 };
 
 export const Undirected: Story = {

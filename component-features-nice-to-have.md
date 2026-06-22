@@ -15,7 +15,7 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 | ~~**🔴 Bundle-Bloat / Tree-Shaking**~~ | ~~D3 + CodeMirror + Tiptap landen im Bundle auch wenn nur `TagSelection` genutzt wird.~~ Gelöst via Rollup `preserveModules` — ESM-Build liefert ein File pro Komponente statt einer Bundle-Datei. Kein API-Change, gemessen: 1.1 MB → 22 KB für Single-Component-Import. | ~~Hoch~~ | ✅ v3.3.0 |
 | ~~**🟡 ChordChart Dark-Mode**~~ | ~~`mixBlendMode: "multiply"` → theme-aware: `normal` im dark mode, `multiply` im light mode.~~ | ~~Niedrig~~ | ✅ v3.2.1 |
 | ~~**🟡 HorizontalTreeChart Link-Opacity**~~ | ~~`linkStrokeOpacity`-Default `0.4` → `1.0`, konsistent mit RadialTreeChart.~~ | ~~Niedrig~~ | ✅ v3.2.1 |
-| **🟡 Storybook Charts — play-Funktionen** | D3-Charts zeigen bei Story-Öffnung nur leeren Container. `play`-Funktionen rendern Charts sofort (wie TagSelection SearchHighlight). Betrifft: SunburstChart, ChordChart, RadialTreeChart, CirclePackingChart, HorizontalTreeChart. | Mittel | ⚡ offen |
+| ~~**🟡 Storybook Charts — play-Funktionen**~~ | ~~D3-Charts zeigten Interaktionsfeatures nur statisch in der Beschreibung.~~ `play`-Funktionen demonstrieren jetzt automatisch: Ctrl+Click Drill-down (Sunburst, RadialTree, HorizontalTree), Ctrl+Click Zoom (CirclePacking), Hover-Highlight (Chord). | ~~Mittel~~ | ✅ v3.5.0 |
 | ~~**🔴 SqlEditor — keine Tests**~~ | ~~`sql-editor/*.test.tsx` existiert nicht.~~ 21 Tests ergänzt (Toolbar-Interaktionen, Dialekte, Schema, Disabled-State). 0% → 82% Lines. | ~~Mittel~~ | ✅ v3.4.0 |
 | ~~**🟡 Test-Coverage-Lücken**~~ | ~~`RichTextEditorImageDialog` (17%), `RichTextEditorTableMenu` (20%), `gantt-chart.util.ts` (0%, Artefakt-Messung) ungetestet.~~ ImageDialog → 94%, TableMenu → 96%, gantt-chart.util → 99% (cascadeDateUpdate + computeCriticalPath ergänzt). Gesamt 68%→74% Lines. | ~~Mittel~~ | ✅ v3.4.0 |
 | ~~**🟡 Accessibility-Audit**~~ | ~~`aria-*` nur in 23 von ~60 Source-Dateien.~~ 13 fehlende `aria-label` ergänzt (GanttTaskPanel, GanttToolbar, TagSelectionAutocomplete Confirm/Cancel, RichTextEditor Color-Swatches + Emoji-Picker). 2 neue TagSelection-Translation-Keys (`confirmCreateLabel`, `cancelCreateLabel`). | ~~Mittel~~ | ✅ v3.4.0 |
@@ -69,7 +69,7 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 |---|---|---|---|
 | ~~Keyboard Shortcut Execute~~ | ~~Cmd / Ctrl+Enter für `onExecute`~~ | ~~Niedrig~~ | ✅ v1.5.0 |
 | ~~Zeilennummern-Gutter anpassen~~ | ~~Breite auto an max. Zeilenzahl~~ | ~~Niedrig~~ | ✅ v1.5.0 |
-| ⭐ Query-Verlauf | Letzte N Abfragen speichern/laden (localStorage) — Nutzer erwarten das von jedem SQL-Editor | Mittel | — |
+| ~~⭐ Query-Verlauf~~ | ~~Letzte N Abfragen speichern/laden (localStorage)~~ — `toolbarConfig.showHistory` + `queryHistoryKey`/`queryHistoryMaxEntries`, History-Menu zum Nachladen, "Clear history". | ~~Mittel~~ | ✅ v3.5.0 |
 | ⭐ Hover-Doku | Spalten-/Tabellen-Kommentar als Tooltip aus Schema beim Hover | Mittel | — |
 | ⭐ AI-Autocomplete | LLM-Endpoint für SQL-Vorschläge — klares Differenzierungsmerkmal, kein anderer MUI-Editor bietet das | Hoch | — |
 | Ergebnis-Metadaten-Footer | Nach `onExecute`: Zeilenanzahl + Ausführungszeit im Footer | Mittel | — |

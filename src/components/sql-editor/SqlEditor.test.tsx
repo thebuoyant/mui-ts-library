@@ -1,9 +1,13 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi, beforeEach } from "vitest";
 import { SqlEditor } from "./SqlEditor";
 
 const SAMPLE_SQL = "SELECT * FROM users WHERE id = 1;";
 const MESSY_SQL  = "select * from   users where id=1";
+
+beforeEach(() => {
+  window.localStorage.clear();
+});
 
 describe("SqlEditor", () => {
   it("renders without crashing", () => {
@@ -169,5 +173,99 @@ describe("SqlEditor", () => {
     render(<SqlEditor value={SAMPLE_SQL} disabled />);
     expect(screen.getByRole("button", { name: "Format SQL" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Copy"        })).toBeDisabled();
+  });
+});
+
+describe("SqlEditor — query history", () => {
+  it("does not render the history button by default", () => {
+    render(<SqlEditor value={SAMPLE_SQL} onExecute={vi.fn()} />);
+    expect(screen.queryByRole("button", { name: "Query history" })).not.toBeInTheDocument();
+  });
+
+  it("does not render the history button without onExecute, even if showHistory is set", () => {
+    render(<SqlEditor value={SAMPLE_SQL} toolbarConfig={{ showHistory: true }} />);
+    expect(screen.queryByRole("button", { name: "Query history" })).not.toBeInTheDocument();
+  });
+
+  it("renders the history button when showHistory and onExecute are set", () => {
+    render(<SqlEditor value={SAMPLE_SQL} onExecute={vi.fn()} toolbarConfig={{ showHistory: true }} />);
+    expect(screen.getByRole("button", { name: "Query history" })).toBeInTheDocument();
+  });
+
+  it("adds the executed query to history and shows it in the menu", async () => {
+    render(
+      <SqlEditor
+        value={SAMPLE_SQL}
+        onExecute={vi.fn()}
+        toolbarConfig={{ showExecute: true, showHistory: true }}
+        queryHistoryKey="test-history-1"
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Execute" }));
+    fireEvent.click(screen.getByRole("button", { name: "Query history" }));
+    expect(await screen.findByText(SAMPLE_SQL)).toBeInTheDocument();
+  });
+
+  it("loads a history entry into the editor when clicked", async () => {
+    const onChange = vi.fn();
+    render(
+      <SqlEditor
+        value={SAMPLE_SQL}
+        onChange={onChange}
+        onExecute={vi.fn()}
+        toolbarConfig={{ showExecute: true, showHistory: true }}
+        queryHistoryKey="test-history-2"
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Execute" }));
+    fireEvent.click(screen.getByRole("button", { name: "Clear" }));
+    expect(document.querySelector(".cm-content")!.textContent).toBe("");
+
+    fireEvent.click(screen.getByRole("button", { name: "Query history" }));
+    fireEvent.click(await screen.findByText(SAMPLE_SQL));
+
+    expect(document.querySelector(".cm-content")!.textContent).toBe(SAMPLE_SQL);
+    expect(onChange).toHaveBeenCalledWith(SAMPLE_SQL);
+  });
+
+  it("clears the history when 'Clear history' is clicked", async () => {
+    render(
+      <SqlEditor
+        value={SAMPLE_SQL}
+        onExecute={vi.fn()}
+        toolbarConfig={{ showExecute: true, showHistory: true }}
+        queryHistoryKey="test-history-3"
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Execute" }));
+    fireEvent.click(screen.getByRole("button", { name: "Query history" }));
+    fireEvent.click(await screen.findByText("Clear history"));
+
+    fireEvent.click(screen.getByRole("button", { name: "Query history" }));
+    expect(await screen.findByText("No queries yet")).toBeInTheDocument();
+  });
+
+  it("persists history across remounts via localStorage", async () => {
+    const { unmount } = render(
+      <SqlEditor
+        value={SAMPLE_SQL}
+        onExecute={vi.fn()}
+        toolbarConfig={{ showExecute: true, showHistory: true }}
+        queryHistoryKey="test-history-persist"
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Execute" }));
+    unmount();
+
+    render(
+      <SqlEditor
+        value=""
+        onExecute={vi.fn()}
+        toolbarConfig={{ showExecute: true, showHistory: true }}
+        queryHistoryKey="test-history-persist"
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Query history" }));
+    expect(await screen.findByText(SAMPLE_SQL)).toBeInTheDocument();
   });
 });

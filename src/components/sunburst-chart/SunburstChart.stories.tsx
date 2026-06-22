@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { fn, fireEvent } from "storybook/test";
 import { SunburstChart } from "./SunburstChart";
 import type { SunburstChartData } from "./SunburstChart.types";
 
@@ -302,7 +302,8 @@ export const DeepHierarchy: Story = {
           '**5 depth levels — combines Ctrl+Click drill-down with Ctrl+Scroll zoom.** ' +
           '`Ctrl+Click` any ring segment → drill-down into that subtree. ' +
           '`Ctrl+Scroll` → visual zoom (content outside `size` is clipped). ' +
-          '`Escape` resets both zoom and drill-down to root.',
+          '`Escape` resets both zoom and drill-down to root. ' +
+          'This story auto-runs a Ctrl+Click on the first segment so you land already drilled in.',
       },
     },
   },
@@ -312,5 +313,9 @@ export const DeepHierarchy: Story = {
     sortBy:    "value",
     zoomable:  true,
     showSegmentLabels: true,
+  },
+  play: async ({ canvasElement }) => {
+    const firstSegment = canvasElement.querySelector<SVGPathElement>('path[data-idx="0"]');
+    if (firstSegment) fireEvent.click(firstSegment, { ctrlKey: true });
   },
 };

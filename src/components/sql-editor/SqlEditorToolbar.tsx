@@ -11,7 +11,9 @@ import { undo, redo }   from "@codemirror/commands";
 import type { EditorView } from "@codemirror/view";
 import { format as formatSql, type SqlLanguage } from "sql-formatter";
 import type { SqlEditorDialect, SqlEditorToolbarConfig, SqlEditorTranslation } from "./SqlEditor.types";
+import type { SqlQueryHistoryEntry } from "./util/sqlQueryHistory.util";
 import { ToolbarButton } from "../shared/ToolbarButton";
+import { SqlEditorHistoryMenu } from "./SqlEditorHistoryMenu";
 
 const DIALECT_MAP: Record<SqlEditorDialect, SqlLanguage> = {
   standard:   "sql",
@@ -22,12 +24,15 @@ const DIALECT_MAP: Record<SqlEditorDialect, SqlLanguage> = {
 };
 
 type SqlEditorToolbarProps = {
-  editorView:    EditorView | null;
-  toolbarConfig: Required<SqlEditorToolbarConfig>;
-  translation:   SqlEditorTranslation;
-  dialect:       SqlEditorDialect;
-  disabled?:     boolean;
-  onExecute?:    (sql: string) => void;
+  editorView:      EditorView | null;
+  toolbarConfig:   Required<SqlEditorToolbarConfig>;
+  translation:     SqlEditorTranslation;
+  dialect:         SqlEditorDialect;
+  disabled?:       boolean;
+  onExecute?:      (sql: string) => void;
+  queryHistory?:        SqlQueryHistoryEntry[];
+  onSelectHistoryEntry?: (sql: string) => void;
+  onClearHistory?:       () => void;
 };
 
 export function SqlEditorToolbar({
@@ -37,6 +42,9 @@ export function SqlEditorToolbar({
   dialect,
   disabled,
   onExecute,
+  queryHistory = [],
+  onSelectHistoryEntry,
+  onClearHistory,
 }: SqlEditorToolbarProps) {
   const [copied, setCopied] = useState(false);
   const isDisabled = disabled || !editorView;
@@ -89,10 +97,11 @@ export function SqlEditorToolbar({
     onExecute(view.state.doc.toString());
   }
 
-  const hasFormatGroup  = tc.showFormat;
-  const hasActionGroup  = tc.showCopy || tc.showClear;
-  const hasHistoryGroup = tc.showUndoRedo;
-  const hasExecuteGroup = tc.showExecute && !!onExecute;
+  const hasFormatGroup      = tc.showFormat;
+  const hasActionGroup      = tc.showCopy || tc.showClear;
+  const hasUndoRedoGroup    = tc.showUndoRedo;
+  const hasExecuteGroup     = tc.showExecute && !!onExecute;
+  const hasQueryHistoryGroup = tc.showHistory && !!onExecute && !!onSelectHistoryEntry && !!onClearHistory;
 
   return (
     <Box
@@ -111,7 +120,7 @@ export function SqlEditorToolbar({
         </Box>
       )}
 
-      {hasFormatGroup && (hasActionGroup || hasHistoryGroup) && (
+      {hasFormatGroup && (hasActionGroup || hasUndoRedoGroup) && (
         <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
       )}
 
@@ -136,11 +145,11 @@ export function SqlEditorToolbar({
         </Box>
       )}
 
-      {hasActionGroup && hasHistoryGroup && (
+      {hasActionGroup && hasUndoRedoGroup && (
         <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
       )}
 
-      {hasHistoryGroup && (
+      {hasUndoRedoGroup && (
         <Box sx={{ display: "flex", gap: 0.25 }}>
           <ToolbarButton
             label={t.undo}
@@ -157,9 +166,24 @@ export function SqlEditorToolbar({
         </Box>
       )}
 
+      {hasQueryHistoryGroup && (
+        <>
+          {(hasActionGroup || hasUndoRedoGroup) && (
+            <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+          )}
+          <SqlEditorHistoryMenu
+            history={queryHistory}
+            onSelect={onSelectHistoryEntry!}
+            onClear={onClearHistory!}
+            translation={t}
+            disabled={disabled}
+          />
+        </>
+      )}
+
       {hasExecuteGroup && (
         <>
-          {(hasActionGroup || hasHistoryGroup) && (
+          {(hasActionGroup || hasUndoRedoGroup || hasQueryHistoryGroup) && (
             <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
           )}
           <ToolbarButton
@@ -171,7 +195,7 @@ export function SqlEditorToolbar({
         </>
       )}
 
-      {!hasFormatGroup && !hasActionGroup && !hasHistoryGroup && !hasExecuteGroup && (
+      {!hasFormatGroup && !hasActionGroup && !hasUndoRedoGroup && !hasQueryHistoryGroup && !hasExecuteGroup && (
         <Box sx={{ height: 32 }} />
       )}
     </Box>

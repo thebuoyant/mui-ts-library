@@ -1,6 +1,6 @@
 import { type ComponentProps, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { fn, userEvent, within } from "storybook/test";
 import { Box } from "@mui/material";
 import { SqlEditor } from "./SqlEditor";
 
@@ -178,6 +178,32 @@ export const WithExecute: Story = {
   },
 };
 
+export const WithQueryHistory: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'The **Query history** button (`toolbarConfig.showHistory: true`) appears next to Execute and ' +
+          'requires `onExecute` to be set. Every executed query is saved to `localStorage` (capped at ' +
+          '`queryHistoryMaxEntries`, default 20) and can be reloaded into the editor with one click. ' +
+          'Use `queryHistoryKey` to namespace the storage when multiple editors run on the same page. ' +
+          'This story auto-runs Execute once so you can open the history menu and see an entry.',
+      },
+    },
+  },
+  args: {
+    value:          SAMPLE_SQL,
+    toolbarConfig:  { showExecute: true, showHistory: true },
+    queryHistoryKey: "storybook-sql-history-demo",
+    onExecute:      fn(),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: "Execute" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Query history" }));
+  },
+};
+
 export const NoLineNumbers: Story = {
   args: {
     value:           SAMPLE_SQL,
@@ -283,14 +309,19 @@ export const WithFormat: Story = {
 export const GermanTranslation: Story = {
   args: {
     value: SAMPLE_SQL,
+    toolbarConfig: { showExecute: true, showHistory: true },
+    onExecute: fn(),
     translation: {
-      copy:        "Kopieren",
-      copySuccess: "Kopiert!",
-      clear:       "Leeren",
-      execute:     "Ausführen",
-      undo:        "Rückgängig",
-      redo:        "Wiederholen",
-      lineColumn:  "Zeile {line}, Sp. {col}",
+      copy:         "Kopieren",
+      copySuccess:  "Kopiert!",
+      clear:        "Leeren",
+      execute:      "Ausführen",
+      undo:         "Rückgängig",
+      redo:         "Wiederholen",
+      lineColumn:   "Zeile {line}, Sp. {col}",
+      history:      "Verlauf",
+      historyEmpty: "Noch keine Abfragen",
+      clearHistory: "Verlauf leeren",
     },
   },
 };

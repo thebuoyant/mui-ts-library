@@ -11,6 +11,8 @@ export type SqlEditorToolbarConfig = {
   showClear?:    boolean;
   showExecute?:  boolean;
   showUndoRedo?: boolean;
+  /** Shows a "Query history" button — requires `onExecute` to be set (default: false). */
+  showHistory?:  boolean;
 };
 
 export const DEFAULT_SQL_EDITOR_TOOLBAR_CONFIG: Required<SqlEditorToolbarConfig> = {
@@ -19,30 +21,37 @@ export const DEFAULT_SQL_EDITOR_TOOLBAR_CONFIG: Required<SqlEditorToolbarConfig>
   showClear:    true,
   showExecute:  false,
   showUndoRedo: true,
+  showHistory:  false,
 };
 
 export type SqlEditorTranslation = {
-  format:      string;
-  copy:        string;
-  copySuccess: string;
-  clear:       string;
-  execute:     string;
-  undo:        string;
-  redo:        string;
-  lineColumn:  string;
-  errorCount:  string;
+  format:        string;
+  copy:          string;
+  copySuccess:   string;
+  clear:         string;
+  execute:       string;
+  undo:          string;
+  redo:          string;
+  lineColumn:    string;
+  errorCount:    string;
+  history:       string;
+  historyEmpty:  string;
+  clearHistory:  string;
 };
 
 export const DEFAULT_SQL_EDITOR_TRANSLATION: SqlEditorTranslation = {
-  format:      "Format SQL",
-  copy:        "Copy",
-  copySuccess: "Copied!",
-  clear:       "Clear",
-  execute:     "Execute",
-  undo:        "Undo",
-  redo:        "Redo",
-  lineColumn:  "Ln {line}, Col {col}",
-  errorCount:  "{count} error(s)",
+  format:        "Format SQL",
+  copy:          "Copy",
+  copySuccess:   "Copied!",
+  clear:         "Clear",
+  execute:       "Execute",
+  undo:          "Undo",
+  redo:          "Redo",
+  lineColumn:    "Ln {line}, Col {col}",
+  errorCount:    "{count} error(s)",
+  history:       "Query history",
+  historyEmpty:  "No queries yet",
+  clearHistory:  "Clear history",
 };
 
 export type SqlEditorDialect = "standard" | "mysql" | "postgresql" | "sqlite" | "mssql";
@@ -81,6 +90,10 @@ export type SqlEditorProps = {
   /** Name for native form submission via hidden input. */
   name?:            string;
   placeholder?:     string;
+  /** localStorage key for the query history — set a unique value if multiple SqlEditors run on the same page (default: "sql-editor-query-history"). */
+  queryHistoryKey?:        string;
+  /** Maximum number of entries kept in the query history (default: 20). */
+  queryHistoryMaxEntries?: number;
   readonly?:        boolean;
   schema?:          SqlSchema;
   showErrorCount?:  boolean;

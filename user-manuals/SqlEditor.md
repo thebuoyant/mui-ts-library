@@ -97,6 +97,8 @@ function App() {
 | `highlightColors` | `SqlEditorHighlightColors` | — | Override syntax highlight colors for keywords, strings, and identifiers |
 | `name` | `string` | — | Name for native form submission (hidden `<input type="hidden">`) |
 | `placeholder` | `string` | — | Placeholder shown when the editor is empty |
+| `queryHistoryKey` | `string` | `"sql-editor-query-history"` | `localStorage` key for the query history — use a unique value per editor if multiple `SqlEditor`s run on the same page |
+| `queryHistoryMaxEntries` | `number` | `20` | Maximum number of entries kept in the query history |
 | `readonly` | `boolean` | `false` | Read-only mode — no toolbar shown |
 | `schema` | `SqlSchema` | — | Table and column definitions for schema-aware autocomplete |
 | `showErrorCount` | `boolean` | `false` | Show/hide the error count in the footer (requires `onLint`) |
@@ -142,6 +144,7 @@ type SqlEditorToolbarConfig = {
   showClear?:    boolean;  // Clear editor
   showExecute?:  boolean;  // Execute button (off by default)
   showUndoRedo?: boolean;  // Undo / Redo
+  showHistory?:  boolean;  // Query history button — requires onExecute (off by default)
 };
 ```
 
@@ -149,22 +152,25 @@ Default configuration:
 
 ```tsx
 import { DEFAULT_SQL_EDITOR_TOOLBAR_CONFIG } from '@thebuoyant-tsdev/mui-ts-library';
-// { showFormat: true, showCopy: true, showClear: true, showExecute: false, showUndoRedo: true }
+// { showFormat: true, showCopy: true, showClear: true, showExecute: false, showUndoRedo: true, showHistory: false }
 ```
 
 ### `SqlEditorTranslation`
 
 ```ts
 type SqlEditorTranslation = {
-  format:      string;   // "Format SQL"
-  copy:        string;   // "Copy"
-  copySuccess: string;   // "Copied!"
-  clear:       string;   // "Clear"
-  execute:     string;   // "Execute"
-  undo:        string;   // "Undo"
-  redo:        string;   // "Redo"
-  lineColumn:  string;   // "Ln {line}, Col {col}"
-  errorCount:  string;   // "{count} error(s)"
+  format:       string;   // "Format SQL"
+  copy:         string;   // "Copy"
+  copySuccess:  string;   // "Copied!"
+  clear:        string;   // "Clear"
+  execute:      string;   // "Execute"
+  undo:         string;   // "Undo"
+  redo:         string;   // "Redo"
+  lineColumn:   string;   // "Ln {line}, Col {col}"
+  errorCount:   string;   // "{count} error(s)"
+  history:      string;   // "Query history"
+  historyEmpty: string;   // "No queries yet"
+  clearHistory: string;   // "Clear history"
 };
 ```
 
@@ -328,6 +334,30 @@ The Execute button is hidden by default. It only appears when both `toolbarConfi
   onExecute={(sql) => runQuery(sql)}
 />
 ```
+
+---
+
+## Query History
+
+```tsx
+<SqlEditor
+  value={sql}
+  onChange={setSql}
+  toolbarConfig={{ showExecute: true, showHistory: true }}
+  onExecute={(sql) => runQuery(sql)}
+  queryHistoryKey="my-app-sql-history"
+  queryHistoryMaxEntries={20}
+/>
+```
+
+The "Query history" toolbar button is hidden by default. It only appears when `toolbarConfig.showHistory: true` **and** an `onExecute` handler are provided — history only ever records queries that were actually run, the same way DataGrip, TablePlus, or pgAdmin do it.
+
+Every call to `onExecute` (whether triggered by the toolbar button or the `Cmd+Enter` / `Ctrl+Enter` shortcut) saves the SQL to `localStorage`, newest first. Re-running the exact same SQL moves the existing entry to the front instead of creating a duplicate. Clicking an entry in the history menu loads it back into the editor; a "Clear history" item at the bottom of the menu empties it.
+
+| Prop | Default | Description |
+|---|---|---|
+| `queryHistoryKey` | `"sql-editor-query-history"` | `localStorage` key. Set a unique value per editor if you render multiple `SqlEditor`s on the same page — otherwise they'd share one history. |
+| `queryHistoryMaxEntries` | `20` | Maximum number of entries kept. Oldest entries are dropped once the limit is reached. |
 
 ---
 
@@ -536,15 +566,18 @@ Only specify the keys you want to override — all others retain their default v
 import { DEFAULT_SQL_EDITOR_TRANSLATION } from '@thebuoyant-tsdev/mui-ts-library';
 
 const DE = {
-  format:      "Formatieren",
-  copy:        "Kopieren",
-  copySuccess: "Kopiert!",
-  clear:       "Leeren",
-  execute:     "Ausführen",
-  undo:        "Rückgängig",
-  redo:        "Wiederholen",
-  lineColumn:  "Zeile {line}, Sp. {col}",
-  errorCount:  "{count} Fehler",
+  format:       "Formatieren",
+  copy:         "Kopieren",
+  copySuccess:  "Kopiert!",
+  clear:        "Leeren",
+  execute:      "Ausführen",
+  undo:         "Rückgängig",
+  redo:         "Wiederholen",
+  lineColumn:   "Zeile {line}, Sp. {col}",
+  errorCount:   "{count} Fehler",
+  history:      "Verlauf",
+  historyEmpty: "Noch keine Abfragen",
+  clearHistory: "Verlauf leeren",
 };
 
 <SqlEditor translation={DE} />
@@ -566,6 +599,7 @@ The placeholders `{line}`, `{col}`, and `{count}` are replaced at runtime.
 | `MySQLDialect` | MySQL-specific syntax |
 | `PostgreSQLDialect` | PostgreSQL-specific syntax |
 | `WithExecute` | Execute button visible |
+| `WithQueryHistory` | Execute + query history button, auto-runs Execute once |
 | `WithSchema` | Schema-aware autocomplete with 3 tables |
 | `WithLinting` | Server-side linting with simulated errors |
 | `WithFormat` | Format button with unformatted SQL |

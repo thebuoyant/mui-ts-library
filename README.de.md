@@ -313,6 +313,14 @@ import type {
 
 ## Changelog
 
+### [3.5.0] — 2026-06-22
+
+**SqlEditor — Query-Verlauf**
+- Neue Option `toolbarConfig.showHistory` speichert jede ausgeführte Abfrage in `localStorage` und lädt sie per Klick wieder. Neue Props: `queryHistoryKey`, `queryHistoryMaxEntries`.
+- D3-Chart-Storybook-Stories demonstrieren jetzt automatisch Drill-down, Zoom und Hover-Highlight beim Laden.
+
+---
+
 ### [3.4.0] — 2026-06-21
 
 **Accessibility & Test-Coverage**
