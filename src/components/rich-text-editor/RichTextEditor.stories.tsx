@@ -402,3 +402,80 @@ export const GermanTranslation: Story = {
     },
   },
 };
+
+// ── Use case: blog post editor ───────────────────────────────────────────────
+
+const BLOG_POST_HTML = `<h1>10 Lessons From Scaling Our API to 1M Requests/Day</h1>
+<p><em>Published by Maria Chen · 8 min read</em></p>
+<p>When we launched in 2023, our API handled a few thousand requests a day. ` +
+  `Eighteen months later, we're well past a million — and the journey taught us things ` +
+  `no amount of planning could have.</p>
+<h2>1. Caching is not optional</h2>
+<p>We deferred a proper caching layer for "later" three separate times. Each time, ` +
+  `it came back to bite us during a traffic spike. <strong>Build it before you think you need it.</strong></p>
+<h2>2. Rate limiting protects you from yourself</h2>
+<p>Most of our worst incidents were caused by <em>our own</em> retry logic, not external abuse.</p>
+<blockquote>"The first DDoS we suffered was self-inflicted." — a lesson learned the hard way.</blockquote>
+<h2>3. Observability pays for itself in the first incident</h2>
+<p>Every dollar spent on tracing and structured logging came back tenfold the first time ` +
+  `we had to debug a 3am outage.</p>
+<p>Read the full write-up on our <a href="https://example.com/engineering-blog">engineering blog</a>.</p>`;
+
+export const BlogPostEditor: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '**Real-world use case: a CMS blog post editor.** ' +
+          'Long-form content with headings, blockquotes, links, and emphasis — the full toolbar earns its keep here. ' +
+          '`showWordCount` helps writers hit a target length.',
+      },
+    },
+  },
+  args: {
+    value: BLOG_POST_HTML,
+    height: 420,
+    showWordCount: true,
+    placeholder: "Start writing your post…",
+  },
+};
+
+// ── Use case: support ticket reply ───────────────────────────────────────────
+
+const SUPPORT_REPLY_HTML = `<p>Hi Alex,</p>
+<p>Thanks for reaching out, and sorry for the trouble with your export!</p>
+<p>I checked your account and can confirm the CSV export was failing due to a special character ` +
+  `in one of your project names. We've shipped a fix — could you try the export again on your end?</p>
+<p>If it still fails, here's a quick workaround in the meantime:</p>
+<ol>
+  <li>Go to <strong>Settings → Projects</strong></li>
+  <li>Rename the project (you can rename it back afterward)</li>
+  <li>Retry the export</li>
+</ol>
+<p>Let me know how it goes — happy to help further.</p>
+<p>Best,<br/>Support Team</p>`;
+
+export const SupportTicketReply: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '**Real-world use case: a help-desk reply composer.** ' +
+          'A trimmed-down toolbar (`MinimalToolbar`-style) keeps replies consistent and on-brand — ' +
+          'numbered steps and bold for emphasis are usually all a support reply needs.',
+      },
+    },
+  },
+  args: {
+    value: SUPPORT_REPLY_HTML,
+    height: 320,
+    toolbarConfig: {
+      showBold: true, showItalic: true, showUnderline: false, showStrike: false,
+      showHeading1: false, showHeading2: false, showHeading3: false,
+      showBulletList: true, showOrderedList: true, showBlockquote: false, showCodeBlock: false,
+      showLink: true, showHorizontalRule: false, showTextColor: false, showHighlight: false,
+      showTableButton: false, showImageButton: false, showEmojiButton: true,
+      showUndoRedo: true, showClearFormat: false, showFullscreenButton: false,
+    },
+  },
+};

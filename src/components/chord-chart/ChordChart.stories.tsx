@@ -176,3 +176,40 @@ export const Disabled: Story = {
   },
   args: { data: TEAM_DATA, disabled: true },
 };
+
+// ── Use case: international trade flows ──────────────────────────────────────
+
+const TRADE_DATA: ChordChartData[] = [
+  { source: "China",   target: "USA",          value: 536 },
+  { source: "USA",     target: "China",         value: 154 },
+  { source: "China",   target: "EU",            value: 472 },
+  { source: "EU",      target: "China",         value: 230 },
+  { source: "USA",     target: "EU",            value: 350 },
+  { source: "EU",      target: "USA",           value: 380 },
+  { source: "China",   target: "Japan",         value: 165 },
+  { source: "Japan",   target: "China",         value: 142 },
+  { source: "USA",     target: "Mexico",        value: 290 },
+  { source: "Mexico",  target: "USA",           value: 310 },
+  { source: "EU",      target: "Japan",         value: 88 },
+  { source: "Japan",   target: "EU",            value: 76 },
+  { source: "China",   target: "Mexico",        value: 45 },
+];
+
+export const TradeRelationships: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '**Real-world use case: bilateral trade flows in $B between major economies.** ' +
+          'A classic chord diagram application — visualizing import/export volume between countries or regions. ' +
+          'Hover "China" to see at a glance which partners dominate its trade, both incoming and outgoing.',
+      },
+    },
+  },
+  args: {
+    data: TRADE_DATA,
+    valueDecimalCount: 0,
+    valueThousandsSeparator: ",",
+    sortChords: "descending",
+  },
+};

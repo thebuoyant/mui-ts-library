@@ -313,6 +313,14 @@ import type {
 
 ## Changelog
 
+### [3.6.0] — 2026-06-22
+
+**Storybook & StackBlitz — Real-World Showcase**
+- 17 new Storybook stories across all 11 components, each with a genuinely different, realistic dataset (disk-usage analysis, trade flows, construction schedules, support-ticket routing, and more) instead of prop-toggle variations on one generic fixture.
+- StackBlitz demo cards now show a use-case category for quick orientation, with sharpened hero copy.
+
+---
+
 ### [3.5.0] — 2026-06-22
 
 **SqlEditor — Query History**

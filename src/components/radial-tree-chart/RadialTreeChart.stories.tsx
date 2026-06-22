@@ -400,3 +400,62 @@ export const DeepTree: Story = {
     translation: { specialValueA: "Version", specialValueB: "Focus area" },
   },
 };
+
+// ── Use case: e-commerce product catalog ─────────────────────────────────────
+
+const CATALOG_DATA: RadialTreeChartData = {
+  id: "catalog", name: "Catalog", subname: "All Departments",
+  children: [
+    {
+      id: "electronics", name: "Electronics", subname: "1,240 products",
+      children: [
+        { id: "phones",  name: "Phones",      subname: "180 products" },
+        { id: "laptops", name: "Laptops",     subname: "95 products" },
+        { id: "audio",   name: "Audio",       subname: "310 products" },
+        { id: "tv",      name: "TVs",         subname: "60 products" },
+      ],
+    },
+    {
+      id: "fashion", name: "Fashion", subname: "3,890 products",
+      children: [
+        { id: "mens",    name: "Men's",       subname: "1,120 products" },
+        { id: "womens",  name: "Women's",     subname: "1,680 products" },
+        { id: "kids",    name: "Kids",        subname: "640 products" },
+        { id: "shoes",   name: "Shoes",       subname: "450 products" },
+      ],
+    },
+    {
+      id: "home", name: "Home & Garden", subname: "2,150 products",
+      children: [
+        { id: "furniture", name: "Furniture", subname: "480 products" },
+        { id: "kitchen",   name: "Kitchen",    subname: "620 products" },
+        { id: "garden",    name: "Garden",     subname: "340 products" },
+      ],
+    },
+    {
+      id: "sports", name: "Sports & Outdoors", subname: "980 products",
+      children: [
+        { id: "fitness", name: "Fitness",     subname: "290 products" },
+        { id: "camping", name: "Camping",     subname: "210 products" },
+      ],
+    },
+  ],
+};
+
+export const ProductCatalog: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '**Real-world use case: an e-commerce category tree.** ' +
+          'Subname shows live product counts per category — useful for catalog admin tools or navigation builders. ' +
+          'Try `showNodePopover` together with `renderNodePopoverContent` to surface stock levels or revenue per category.',
+      },
+    },
+  },
+  args: {
+    data: CATALOG_DATA,
+    chartColors: ["#1565C0", "#AD1457", "#00695C", "#E65100"],
+    translation: { specialValueA: "SKU count" },
+  },
+};

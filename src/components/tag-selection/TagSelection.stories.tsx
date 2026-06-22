@@ -298,3 +298,100 @@ export const OverflowChips: Story = {
     </Box>
   ),
 };
+
+// ── Use case: developer skill selector ────────────────────────────────────────
+
+const SKILL_TAGS: TagSelectionItem[] = [
+  { id: "react",      label: "React",       color: "info",      selected: true },
+  { id: "typescript", label: "TypeScript",  color: "info",      selected: true },
+  { id: "nodejs",     label: "Node.js",     color: "success" },
+  { id: "python",     label: "Python",      color: "success" },
+  { id: "go",         label: "Go",          color: "success" },
+  { id: "postgresql", label: "PostgreSQL",  color: "warning" },
+  { id: "redis",      label: "Redis",       color: "warning" },
+  { id: "docker",     label: "Docker",      color: "secondary", selected: true },
+  { id: "kubernetes", label: "Kubernetes",  color: "secondary" },
+  { id: "aws",        label: "AWS",         color: "error" },
+  { id: "terraform",  label: "Terraform",   color: "error" },
+];
+
+function SkillSelectorStory(args: ComponentProps<typeof TagSelection>) {
+  const [tags, setTags] = useState<TagSelectionItem[]>(SKILL_TAGS);
+  return (
+    <Box sx={{ maxWidth: 460 }}>
+      <TagSelection
+        {...args}
+        tags={tags}
+        onTagsChange={(selected, all) => { setTags(all); args.onTagsChange?.(selected, all); }}
+      />
+    </Box>
+  );
+}
+
+export const SkillSelector: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '**Real-world use case: a developer profile skill picker.** ' +
+          'Colors group skills by category (languages, infra, cloud) — a pattern common in hiring tools and ' +
+          'team-directory apps. `allowCreate` lets a developer add a skill that is not yet in the list.',
+      },
+    },
+  },
+  args: {
+    allowCreate: true,
+    showSelectedTagsLabel: true,
+    translation: { selectedTagsLabel: "Your skills", autoCompleteLabel: "Add a skill", placeholder: "e.g. GraphQL, Rust …" },
+  },
+  render: (args) => <SkillSelectorStory {...args} />,
+};
+
+// ── Use case: email recipient picker ─────────────────────────────────────────
+
+const RECIPIENT_TAGS: TagSelectionItem[] = [
+  { id: "alice",  label: "alice@company.com",   color: "primary", selected: true },
+  { id: "bob",    label: "bob@company.com",     color: "primary", selected: true },
+  { id: "carol",  label: "carol@partner.io" },
+  { id: "dave",   label: "dave@partner.io" },
+  { id: "eng",    label: "engineering-team@company.com",  color: "secondary" },
+  { id: "design", label: "design-team@company.com",       color: "secondary" },
+  { id: "sales",  label: "sales-team@company.com",        color: "secondary" },
+];
+
+function RecipientPickerStory(args: ComponentProps<typeof TagSelection>) {
+  const [tags, setTags] = useState<TagSelectionItem[]>(RECIPIENT_TAGS);
+  return (
+    <Box sx={{ maxWidth: 460 }}>
+      <TagSelection
+        {...args}
+        tags={tags}
+        onTagsChange={(selected, all) => { setTags(all); args.onTagsChange?.(selected, all); }}
+      />
+    </Box>
+  );
+}
+
+export const EmailRecipients: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '**Real-world use case: a "To" field in an email composer or invite dialog.** ' +
+          'Mixing individual addresses with team distribution lists, plus free-text entry for one-off addresses ' +
+          'not yet in the address book.',
+      },
+    },
+  },
+  args: {
+    allowCreate: true,
+    maxTags: 10,
+    translation: {
+      selectedTagsLabel: "To",
+      autoCompleteLabel: "Add recipients",
+      placeholder: "Type a name or email…",
+      maxTagsReachedText: "Maximum of 10 recipients reached.",
+    },
+  },
+  render: (args) => <RecipientPickerStory {...args} />,
+};

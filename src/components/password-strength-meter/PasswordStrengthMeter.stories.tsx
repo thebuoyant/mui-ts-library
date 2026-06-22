@@ -312,3 +312,65 @@ export const WithConfirmField: Story = {
     </Box>
   ),
 };
+
+// ── Use case: SaaS signup form ────────────────────────────────────────────────
+
+export const SignupForm: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '**Real-world use case: an account signup form.** ' +
+          'Friendly defaults — segmented bar for quick visual feedback, a generator for users who want a strong ' +
+          'password without thinking about it, and a confirm field to catch typos before submit.',
+      },
+    },
+  },
+  args: {
+    showSegmentedBar: true,
+    showPasswordGenerator: true,
+    showConfirmField: true,
+    passwordMinLength: 10,
+  },
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <Typography variant="h6" sx={{ mb: 0.5 }}>Create your account</Typography>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        Free 14-day trial, no credit card required.
+      </Typography>
+      <PasswordStrengthMeter {...args} />
+    </Box>
+  ),
+};
+
+// ── Use case: admin-enforced password reset ──────────────────────────────────
+
+export const AdminPasswordReset: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '**Real-world use case: an enterprise admin console enforcing a strict security policy** ' +
+          '(e.g. SOC 2 / ISO 27001 compliance). `customRequirements` adds organization-specific rules — ' +
+          'no dictionary words, no reused passwords — on top of the built-in checks, with a higher minimum length.',
+      },
+    },
+  },
+  args: {
+    passwordMinLength: 14,
+    showSegmentedBar: true,
+    customRequirements: [
+      { label: "Must not contain your username", fulfilled: (pw) => !pw.toLowerCase().includes("admin") },
+      { label: "Must differ from your last 5 passwords", fulfilled: true },
+    ],
+  },
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <Typography variant="h6" sx={{ mb: 0.5 }}>Reset Required</Typography>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        Your organization requires a password reset every 90 days.
+      </Typography>
+      <PasswordStrengthMeter {...args} />
+    </Box>
+  ),
+};

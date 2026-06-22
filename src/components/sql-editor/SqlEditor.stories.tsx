@@ -325,3 +325,52 @@ export const GermanTranslation: Story = {
     },
   },
 };
+
+// ── Use case: analytics dashboard query builder ──────────────────────────────
+
+const ANALYTICS_SQL = `-- Weekly active users by acquisition channel
+SELECT
+  DATE_TRUNC('week', s.started_at) AS week,
+  u.acquisition_channel,
+  COUNT(DISTINCT s.user_id) AS weekly_active_users,
+  ROUND(AVG(s.duration_seconds) / 60, 1) AS avg_session_minutes
+FROM sessions s
+JOIN users u ON u.id = s.user_id
+WHERE s.started_at >= NOW() - INTERVAL '12 weeks'
+GROUP BY week, u.acquisition_channel
+ORDER BY week DESC, weekly_active_users DESC;`;
+
+export const AnalyticsDashboardQuery: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '**Real-world use case: an internal BI / analytics dashboard query builder.** ' +
+          'Schema-aware autocomplete (`schema` prop) helps analysts write correct joins without memorizing ' +
+          'every column name, and `showErrorCount` + `onLint` catch typos before the query is sent to the warehouse.',
+      },
+    },
+  },
+  args: {
+    value: ANALYTICS_SQL,
+    dialect: "postgresql",
+    toolbarConfig: { showExecute: true },
+    onExecute: fn(),
+    showErrorCount: true,
+    schema: {
+      tables: [
+        { name: "users", columns: [
+          { name: "id", type: "INT" },
+          { name: "acquisition_channel", type: "VARCHAR" },
+          { name: "created_at", type: "TIMESTAMP" },
+        ]},
+        { name: "sessions", columns: [
+          { name: "id", type: "INT" },
+          { name: "user_id", type: "INT" },
+          { name: "started_at", type: "TIMESTAMP" },
+          { name: "duration_seconds", type: "INT" },
+        ]},
+      ],
+    },
+  },
+};

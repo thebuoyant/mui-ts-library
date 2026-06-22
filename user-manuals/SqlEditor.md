@@ -600,6 +600,7 @@ The placeholders `{line}`, `{col}`, and `{count}` are replaced at runtime.
 | `PostgreSQLDialect` | PostgreSQL-specific syntax |
 | `WithExecute` | Execute button visible |
 | `WithQueryHistory` | Execute + query history button, auto-runs Execute once |
+| `AnalyticsDashboardQuery` | BI dashboard query with schema-aware autocomplete and linting |
 | `WithSchema` | Schema-aware autocomplete with 3 tables |
 | `WithLinting` | Server-side linting with simulated errors |
 | `WithFormat` | Format button with unformatted SQL |

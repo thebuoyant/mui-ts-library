@@ -130,5 +130,7 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 | ~~Changelog in README sichtbar~~ | ~~Letzte 2 Versionen direkt in README.md eingebettet (EN+DE) — auf npm ohne Link-Klick lesbar~~ | ~~Niedrig~~ | ✅ v3.1.1 |
 | ⭐ GitHub Releases anlegen | Für `v3.0.0`, `v3.1.0`, `v3.1.1` — GitHub zeigt Releases prominent in der Sidebar; aktuell nur nackte Tags ohne Beschreibung | Niedrig | ⚡ offen |
 | ~~⭐ npm-app Demo für Highlighting~~ | ~~npm-app entfernt — stackblitz-demo zeigt Highlighting~~ | ~~Niedrig~~ | ✅ v3.2.0 |
+| ~~⭐ Storybook — diverse Use-Case-Stories~~ | ~~Alle Stories liefen auf eine generische Default-Fixture pro Komponente hinaus — fühlte sich wie Controls-Spielerei statt Produktpräsentation an.~~ 17 neue Stories mit komplett unterschiedlichen, realistischen Datensätzen (z.B. Disk-Usage, Handelsbeziehungen, Bauprojekt, Blog-Editor, Skill-Selector) über alle 11 Komponenten. | ~~Hoch~~ | ✅ v3.6.0 |
+| ~~⭐ StackBlitz — Use-Case-Einordnung~~ | ~~Demo-Karten zeigten nur Feature-Liste, keine Einordnung wofür man die Komponente einsetzt.~~ Use-Case-Chip pro Karte (z.B. "Database & Analytics Tooling") + geschärfter Hero-Text mit konkreten Wertversprechen. | ~~Niedrig~~ | ✅ v3.6.0 |
 | VS Code Snippets | `rte-basic`, `gantt-basic` → autovervollständigt fertiges Snippet | Niedrig | — |
 | Playwright Visual Tests | Screenshot-Vergleiche für Chart-Rendering | Hoch | — |

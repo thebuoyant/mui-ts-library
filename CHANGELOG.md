@@ -13,6 +13,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.6.0] — 2026-06-22
+
+### Added
+
+#### Storybook — Real-World Use-Case Stories
+
+Every component's Storybook stories previously revolved around a single generic dataset with prop-toggle variations. Added 17 new stories across all 11 components, each using a genuinely different, realistic dataset:
+
+- **SunburstChart** — `DiskUsageBreakdown` (disk-usage analyzer)
+- **ChordChart** — `TradeRelationships` (bilateral trade flows between economies)
+- **RadialTreeChart** — `ProductCatalog` (e-commerce category tree)
+- **CirclePackingChart** — `DiskUsageBreakdown` (storage breakdown)
+- **HorizontalTreeChart** — `DecisionTree` (support-ticket routing logic)
+- **GanttChart** — `ConstructionProject`, `MarketingCampaignLaunch`
+- **RichTextEditor** — `BlogPostEditor`, `SupportTicketReply`
+- **JsonEditor** — `ApiResponseViewer`, `WebhookPayloadInspector`
+- **TagSelection** — `SkillSelector`, `EmailRecipients`
+- **PasswordStrengthMeter** — `SignupForm`, `AdminPasswordReset`
+- **SqlEditor** — `AnalyticsDashboardQuery`
+
+#### StackBlitz Demo
+
+- Every component card now shows a use-case category chip (e.g. "Database & Analytics Tooling", "Project & Resource Planning") for quick orientation.
+- Sharpened hero copy to lead with concrete value propositions instead of a generic tech-stack list.
+
+---
+
 ## [3.5.0] — 2026-06-22
 
 ### Added

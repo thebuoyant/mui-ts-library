@@ -600,6 +600,7 @@ Die Platzhalter `{line}`, `{col}` und `{count}` werden zur Laufzeit ersetzt.
 | `PostgreSQLDialect` | PostgreSQL-spezifische Syntax |
 | `WithExecute` | Ausführen-Schaltfläche sichtbar |
 | `WithQueryHistory` | Ausführen + Query-Verlauf-Schaltfläche, führt Execute automatisch einmal aus |
+| `AnalyticsDashboardQuery` | BI-Dashboard-Abfrage mit Schema-aware Autocomplete und Linting |
 | `WithSchema` | Schema-aware Autocomplete mit 3 Tabellen |
 | `WithLinting` | Server-seitiges Linting mit simulierten Fehlern |
 | `WithFormat` | Format-Schaltfläche mit unformatiertem SQL |

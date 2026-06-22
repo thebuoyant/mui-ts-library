@@ -412,6 +412,8 @@ const colors: JsonEditorHighlightColors = {
 | `GermanTranslation` | Vollständig übersetzte Toolbar und Validierungslabels |
 | `LargeDataset` | 20-Element-Array, 500px Höhe |
 | `WithMinimap` | Großer Datensatz mit aktiviertem Minimap-Panel |
+| `ApiResponseViewer` | Schreibgeschützter REST-API-Response-Inspektor |
+| `WebhookPayloadInspector` | Stripe-artiges Webhook-Event-Payload mit Validierung |
 
 ---
 
