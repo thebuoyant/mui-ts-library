@@ -850,3 +850,146 @@ export const WithCSVExport: Story = {
     </Box>
   ),
 };
+
+// ── Use case: construction project ───────────────────────────────────────────
+
+const constructionTasks: GanttTask[] = [
+  { id: "house", name: "Single-Family Home Build", status: "in-progress",
+    startDate: new Date("2026-02-01"), endDate: new Date("2026-09-30") },
+
+  { id: "site",       parentId: "house", name: "Site Preparation", status: "done",
+    startDate: new Date("2026-02-01"), endDate: new Date("2026-02-21") },
+  { id: "site-clear",  parentId: "site", name: "Clearing & Excavation", status: "done",
+    startDate: new Date("2026-02-01"), endDate: new Date("2026-02-10") },
+  { id: "site-survey", parentId: "site", name: "Land Survey & Permits", status: "done",
+    startDate: new Date("2026-02-01"), endDate: new Date("2026-02-14") },
+
+  { id: "foundation", parentId: "house", name: "Foundation", status: "done",
+    startDate: new Date("2026-02-22"), endDate: new Date("2026-03-20"), dependencies: ["site"] },
+  { id: "found-pour",  parentId: "foundation", name: "Footings & Slab Pour", status: "done",
+    startDate: new Date("2026-02-22"), endDate: new Date("2026-03-08") },
+  { id: "found-cure",  parentId: "foundation", name: "Curing Period", status: "done",
+    startDate: new Date("2026-03-09"), endDate: new Date("2026-03-20") },
+
+  { id: "framing", parentId: "house", name: "Framing", status: "in-progress",
+    startDate: new Date("2026-03-21"), endDate: new Date("2026-05-15"), dependencies: ["foundation"] },
+  { id: "frame-walls", parentId: "framing", name: "Wall Framing", status: "done",
+    startDate: new Date("2026-03-21"), endDate: new Date("2026-04-15") },
+  { id: "frame-roof",  parentId: "framing", name: "Roof Trusses", status: "in-progress", progress: 60,
+    startDate: new Date("2026-04-16"), endDate: new Date("2026-05-15") },
+
+  { id: "mep", parentId: "house", name: "Mechanical / Electrical / Plumbing", status: "planned",
+    startDate: new Date("2026-05-16"), endDate: new Date("2026-07-10"), dependencies: ["framing"] },
+  { id: "mep-electrical", parentId: "mep", name: "Electrical Rough-In", status: "planned",
+    startDate: new Date("2026-05-16"), endDate: new Date("2026-06-05") },
+  { id: "mep-plumbing",   parentId: "mep", name: "Plumbing Rough-In", status: "planned",
+    startDate: new Date("2026-05-16"), endDate: new Date("2026-06-10") },
+  { id: "mep-hvac",       parentId: "mep", name: "HVAC Install", status: "planned",
+    startDate: new Date("2026-06-11"), endDate: new Date("2026-07-10") },
+
+  { id: "inspection-rough", name: "Rough-In Inspection", status: "planned", isMilestone: true,
+    startDate: new Date("2026-07-11"), endDate: new Date("2026-07-11"), dependencies: ["mep"] },
+
+  { id: "finishing", parentId: "house", name: "Interior Finishing", status: "planned",
+    startDate: new Date("2026-07-12"), endDate: new Date("2026-09-15"), dependencies: ["inspection-rough"] },
+  { id: "finish-drywall", parentId: "finishing", name: "Drywall & Paint", status: "planned",
+    startDate: new Date("2026-07-12"), endDate: new Date("2026-08-05") },
+  { id: "finish-flooring", parentId: "finishing", name: "Flooring", status: "planned",
+    startDate: new Date("2026-08-06"), endDate: new Date("2026-08-25") },
+  { id: "finish-fixtures", parentId: "finishing", name: "Fixtures & Cabinetry", status: "planned",
+    startDate: new Date("2026-08-26"), endDate: new Date("2026-09-15") },
+
+  { id: "handover", name: "Final Walkthrough & Handover", status: "planned", isMilestone: true,
+    startDate: new Date("2026-09-30"), endDate: new Date("2026-09-30"), dependencies: ["finishing"] },
+];
+
+export const ConstructionProject: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '**Real-world use case: a residential construction schedule.** ' +
+          'Finish-to-start dependencies model the natural build sequence (foundation must cure before framing, ' +
+          'framing before MEP, inspection before finishing) — try `CriticalPath` highlighting to see which phases ' +
+          'directly threaten the handover date.',
+      },
+    },
+  },
+  args: {
+    tasks: constructionTasks,
+    timeScale: "months",
+    initialExpandAll: true,
+    height: 480,
+  },
+  render: (args) => (
+    <Box sx={{ width: "100%" }}>
+      <GanttChart {...args} />
+    </Box>
+  ),
+};
+
+// ── Use case: marketing campaign launch ──────────────────────────────────────
+
+const campaignTasks: GanttTask[] = [
+  { id: "campaign", name: "Q3 Product Launch Campaign", status: "in-progress",
+    startDate: new Date("2026-06-01"), endDate: new Date("2026-08-15") },
+
+  { id: "strategy", parentId: "campaign", name: "Strategy & Positioning", status: "done",
+    startDate: new Date("2026-06-01"), endDate: new Date("2026-06-12") },
+  { id: "strategy-research", parentId: "strategy", name: "Market Research", status: "done",
+    startDate: new Date("2026-06-01"), endDate: new Date("2026-06-07") },
+  { id: "strategy-messaging", parentId: "strategy", name: "Messaging Framework", status: "done",
+    startDate: new Date("2026-06-08"), endDate: new Date("2026-06-12") },
+
+  { id: "creative", parentId: "campaign", name: "Creative Production", status: "in-progress",
+    startDate: new Date("2026-06-13"), endDate: new Date("2026-07-10"), dependencies: ["strategy"] },
+  { id: "creative-copy",   parentId: "creative", name: "Copywriting", status: "done",
+    startDate: new Date("2026-06-13"), endDate: new Date("2026-06-22") },
+  { id: "creative-design", parentId: "creative", name: "Visual Design", status: "in-progress", progress: 70,
+    startDate: new Date("2026-06-20"), endDate: new Date("2026-07-05") },
+  { id: "creative-video",  parentId: "creative", name: "Launch Video", status: "in-progress", progress: 35,
+    startDate: new Date("2026-06-25"), endDate: new Date("2026-07-10") },
+
+  { id: "channels", parentId: "campaign", name: "Channel Setup", status: "planned",
+    startDate: new Date("2026-07-06"), endDate: new Date("2026-07-25"), dependencies: ["creative-copy"] },
+  { id: "channels-paid",   parentId: "channels", name: "Paid Ads (Google/Meta)", status: "planned",
+    startDate: new Date("2026-07-06"), endDate: new Date("2026-07-18") },
+  { id: "channels-email",  parentId: "channels", name: "Email Sequence", status: "planned",
+    startDate: new Date("2026-07-06"), endDate: new Date("2026-07-15") },
+  { id: "channels-social", parentId: "channels", name: "Social Media Calendar", status: "planned",
+    startDate: new Date("2026-07-10"), endDate: new Date("2026-07-25") },
+
+  { id: "launch-day", name: "Launch Day", status: "planned", isMilestone: true,
+    startDate: new Date("2026-07-28"), endDate: new Date("2026-07-28"), dependencies: ["channels"] },
+
+  { id: "post-launch", parentId: "campaign", name: "Post-Launch Optimization", status: "planned",
+    startDate: new Date("2026-07-29"), endDate: new Date("2026-08-15"), dependencies: ["launch-day"] },
+  { id: "post-monitor", parentId: "post-launch", name: "Performance Monitoring", status: "planned",
+    startDate: new Date("2026-07-29"), endDate: new Date("2026-08-08") },
+  { id: "post-retro",   parentId: "post-launch", name: "Campaign Retrospective", status: "planned",
+    startDate: new Date("2026-08-09"), endDate: new Date("2026-08-15") },
+];
+
+export const MarketingCampaignLaunch: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '**Real-world use case: a marketing campaign timeline** — strategy, creative production, channel setup, ' +
+          'and a launch-day milestone. Note the overlapping creative sub-tasks (copy can finish while design and ' +
+          'video are still in progress) — a common real-world pattern this chart handles natively.',
+      },
+    },
+  },
+  args: {
+    tasks: campaignTasks,
+    timeScale: "weeks",
+    initialExpandAll: true,
+    height: 480,
+  },
+  render: (args) => (
+    <Box sx={{ width: "100%" }}>
+      <GanttChart {...args} />
+    </Box>
+  ),
+};

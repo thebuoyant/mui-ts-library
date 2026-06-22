@@ -15,7 +15,7 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 | ~~**🔴 Bundle-Bloat / Tree-Shaking**~~ | ~~D3 + CodeMirror + Tiptap landen im Bundle auch wenn nur `TagSelection` genutzt wird.~~ Gelöst via Rollup `preserveModules` — ESM-Build liefert ein File pro Komponente statt einer Bundle-Datei. Kein API-Change, gemessen: 1.1 MB → 22 KB für Single-Component-Import. | ~~Hoch~~ | ✅ v3.3.0 |
 | ~~**🟡 ChordChart Dark-Mode**~~ | ~~`mixBlendMode: "multiply"` → theme-aware: `normal` im dark mode, `multiply` im light mode.~~ | ~~Niedrig~~ | ✅ v3.2.1 |
 | ~~**🟡 HorizontalTreeChart Link-Opacity**~~ | ~~`linkStrokeOpacity`-Default `0.4` → `1.0`, konsistent mit RadialTreeChart.~~ | ~~Niedrig~~ | ✅ v3.2.1 |
-| **🟡 Storybook Charts — play-Funktionen** | D3-Charts zeigen bei Story-Öffnung nur leeren Container. `play`-Funktionen rendern Charts sofort (wie TagSelection SearchHighlight). Betrifft: SunburstChart, ChordChart, RadialTreeChart, CirclePackingChart, HorizontalTreeChart. | Mittel | ⚡ offen |
+| ~~**🟡 Storybook Charts — play-Funktionen**~~ | ~~D3-Charts zeigten Interaktionsfeatures nur statisch in der Beschreibung.~~ `play`-Funktionen demonstrieren jetzt automatisch: Ctrl+Click Drill-down (Sunburst, RadialTree, HorizontalTree), Ctrl+Click Zoom (CirclePacking), Hover-Highlight (Chord). | ~~Mittel~~ | ✅ v3.5.0 |
 | ~~**🔴 SqlEditor — keine Tests**~~ | ~~`sql-editor/*.test.tsx` existiert nicht.~~ 21 Tests ergänzt (Toolbar-Interaktionen, Dialekte, Schema, Disabled-State). 0% → 82% Lines. | ~~Mittel~~ | ✅ v3.4.0 |
 | ~~**🟡 Test-Coverage-Lücken**~~ | ~~`RichTextEditorImageDialog` (17%), `RichTextEditorTableMenu` (20%), `gantt-chart.util.ts` (0%, Artefakt-Messung) ungetestet.~~ ImageDialog → 94%, TableMenu → 96%, gantt-chart.util → 99% (cascadeDateUpdate + computeCriticalPath ergänzt). Gesamt 68%→74% Lines. | ~~Mittel~~ | ✅ v3.4.0 |
 | ~~**🟡 Accessibility-Audit**~~ | ~~`aria-*` nur in 23 von ~60 Source-Dateien.~~ 13 fehlende `aria-label` ergänzt (GanttTaskPanel, GanttToolbar, TagSelectionAutocomplete Confirm/Cancel, RichTextEditor Color-Swatches + Emoji-Picker). 2 neue TagSelection-Translation-Keys (`confirmCreateLabel`, `cancelCreateLabel`). | ~~Mittel~~ | ✅ v3.4.0 |
@@ -69,7 +69,7 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 |---|---|---|---|
 | ~~Keyboard Shortcut Execute~~ | ~~Cmd / Ctrl+Enter für `onExecute`~~ | ~~Niedrig~~ | ✅ v1.5.0 |
 | ~~Zeilennummern-Gutter anpassen~~ | ~~Breite auto an max. Zeilenzahl~~ | ~~Niedrig~~ | ✅ v1.5.0 |
-| ⭐ Query-Verlauf | Letzte N Abfragen speichern/laden (localStorage) — Nutzer erwarten das von jedem SQL-Editor | Mittel | — |
+| ~~⭐ Query-Verlauf~~ | ~~Letzte N Abfragen speichern/laden (localStorage)~~ — `toolbarConfig.showHistory` + `queryHistoryKey`/`queryHistoryMaxEntries`, History-Menu zum Nachladen, "Clear history". | ~~Mittel~~ | ✅ v3.5.0 |
 | ⭐ Hover-Doku | Spalten-/Tabellen-Kommentar als Tooltip aus Schema beim Hover | Mittel | — |
 | ⭐ AI-Autocomplete | LLM-Endpoint für SQL-Vorschläge — klares Differenzierungsmerkmal, kein anderer MUI-Editor bietet das | Hoch | — |
 | Ergebnis-Metadaten-Footer | Nach `onExecute`: Zeilenanzahl + Ausführungszeit im Footer | Mittel | — |
@@ -130,5 +130,7 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 | ~~Changelog in README sichtbar~~ | ~~Letzte 2 Versionen direkt in README.md eingebettet (EN+DE) — auf npm ohne Link-Klick lesbar~~ | ~~Niedrig~~ | ✅ v3.1.1 |
 | ⭐ GitHub Releases anlegen | Für `v3.0.0`, `v3.1.0`, `v3.1.1` — GitHub zeigt Releases prominent in der Sidebar; aktuell nur nackte Tags ohne Beschreibung | Niedrig | ⚡ offen |
 | ~~⭐ npm-app Demo für Highlighting~~ | ~~npm-app entfernt — stackblitz-demo zeigt Highlighting~~ | ~~Niedrig~~ | ✅ v3.2.0 |
+| ~~⭐ Storybook — diverse Use-Case-Stories~~ | ~~Alle Stories liefen auf eine generische Default-Fixture pro Komponente hinaus — fühlte sich wie Controls-Spielerei statt Produktpräsentation an.~~ 17 neue Stories mit komplett unterschiedlichen, realistischen Datensätzen (z.B. Disk-Usage, Handelsbeziehungen, Bauprojekt, Blog-Editor, Skill-Selector) über alle 11 Komponenten. | ~~Hoch~~ | ✅ v3.6.0 |
+| ~~⭐ StackBlitz — Use-Case-Einordnung~~ | ~~Demo-Karten zeigten nur Feature-Liste, keine Einordnung wofür man die Komponente einsetzt.~~ Use-Case-Chip pro Karte (z.B. "Database & Analytics Tooling") + geschärfter Hero-Text mit konkreten Wertversprechen. | ~~Niedrig~~ | ✅ v3.6.0 |
 | VS Code Snippets | `rte-basic`, `gantt-basic` → autovervollständigt fertiges Snippet | Niedrig | — |
 | Playwright Visual Tests | Screenshot-Vergleiche für Chart-Rendering | Hoch | — |

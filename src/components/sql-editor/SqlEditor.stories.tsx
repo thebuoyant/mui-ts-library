@@ -1,6 +1,6 @@
 import { type ComponentProps, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { fn, userEvent, within } from "storybook/test";
 import { Box } from "@mui/material";
 import { SqlEditor } from "./SqlEditor";
 
@@ -178,6 +178,32 @@ export const WithExecute: Story = {
   },
 };
 
+export const WithQueryHistory: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'The **Query history** button (`toolbarConfig.showHistory: true`) appears next to Execute and ' +
+          'requires `onExecute` to be set. Every executed query is saved to `localStorage` (capped at ' +
+          '`queryHistoryMaxEntries`, default 20) and can be reloaded into the editor with one click. ' +
+          'Use `queryHistoryKey` to namespace the storage when multiple editors run on the same page. ' +
+          'This story auto-runs Execute once so you can open the history menu and see an entry.',
+      },
+    },
+  },
+  args: {
+    value:          SAMPLE_SQL,
+    toolbarConfig:  { showExecute: true, showHistory: true },
+    queryHistoryKey: "storybook-sql-history-demo",
+    onExecute:      fn(),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: "Execute" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Query history" }));
+  },
+};
+
 export const NoLineNumbers: Story = {
   args: {
     value:           SAMPLE_SQL,
@@ -283,14 +309,68 @@ export const WithFormat: Story = {
 export const GermanTranslation: Story = {
   args: {
     value: SAMPLE_SQL,
+    toolbarConfig: { showExecute: true, showHistory: true },
+    onExecute: fn(),
     translation: {
-      copy:        "Kopieren",
-      copySuccess: "Kopiert!",
-      clear:       "Leeren",
-      execute:     "Ausführen",
-      undo:        "Rückgängig",
-      redo:        "Wiederholen",
-      lineColumn:  "Zeile {line}, Sp. {col}",
+      copy:         "Kopieren",
+      copySuccess:  "Kopiert!",
+      clear:        "Leeren",
+      execute:      "Ausführen",
+      undo:         "Rückgängig",
+      redo:         "Wiederholen",
+      lineColumn:   "Zeile {line}, Sp. {col}",
+      history:      "Verlauf",
+      historyEmpty: "Noch keine Abfragen",
+      clearHistory: "Verlauf leeren",
+    },
+  },
+};
+
+// ── Use case: analytics dashboard query builder ──────────────────────────────
+
+const ANALYTICS_SQL = `-- Weekly active users by acquisition channel
+SELECT
+  DATE_TRUNC('week', s.started_at) AS week,
+  u.acquisition_channel,
+  COUNT(DISTINCT s.user_id) AS weekly_active_users,
+  ROUND(AVG(s.duration_seconds) / 60, 1) AS avg_session_minutes
+FROM sessions s
+JOIN users u ON u.id = s.user_id
+WHERE s.started_at >= NOW() - INTERVAL '12 weeks'
+GROUP BY week, u.acquisition_channel
+ORDER BY week DESC, weekly_active_users DESC;`;
+
+export const AnalyticsDashboardQuery: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '**Real-world use case: an internal BI / analytics dashboard query builder.** ' +
+          'Schema-aware autocomplete (`schema` prop) helps analysts write correct joins without memorizing ' +
+          'every column name, and `showErrorCount` + `onLint` catch typos before the query is sent to the warehouse.',
+      },
+    },
+  },
+  args: {
+    value: ANALYTICS_SQL,
+    dialect: "postgresql",
+    toolbarConfig: { showExecute: true },
+    onExecute: fn(),
+    showErrorCount: true,
+    schema: {
+      tables: [
+        { name: "users", columns: [
+          { name: "id", type: "INT" },
+          { name: "acquisition_channel", type: "VARCHAR" },
+          { name: "created_at", type: "TIMESTAMP" },
+        ]},
+        { name: "sessions", columns: [
+          { name: "id", type: "INT" },
+          { name: "user_id", type: "INT" },
+          { name: "started_at", type: "TIMESTAMP" },
+          { name: "duration_seconds", type: "INT" },
+        ]},
+      ],
     },
   },
 };

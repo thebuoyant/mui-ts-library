@@ -97,6 +97,8 @@ function App() {
 | `highlightColors` | `SqlEditorHighlightColors` | — | Syntax-Highlight-Farben für Keywords, Strings und Identifier |
 | `name` | `string` | — | Name für native Formularübermittlung (verstecktes `<input type="hidden">`) |
 | `placeholder` | `string` | — | Platzhaltertext bei leerem Editor |
+| `queryHistoryKey` | `string` | `"sql-editor-query-history"` | `localStorage`-Key für den Query-Verlauf — eindeutigen Wert setzen, wenn mehrere `SqlEditor` auf derselben Seite laufen |
+| `queryHistoryMaxEntries` | `number` | `20` | Maximale Anzahl an Einträgen im Query-Verlauf |
 | `readonly` | `boolean` | `false` | Nur-Lesen-Modus — keine Toolbar |
 | `schema` | `SqlSchema` | — | Tabellen- und Spaltendefinitionen für Schema-aware Autocomplete |
 | `showErrorCount` | `boolean` | `false` | Fehleranzahl im Footer ein-/ausblenden (benötigt `onLint`) |
@@ -142,6 +144,7 @@ type SqlEditorToolbarConfig = {
   showClear?:    boolean;  // Editor leeren
   showExecute?:  boolean;  // Ausführen-Schaltfläche (standardmäßig aus)
   showUndoRedo?: boolean;  // Rückgängig / Wiederholen
+  showHistory?:  boolean;  // Query-Verlauf-Schaltfläche — benötigt onExecute (standardmäßig aus)
 };
 ```
 
@@ -149,22 +152,25 @@ Standard-Konfiguration:
 
 ```tsx
 import { DEFAULT_SQL_EDITOR_TOOLBAR_CONFIG } from '@thebuoyant-tsdev/mui-ts-library';
-// { showFormat: true, showCopy: true, showClear: true, showExecute: false, showUndoRedo: true }
+// { showFormat: true, showCopy: true, showClear: true, showExecute: false, showUndoRedo: true, showHistory: false }
 ```
 
 ### `SqlEditorTranslation`
 
 ```ts
 type SqlEditorTranslation = {
-  format:      string;   // "Format SQL"
-  copy:        string;   // "Copy"
-  copySuccess: string;   // "Copied!"
-  clear:       string;   // "Clear"
-  execute:     string;   // "Execute"
-  undo:        string;   // "Undo"
-  redo:        string;   // "Redo"
-  lineColumn:  string;   // "Ln {line}, Col {col}"
-  errorCount:  string;   // "{count} error(s)"
+  format:       string;   // "Format SQL"
+  copy:         string;   // "Copy"
+  copySuccess:  string;   // "Copied!"
+  clear:        string;   // "Clear"
+  execute:      string;   // "Execute"
+  undo:         string;   // "Undo"
+  redo:         string;   // "Redo"
+  lineColumn:   string;   // "Ln {line}, Col {col}"
+  errorCount:   string;   // "{count} error(s)"
+  history:      string;   // "Query history"
+  historyEmpty: string;   // "No queries yet"
+  clearHistory: string;   // "Clear history"
 };
 ```
 
@@ -328,6 +334,30 @@ Die Ausführen-Schaltfläche ist standardmäßig ausgeblendet. Sie erscheint nur
   onExecute={(sql) => runQuery(sql)}
 />
 ```
+
+---
+
+## Query-Verlauf
+
+```tsx
+<SqlEditor
+  value={sql}
+  onChange={setSql}
+  toolbarConfig={{ showExecute: true, showHistory: true }}
+  onExecute={(sql) => runQuery(sql)}
+  queryHistoryKey="my-app-sql-history"
+  queryHistoryMaxEntries={20}
+/>
+```
+
+Die "Query history"-Schaltfläche ist standardmäßig ausgeblendet. Sie erscheint nur wenn `toolbarConfig.showHistory: true` **und** ein `onExecute`-Handler angegeben sind — der Verlauf erfasst nur Abfragen, die tatsächlich ausgeführt wurden, genau wie bei DataGrip, TablePlus oder pgAdmin.
+
+Jeder Aufruf von `onExecute` (egal ob per Toolbar-Schaltfläche oder `Cmd+Enter` / `Ctrl+Enter`) speichert die SQL in `localStorage`, neueste zuerst. Wird exakt dieselbe SQL erneut ausgeführt, wandert der bestehende Eintrag nach vorne statt dupliziert zu werden. Ein Klick auf einen Eintrag im Verlaufsmenü lädt ihn zurück in den Editor; ein "Verlauf leeren"-Eintrag am Ende des Menüs löscht den gesamten Verlauf.
+
+| Prop | Standard | Beschreibung |
+|---|---|---|
+| `queryHistoryKey` | `"sql-editor-query-history"` | `localStorage`-Key. Eindeutigen Wert pro Editor setzen, wenn mehrere `SqlEditor` auf derselben Seite laufen — sonst teilen sie sich einen Verlauf. |
+| `queryHistoryMaxEntries` | `20` | Maximale Anzahl an Einträgen. Älteste Einträge werden verworfen, wenn das Limit erreicht ist. |
 
 ---
 
@@ -514,15 +544,18 @@ Nur die zu überschreibenden Schlüssel angeben — alle anderen behalten ihren 
 import { DEFAULT_SQL_EDITOR_TRANSLATION } from '@thebuoyant-tsdev/mui-ts-library';
 
 const DE = {
-  format:      "Formatieren",
-  copy:        "Kopieren",
-  copySuccess: "Kopiert!",
-  clear:       "Leeren",
-  execute:     "Ausführen",
-  undo:        "Rückgängig",
-  redo:        "Wiederholen",
-  lineColumn:  "Zeile {line}, Sp. {col}",
-  errorCount:  "{count} Fehler",
+  format:       "Formatieren",
+  copy:         "Kopieren",
+  copySuccess:  "Kopiert!",
+  clear:        "Leeren",
+  execute:      "Ausführen",
+  undo:         "Rückgängig",
+  redo:         "Wiederholen",
+  lineColumn:   "Zeile {line}, Sp. {col}",
+  errorCount:   "{count} Fehler",
+  history:      "Verlauf",
+  historyEmpty: "Noch keine Abfragen",
+  clearHistory: "Verlauf leeren",
 };
 
 <SqlEditor translation={DE} />
@@ -566,6 +599,8 @@ Die Platzhalter `{line}`, `{col}` und `{count}` werden zur Laufzeit ersetzt.
 | `MySQLDialect` | MySQL-spezifische Syntax |
 | `PostgreSQLDialect` | PostgreSQL-spezifische Syntax |
 | `WithExecute` | Ausführen-Schaltfläche sichtbar |
+| `WithQueryHistory` | Ausführen + Query-Verlauf-Schaltfläche, führt Execute automatisch einmal aus |
+| `AnalyticsDashboardQuery` | BI-Dashboard-Abfrage mit Schema-aware Autocomplete und Linting |
 | `WithSchema` | Schema-aware Autocomplete mit 3 Tabellen |
 | `WithLinting` | Server-seitiges Linting mit simulierten Fehlern |
 | `WithFormat` | Format-Schaltfläche mit unformatiertem SQL |

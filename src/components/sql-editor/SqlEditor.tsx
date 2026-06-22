@@ -10,6 +10,7 @@ import { SqlEditorContent } from "./SqlEditorContent";
 import { SqlEditorToolbar } from "./SqlEditorToolbar";
 import { SqlEditorFooter }  from "./SqlEditorFooter";
 import { normalizeSize } from "../shared/normalizeSize";
+import { useSqlQueryHistory } from "./useSqlQueryHistory";
 
 export function SqlEditor({
   value,
@@ -30,6 +31,8 @@ export function SqlEditor({
   translation,
   highlightColors,
   schema,
+  queryHistoryKey        = "sql-editor-query-history",
+  queryHistoryMaxEntries = 20,
   onExecute,
   onLint,
   onBlur,
@@ -37,6 +40,8 @@ export function SqlEditor({
 }: SqlEditorProps) {
   const t  = { ...DEFAULT_SQL_EDITOR_TRANSLATION, ...translation };
   const tc = { ...DEFAULT_SQL_EDITOR_TOOLBAR_CONFIG, ...toolbarConfig };
+
+  const { history, addEntry, clearHistory } = useSqlQueryHistory(queryHistoryKey, queryHistoryMaxEntries);
 
   const normH   = normalizeSize(height);
   const normW   = normalizeSize(width);
@@ -60,6 +65,19 @@ export function SqlEditor({
   const handleDiagnosticsChange = useCallback((count: number) => {
     setDiagnosticsCount(count);
   }, []);
+
+  const handleExecute = onExecute
+    ? (sql: string) => { addEntry(sql); onExecute(sql); }
+    : undefined;
+
+  const handleSelectHistoryEntry = useCallback((sql: string) => {
+    const view = viewRef.current;
+    if (view) {
+      view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: sql } });
+      view.focus();
+    }
+    onChange?.(sql);
+  }, [onChange]);
 
   const showFooter = showLineColumn || showErrorCount || !!helperText;
 
@@ -92,7 +110,10 @@ export function SqlEditor({
               translation={t}
               dialect={dialect}
               disabled={disabled}
-              onExecute={onExecute}
+              onExecute={handleExecute}
+              queryHistory={history}
+              onSelectHistoryEntry={handleSelectHistoryEntry}
+              onClearHistory={clearHistory}
             />
             <Divider />
           </>
@@ -109,7 +130,7 @@ export function SqlEditor({
           stringColor={highlightColors?.string}
           identifierColor={highlightColors?.identifier}
           schema={schema}
-          onExecute={onExecute}
+          onExecute={handleExecute}
           onLint={onLint}
           onDiagnosticsChange={onLint ? handleDiagnosticsChange : undefined}
           onViewReady={handleViewReady}

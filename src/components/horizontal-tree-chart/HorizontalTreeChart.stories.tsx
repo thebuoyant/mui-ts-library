@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { fn, fireEvent, within } from "storybook/test";
 import { HorizontalTreeChart } from "./HorizontalTreeChart";
 import type { HorizontalTreeData } from "./HorizontalTreeChart.types";
 
@@ -176,11 +176,16 @@ export const WithDrillDown: Story = {
           '`drillable={true}` + `zoomable={true}`. ' +
           '`Ctrl / Cmd ⌘+Click` on a branch node → drill into that subtree. ' +
           '`Ctrl / Cmd ⌘+DblClick` → zoom out. `Escape` → reset. ' +
-          'Breadcrumb shows current position.',
+          'Breadcrumb shows current position. ' +
+          'This story auto-runs a Ctrl+Click on the "Frontend" node so you land already drilled in.',
       },
     },
   },
   args: { data: ARCH_DATA, drillable: true, zoomable: true },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    fireEvent.click(canvas.getByText("Frontend"), { ctrlKey: true });
+  },
 };
 
 export const WithColorConfig: Story = {
@@ -235,4 +240,61 @@ export const Disabled: Story = {
     },
   },
   args: { data: ARCH_DATA, disabled: true },
+};
+
+// ── Use case: support ticket routing decision tree ───────────────────────────
+
+const DECISION_TREE_DATA: HorizontalTreeData = {
+  name: "New Support Ticket",
+  children: [
+    {
+      name: "Billing question?", subname: "Keyword match",
+      children: [
+        { name: "Refund request",      subname: "→ Billing team",      specialValueA: "SLA: 4h" },
+        { name: "Plan upgrade",        subname: "→ Sales team",        specialValueA: "SLA: 8h" },
+        { name: "Invoice mismatch",    subname: "→ Billing team",      specialValueA: "SLA: 4h" },
+      ],
+    },
+    {
+      name: "Technical issue?", subname: "Keyword match",
+      children: [
+        {
+          name: "Severity check", subname: "Auto-triage",
+          children: [
+            { name: "Outage / data loss", subname: "→ On-call engineer", specialValueA: "SLA: 15min" },
+            { name: "Bug, non-blocking",  subname: "→ Engineering queue", specialValueA: "SLA: 2d" },
+          ],
+        },
+        { name: "How-to question",     subname: "→ Knowledge base bot", specialValueA: "SLA: instant" },
+      ],
+    },
+    {
+      name: "Account access?", subname: "Keyword match",
+      children: [
+        { name: "Password reset",      subname: "→ Self-service flow",  specialValueA: "SLA: instant" },
+        { name: "2FA locked out",      subname: "→ Identity team",      specialValueA: "SLA: 1h" },
+      ],
+    },
+  ],
+};
+
+export const DecisionTree: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '**Real-world use case: a support-ticket routing tree** for an internal ops dashboard. ' +
+          'Each leaf shows the resulting queue and SLA via `specialValueA` — exactly the kind of automation flow ' +
+          'this chart is well suited for (decision logic, escalation paths, triage rules).',
+      },
+    },
+  },
+  args: {
+    data: DECISION_TREE_DATA,
+    orientation: "LR",
+    width: 900,
+    height: 480,
+    showNodePopover: true,
+    translation: { specialValueA: "Routing" },
+  },
 };

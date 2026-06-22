@@ -189,10 +189,12 @@ const HORIZONTAL_TREE_DATA: HorizontalTreeData = {
 
 function DemoCard({
   title,
+  useCase,
   subtitle,
   children,
 }: {
   title: string;
+  useCase: string;
   subtitle?: string;
   children: React.ReactNode;
 }) {
@@ -200,9 +202,16 @@ function DemoCard({
   return (
     <Card id={id} variant="outlined" sx={{ borderRadius: 3, scrollMarginTop: 72 }}>
       <CardContent sx={{ p: 3 }}>
-        <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.3, mb: 0.5 }}>
-          {title}
-        </Typography>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5, flexWrap: "wrap" }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.3 }}>
+            {title}
+          </Typography>
+          <Chip
+            label={useCase}
+            size="small"
+            sx={{ fontSize: 11, height: 22, bgcolor: "action.selected", fontWeight: 600 }}
+          />
+        </Box>
         {subtitle && (
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5 }}>
             {subtitle}
@@ -278,10 +287,14 @@ export default function App() {
       {/* ── Hero ── */}
       <Box sx={{ bgcolor: "primary.main", color: "primary.contrastText", py: 6, px: 3, textAlign: "center" }}>
         <Typography variant="h3" sx={{ fontWeight: 800, mb: 1 }}>
-          Live Component Demo
+          Production-ready components, not toy widgets
         </Typography>
-        <Typography variant="h6" sx={{ opacity: 0.85, fontWeight: 400, mb: 3 }}>
-          11 TypeScript-typed components for React 19 + MUI v9
+        <Typography variant="h6" sx={{ opacity: 0.85, fontWeight: 400, mb: 1.5, maxWidth: 720, mx: "auto" }}>
+          Project planning, content editing, SQL &amp; JSON tooling, and D3 data visualization —
+          11 fully-typed React 19 + MUI v9 components, each built for a real use case below.
+        </Typography>
+        <Typography variant="body2" sx={{ opacity: 0.7, mb: 3 }}>
+          Edit any file on the left — changes hot-reload instantly. No setup, no install.
         </Typography>
         <Box sx={{ display: "flex", flexDirection: "row", gap: 1, justifyContent: "center", flexWrap: "wrap" }}>
           {["ChordChart", "CirclePackingChart", "GanttChart", "HorizontalTreeChart", "JsonEditor",
@@ -315,6 +328,7 @@ export default function App() {
           {/* ChordChart */}
           <DemoCard
             title="ChordChart"
+            useCase="Flow & Relationship Analysis"
             subtitle="Flow relationships between groups. Hover to highlight connections, click for details."
           >
             <Box sx={{ display: "flex", justifyContent: "center" }}>
@@ -325,6 +339,7 @@ export default function App() {
           {/* CirclePackingChart */}
           <DemoCard
             title="CirclePackingChart"
+            useCase="Storage & Hierarchy Analysis"
             subtitle="Nested circles with D3 zoom animation. Click any circle to zoom in, DblClick root to reset."
           >
             <Box sx={{ display: "flex", justifyContent: "center" }}>
@@ -335,6 +350,7 @@ export default function App() {
           {/* GanttChart */}
           <DemoCard
             title="GanttChart"
+            useCase="Project & Resource Planning"
             subtitle="Project timeline with drag & drop, resize handles, progress dragging, milestones, and Ctrl+Scroll zoom."
           >
             <GanttChart tasks={TASKS} draggable resizable progressDraggable height={320} />
@@ -343,6 +359,7 @@ export default function App() {
           {/* HorizontalTreeChart */}
           <DemoCard
             title="HorizontalTreeChart"
+            useCase="Decision Trees & Org Charts"
             subtitle="Component hierarchy as a left-to-right tree. Ctrl+Click to drill down, click nodes for a popover."
           >
             <Box sx={{ overflowX: "auto" }}>
@@ -361,6 +378,7 @@ export default function App() {
           {/* JsonEditor */}
           <DemoCard
             title="JsonEditor"
+            useCase="API & Config Tooling"
             subtitle="JSON editor with real-time validation, Format / Compact buttons, and optional minimap."
           >
             <JsonEditor
@@ -376,6 +394,7 @@ export default function App() {
           {/* PasswordStrengthMeter */}
           <DemoCard
             title="PasswordStrengthMeter"
+            useCase="Auth & Onboarding"
             subtitle="Real-time strength feedback, animated segments, confirm field with match validation, and built-in secure password generator."
           >
             <Box sx={{ maxWidth: 480 }}>
@@ -392,6 +411,7 @@ export default function App() {
           {/* RadialTreeChart */}
           <DemoCard
             title="RadialTreeChart"
+            useCase="Org Charts & Taxonomies"
             subtitle="Org chart as a radial tree. Ctrl+Click to drill into a subtree, Ctrl+DblClick to go back."
           >
             <Box sx={{ display: "flex", justifyContent: "center" }}>
@@ -402,6 +422,7 @@ export default function App() {
           {/* RichTextEditor */}
           <DemoCard
             title="RichTextEditor"
+            useCase="Content Management"
             subtitle="WYSIWYG editor with toolbar, tables, image embed, emoji picker, word count, and fullscreen mode."
           >
             <RichTextEditor value={html} onChange={setHtml} height={260} showWordCount />
@@ -410,7 +431,8 @@ export default function App() {
           {/* SqlEditor */}
           <DemoCard
             title="SqlEditor"
-            subtitle="SQL editor with syntax highlighting, dialect-aware autocomplete, linting, and Cmd+Enter to execute."
+            useCase="Database & Analytics Tooling"
+            subtitle="SQL editor with syntax highlighting, dialect-aware autocomplete, linting, query history, and Cmd+Enter to execute."
           >
             <SqlEditor
               value={sql}
@@ -420,12 +442,14 @@ export default function App() {
               height={200}
               showLineNumbers
               showLineColumn
+              toolbarConfig={{ showExecute: true, showHistory: true }}
             />
           </DemoCard>
 
           {/* SunburstChart */}
           <DemoCard
             title="SunburstChart"
+            useCase="Hierarchical Data Visualization"
             subtitle="Hierarchical data as concentric rings. Ctrl+Click to drill into a segment, Escape to reset."
           >
             <Box sx={{ display: "flex", justifyContent: "center" }}>
@@ -436,6 +460,7 @@ export default function App() {
           {/* TagSelection */}
           <DemoCard
             title="TagSelection"
+            useCase="Filtering & Tagging"
             subtitle='Multi-select with autocomplete and free tag creation. Type "Reac" to see search highlighting.'
           >
             <TagSelection

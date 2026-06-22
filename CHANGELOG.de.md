@@ -13,6 +13,52 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [3.6.0] — 2026-06-22
+
+### Hinzugefügt
+
+#### Storybook — Realistische Use-Case-Stories
+
+Die Stories aller Komponenten drehten sich bisher um einen generischen Datensatz mit Prop-Toggle-Varianten. 17 neue Stories über alle 11 Komponenten ergänzt, jede mit einem komplett anderen, realistischen Datensatz:
+
+- **SunburstChart** — `DiskUsageBreakdown` (Festplatten-Analyse)
+- **ChordChart** — `TradeRelationships` (bilaterale Handelsströme zwischen Volkswirtschaften)
+- **RadialTreeChart** — `ProductCatalog` (E-Commerce-Kategoriebaum)
+- **CirclePackingChart** — `DiskUsageBreakdown` (Speicherplatz-Aufteilung)
+- **HorizontalTreeChart** — `DecisionTree` (Support-Ticket-Routing-Logik)
+- **GanttChart** — `ConstructionProject`, `MarketingCampaignLaunch`
+- **RichTextEditor** — `BlogPostEditor`, `SupportTicketReply`
+- **JsonEditor** — `ApiResponseViewer`, `WebhookPayloadInspector`
+- **TagSelection** — `SkillSelector`, `EmailRecipients`
+- **PasswordStrengthMeter** — `SignupForm`, `AdminPasswordReset`
+- **SqlEditor** — `AnalyticsDashboardQuery`
+
+#### StackBlitz-Demo
+
+- Jede Komponenten-Karte zeigt jetzt einen Use-Case-Chip (z.B. "Database & Analytics Tooling", "Project & Resource Planning") zur schnellen Einordnung.
+- Hero-Text geschärft — führt jetzt mit konkreten Wertversprechen statt einer generischen Tech-Stack-Liste.
+
+---
+
+## [3.5.0] — 2026-06-22
+
+### Hinzugefügt
+
+#### SqlEditor — Query-Verlauf
+
+- Neue Option `toolbarConfig.showHistory` — fügt einen "Query history"-Toolbar-Button hinzu (benötigt `onExecute`). Jede ausgeführte Abfrage wird in `localStorage` gespeichert (neueste zuerst, exakte Duplikate werden nach vorne verschoben statt wiederholt) und kann per Klick wieder in den Editor geladen werden.
+- Neue Props: `queryHistoryKey` (Default `"sql-editor-query-history"` — eindeutigen Wert setzen, wenn mehrere `SqlEditor` auf derselben Seite laufen) und `queryHistoryMaxEntries` (Default `20`).
+- Neue Translation-Keys: `history`, `historyEmpty`, `clearHistory`.
+
+#### Storybook — Interaktive Chart-Demos
+
+- `SunburstChart`, `RadialTreeChart` und `HorizontalTreeChart` führen beim Laden automatisch einen `Ctrl+Click`-Drill-down aus.
+- `CirclePackingChart` führt automatisch einen `Ctrl+Click`-Zoom aus.
+- `ChordChart` hovert automatisch die erste Gruppe, um den Ribbon-Highlight-Effekt zu zeigen.
+- `SqlEditor` hat eine neue `WithQueryHistory`-Story, die das neue Feature end-to-end zeigt.
+
+---
+
 ## [3.4.0] — 2026-06-21
 
 ### Hinzugefügt

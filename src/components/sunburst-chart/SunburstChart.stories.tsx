@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { fn, fireEvent } from "storybook/test";
 import { SunburstChart } from "./SunburstChart";
 import type { SunburstChartData } from "./SunburstChart.types";
 
@@ -302,7 +302,8 @@ export const DeepHierarchy: Story = {
           '**5 depth levels — combines Ctrl+Click drill-down with Ctrl+Scroll zoom.** ' +
           '`Ctrl+Click` any ring segment → drill-down into that subtree. ' +
           '`Ctrl+Scroll` → visual zoom (content outside `size` is clipped). ' +
-          '`Escape` resets both zoom and drill-down to root.',
+          '`Escape` resets both zoom and drill-down to root. ' +
+          'This story auto-runs a Ctrl+Click on the first segment so you land already drilled in.',
       },
     },
   },
@@ -311,6 +312,76 @@ export const DeepHierarchy: Story = {
     size:      520,
     sortBy:    "value",
     zoomable:  true,
+    showSegmentLabels: true,
+  },
+  play: async ({ canvasElement }) => {
+    const firstSegment = canvasElement.querySelector<SVGPathElement>('path[data-idx="0"]');
+    if (firstSegment) fireEvent.click(firstSegment, { ctrlKey: true });
+  },
+};
+
+// ── Use case: disk usage breakdown ───────────────────────────────────────────
+
+const DISK_USAGE_DATA: SunburstChartData = {
+  id: "disk", name: "Macintosh HD — 1 TB",
+  children: [
+    {
+      id: "users", name: "Users",
+      children: [
+        { id: "documents", name: "Documents", value: 42 },
+        { id: "desktop",    name: "Desktop",   value: 8 },
+        { id: "downloads",  name: "Downloads", value: 65 },
+        { id: "movies",     name: "Movies",    value: 210 },
+        { id: "photos",     name: "Photos",    value: 156 },
+        { id: "music",      name: "Music",     value: 38 },
+      ],
+    },
+    {
+      id: "applications", name: "Applications",
+      children: [
+        { id: "xcode",      name: "Xcode",          value: 48 },
+        { id: "adobe",      name: "Adobe CC",        value: 32 },
+        { id: "docker",     name: "Docker Desktop",  value: 12 },
+        { id: "browsers",   name: "Browsers",        value: 6 },
+        { id: "other-apps", name: "Other Apps",      value: 28 },
+      ],
+    },
+    {
+      id: "system", name: "System",
+      children: [
+        { id: "macos",   name: "macOS",        value: 18 },
+        { id: "caches",  name: "Caches",       value: 24 },
+        { id: "logs",    name: "System Logs",  value: 4 },
+      ],
+    },
+    {
+      id: "vms", name: "Virtual Machines",
+      children: [
+        { id: "ubuntu-vm",  name: "Ubuntu VM",  value: 80 },
+        { id: "windows-vm", name: "Windows VM", value: 120 },
+      ],
+    },
+  ],
+};
+
+export const DiskUsageBreakdown: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '**Real-world use case: a disk-usage analyzer.** ' +
+          'Values are GB — `Movies` and `Windows VM` immediately stand out as the biggest space hogs. ' +
+          'This is the classic sunburst use case (think DaisyDisk / WizTree) — proportional space at a glance, ' +
+          'with `Ctrl+Click` to drill into any folder.',
+      },
+    },
+  },
+  args: {
+    data:      DISK_USAGE_DATA,
+    size:      500,
+    sortBy:    "value",
+    zoomable:  true,
+    valueDecimalCount: 0,
     showSegmentLabels: true,
   },
 };

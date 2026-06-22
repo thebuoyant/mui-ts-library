@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { fn, fireEvent } from "storybook/test";
 import { CirclePackingChart } from "./CirclePackingChart";
 import type { CirclePackingData } from "./CirclePackingChart.types";
 
@@ -187,11 +187,16 @@ export const Default: Story = {
           '`Ctrl / Cmd ⌘+Click` any circle with children → animated zoom in. ' +
           '`Ctrl / Cmd ⌘+Double-click` → zoom out one level. ' +
           '`Escape` → reset to root. ' +
-          'Regular click fires `onCircleClick` with name, value, percentage, and path.',
+          'Regular click fires `onCircleClick` with name, value, percentage, and path. ' +
+          'This story auto-runs a Ctrl+Click on the first eligible circle so you see the zoom animation.',
       },
     },
   },
   args: { data: GLOBAL_SOFTWARE },
+  play: async ({ canvasElement }) => {
+    const firstZoomable = canvasElement.querySelector<SVGCircleElement>('circle[style*="cursor: pointer"]');
+    if (firstZoomable) fireEvent.click(firstZoomable, { ctrlKey: true });
+  },
 };
 
 export const DeepHierarchy: Story = {
@@ -342,4 +347,51 @@ export const Disabled: Story = {
     },
   },
   args: { data: GLOBAL_SOFTWARE, disabled: true },
+};
+
+// ── Use case: disk usage breakdown ───────────────────────────────────────────
+
+const DISK_USAGE: CirclePackingData = {
+  name: "Macintosh HD — 1 TB",
+  children: [
+    { name: "Users", children: [
+      { name: "Movies",    value: 210 },
+      { name: "Photos",    value: 156 },
+      { name: "Downloads", value: 65 },
+      { name: "Music",     value: 38 },
+      { name: "Documents", value: 42 },
+    ]},
+    { name: "Applications", children: [
+      { name: "Xcode",         value: 48 },
+      { name: "Adobe CC",      value: 32 },
+      { name: "Docker",        value: 12 },
+      { name: "Other Apps",    value: 28 },
+    ]},
+    { name: "Virtual Machines", children: [
+      { name: "Windows VM", value: 120 },
+      { name: "Ubuntu VM",  value: 80 },
+    ]},
+    { name: "System", children: [
+      { name: "macOS",  value: 18 },
+      { name: "Caches", value: 24 },
+    ]},
+  ],
+};
+
+export const DiskUsageBreakdown: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '**Real-world use case: a disk-usage analyzer (think DaisyDisk / WizTree).** ' +
+          'Circle area scales with GB — the biggest space hogs (`Movies`, `Windows VM`) are instantly obvious. ' +
+          '`Ctrl/Cmd+Click` any folder to zoom in for a closer look.',
+      },
+    },
+  },
+  args: {
+    data:       DISK_USAGE,
+    size:       550,
+    showAllLabels: true,
+  },
 };

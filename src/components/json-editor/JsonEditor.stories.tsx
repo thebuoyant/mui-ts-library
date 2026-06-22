@@ -270,3 +270,86 @@ export const WithMinimap: Story = {
     showMinimap: true,
   },
 };
+
+// ── Use case: REST API response viewer ───────────────────────────────────────
+
+const API_RESPONSE_JSON = JSON.stringify(
+  {
+    status: 200,
+    data: {
+      user: {
+        id: "usr_8f3a1c",
+        name: "Sarah Connor",
+        email: "sarah.connor@example.com",
+        role: "admin",
+        createdAt: "2024-11-02T08:15:00Z",
+        subscription: { plan: "enterprise", seats: 25, renewsAt: "2026-11-02" },
+      },
+      permissions: ["read", "write", "delete", "manage_billing"],
+    },
+    meta: { requestId: "req_a91f2e0c", durationMs: 42, cached: false },
+  },
+  null,
+  2,
+);
+
+export const ApiResponseViewer: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '**Real-world use case: a read-only API response inspector** — the kind of panel you\'d build into ' +
+          'an internal admin tool or API debugging dashboard. `readonly` disables editing while keeping ' +
+          'syntax highlighting and the line/column footer for easy reference.',
+      },
+    },
+  },
+  args: {
+    value:    API_RESPONSE_JSON,
+    readonly: true,
+    height:   "320",
+  },
+};
+
+// ── Use case: webhook payload inspector ──────────────────────────────────────
+
+const WEBHOOK_PAYLOAD_JSON = JSON.stringify(
+  {
+    id: "evt_1PQ8xKLkjH3a2bN9",
+    type: "payment_intent.succeeded",
+    created: 1719600000,
+    data: {
+      object: {
+        id: "pi_3PQ8xKLkjH3a2bN9",
+        amount: 4999,
+        currency: "usd",
+        customer: "cus_QbZ8xKLkjH3a2b",
+        payment_method: "pm_1PQ8xKLkjH3a2bN9",
+        status: "succeeded",
+        metadata: { orderId: "ord_9931", plan: "pro-yearly" },
+      },
+    },
+    livemode: true,
+  },
+  null,
+  2,
+);
+
+export const WebhookPayloadInspector: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '**Real-world use case: inspecting an incoming webhook payload** (Stripe-style event). ' +
+          '`showValidation` confirms the payload is well-formed JSON before your handler tries to parse it — ' +
+          'useful in a webhook-debugging tool or a "replay event" admin feature.',
+      },
+    },
+  },
+  args: {
+    value:          WEBHOOK_PAYLOAD_JSON,
+    showValidation: true,
+    showLineNumbers: true,
+    height:         "320",
+  },
+};

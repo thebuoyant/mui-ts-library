@@ -313,6 +313,22 @@ import type {
 
 ## Changelog
 
+### [3.6.0] — 2026-06-22
+
+**Storybook & StackBlitz — Praxisnahe Vitrine**
+- 17 neue Storybook-Stories über alle 11 Komponenten, jede mit einem komplett anderen, realistischen Datensatz (Festplatten-Analyse, Handelsströme, Bauprojekt-Zeitpläne, Support-Ticket-Routing u.v.m.) statt Prop-Toggle-Varianten auf einer generischen Fixture.
+- StackBlitz-Demo-Karten zeigen jetzt eine Use-Case-Kategorie zur schnellen Einordnung, mit geschärftem Hero-Text.
+
+---
+
+### [3.5.0] — 2026-06-22
+
+**SqlEditor — Query-Verlauf**
+- Neue Option `toolbarConfig.showHistory` speichert jede ausgeführte Abfrage in `localStorage` und lädt sie per Klick wieder. Neue Props: `queryHistoryKey`, `queryHistoryMaxEntries`.
+- D3-Chart-Storybook-Stories demonstrieren jetzt automatisch Drill-down, Zoom und Hover-Highlight beim Laden.
+
+---
+
 ### [3.4.0] — 2026-06-21
 
 **Accessibility & Test-Coverage**

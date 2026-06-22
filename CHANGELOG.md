@@ -13,6 +13,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.6.0] — 2026-06-22
+
+### Added
+
+#### Storybook — Real-World Use-Case Stories
+
+Every component's Storybook stories previously revolved around a single generic dataset with prop-toggle variations. Added 17 new stories across all 11 components, each using a genuinely different, realistic dataset:
+
+- **SunburstChart** — `DiskUsageBreakdown` (disk-usage analyzer)
+- **ChordChart** — `TradeRelationships` (bilateral trade flows between economies)
+- **RadialTreeChart** — `ProductCatalog` (e-commerce category tree)
+- **CirclePackingChart** — `DiskUsageBreakdown` (storage breakdown)
+- **HorizontalTreeChart** — `DecisionTree` (support-ticket routing logic)
+- **GanttChart** — `ConstructionProject`, `MarketingCampaignLaunch`
+- **RichTextEditor** — `BlogPostEditor`, `SupportTicketReply`
+- **JsonEditor** — `ApiResponseViewer`, `WebhookPayloadInspector`
+- **TagSelection** — `SkillSelector`, `EmailRecipients`
+- **PasswordStrengthMeter** — `SignupForm`, `AdminPasswordReset`
+- **SqlEditor** — `AnalyticsDashboardQuery`
+
+#### StackBlitz Demo
+
+- Every component card now shows a use-case category chip (e.g. "Database & Analytics Tooling", "Project & Resource Planning") for quick orientation.
+- Sharpened hero copy to lead with concrete value propositions instead of a generic tech-stack list.
+
+---
+
+## [3.5.0] — 2026-06-22
+
+### Added
+
+#### SqlEditor — Query History
+
+- New `toolbarConfig.showHistory` option — adds a "Query history" toolbar button (requires `onExecute`). Every executed query is saved to `localStorage` (newest first, exact duplicates moved to the front instead of repeated) and can be reloaded into the editor with one click.
+- New props: `queryHistoryKey` (default `"sql-editor-query-history"` — set a unique value if multiple `SqlEditor`s run on the same page) and `queryHistoryMaxEntries` (default `20`).
+- New translation keys: `history`, `historyEmpty`, `clearHistory`.
+
+#### Storybook — Interactive Chart Demos
+
+- `SunburstChart`, `RadialTreeChart`, and `HorizontalTreeChart` stories now auto-run a `Ctrl+Click` drill-down on load.
+- `CirclePackingChart` story auto-runs a `Ctrl+Click` zoom-in.
+- `ChordChart` story auto-hovers the first group to show the ribbon-highlight effect.
+- `SqlEditor` gained a `WithQueryHistory` story demonstrating the new feature end-to-end.
+
+---
+
 ## [3.4.0] — 2026-06-21
 
 ### Added

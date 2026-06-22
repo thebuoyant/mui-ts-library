@@ -187,6 +187,8 @@ type TagSelectionTranslation = {
   backgroundColorLabel: string;
   textColorLabel:      string;
   autoTextColorLabel:  string;
+  confirmCreateLabel:  string;
+  cancelCreateLabel:   string;
 };
 ```
 
@@ -203,6 +205,8 @@ type TagSelectionTranslation = {
 | `backgroundColorLabel` | `"Background color"` | Überschrift über den Hintergrundfarb-Swatches und dem Hex-Input im Custom-Color-Picker-Panel. |
 | `textColorLabel` | `"Text color"` | Überschrift über den Textfarb-Swatches und dem Hex-Input im Custom-Color-Picker-Panel. Gedimmt solange der "Auto"-Schalter aktiv ist. |
 | `autoTextColorLabel` | `"Auto"` | Label neben dem Schalter, der zwischen automatischer (WCAG-Kontrast-basierter) und manueller Textfarbe umschaltet. |
+| `confirmCreateLabel` | `"Confirm new tag"` | `aria-label` des Häkchen-Icon-Buttons, der beim Anlegen eines neuen Tags angezeigt wird (`allowCreate={true}`). |
+| `cancelCreateLabel` | `"Cancel new tag"` | `aria-label` des Schließen-Icon-Buttons, der beim Anlegen eines neuen Tags angezeigt wird (`allowCreate={true}`). |
 
 **Vollständige deutsche Übersetzung:**
 
@@ -221,6 +225,8 @@ type TagSelectionTranslation = {
     backgroundColorLabel: 'Hintergrundfarbe',
     textColorLabel:      'Textfarbe',
     autoTextColorLabel:  'Automatisch',
+    confirmCreateLabel:  'Neuen Tag bestätigen',
+    cancelCreateLabel:   'Neuen Tag abbrechen',
   }}
 />
 ```
