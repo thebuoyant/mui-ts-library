@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { TagSelectionSelectedTags } from "./TagSelectionSelectedTags";
 import type { TagSelectionTranslation } from "./TagSelection.types";
 
-const translation: TagSelectionTranslation = {
+const translation: Required<TagSelectionTranslation> = {
   selectedTagsLabel: "Selected tags",
   autoCompleteLabel: "Search and add tags",
   noSelectedTagsText: "No tags selected.",

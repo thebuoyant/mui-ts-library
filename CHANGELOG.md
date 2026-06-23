@@ -13,6 +13,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.6.1] — 2026-06-22
+
+### Fixed
+
+#### ⚠️ TypeScript Compatibility
+
+`v3.4.0` and `v3.5.0` added new fields (`confirmCreateLabel`/`cancelCreateLabel` to `TagSelectionTranslation`, `history`/`historyEmpty`/`clearHistory` to `SqlEditorTranslation`) as **required** properties on those exported types. This only broke TypeScript builds for the narrow case of declaring a standalone variable typed against the full named type instead of passing a partial object directly to the `translation` prop (the documented, recommended pattern) — but it was a real, undocumented breaking change for that pattern, shipped without a major version bump.
+
+**Fix:** the new fields are now optional (`confirmCreateLabel?: string`, `history?: string`, etc.) on `TagSelectionTranslation` and `SqlEditorTranslation`. If you were affected, no code change is needed — your existing object literals (with or without the newer keys) compile again.
+
+```tsx
+// This now compiles again, exactly as it did before v3.4.0 / v3.5.0:
+const de: TagSelectionTranslation = {
+  selectedTagsLabel: 'Ausgewählte Tags',
+  // ...other keys, without confirmCreateLabel/cancelCreateLabel
+};
+```
+
+---
+
 ## [3.6.0] — 2026-06-22
 
 ### Added

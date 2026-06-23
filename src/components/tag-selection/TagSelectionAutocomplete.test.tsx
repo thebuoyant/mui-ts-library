@@ -8,7 +8,7 @@ import type {
   TagSelectionTranslation,
 } from "./TagSelection.types";
 
-const translation: TagSelectionTranslation = {
+const translation: Required<TagSelectionTranslation> = {
   selectedTagsLabel: "Selected tags",
   autoCompleteLabel: "Search and add tags",
   noSelectedTagsText: "No tags selected.",

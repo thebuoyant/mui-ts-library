@@ -313,6 +313,13 @@ import type {
 
 ## Changelog
 
+### [3.6.1] — 2026-06-22
+
+**⚠️ TypeScript Compatibility Fix**
+- `v3.4.0`/`v3.5.0` made new translation fields required on `TagSelectionTranslation` and `SqlEditorTranslation`, breaking TypeScript builds for code that declares a standalone variable against the full named type. Those fields are now optional — old object literals compile again, no code change needed.
+
+---
+
 ### [3.6.0] — 2026-06-22
 
 **Storybook & StackBlitz — Real-World Showcase**

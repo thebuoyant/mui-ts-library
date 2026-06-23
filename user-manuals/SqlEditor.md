@@ -168,11 +168,13 @@ type SqlEditorTranslation = {
   redo:         string;   // "Redo"
   lineColumn:   string;   // "Ln {line}, Col {col}"
   errorCount:   string;   // "{count} error(s)"
-  history:      string;   // "Query history"
-  historyEmpty: string;   // "No queries yet"
-  clearHistory: string;   // "Clear history"
+  history?:      string;   // "Query history"
+  historyEmpty?: string;   // "No queries yet"
+  clearHistory?: string;   // "Clear history"
 };
 ```
+
+> **⚠️ Compatibility note:** `history`, `historyEmpty`, and `clearHistory` (added in `v3.5.0`) are optional on this type — unlike the other keys, which are required. This is intentional: it lets older code that declares a full `SqlEditorTranslation` literal (instead of passing a partial object to the `translation` prop) keep compiling without changes when we add new keys in the future. Internally, the component always resolves missing keys against `DEFAULT_SQL_EDITOR_TRANSLATION`, so you never need to provide them.
 
 ```tsx
 import { DEFAULT_SQL_EDITOR_TRANSLATION } from '@thebuoyant-tsdev/mui-ts-library';

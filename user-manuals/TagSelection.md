@@ -187,10 +187,12 @@ type TagSelectionTranslation = {
   backgroundColorLabel: string;
   textColorLabel:      string;
   autoTextColorLabel:  string;
-  confirmCreateLabel:  string;
-  cancelCreateLabel:   string;
+  confirmCreateLabel?: string;
+  cancelCreateLabel?:  string;
 };
 ```
+
+> **⚠️ Compatibility note:** `confirmCreateLabel` and `cancelCreateLabel` (added in `v3.4.0`) are optional on this type — unlike the other keys, which are required. This is intentional: it lets older code that declares a full `TagSelectionTranslation` literal (instead of passing a partial object to the `translation` prop) keep compiling without changes when we add new keys in the future. Internally, the component always resolves missing keys against `DEFAULT_TAG_SELECTION_TRANSLATION`, so you never need to provide them.
 
 | Key | Default value | Description |
 |---|---|---|
