@@ -313,6 +313,13 @@ import type {
 
 ## Changelog
 
+### [3.6.1] — 2026-06-22
+
+**⚠️ TypeScript-Kompatibilitäts-Fix**
+- `v3.4.0`/`v3.5.0` machten neue Translation-Felder auf `TagSelectionTranslation` und `SqlEditorTranslation` erforderlich, was TypeScript-Builds für Code brach, der eine eigenständige Variable gegen den vollen benannten Typ deklariert. Diese Felder sind jetzt optional — alte Objekt-Literale kompilieren wieder, keine Code-Änderung nötig.
+
+---
+
 ### [3.6.0] — 2026-06-22
 
 **Storybook & StackBlitz — Praxisnahe Vitrine**

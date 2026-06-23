@@ -26,7 +26,7 @@ const DIALECT_MAP: Record<SqlEditorDialect, SqlLanguage> = {
 type SqlEditorToolbarProps = {
   editorView:      EditorView | null;
   toolbarConfig:   Required<SqlEditorToolbarConfig>;
-  translation:     SqlEditorTranslation;
+  translation:     Required<SqlEditorTranslation>;
   dialect:         SqlEditorDialect;
   disabled?:       boolean;
   onExecute?:      (sql: string) => void;

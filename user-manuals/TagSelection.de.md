@@ -187,10 +187,12 @@ type TagSelectionTranslation = {
   backgroundColorLabel: string;
   textColorLabel:      string;
   autoTextColorLabel:  string;
-  confirmCreateLabel:  string;
-  cancelCreateLabel:   string;
+  confirmCreateLabel?: string;
+  cancelCreateLabel?:  string;
 };
 ```
+
+> **⚠️ Kompatibilitäts-Hinweis:** `confirmCreateLabel` und `cancelCreateLabel` (hinzugefügt in `v3.4.0`) sind bei diesem Typ optional — im Gegensatz zu den anderen Keys, die erforderlich sind. Das ist bewusst so: dadurch kompiliert älterer Code, der ein vollständiges `TagSelectionTranslation`-Literal deklariert (statt ein partielles Objekt an die `translation`-Prop zu übergeben), auch dann weiter, wenn wir künftig neue Keys hinzufügen. Intern löst die Komponente fehlende Keys immer gegen `DEFAULT_TAG_SELECTION_TRANSLATION` auf — du musst sie also nie angeben.
 
 | Key | Standard-Wert | Beschreibung |
 |---|---|---|

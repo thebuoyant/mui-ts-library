@@ -35,11 +35,13 @@ export type TagSelectionTranslation = {
   backgroundColorLabel: string;
   textColorLabel: string;
   autoTextColorLabel: string;
-  confirmCreateLabel: string;
-  cancelCreateLabel: string;
+  /** @since 3.4.0 — optional for backward compatibility with full-literal objects typed before this field existed. */
+  confirmCreateLabel?: string;
+  /** @since 3.4.0 — optional for backward compatibility with full-literal objects typed before this field existed. */
+  cancelCreateLabel?: string;
 };
 
-export const DEFAULT_TAG_SELECTION_TRANSLATION: TagSelectionTranslation = {
+export const DEFAULT_TAG_SELECTION_TRANSLATION: Required<TagSelectionTranslation> = {
   selectedTagsLabel: "Selected tags",
   autoCompleteLabel: "Search and add tags",
   noSelectedTagsText: "No tags selected.",

@@ -30,7 +30,7 @@ function useTagSelectionStore<T>(
 
 // translation ist hier nicht optional, da der äußere Wrapper den Default bereits auflöst.
 type TagSelectionInnerProps = Omit<TagSelectionProps, "translation"> & {
-  translation: TagSelectionTranslation;
+  translation: Required<TagSelectionTranslation>;
 };
 
 function TagSelectionInner({
@@ -220,7 +220,7 @@ export function TagSelection({
   onSearchChange,
   onTagCreate,
 }: TagSelectionProps) {
-  const t: TagSelectionTranslation = { ...DEFAULT_TAG_SELECTION_TRANSLATION, ...translation };
+  const t: Required<TagSelectionTranslation> = { ...DEFAULT_TAG_SELECTION_TRANSLATION, ...translation };
   const [store] = useState(() => createTagSelectionStore(tags));
 
   return (

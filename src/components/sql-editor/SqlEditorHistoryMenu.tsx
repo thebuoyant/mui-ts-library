@@ -23,7 +23,7 @@ type SqlEditorHistoryMenuProps = {
   history:     SqlQueryHistoryEntry[];
   onSelect:    (sql: string) => void;
   onClear:     () => void;
-  translation: SqlEditorTranslation;
+  translation: Required<SqlEditorTranslation>;
   disabled?:   boolean;
 };
 

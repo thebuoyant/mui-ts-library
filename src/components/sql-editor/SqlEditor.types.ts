@@ -34,12 +34,15 @@ export type SqlEditorTranslation = {
   redo:          string;
   lineColumn:    string;
   errorCount:    string;
-  history:       string;
-  historyEmpty:  string;
-  clearHistory:  string;
+  /** @since 3.5.0 — optional for backward compatibility with full-literal objects typed before this field existed. */
+  history?:       string;
+  /** @since 3.5.0 — optional for backward compatibility with full-literal objects typed before this field existed. */
+  historyEmpty?:  string;
+  /** @since 3.5.0 — optional for backward compatibility with full-literal objects typed before this field existed. */
+  clearHistory?:  string;
 };
 
-export const DEFAULT_SQL_EDITOR_TRANSLATION: SqlEditorTranslation = {
+export const DEFAULT_SQL_EDITOR_TRANSLATION: Required<SqlEditorTranslation> = {
   format:        "Format SQL",
   copy:          "Copy",
   copySuccess:   "Copied!",

@@ -10,7 +10,7 @@ type SqlEditorFooterProps = {
   diagnosticsCount: number;
   cursorLine:       number;
   cursorCol:        number;
-  translation:      SqlEditorTranslation;
+  translation:      Required<SqlEditorTranslation>;
 };
 
 export function SqlEditorFooter({

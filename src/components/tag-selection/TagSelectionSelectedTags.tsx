@@ -8,7 +8,7 @@ import type {
 
 type TagSelectionSelectedTagsProps = {
   selectedTags: TagSelectionItem[];
-  translation: TagSelectionTranslation;
+  translation: Required<TagSelectionTranslation>;
   onTagDelete: (tag: TagSelectionItem) => void;
   showSelectedTagsLabel: boolean;
   chipSize: "small" | "medium";

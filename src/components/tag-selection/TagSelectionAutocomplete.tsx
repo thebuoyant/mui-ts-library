@@ -60,7 +60,7 @@ type TagSelectionAutocompleteProps = {
   chipSize: "medium" | "small";
   availableTags: TagSelectionItem[];
   searchValue: string;
-  translation: TagSelectionTranslation;
+  translation: Required<TagSelectionTranslation>;
   onSearchChange: (value: string) => void;
   onTagSelect: (tag: TagSelectionItem) => void;
   onTagCreate?: (tag: TagSelectionItem) => void;
