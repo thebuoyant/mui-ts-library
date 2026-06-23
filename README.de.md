@@ -343,6 +343,13 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/). In der Praxis b
 
 ## Changelog
 
+### [3.7.1] — 2026-06-23
+
+**Re-Publish — fehlende README auf npm**
+- `v3.7.0` wurde mit leerem `readme`-Registry-Feld veröffentlicht (npmjs.com zeigte keine README, obwohl der Tarball selbst korrekt war). Kein Code oder Inhalt hat sich geändert — diese Version existiert ausschließlich, um die Registry-Metadaten korrekt zu setzen.
+
+---
+
 ### [3.7.0] — 2026-06-23
 
 **JsonEditor — Folding, Path Finder und Schema-Validierung**

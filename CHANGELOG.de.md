@@ -13,6 +13,18 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [3.7.1] — 2026-06-23
+
+### Behoben
+
+#### Re-Publish — fehlende README auf npm
+
+`v3.7.0` wurde erfolgreich veröffentlicht, aber das `readme`-Metadatenfeld der Registry kam leer an — die npmjs.com-Paketseite zeigte gar keine README, obwohl der Tarball selbst `README.md`/`README.de.md` korrekt enthielt (verifiziert via `npm publish --dry-run`). Verursacht wurde das offenbar durch einen Retry von `npm publish` nach einem OTP-Fehlschlag (2FA), der den separaten Readme-Metadaten-Write der Registry aus dem Tarball-Upload herauslösen kann.
+
+**Kein Code oder Inhalt hat sich geändert** — das ist ein Re-Publish, um die Registry-Metadaten korrekt zu setzen. Wer bereits auf `3.7.0` ist, kann auf `3.7.1` aktualisieren, ändert funktional nichts — nur die README wird auf npm sichtbar.
+
+---
+
 ## [3.7.0] — 2026-06-23
 
 ### Hinzugefügt

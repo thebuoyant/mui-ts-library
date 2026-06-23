@@ -165,6 +165,8 @@ The script steps through:
 
 If not logged in, run `npm login` first. For 2FA-protected accounts, use an **Automation token** from [npmjs.com → Access Tokens](https://www.npmjs.com/settings/thebuoyant-tsdev/tokens) to avoid the 2FA prompt during publish.
 
+> **⚠️ OTP retry pitfall (learned from `v3.7.0`):** if `npm publish` fails with `EOTP` and you retry the command, the registry's `readme` metadata can come through **empty** even though the tarball itself contains the README correctly — the npmjs.com package page then shows no README at all. Run `npm publish --dry-run --access public` first to confirm `README.md` appears under "Tarball Contents", then publish in a single, uninterrupted attempt. If it happens anyway, there is no way to patch metadata on an already-published version — bump a new patch version and republish.
+
 ### Versioning (SemVer)
 
 | Change type | Level | Example |
