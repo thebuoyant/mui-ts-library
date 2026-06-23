@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   EditorView,
   lineNumbers,
@@ -10,27 +10,35 @@ import {
 import { EditorState, Compartment } from "@codemirror/state";
 import { json, jsonParseLinter } from "@codemirror/lang-json";
 import { history, defaultKeymap, historyKeymap } from "@codemirror/commands";
-import { syntaxHighlighting, HighlightStyle } from "@codemirror/language";
-import { linter, lintGutter } from "@codemirror/lint";
+import { syntaxHighlighting, HighlightStyle, foldGutter, foldKeymap } from "@codemirror/language";
+import { linter, lintGutter, forceLinting, type Diagnostic } from "@codemirror/lint";
 import { tags } from "@lezer/highlight";
 import { showMinimap as cmShowMinimap } from "@replit/codemirror-minimap";
-import { Box, useTheme } from "@mui/material";
-import type { JsonEditorHighlightColors } from "./JsonEditor.types";
+import { Box, Fade, Paper, Typography, useTheme } from "@mui/material";
+import type { JsonEditorHighlightColors, JsonEditorSchema } from "./JsonEditor.types";
+import { computeJsonPath } from "./util/jsonPathFinder";
+import { validateAgainstSchema, findRangeForPath } from "./util/jsonSchemaValidator";
 
 type JsonEditorContentProps = {
-  value?:           string;
-  onChange?:        (json: string) => void;
-  placeholder?:     string;
-  disabled?:        boolean;
-  readonly?:        boolean;
-  showLineNumbers?: boolean;
-  showMinimap?:     boolean;
-  highlightColors?: JsonEditorHighlightColors;
-  onViewReady:      (view: EditorView | null) => void;
-  onCursorChange:   (line: number, col: number) => void;
-  onBlur?:          () => void;
-  onFocus?:         () => void;
+  value?:             string;
+  onChange?:          (json: string) => void;
+  placeholder?:       string;
+  disabled?:          boolean;
+  readonly?:          boolean;
+  schema?:            JsonEditorSchema;
+  showLineNumbers?:   boolean;
+  showMinimap?:       boolean;
+  showFolding?:       boolean;
+  enablePathFinder?:  boolean;
+  highlightColors?:   JsonEditorHighlightColors;
+  onViewReady:        (view: EditorView | null) => void;
+  onCursorChange:     (line: number, col: number) => void;
+  onBlur?:            () => void;
+  onFocus?:           () => void;
+  onPathCopy?:        (path: string) => void;
 };
+
+type PathFeedback = { x: number; y: number; path: string };
 
 export function JsonEditorContent({
   value,
@@ -38,14 +46,19 @@ export function JsonEditorContent({
   placeholder,
   disabled = false,
   readonly = false,
+  schema,
   showLineNumbers = true,
   showMinimap = false,
+  showFolding = true,
+  enablePathFinder = true,
   highlightColors,
   onViewReady,
   onCursorChange,
   onBlur,
   onFocus,
+  onPathCopy,
 }: JsonEditorContentProps) {
+  const wrapperRef      = useRef<HTMLDivElement>(null);
   const containerRef    = useRef<HTMLDivElement>(null);
   const viewRef         = useRef<EditorView | null>(null);
   const onChangeRef     = useRef(onChange);
@@ -53,6 +66,11 @@ export function JsonEditorContent({
   const onBlurRef       = useRef(onBlur);
   const onFocusRef      = useRef(onFocus);
   const onViewReadyRef  = useRef(onViewReady);
+  const onPathCopyRef   = useRef(onPathCopy);
+  const enablePathFinderRef = useRef(enablePathFinder);
+  const schemaRef        = useRef(schema);
+
+  const [pathFeedback, setPathFeedback] = useState<PathFeedback | null>(null);
 
   const editableCompartment = useRef(new Compartment());
   const readOnlyCompartment = useRef(new Compartment());
@@ -71,6 +89,12 @@ export function JsonEditorContent({
   useEffect(() => { onBlurRef.current      = onBlur;        }, [onBlur]);
   useEffect(() => { onFocusRef.current     = onFocus;       }, [onFocus]);
   useEffect(() => { onViewReadyRef.current = onViewReady;   }, [onViewReady]);
+  useEffect(() => { onPathCopyRef.current  = onPathCopy;    }, [onPathCopy]);
+  useEffect(() => { enablePathFinderRef.current = enablePathFinder; }, [enablePathFinder]);
+  useEffect(() => {
+    schemaRef.current = schema;
+    if (viewRef.current) forceLinting(viewRef.current);
+  }, [schema]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -115,6 +139,14 @@ export function JsonEditorContent({
         ".cm-gutter-lint": { width: "16px" },
         ".cm-lint-marker-error":   { color: muiTheme.palette.error.main },
         ".cm-lint-marker-warning": { color: muiTheme.palette.warning.main },
+        ".cm-foldGutter .cm-gutterElement": { cursor: "pointer", color: muiTheme.palette.text.disabled },
+        ".cm-foldPlaceholder": {
+          backgroundColor: muiTheme.palette.action.selected,
+          border:          `1px solid ${muiTheme.palette.divider}`,
+          borderRadius:    "3px",
+          color:           muiTheme.palette.text.secondary,
+          padding:         "0 4px",
+        },
         ".cm-tooltip.cm-tooltip-lint": {
           backgroundColor: muiTheme.palette.background.paper,
           border:          `1px solid ${muiTheme.palette.divider}`,
@@ -149,12 +181,32 @@ export function JsonEditorContent({
       json(),
       lintGutter(),
       linter(jsonParseLinter()),
+      linter((view) => {
+        const schema = schemaRef.current;
+        if (!schema) return [];
+
+        let parsed: unknown;
+        try {
+          parsed = JSON.parse(view.state.doc.toString());
+        } catch {
+          return []; // jsonParseLinter already reports syntax errors
+        }
+
+        const diagnostics: Diagnostic[] = [];
+        for (const error of validateAgainstSchema(parsed, schema)) {
+          const range = findRangeForPath(view.state, error.path);
+          if (!range) continue;
+          diagnostics.push({ from: range.from, to: range.to, severity: "error", message: error.message });
+        }
+        return diagnostics;
+      }),
       history(),
-      keymap.of([...defaultKeymap, ...historyKeymap]),
+      keymap.of([...defaultKeymap, ...historyKeymap, ...foldKeymap]),
       editableCompartment.current.of(EditorView.editable.of(!disabled && !readonly)),
       readOnlyCompartment.current.of(EditorState.readOnly.of(readonly)),
       highlightActiveLine(),
       ...(showLineNumbers ? [lineNumbers(), highlightActiveLineGutter()] : []),
+      ...(showFolding ? [foldGutter()] : []),
       ...(placeholder ? [cmPlaceholder(placeholder)] : []),
       ...minimapExtensions,
       EditorView.updateListener.of((update) => {
@@ -168,6 +220,33 @@ export function JsonEditorContent({
       EditorView.domEventHandlers({
         blur:  () => { onBlurRef.current?.();  },
         focus: () => { onFocusRef.current?.(); },
+        click: (event, view) => {
+          if (!enablePathFinderRef.current) return false;
+          if (!(event.ctrlKey || event.metaKey)) return false;
+
+          let pos: number | null;
+          try {
+            pos = view.posAtCoords({ x: event.clientX, y: event.clientY });
+          } catch {
+            // posAtCoords can throw if the click lands before layout has settled.
+            return false;
+          }
+          if (pos === null) return false;
+
+          const path = computeJsonPath(view.state, pos);
+          if (!path) return false;
+
+          navigator.clipboard.writeText(path).then(() => {
+            const wrapperBox = wrapperRef.current?.getBoundingClientRect();
+            setPathFeedback({
+              x:    event.clientX - (wrapperBox?.left ?? 0),
+              y:    event.clientY - (wrapperBox?.top ?? 0),
+              path,
+            });
+            onPathCopyRef.current?.(path);
+          });
+          return true;
+        },
       }),
     ];
 
@@ -205,18 +284,50 @@ export function JsonEditorContent({
     });
   }, [disabled, readonly]);
 
+  useEffect(() => {
+    if (!pathFeedback) return;
+    const timer = setTimeout(() => setPathFeedback(null), 1500);
+    return () => clearTimeout(timer);
+  }, [pathFeedback]);
+
   return (
-    <Box
-      ref={containerRef}
-      sx={{
-        flex:            1,
-        overflow:        "hidden",
-        display:         "flex",
-        flexDirection:   "column",
-        opacity:         disabled ? 0.5 : 1,
-        backgroundColor: muiTheme.palette.background.paper,
-        "& .cm-editor": { flex: 1, display: "flex", flexDirection: "column" },
-      }}
-    />
+    <Box ref={wrapperRef} sx={{ position: "relative", flex: 1, overflow: "hidden", display: "flex" }}>
+      <Box
+        ref={containerRef}
+        sx={{
+          flex:            1,
+          overflow:        "hidden",
+          display:         "flex",
+          flexDirection:   "column",
+          opacity:         disabled ? 0.5 : 1,
+          backgroundColor: muiTheme.palette.background.paper,
+          "& .cm-editor": { flex: 1, display: "flex", flexDirection: "column" },
+        }}
+      />
+
+      {pathFeedback && (
+        <Fade in>
+          <Paper
+            elevation={3}
+            sx={{
+              position:     "absolute",
+              left:         pathFeedback.x,
+              top:          pathFeedback.y,
+              transform:    "translate(-50%, -130%)",
+              px:           1,
+              py:           0.5,
+              pointerEvents: "none",
+              zIndex:       10,
+              bgcolor:      "grey.900",
+              color:        "common.white",
+            }}
+          >
+            <Typography variant="caption" sx={{ fontFamily: "monospace" }}>
+              Copied: {pathFeedback.path}
+            </Typography>
+          </Paper>
+        </Fade>
+      )}
+    </Box>
   );
 }

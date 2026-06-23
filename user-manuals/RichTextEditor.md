@@ -8,7 +8,7 @@
 
 The `RichTextEditor` is a full-featured WYSIWYG text editor built on [TipTap v3](https://tiptap.dev) and Material UI. It provides a rich input interface for content such as CMS texts, email templates, comments, and description fields — fully integrated with the MUI theme, without any external CSS dependencies.
 
-| ✨ New in v2.1.0 | |
+| New in v2.1.0 | |
 |---|---|
 | **Table editing** | Insert tables, manage rows/columns via toolbar dropdown (`showTableButton`) |
 | **Image embed** | Insert images by URL or Base64 (`showImageButton`) |

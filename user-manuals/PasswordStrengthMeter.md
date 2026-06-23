@@ -17,7 +17,7 @@ The `PasswordStrengthMeter` is a password input component built on React and Mat
 
 ---
 
-> ### ✨ New in v1.5.0
+> ### New in v1.5.0
 >
 > | Feature | Description | Jump to |
 > |---|---|---|

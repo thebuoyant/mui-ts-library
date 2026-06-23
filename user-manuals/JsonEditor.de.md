@@ -18,7 +18,7 @@ Der `JsonEditor` ist ein vollständiger JSON-Code-Editor auf Basis von [CodeMirr
 
 ---
 
-> ### ✨ Neu in v1.5.0
+> ### Neu in v1.5.0
 >
 > | Feature | Beschreibung | Springe zu |
 > |---|---|---|
@@ -78,6 +78,7 @@ function App() {
 | Prop | Typ | Standard | Beschreibung |
 |---|---|---|---|
 | `disabled` | `boolean` | `false` | Deaktiviert Editor und Toolbar vollständig |
+| `enablePathFinder` | `boolean` | `true` | Aktiviert `Ctrl / Cmd ⌘+Click` auf einen Wert oder Property-Key, um dessen JSON-Path in die Zwischenablage zu kopieren |
 | `error` | `boolean` | `false` | Roter Rahmen im Fehlerzustand |
 | `height` | `number \| string` | `300` | Gesamthöhe (Toolbar + Inhalt). Zahlen → px. `"auto"` → füllt den umgebenden Flex-Container. |
 | `helperText` | `string` | — | Hilfetext unter dem Editor (wie MUI TextField) |
@@ -86,6 +87,8 @@ function App() {
 | `name` | `string` | — | Name für natives Form-Submit (verstecktes `<input type="hidden">`) |
 | `placeholder` | `string` | — | Platzhaltertext wenn der Editor leer ist |
 | `readonly` | `boolean` | `false` | Schreibgeschützter Modus — keine Toolbar |
+| `schema` | `JsonEditorSchema` | — | Validiert das Dokument strukturell — siehe [Schema-Validierung](#schema-validierung) |
+| `showFolding` | `boolean` | `true` | Zeigt ein Fold-Gutter — Klick auf die ▾/▸-Pfeile klappt Objects/Arrays ein-/aus |
 | `showLineColumn` | `boolean` | `true` | Cursor-Position im Footer anzeigen (Ln / Sp.) |
 | `showLineNumbers` | `boolean` | `true` | Zeilennummern-Gutter anzeigen |
 | `showMinimap` | `boolean` | `false` | Zeigt eine verkleinerte Dokumentenübersicht (Minimap) auf der rechten Seite des Editors an. Nützlich für die Navigation in großen JSON-Dateien. |
@@ -97,6 +100,7 @@ function App() {
 | `onBlur` | `() => void` | — | Wird aufgerufen wenn der Editor den Fokus verliert |
 | `onChange` | `(json: string) => void` | — | Wird bei jeder Inhaltsänderung aufgerufen |
 | `onFocus` | `() => void` | — | Wird aufgerufen wenn der Editor den Fokus erhält |
+| `onPathCopy` | `(path: string) => void` | — | Wird nach erfolgreichem `Ctrl / Cmd ⌘+Click`-Kopieren über den Path Finder aufgerufen |
 | `onValidChange` | `(isValid: boolean) => void` | — | Wird aufgerufen, wenn sich die JSON-Gültigkeit ändert |
 
 ---
@@ -156,6 +160,22 @@ type JsonEditorHighlightColors = {
 };
 ```
 
+### `JsonEditorSchema`
+
+```ts
+type JsonSchemaType = "string" | "number" | "integer" | "boolean" | "object" | "array" | "null";
+
+type JsonEditorSchema = {
+  type?:       JsonSchemaType | JsonSchemaType[];
+  properties?: Record<string, JsonEditorSchema>;
+  required?:   string[];
+  items?:      JsonEditorSchema;
+  enum?:       unknown[];
+};
+```
+
+Eine fokussierte Teilmenge von JSON Schema — keine vollständige Implementierung (kein `$ref`, `oneOf`/`anyOf`, `pattern`, `minimum`/`maximum` usw.). Siehe [Schema-Validierung](#schema-validierung) weiter unten.
+
 ---
 
 ## Validierung
@@ -185,6 +205,71 @@ Die Anzeige ist farbkodiert: Grün (`success.main`) für gültig, Rot (`error.ma
 ```
 
 Wird bei jeder Inhaltsänderung ausgelöst, wenn die Gültigkeit zwischen `true` und `false` wechselt.
+
+### Schema-Validierung
+
+```tsx
+import type { JsonEditorSchema } from '@thebuoyant-tsdev/mui-ts-library';
+
+const userSchema: JsonEditorSchema = {
+  type: 'object',
+  required: ['name', 'age'],
+  properties: {
+    name: { type: 'string' },
+    age:  { type: 'number' },
+    role: { enum: ['admin', 'member', 'viewer'] },
+  },
+};
+
+<JsonEditor value={json} schema={userSchema} />
+```
+
+Die `schema`-Prop validiert das Dokument strukturell gegen eine **fokussierte Teilmenge von JSON Schema** — `type`, `required`, `enum` sowie verschachtelte `properties`/`items`. Verstöße werden als Inline-Fehler-Diagnostics angezeigt, genau wie Syntaxfehler (rote Wellenlinie + Lint-Gutter-Marker; Hover zeigt die Meldung).
+
+Die Schema-Validierung wird **übersprungen, solange das Dokument kein gültiges JSON ist** — der eingebaute Parse-Linter meldet das bereits, und es gibt noch keine sinnvolle Struktur zum Validieren.
+
+```tsx
+// Array-Elemente werden gegen `items` validiert
+const listSchema: JsonEditorSchema = {
+  type: 'array',
+  items: { type: 'object', required: ['id'] },
+};
+
+// Mehrere erlaubte Typen
+const nullableSchema: JsonEditorSchema = { type: ['string', 'null'] };
+```
+
+Das ist **keine vollständige JSON-Schema-Implementierung** — es gibt kein `$ref`, `oneOf`/`anyOf`, `pattern`, `minimum`/`maximum` oder Format-Validatoren. Abgedeckt sind die häufigsten Fälle realer Config-/API-Validierung: hat das Objekt die richtige Form, sind die Pflichtfelder vorhanden, und ist dieser Wert einer der erlaubten Optionen.
+
+---
+
+## Folding
+
+```tsx
+{/* Fold-Gutter standardmäßig sichtbar */}
+<JsonEditor value={json} />
+
+{/* Fold-Gutter ausblenden */}
+<JsonEditor value={json} showFolding={false} />
+```
+
+Klick auf den ▾/▸-Pfeil neben einem `{` oder `[` klappt das jeweilige Objekt/Array inline zu — der zusammengeklappte Bereich zeigt einen kleinen Platzhalter, auf den erneut geklickt werden kann, um wieder aufzuklappen. Besonders nützlich für große, tief verschachtelte Dokumente (API-Responses, Config-Dateien). Der Fold-Zustand wird komplett von CodeMirror verwaltet — keine zusätzlichen Props nötig außer `showFolding`.
+
+---
+
+## JSON Path Finder
+
+```tsx
+<JsonEditor
+  value={json}
+  enablePathFinder
+  onPathCopy={(path) => console.log('Kopiert:', path)}
+/>
+```
+
+`Ctrl+Click` (Windows/Linux) oder `Cmd ⌘+Click` (macOS) auf einen beliebigen Wert oder Property-Key kopiert dessen vollständigen JSON-Path in die Zwischenablage — z.B. `$.users[0].address.city` — und zeigt eine kurze "Copied: …"-Bestätigungsblase nahe der Klickstelle. Ein Klick auf den Key oder den Wert derselben Property liefert denselben Pfad.
+
+Standardmäßig aktiviert (`enablePathFinder={true}`); auf `false` setzen, um es zu deaktivieren. Mit `onPathCopy` lässt sich das Feature in eigene UI integrieren (Toast-Benachrichtigung, Verlaufsliste usw.) statt sich auf die eingebaute Blase zu verlassen.
 
 ---
 
@@ -414,6 +499,9 @@ const colors: JsonEditorHighlightColors = {
 | `WithMinimap` | Großer Datensatz mit aktiviertem Minimap-Panel |
 | `ApiResponseViewer` | Schreibgeschützter REST-API-Response-Inspektor |
 | `WebhookPayloadInspector` | Stripe-artiges Webhook-Event-Payload mit Validierung |
+| `WithFolding` | Großer Datensatz zur Demonstration des Fold-Gutters |
+| `WithPathFinder` | `Ctrl+Click` auf einen Wert kopiert dessen JSON-Path |
+| `WithSchemaValidation` | Vorbefüllt mit Schema-Verstoß (fehlendes Feld + ungültiger Enum-Wert) |
 
 ---
 
@@ -443,3 +531,7 @@ Die Minimap wird von [`@replit/codemirror-minimap`](https://www.npmjs.com/packag
 | **Gleiches Layout wie SqlEditor** | `Paper`-Wrapper, `Toolbar` + `Divider` + `Content` + optionaler `Footer` — konsistent mit der restlichen Bibliothek |
 | **`normalizeSize()`** | Konvertiert numerische Strings (`"300"`) zu Zahlen, damit MUI `px` anhängt — ermöglicht Storybook-Text-Controls |
 | **Dark Mode** | Alle Farben werden aus `useTheme()` bezogen — reagiert automatisch auf MUI-Theme-Moduswechsel |
+| **Folding-Implementierung** | `@codemirror/lang-json` markiert `Object`/`Array`-Knoten bereits als faltbar (`foldNodeProp`) — `showFolding` fügt nur `foldGutter()` + `foldKeymap` hinzu, keine eigene Fold-Logik nötig |
+| **Path-Finder-Implementierung** | Läuft den Lezer-JSON-Syntaxbaum von der Klick-Position bis zur Wurzel hoch, liest `PropertyName`-Text und zählt `Array`-Geschwister — kein erneutes JSON-Parsing nötig. `posAtCoords` ist in try/catch gekapselt, da es werfen kann, wenn der Klick vor abgeschlossenem Layout erfolgt |
+| **Schema-Validierungsfehler → Quell-Bereich** | Fehler werden gegen den *geparsten* Wert berechnet (keine Positionsinfo), dann läuft ein Pfad-zu-Bereich-Resolver den Syntaxbaum von der Wurzel wieder *hinunter*, um den passenden Knoten zu finden. "Missing required property"-Fehler zeigen auf das *umschließende* Objekt, da der fehlende Key keinen eigenen Bereich hat |
+| **Keine JSON-Schema-Abhängigkeit** | Der Validator ist eine kleine, fokussierte Implementierung für `type`/`required`/`enum`/verschachtelte Strukturen — bewusst keine vollständige JSON-Schema-Implementierung (kein `ajv` o.ä.), um die Bundle-Größe von `JsonEditor` vorhersehbar zu halten |

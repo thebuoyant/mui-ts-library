@@ -15,7 +15,7 @@ Der `ChordChart` visualisiert **Flüsse zwischen benannten Gruppen** als Kreisdi
 - Handels- oder Kommunikationsflüsse zwischen Parteien
 - Beliebige gerichtete oder ungerichtete Quelle→Ziel-Beziehungen mit numerischem Gewicht
 
-| ✨ Neu in v2.3.0 | |
+| Neu in v2.3.0 | |
 |---|---|
 | **ChordChart** | D3 Fluss-Chart — Arc-Gruppen, Bänder, Hover-Highlight, gerichtet/ungerichtet |
 

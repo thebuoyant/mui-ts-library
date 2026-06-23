@@ -8,7 +8,7 @@
 
 Der `HorizontalTreeChart` stellt hierarchische Daten mit D3 v7's Tree-Layout und geschwungenen Bézier-Links dar. Er unterstützt 4 Wachstumsrichtungen, farbige Bubble-Nodes mit Icons, Ctrl / Cmd ⌘+Click Drill-Down und Ctrl / Cmd ⌘+Scroll Zoom. Er ist die fünfte Komponente der **D3-Charts-Familie** und teilt alle Konventionen (`colorConfig`, `chartColors`, `zoomable`, `drillable`, MUI Tooltip) mit seinen Geschwistern.
 
-| ✨ Neu in v2.6.0 | |
+| Neu in v2.6.0 | |
 |---|---|
 | **HorizontalTreeChart** | 4 Orientierungen, D3-Tree-Layout, Drill-Down, Zoom, MUI-Theme |
 

@@ -16,7 +16,7 @@ Der `SunburstChart` visualisiert **hierarchische Daten als konzentrische Ringe**
 - Produkttaxonomie mit Drill-down
 - Beliebige hierarchische und proportionale Daten
 
-| ✨ Neu in v2.2.0 | |
+| Neu in v2.2.0 | |
 |---|---|
 | **SunburstChart** | Erstes D3-Chart — Ctrl / Cmd ⌘+Click Drill-Down, Donut-Modus, MUI-Theme-Palette |
 | **`zoomable`** *(v2.4.0)* | `Ctrl / Cmd ⌘ + Scroll` visueller Zoom — Inhalt wird am `size`-Rand abgeschnitten |

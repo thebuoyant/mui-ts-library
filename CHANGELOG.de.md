@@ -13,6 +13,18 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [3.7.0] — 2026-06-23
+
+### Hinzugefügt
+
+#### JsonEditor — Folding, Path Finder und Schema-Validierung
+
+- **Folding** — `showFolding` (Default `true`) fügt ein Fold-Gutter hinzu; Klick auf die ▾/▸-Pfeile neben `{` oder `[` klappt das Objekt/Array inline zu. `@codemirror/lang-json` markiert Objects/Arrays bereits als faltbar — hier wird nur Gutter und Keymap angeschlossen.
+- **JSON Path Finder** — `enablePathFinder` (Default `true`) erlaubt `Ctrl+Click` / `Cmd ⌘+Click` auf einen Wert oder Property-Key, um dessen vollständigen JSON-Path (z.B. `$.items[0].id`) in die Zwischenablage zu kopieren, mit kurzer "Copied: …"-Bestätigungsblase. Löst `onPathCopy(path)` aus.
+- **Schema-Validierung** — neue `schema`-Prop validiert das Dokument strukturell gegen eine fokussierte JSON-Schema-Teilmenge (`type`, `required`, `enum`, verschachtelte `properties`/`items`). Verstöße werden als Inline-Fehler-Diagnostics angezeigt, genau wie Syntaxfehler. Wird übersprungen, solange das Dokument kein gültiges JSON ist.
+
+---
+
 ## [3.6.1] — 2026-06-22
 
 ### Behoben

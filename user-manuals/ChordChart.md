@@ -15,7 +15,7 @@ The `ChordChart` visualizes **flows between named groups** as a circular diagram
 - Trade or communication flows between parties
 - Any directed or undirected source → target relationship with a numeric weight
 
-| ✨ New in v2.3.0 | |
+| New in v2.3.0 | |
 |---|---|
 | **ChordChart** | D3 flow chart — arc groups, ribbons, hover highlight, directed/undirected |
 

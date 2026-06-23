@@ -29,15 +29,19 @@ export function JsonEditor({
   helperText,
   name,
   indent          = 2,
-  showLineNumbers = true,
-  showLineColumn  = true,
-  showMinimap     = false,
-  showValidation  = false,
+  schema,
+  showLineNumbers   = true,
+  showLineColumn    = true,
+  showMinimap       = false,
+  showFolding       = true,
+  showValidation    = false,
+  enablePathFinder  = true,
   toolbarConfig,
   translation,
   highlightColors,
   onBlur,
   onFocus,
+  onPathCopy,
 }: JsonEditorProps) {
   const t  = { ...DEFAULT_JSON_EDITOR_TRANSLATION, ...translation };
   const tc = { ...DEFAULT_JSON_EDITOR_TOOLBAR_CONFIG, ...toolbarConfig };
@@ -109,13 +113,17 @@ export function JsonEditor({
           placeholder={placeholder}
           disabled={disabled}
           readonly={readonly}
+          schema={schema}
           showLineNumbers={showLineNumbers}
           showMinimap={showMinimap}
+          showFolding={showFolding}
+          enablePathFinder={enablePathFinder}
           highlightColors={highlightColors}
           onViewReady={handleViewReady}
           onCursorChange={handleCursorChange}
           onBlur={onBlur}
           onFocus={onFocus}
+          onPathCopy={onPathCopy}
         />
       </Paper>
 

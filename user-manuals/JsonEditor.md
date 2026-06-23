@@ -18,7 +18,7 @@
 
 ---
 
-> ### ✨ New in v1.5.0
+> ### New in v1.5.0
 >
 > | Feature | Description | Jump to |
 > |---|---|---|
@@ -78,6 +78,7 @@ function App() {
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `disabled` | `boolean` | `false` | Disables editor and toolbar completely |
+| `enablePathFinder` | `boolean` | `true` | Enables `Ctrl / Cmd ⌘+Click` on a value or property key to copy its JSON path to the clipboard |
 | `error` | `boolean` | `false` | Red border in error state |
 | `height` | `number \| string` | `300` | Total height (toolbar + content). Numbers → px. `"auto"` → fills surrounding flex container. |
 | `helperText` | `string` | — | Helper text below the editor (like MUI TextField) |
@@ -86,6 +87,8 @@ function App() {
 | `name` | `string` | — | Name for native form submission via hidden `<input type="hidden">` |
 | `placeholder` | `string` | — | Placeholder text shown when the editor is empty |
 | `readonly` | `boolean` | `false` | Read-only mode — no toolbar |
+| `schema` | `JsonEditorSchema` | — | Structurally validates the document — see [Schema Validation](#schema-validation) |
+| `showFolding` | `boolean` | `true` | Shows a fold gutter — click the ▾/▸ arrows to collapse/expand objects and arrays |
 | `showLineColumn` | `boolean` | `true` | Show cursor position in footer (Ln / Col) |
 | `showLineNumbers` | `boolean` | `true` | Show line number gutter |
 | `showMinimap` | `boolean` | `false` | Shows a scaled-down document overview (minimap) on the right side of the editor. Useful for navigating large JSON files. |
@@ -97,6 +100,7 @@ function App() {
 | `onBlur` | `() => void` | — | Called when the editor loses focus |
 | `onChange` | `(json: string) => void` | — | Called on every content change |
 | `onFocus` | `() => void` | — | Called when the editor gains focus |
+| `onPathCopy` | `(path: string) => void` | — | Called after `Ctrl / Cmd ⌘+Click` successfully copies a path via the path finder |
 | `onValidChange` | `(isValid: boolean) => void` | — | Called whenever JSON validity changes |
 
 ---
@@ -156,6 +160,22 @@ type JsonEditorHighlightColors = {
 };
 ```
 
+### `JsonEditorSchema`
+
+```ts
+type JsonSchemaType = "string" | "number" | "integer" | "boolean" | "object" | "array" | "null";
+
+type JsonEditorSchema = {
+  type?:       JsonSchemaType | JsonSchemaType[];
+  properties?: Record<string, JsonEditorSchema>;
+  required?:   string[];
+  items?:      JsonEditorSchema;
+  enum?:       unknown[];
+};
+```
+
+A focused subset of JSON Schema — not a full implementation (no `$ref`, `oneOf`/`anyOf`, `pattern`, `minimum`/`maximum`, etc.). See [Schema Validation](#schema-validation) below.
+
 ---
 
 ## Validation
@@ -185,6 +205,71 @@ The indicator is color-coded: green (`success.main`) for valid, red (`error.main
 ```
 
 Fires on every content change whenever validity transitions between `true` and `false`.
+
+### Schema Validation
+
+```tsx
+import type { JsonEditorSchema } from '@thebuoyant-tsdev/mui-ts-library';
+
+const userSchema: JsonEditorSchema = {
+  type: 'object',
+  required: ['name', 'age'],
+  properties: {
+    name: { type: 'string' },
+    age:  { type: 'number' },
+    role: { enum: ['admin', 'member', 'viewer'] },
+  },
+};
+
+<JsonEditor value={json} schema={userSchema} />
+```
+
+The `schema` prop structurally validates the document against a **focused subset of JSON Schema** — `type`, `required`, `enum`, and nested `properties`/`items`. Violations show as inline error diagnostics, exactly like syntax errors (red squiggly underline + lint gutter marker; hover for the message).
+
+Schema validation is **skipped while the document doesn't parse as valid JSON** — the built-in parse linter already reports that, and there is no meaningful structure to validate against yet.
+
+```tsx
+// Array items are validated against `items`
+const listSchema: JsonEditorSchema = {
+  type: 'array',
+  items: { type: 'object', required: ['id'] },
+};
+
+// Multiple allowed types
+const nullableSchema: JsonEditorSchema = { type: ['string', 'null'] };
+```
+
+This is **not a full JSON Schema implementation** — there's no `$ref`, `oneOf`/`anyOf`, `pattern`, `minimum`/`maximum`, or format validators. It covers the cases named in most real-world config/API validation: is this the right shape, are the required fields present, and is this value one of the allowed options.
+
+---
+
+## Folding
+
+```tsx
+{/* Fold gutter shown by default */}
+<JsonEditor value={json} />
+
+{/* Hide the fold gutter */}
+<JsonEditor value={json} showFolding={false} />
+```
+
+Click the ▾/▸ arrow next to any `{` or `[` to collapse that object or array inline — the collapsed region shows a small placeholder you can click again to expand. Especially useful for large, deeply nested documents (API responses, config files). Folding state is managed entirely by CodeMirror — no extra props needed beyond `showFolding`.
+
+---
+
+## JSON Path Finder
+
+```tsx
+<JsonEditor
+  value={json}
+  enablePathFinder
+  onPathCopy={(path) => console.log('Copied:', path)}
+/>
+```
+
+`Ctrl+Click` (Windows/Linux) or `Cmd ⌘+Click` (macOS) on any value or property key copies its full JSON path to the clipboard — e.g. `$.users[0].address.city` — and shows a brief "Copied: …" confirmation bubble near the click. Clicking the key or the value of the same property produces the same path.
+
+Enabled by default (`enablePathFinder={true}`); set it to `false` to disable. Use `onPathCopy` to integrate with your own UI (toast notification, history list, etc.) instead of relying on the built-in bubble.
 
 ---
 
@@ -414,6 +499,9 @@ const colors: JsonEditorHighlightColors = {
 | `WithMinimap` | Large dataset with minimap panel enabled |
 | `ApiResponseViewer` | Read-only REST API response inspector |
 | `WebhookPayloadInspector` | Stripe-style webhook event payload with validation |
+| `WithFolding` | Large dataset demonstrating the fold gutter |
+| `WithPathFinder` | `Ctrl+Click` any value to copy its JSON path |
+| `WithSchemaValidation` | Pre-filled with a schema violation (missing field + invalid enum value) |
 
 ---
 
@@ -443,3 +531,7 @@ The minimap is rendered by [`@replit/codemirror-minimap`](https://www.npmjs.com/
 | **Same layout as SqlEditor** | `Paper` wrapper, `Toolbar` + `Divider` + `Content` + optional `Footer` — consistent with the rest of the library |
 | **`normalizeSize()`** | Converts numeric strings (`"300"`) to numbers so MUI appends `px` — enables Storybook text controls |
 | **Dark mode** | All colors are sourced from `useTheme()` — responds automatically to MUI theme mode changes |
+| **Folding implementation** | `@codemirror/lang-json` already marks `Object`/`Array` nodes as foldable (`foldNodeProp`) — `showFolding` just adds `foldGutter()` + `foldKeymap`, no custom fold logic needed |
+| **Path Finder implementation** | Walks the Lezer JSON syntax tree from the clicked position up to the root, reading `PropertyName` text and counting `Array` siblings — no JSON re-parsing needed. `posAtCoords` is wrapped in try/catch since it can throw if the click lands before layout has settled |
+| **Schema validation error → source range** | Errors are computed against the *parsed* value (no position info), then a path-to-range resolver walks the syntax tree back *down* from the root to find the matching node. "Missing required property" errors point at the *enclosing* object, since the missing key has no range of its own |
+| **No JSON Schema dependency** | The validator is a small, focused implementation covering `type`/`required`/`enum`/nested shapes — deliberately not a full JSON Schema implementation (no `ajv` or similar), to keep `JsonEditor`'s bundle size predictable |

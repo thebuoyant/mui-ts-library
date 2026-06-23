@@ -17,7 +17,7 @@ Der `SqlEditor` ist ein vollwertiger SQL-Code-Editor auf Basis [CodeMirror 6](ht
 
 ---
 
-> ### ✨ Neu in v1.5.0
+> ### Neu in v1.5.0
 >
 > | Feature | Beschreibung | Springe zu |
 > |---|---|---|

@@ -83,9 +83,9 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
 | ~~Minimap~~ | ~~Vertikale Übersicht für große JSON-Dokumente~~ | ~~Niedrig~~ | ✅ v1.5.0 |
-| ⭐ JSON Path Finder | Klick auf Wert kopiert vollständigen JSON-Path — extrem nützlich für Entwickler | Niedrig | — |
-| ⭐ Folding / Collapsible | Objekte und Arrays inline ein-/aufklappen | Mittel | — |
-| JSON Schema Validierung | Schema-Prop für strukturelle Validierung (Typ, Required-Felder, Enum) | Hoch | — |
+| ~~⭐ JSON Path Finder~~ | ~~Klick auf Wert kopiert vollständigen JSON-Path~~ — `Ctrl/Cmd+Click` kopiert Pfad (z.B. `$.items[0].id`) via Lezer-Syntaxbaum, mit visuellem Feedback. `enablePathFinder`, `onPathCopy`. | ~~Niedrig~~ | ✅ v3.7.0 |
+| ~~⭐ Folding / Collapsible~~ | ~~Objekte und Arrays inline ein-/aufklappen~~ — `@codemirror/lang-json` hatte Folding schon eingebaut, nur Gutter + Keymap fehlten. `showFolding` (Default `true`). | ~~Mittel → Niedrig~~ | ✅ v3.7.0 |
+| ~~JSON Schema Validierung~~ | ~~Schema-Prop für strukturelle Validierung (Typ, Required-Felder, Enum)~~ — `schema`-Prop mit Typ/Required/Enum/verschachtelten properties+items, Fehler als Inline-Diagnostics wie der Parse-Linter. | ~~Hoch~~ | ✅ v3.7.0 |
 | Beispiel-JSON Generator | Button generiert minimales Placeholder-JSON für schnelles Testen | Niedrig | — |
 | Diff Mode | Zwei JSON-Strings readonly nebeneinander vergleichen | Hoch | — |
 | Tree View | Toggle zwischen Text- und Baumansicht | Hoch | — |
