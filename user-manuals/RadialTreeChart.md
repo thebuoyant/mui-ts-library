@@ -16,7 +16,7 @@ The `RadialTreeChart` renders hierarchical data as a circular radial tree built 
 - Knowledge graphs and topic maps
 - Any hierarchical structure with 2–4 depth levels
 
-| ✨ New in v2.4.0 | |
+| New in v2.4.0 | |
 |---|---|
 | **RadialTreeChart** | D3 radial tree, MUI icons, built-in node popover |
 | **`zoomable`** | `Ctrl / Cmd ⌘ + Scroll` visual zoom — clips content at `size` boundary |

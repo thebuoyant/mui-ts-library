@@ -9,48 +9,55 @@ const meta: Meta<typeof JsonEditor> = {
   component: JsonEditor,
   argTypes: {
     // A–Z: kontrollierbare Props
-    disabled:        { control: "boolean" },
-    error:           { control: "boolean" },
-    height:          { control: "text" },
-    helperText:      { control: "text" },
-    indent:          { control: "number" },
-    name:            { control: "text" },
-    placeholder:     { control: "text" },
-    readonly:        { control: "boolean" },
-    showLineColumn:  { control: "boolean" },
-    showLineNumbers: { control: "boolean" },
-    showMinimap:     { control: "boolean" },
-    showValidation:  { control: "boolean" },
-    width:           { control: "text" },
+    disabled:         { control: "boolean" },
+    enablePathFinder: { control: "boolean" },
+    error:            { control: "boolean" },
+    height:           { control: "text" },
+    helperText:       { control: "text" },
+    indent:           { control: "number" },
+    name:             { control: "text" },
+    placeholder:      { control: "text" },
+    readonly:         { control: "boolean" },
+    showFolding:      { control: "boolean" },
+    showLineColumn:   { control: "boolean" },
+    showLineNumbers:  { control: "boolean" },
+    showMinimap:      { control: "boolean" },
+    showValidation:   { control: "boolean" },
+    width:            { control: "text" },
     // Komplexe Objekte / Callbacks — dedizierte Stories verwenden
     highlightColors: { control: false },
+    schema:          { control: false },
     toolbarConfig:   { control: false },
     translation:     { control: false },
     value:           { control: false },
     onBlur:          { control: false },
     onChange:        { control: false },
     onFocus:         { control: false },
+    onPathCopy:      { control: false },
     onValidChange:   { control: false },
   },
   args: {
     // A–Z
-    disabled:        false,
-    error:           false,
-    height:          "",
-    helperText:      "",
-    indent:          2,
-    name:            "",
-    placeholder:     "Enter JSON …",
-    readonly:        false,
-    showLineColumn:  true,
-    showLineNumbers: true,
-    showMinimap:     false,
-    showValidation:  false,
-    width:           "",
+    disabled:         false,
+    enablePathFinder: true,
+    error:            false,
+    height:           "",
+    helperText:       "",
+    indent:           2,
+    name:             "",
+    placeholder:      "Enter JSON …",
+    readonly:         false,
+    showFolding:      true,
+    showLineColumn:   true,
+    showLineNumbers:  true,
+    showMinimap:      false,
+    showValidation:   false,
+    width:            "",
     // Callbacks
     onBlur:          fn(),
     onChange:        fn(),
     onFocus:         fn(),
+    onPathCopy:      fn(),
     onValidChange:   fn(),
   },
   parameters: {
@@ -351,5 +358,68 @@ export const WebhookPayloadInspector: Story = {
     showValidation: true,
     showLineNumbers: true,
     height:         "320",
+  },
+};
+
+export const WithFolding: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`showFolding` (default `true`) adds a fold gutter — click the ▾/▸ arrows next to any `{` or `[` ' +
+          'to collapse that object or array inline. Especially useful for large, deeply nested documents. ' +
+          'Set `showFolding={false}` to hide the gutter.',
+      },
+    },
+  },
+  args: {
+    value: LARGE_JSON,
+    height: "400",
+  },
+};
+
+export const WithPathFinder: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`enablePathFinder` (default `true`) lets you `Ctrl+Click` / `Cmd ⌘+Click` any value or property key ' +
+          'to copy its full JSON path (e.g. `$.items[0].id`) to the clipboard — a small "Copied: …" bubble ' +
+          'confirms it. Extremely useful when wiring up code against a large API response or config file. ' +
+          'Fires `onPathCopy(path)` for your own tracking/UI. Set `enablePathFinder={false}` to disable.',
+      },
+    },
+  },
+  args: {
+    value: API_RESPONSE_JSON,
+    height: "320",
+  },
+};
+
+export const WithSchemaValidation: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`schema` structurally validates the document against a focused JSON Schema subset — `type`, ' +
+          '`required`, `enum`, and nested `properties`/`items`. Violations show as inline error diagnostics, ' +
+          'exactly like syntax errors (hover the red squiggly or the gutter marker for details). ' +
+          'This story is pre-filled with a violation: `"role": "owner"` is not one of the allowed enum values, ' +
+          'and `age` is missing. Try fixing both to see the diagnostics clear.',
+      },
+    },
+  },
+  args: {
+    value: JSON.stringify({ name: "Alice", role: "owner" }, null, 2),
+    height: "260",
+    schema: {
+      type: "object",
+      required: ["name", "age"],
+      properties: {
+        name: { type: "string" },
+        age:  { type: "number" },
+        role: { enum: ["admin", "member", "viewer"] },
+      },
+    },
   },
 };

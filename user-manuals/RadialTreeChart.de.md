@@ -15,7 +15,7 @@ Der `RadialTreeChart` stellt hierarchische Daten als kreisförmigen radialen Bau
 - Modul- oder Paket-Abhängigkeitsbäume
 - Wissensgraphen und Themenlandkarten
 
-| ✨ Neu in v2.4.0 | |
+| Neu in v2.4.0 | |
 |---|---|
 | **RadialTreeChart** | D3 radialer Baum, MUI-Icons, eingebautes Knoten-Popover |
 | **`zoomable`** | `Ctrl / Cmd ⌘ + Scroll` visueller Zoom — Inhalt am `size`-Rand abschneiden |

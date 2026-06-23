@@ -8,7 +8,7 @@
 
 The `CirclePackingChart` renders hierarchical data using [D3 v7](https://d3js.org)'s circle packing layout. Circles are nested and sized proportionally to their values. Double-clicking zooms in with a smooth D3 interpolation animation — not a simple viewBox scale, but a genuine wipe transition that repositions and resizes all circles. It is the fourth component in the **D3 Charts family**.
 
-| ✨ New in v2.5.0 | |
+| New in v2.5.0 | |
 |---|---|
 | **CirclePackingChart** | D3 circle packing, animated zoom, depth gradient or palette, MUI theme |
 

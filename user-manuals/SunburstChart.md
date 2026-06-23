@@ -16,7 +16,7 @@ The `SunburstChart` visualizes **hierarchical data as concentric rings** — the
 - Product taxonomy drill-downs
 - Any data that is both hierarchical and proportional
 
-| ✨ New in v2.2.0 | |
+| New in v2.2.0 | |
 |---|---|
 | **SunburstChart** | First D3 chart — Ctrl / Cmd ⌘+Click drill-down zoom, donut mode, MUI theme palette |
 | **`zoomable`** *(v2.4.0)* | `Ctrl / Cmd ⌘ + Scroll` visual zoom — content clipped at `size` boundary |

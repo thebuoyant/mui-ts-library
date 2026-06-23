@@ -53,6 +53,21 @@ export type JsonEditorHighlightColors = {
   null?:         string;
 };
 
+export type JsonSchemaType = "string" | "number" | "integer" | "boolean" | "object" | "array" | "null";
+
+/**
+ * A focused subset of JSON Schema — type checking, required fields, enum, and
+ * nested object/array shapes. Not a full JSON Schema implementation (no $ref,
+ * oneOf/anyOf, pattern, min/max, etc.).
+ */
+export type JsonEditorSchema = {
+  type?:       JsonSchemaType | JsonSchemaType[];
+  properties?: Record<string, JsonEditorSchema>;
+  required?:   string[];
+  items?:      JsonEditorSchema;
+  enum?:       unknown[];
+};
+
 export type JsonEditorProps = {
   disabled?:        boolean;
   error?:           boolean;
@@ -66,10 +81,19 @@ export type JsonEditorProps = {
   name?:            string;
   placeholder?:     string;
   readonly?:        boolean;
+  /**
+   * Structurally validates the document against a focused JSON Schema subset
+   * (type, required, enum, nested properties/items). Errors are shown as
+   * inline diagnostics, same as parse errors. Skipped while the document
+   * doesn't parse as valid JSON.
+   */
+  schema?:          JsonEditorSchema;
   showLineColumn?:  boolean;
   showLineNumbers?: boolean;
   /** Shows a scaled-down document overview (minimap) on the right side of the editor. */
   showMinimap?:     boolean;
+  /** Shows a fold gutter — click the arrows to collapse/expand objects and arrays (default: true). */
+  showFolding?:     boolean;
   /** Shows a Valid / Invalid JSON indicator in the footer. */
   showValidation?:  boolean;
   toolbarConfig?:   JsonEditorToolbarConfig;
@@ -77,9 +101,16 @@ export type JsonEditorProps = {
   value?:           string;
   /** Width. Numbers → px. Default → 100%. */
   width?:           number | string;
+  /**
+   * Enables Ctrl / Cmd ⌘+Click on a value or property name to copy its full
+   * JSON path (e.g. `$.users[0].name`) to the clipboard (default: true).
+   */
+  enablePathFinder?: boolean;
   // Callbacks
   onBlur?:        () => void;
   onChange?:      (json: string) => void;
   onFocus?:       () => void;
+  /** Fired after Ctrl / Cmd ⌘+Click successfully copies a path via the path finder. */
+  onPathCopy?:    (path: string) => void;
   onValidChange?: (isValid: boolean) => void;
 };

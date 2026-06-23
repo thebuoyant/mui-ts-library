@@ -12,19 +12,35 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 
 ## Komponenten
 
-| Komponente | Beschreibung | Docs |
+11 produktionsreife Komponenten in drei Kategorien. Jede verlinkt zu einer interaktiven Live-Demo und einem vollständigen Manual mit allen Props, Typen und Mustern.
+
+### Interaktive UI
+
+| Komponente | Wofür | Ausprobieren |
 |---|---|---|
-| [`GanttChart`](#ganttchart) | Projekt-Timeline mit hierarchischen Aufgaben, Meilensteinen, Drag & Drop, Ctrl / Cmd ⌘+Scroll-Zoom, Heute-Chip, Assignee-Spalte, CSV-Export und integrierten CRUD-Dialogen | [Vollständiges Manual →](user-manuals/GanttChart.de.md) |
-| [`TagSelection`](#tagselection) | Multi-Tag-Auswahlfeld mit Autocomplete, freier Tag-Erstellung, Overflow-Chips und MUI-Theme-Farben | [Vollständiges Manual →](user-manuals/TagSelection.de.md) |
-| [`PasswordStrengthMeter`](#passwordstrengthmeter) | Passwort-Eingabe mit animiertem Stärke-Meter, Confirm-Feld mit Match-Validierung, eigenen Anforderungen und eingebautem sicheren Passwort-Generator | [Vollständiges Manual →](user-manuals/PasswordStrengthMeter.de.md) |
-| [`RichTextEditor`](#richtexteditor) | WYSIWYG-Editor (TipTap v3) mit Toolbar, Link-Dialog, Textfarbe, Hervorhebung, Wörter-Zähler, Vollbild-Modus, Markdown-Einfügen, Tabellen-Bearbeitung, Bild-Embed und Emoji-Picker | [Vollständiges Manual →](user-manuals/RichTextEditor.de.md) |
-| [`SqlEditor`](#sqleditor) | SQL-Code-Editor (CodeMirror 6) mit Syntax-Highlighting, Multi-Dialekt, Autocomplete, Linting und `Cmd+Enter`-Ausführen-Shortcut | [Vollständiges Manual →](user-manuals/SqlEditor.de.md) |
-| [`JsonEditor`](#jsoneditor) | JSON-Code-Editor (CodeMirror 6) mit Echtzeit-Validierung, Format- und Komprimieren-Schaltfläche sowie optionaler Minimap | [Vollständiges Manual →](user-manuals/JsonEditor.de.md) |
-| [`SunburstChart`](#sunburstchart) | D3 v7 hierarchisches Chart — konzentrische Ringe, Ctrl / Cmd ⌘+Click Drill-Down, Ctrl / Cmd ⌘+Scroll Zoom, Donut-Modus, eigene Farben, MUI-Theme-Integration. Erste der D3-Chart-Familie. | [Vollständiges Manual →](user-manuals/SunburstChart.de.md) |
-| [`ChordChart`](#chordchart) | D3 v7 Fluss-Chart — Arc-Gruppen, Bänder, Hover-Highlight, Ctrl / Cmd ⌘+Scroll-Zoom, gerichtet/ungerichtet, MUI-Theme-Integration | [Vollständiges Manual →](user-manuals/ChordChart.de.md) |
-| [`RadialTreeChart`](#radialtreechart) | D3 v7 radialer Baum — Knoten auf konzentrischen Ringen, MUI-Icons, Ctrl / Cmd ⌘+Click Drill-Down, Ctrl / Cmd ⌘+Scroll Zoom, MUI-Theme-Integration | [Vollständiges Manual →](user-manuals/RadialTreeChart.de.md) |
-| [`CirclePackingChart`](#circlepackingchart) | D3 v7 Circle Packing — verschachtelte Kreise, animierter D3-Zoom, Ctrl / Cmd ⌘+Scroll-Zoom, Tiefen-Gradient oder Palette, MUI-Theme-Integration | [Vollständiges Manual →](user-manuals/CirclePackingChart.de.md) |
-| [`HorizontalTreeChart`](#horizontaltreechart) | D3 v7 Baum-Chart — 4 Orientierungen (LR/RL/TB/BT), geschwungene Links, Drill-Down, Ctrl / Cmd ⌘+Scroll-Zoom, MUI-Icons und Theme-Integration | [Vollständiges Manual →](user-manuals/HorizontalTreeChart.de.md) |
+| [`GanttChart`](#ganttchart) | Drag-and-Drop-Projekt-Timelines mit Meilensteinen, Abhängigkeiten und CSV-Export | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-ganttchart--default) · [Docs](user-manuals/GanttChart.de.md) |
+| [`TagSelection`](#tagselection) | Multi-Tag-Autocomplete mit freier Tag-Erstellung und Suchergebnis-Highlighting | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-tagselection--default) · [Docs](user-manuals/TagSelection.de.md) |
+| [`PasswordStrengthMeter`](#passwordstrengthmeter) | Echtzeit-Stärke-Feedback mit eingebautem sicheren Passwort-Generator | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-passwordstrengthmeter--default) · [Docs](user-manuals/PasswordStrengthMeter.de.md) |
+
+### Code-Editoren
+
+| Komponente | Wofür | Ausprobieren |
+|---|---|---|
+| [`RichTextEditor`](#richtexteditor) | WYSIWYG-Editing (TipTap v3) mit Tabellen, Bildern und Emoji-Picker | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-richtexteditor--default) · [Docs](user-manuals/RichTextEditor.de.md) |
+| [`SqlEditor`](#sqleditor) | SQL-Editing (CodeMirror 6) mit dialekt-bewusstem Autocomplete und Query-Verlauf | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-sqleditor--default) · [Docs](user-manuals/SqlEditor.de.md) |
+| [`JsonEditor`](#jsoneditor) | JSON-Editing (CodeMirror 6) mit Schema-Validierung, Folding und Path Finder | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-jsoneditor--default) · [Docs](user-manuals/JsonEditor.de.md) |
+
+### D3-Datenvisualisierung
+
+| Komponente | Wofür | Ausprobieren |
+|---|---|---|
+| [`SunburstChart`](#sunburstchart) | Hierarchische Daten als konzentrische Ringe — Drill-Down mit `Ctrl+Click` | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-sunburstchart--default) · [Docs](user-manuals/SunburstChart.de.md) |
+| [`ChordChart`](#chordchart) | Fluss und Beziehungen zwischen benannten Gruppen als kreisförmiges Diagramm | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-chordchart--default) · [Docs](user-manuals/ChordChart.de.md) |
+| [`RadialTreeChart`](#radialtreechart) | Org-Charts und Taxonomien als radialer Baum, mit Drill-Down | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-radialtreechart--default) · [Docs](user-manuals/RadialTreeChart.de.md) |
+| [`CirclePackingChart`](#circlepackingchart) | Verschachtelte Kreise mit animiertem Zoom — Speicher und Hierarchie auf einen Blick | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-circlepackingchart--default) · [Docs](user-manuals/CirclePackingChart.de.md) |
+| [`HorizontalTreeChart`](#horizontaltreechart) | Entscheidungsbäume und Hierarchien in 4 Orientierungen (LR/RL/TB/BT) | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-horizontaltreechart--default) · [Docs](user-manuals/HorizontalTreeChart.de.md) |
+
+Alle Charts teilen sich Ctrl / Cmd ⌘+Scroll-Zoom und vollständige MUI-Theme-Integration (Dark Mode inklusive).
 
 ---
 
@@ -311,7 +327,28 @@ import type {
 
 ---
 
+## Versionierung & Abwärtskompatibilität
+
+Dieses Projekt folgt [Semantic Versioning](https://semver.org/). In der Praxis bedeutet das:
+
+- **Patch** (`3.7.0` → `3.7.1`) — nur Bugfixes, jederzeit gefahrlos aktualisierbar.
+- **Minor** (`3.6.0` → `3.7.0`) — neue Features, vollständig abwärtskompatibel.
+- **Major** (`2.x` → `3.0.0`) — Breaking Changes, explizit im [Changelog](#changelog) gekennzeichnet.
+
+**Bisher nur ein Breaking Release:** [`3.0.0`](#300--2026-06-15--breaking-changes) hat `ConfirmDialog` / `ConfirmDialogProvider` / `useConfirm` entfernt und die Signatur von `TagSelection`s `onTagCreate` geändert. Jedes Release seitdem war additiv.
+
+**TypeScript-Hinweis:** Translation-Typen (z.B. `TagSelectionTranslation`, `SqlEditorTranslation`) bekommen mit der Zeit neue optionale Felder, wenn Features hinzukommen — ein `Partial<...>`-Objekt direkt an die `translation`-Prop zu übergeben (das in dieser README durchgängig verwendete Muster) ist immer vorwärtskompatibel. Eine eigenständige Variable, die gegen den vollen benannten Typ deklariert wird, bleibt nur kompatibel, solange neue Felder optional sind — was seit `3.6.1` der Fall ist (siehe [Changelog](#361--2026-06-22)).
+
+---
+
 ## Changelog
+
+### [3.7.0] — 2026-06-23
+
+**JsonEditor — Folding, Path Finder und Schema-Validierung**
+- Neu: `showFolding` (Fold-Gutter für Objects/Arrays), `enablePathFinder` (`Ctrl+Click` auf einen Wert kopiert den JSON-Path), und `schema`-Prop (strukturelle Validierung mit Inline-Fehler-Diagnostics — Typ, Required, Enum, verschachtelte Strukturen).
+
+---
 
 ### [3.6.1] — 2026-06-22
 

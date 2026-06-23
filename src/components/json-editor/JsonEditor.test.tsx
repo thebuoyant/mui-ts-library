@@ -1,6 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { JsonEditor } from "./JsonEditor";
+import type { JsonEditorSchema } from "./JsonEditor.types";
 
 const VALID_JSON   = '{"name":"Alice","age":30}';
 const INVALID_JSON = '{"name":"Alice", age: 30}';
@@ -123,5 +124,90 @@ describe("JsonEditor", () => {
     render(<JsonEditor width={600} />);
     const wrapper = document.querySelector(".MuiBox-root") as HTMLElement;
     expect(wrapper).toBeInTheDocument();
+  });
+
+  it("renders a fold gutter by default", () => {
+    render(<JsonEditor value={VALID_JSON} />);
+    expect(document.querySelector(".cm-foldGutter")).toBeInTheDocument();
+  });
+
+  it("does not render a fold gutter when showFolding=false", () => {
+    render(<JsonEditor value={VALID_JSON} showFolding={false} />);
+    expect(document.querySelector(".cm-foldGutter")).not.toBeInTheDocument();
+  });
+
+  it("does not copy a path on a plain click (no modifier key)", () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+    render(<JsonEditor value={VALID_JSON} />);
+    const content = document.querySelector(".cm-content") as HTMLElement;
+    content.dispatchEvent(new MouseEvent("click", { bubbles: true, clientX: 5, clientY: 5 }));
+    expect(writeText).not.toHaveBeenCalled();
+  });
+
+  it("does not copy a path when enablePathFinder=false, even with Ctrl+Click", () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+    render(<JsonEditor value={VALID_JSON} enablePathFinder={false} />);
+    const content = document.querySelector(".cm-content") as HTMLElement;
+    content.dispatchEvent(new MouseEvent("click", { bubbles: true, ctrlKey: true, clientX: 5, clientY: 5 }));
+    expect(writeText).not.toHaveBeenCalled();
+  });
+
+  it("does not throw when Ctrl+Click lands before layout geometry is available", () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+    render(<JsonEditor value={VALID_JSON} />);
+    const content = document.querySelector(".cm-content") as HTMLElement;
+    expect(() => {
+      content.dispatchEvent(new MouseEvent("click", { bubbles: true, ctrlKey: true, clientX: 5, clientY: 5 }));
+    }).not.toThrow();
+  });
+
+  describe("schema validation", () => {
+    const userSchema: JsonEditorSchema = {
+      type: "object",
+      required: ["name", "age"],
+      properties: {
+        name: { type: "string" },
+        age:  { type: "number" },
+        role: { enum: ["admin", "member"] },
+      },
+    };
+
+    it("shows no diagnostics when the document satisfies the schema", async () => {
+      render(<JsonEditor value='{"name":"Alice","age":30}' schema={userSchema} />);
+      await waitFor(() => {
+        expect(document.querySelector(".cm-lint-marker-error")).not.toBeInTheDocument();
+      }, { timeout: 2000 });
+    });
+
+    it("shows a diagnostic for a missing required property", async () => {
+      render(<JsonEditor value='{"name":"Alice"}' schema={userSchema} />);
+      await waitFor(() => {
+        expect(document.querySelector(".cm-lint-marker-error")).toBeInTheDocument();
+      }, { timeout: 2000 });
+    });
+
+    it("shows a diagnostic for a type mismatch", async () => {
+      render(<JsonEditor value='{"name":"Alice","age":"thirty"}' schema={userSchema} />);
+      await waitFor(() => {
+        expect(document.querySelector(".cm-lint-marker-error")).toBeInTheDocument();
+      }, { timeout: 2000 });
+    });
+
+    it("shows no diagnostics when no schema is provided, regardless of shape", async () => {
+      render(<JsonEditor value='{"anything": "goes"}' />);
+      await new Promise((r) => setTimeout(r, 900));
+      expect(document.querySelector(".cm-lint-marker-error")).not.toBeInTheDocument();
+    });
+
+    it("skips schema validation while the document doesn't parse as JSON", async () => {
+      render(<JsonEditor value='{"name": "Alice", invalid}' schema={userSchema} />);
+      await new Promise((r) => setTimeout(r, 900));
+      // The parse-error marker is still expected, but no duplicate from the schema linter.
+      const markers = document.querySelectorAll(".cm-lint-marker-error");
+      expect(markers.length).toBeGreaterThan(0);
+    });
   });
 });

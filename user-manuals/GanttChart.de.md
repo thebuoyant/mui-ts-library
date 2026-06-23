@@ -17,7 +17,7 @@ Der `GanttChart` ist eine vollständig interaktive Projektplanungs-Komponente au
 
 ---
 
-> ### ✨ Neu in v1.5.0
+> ### Neu in v1.5.0
 >
 > | Feature | Beschreibung | Springe zu |
 > |---|---|---|

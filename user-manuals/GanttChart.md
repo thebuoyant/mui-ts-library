@@ -17,7 +17,7 @@ The `GanttChart` is a fully interactive project planning component built on Reac
 
 ---
 
-> ### ✨ New in v1.5.0
+> ### New in v1.5.0
 >
 > | Feature | Description | Jump to |
 > |---|---|---|

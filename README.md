@@ -12,19 +12,35 @@ A type-safe React component library built on **TypeScript** and **MUI (Material 
 
 ## Components
 
-| Component | Description | Docs |
+11 production-ready components across three categories. Each links to a live, interactive demo and a full manual covering every prop, type, and pattern.
+
+### Interactive UI
+
+| Component | What it's for | Try it |
 |---|---|---|
-| [`GanttChart`](#ganttchart) | Project timeline with hierarchical tasks, milestones, drag & drop, Ctrl / Cmd ⌘+Scroll zoom, today chip, assignee column, CSV export, and built-in CRUD dialogs | [Full Manual →](user-manuals/GanttChart.md) |
-| [`TagSelection`](#tagselection) | Multi-tag selector with autocomplete, free tag creation, overflow chips, and MUI theme colors | [Full Manual →](user-manuals/TagSelection.md) |
-| [`PasswordStrengthMeter`](#passwordstrengthmeter) | Password input with animated strength meter, segmented bar, custom requirements, confirm field with match validation, and built-in secure password generator | [Full Manual →](user-manuals/PasswordStrengthMeter.md) |
-| [`RichTextEditor`](#richtexteditor) | WYSIWYG editor (TipTap v3) with toolbar, link dialog, text color, highlight, word count, fullscreen mode, Markdown paste, table editing, image embed, and emoji picker | [Full Manual →](user-manuals/RichTextEditor.md) |
-| [`SqlEditor`](#sqleditor) | SQL code editor (CodeMirror 6) with syntax highlighting, multi-dialect, autocomplete, linting, and `Cmd+Enter` execute shortcut | [Full Manual →](user-manuals/SqlEditor.md) |
-| [`JsonEditor`](#jsoneditor) | JSON code editor (CodeMirror 6) with real-time validation, Format, Compact buttons, and optional minimap | [Full Manual →](user-manuals/JsonEditor.md) |
-| [`SunburstChart`](#sunburstchart) | D3 v7 hierarchical chart — concentric rings, Ctrl / Cmd ⌘+Click drill-down, Ctrl / Cmd ⌘+Scroll zoom, donut mode, MUI theme integration | [Full Manual →](user-manuals/SunburstChart.md) |
-| [`ChordChart`](#chordchart) | D3 v7 flow chart — arc groups, ribbons, hover highlight, Ctrl / Cmd ⌘+Scroll zoom, directed/undirected, MUI theme integration | [Full Manual →](user-manuals/ChordChart.md) |
-| [`RadialTreeChart`](#radialtreechart) | D3 v7 radial tree — hierarchical nodes on concentric rings, MUI icons, Ctrl / Cmd ⌘+Click drill-down, Ctrl / Cmd ⌘+Scroll zoom, MUI theme integration | [Full Manual →](user-manuals/RadialTreeChart.md) |
-| [`CirclePackingChart`](#circlepackingchart) | D3 v7 circle packing — nested circles, animated D3 zoom, Ctrl / Cmd ⌘+Scroll zoom, depth gradient or palette, MUI theme integration | [Full Manual →](user-manuals/CirclePackingChart.md) |
-| [`HorizontalTreeChart`](#horizontaltreechart) | D3 v7 tree chart — 4 orientations (LR/RL/TB/BT), curved links, drill-down, Ctrl / Cmd ⌘+Scroll zoom, MUI icons and theme integration | [Full Manual →](user-manuals/HorizontalTreeChart.md) |
+| [`GanttChart`](#ganttchart) | Drag-and-drop project timelines with milestones, dependencies, and CSV export | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-ganttchart--default) · [Docs](user-manuals/GanttChart.md) |
+| [`TagSelection`](#tagselection) | Multi-tag autocomplete with free-form tag creation and search highlighting | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-tagselection--default) · [Docs](user-manuals/TagSelection.md) |
+| [`PasswordStrengthMeter`](#passwordstrengthmeter) | Real-time strength feedback with a built-in secure password generator | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-passwordstrengthmeter--default) · [Docs](user-manuals/PasswordStrengthMeter.md) |
+
+### Code Editors
+
+| Component | What it's for | Try it |
+|---|---|---|
+| [`RichTextEditor`](#richtexteditor) | WYSIWYG editing (TipTap v3) with tables, images, and an emoji picker | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-richtexteditor--default) · [Docs](user-manuals/RichTextEditor.md) |
+| [`SqlEditor`](#sqleditor) | SQL editing (CodeMirror 6) with dialect-aware autocomplete and query history | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-sqleditor--default) · [Docs](user-manuals/SqlEditor.md) |
+| [`JsonEditor`](#jsoneditor) | JSON editing (CodeMirror 6) with schema validation, folding, and a path finder | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-jsoneditor--default) · [Docs](user-manuals/JsonEditor.md) |
+
+### D3 Data Visualization
+
+| Component | What it's for | Try it |
+|---|---|---|
+| [`SunburstChart`](#sunburstchart) | Hierarchical data as concentric rings — drill down with `Ctrl+Click` | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-sunburstchart--default) · [Docs](user-manuals/SunburstChart.md) |
+| [`ChordChart`](#chordchart) | Flow and relationships between named groups as a circular diagram | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-chordchart--default) · [Docs](user-manuals/ChordChart.md) |
+| [`RadialTreeChart`](#radialtreechart) | Org charts and taxonomies as a radial tree, with drill-down | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-radialtreechart--default) · [Docs](user-manuals/RadialTreeChart.md) |
+| [`CirclePackingChart`](#circlepackingchart) | Nested circles with animated zoom — storage and hierarchy at a glance | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-circlepackingchart--default) · [Docs](user-manuals/CirclePackingChart.md) |
+| [`HorizontalTreeChart`](#horizontaltreechart) | Decision trees and hierarchies in 4 orientations (LR/RL/TB/BT) | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-horizontaltreechart--default) · [Docs](user-manuals/HorizontalTreeChart.md) |
+
+All charts share Ctrl / Cmd ⌘+Scroll zoom and full MUI theme integration (dark mode included).
 
 ---
 
@@ -311,7 +327,28 @@ import type {
 
 ---
 
+## Versioning & Compatibility
+
+This project follows [Semantic Versioning](https://semver.org/). In practice:
+
+- **Patch** (`3.7.0` → `3.7.1`) — bug fixes only, always safe to upgrade.
+- **Minor** (`3.6.0` → `3.7.0`) — new features, fully backwards compatible.
+- **Major** (`2.x` → `3.0.0`) — breaking changes, called out explicitly in the [Changelog](#changelog).
+
+**Only one breaking release to date:** [`3.0.0`](#300--2026-06-15--breaking-changes) removed `ConfirmDialog` / `ConfirmDialogProvider` / `useConfirm` and changed `TagSelection`'s `onTagCreate` signature. Every other release since has been additive.
+
+**TypeScript note:** translation types (e.g. `TagSelectionTranslation`, `SqlEditorTranslation`) gain new optional fields over time as features are added — passing a `Partial<...>` object straight to the `translation` prop (the pattern used throughout this README) is always forward-compatible. Declaring a standalone variable typed against the full named type only stays compatible if new fields are optional, which they are as of `3.6.1` (see [Changelog](#361--2026-06-22)).
+
+---
+
 ## Changelog
+
+### [3.7.0] — 2026-06-23
+
+**JsonEditor — Folding, Path Finder, and Schema Validation**
+- New `showFolding` (fold gutter for objects/arrays), `enablePathFinder` (`Ctrl+Click` a value to copy its JSON path), and `schema` prop (structural validation with inline error diagnostics — type, required, enum, nested shapes).
+
+---
 
 ### [3.6.1] — 2026-06-22
 

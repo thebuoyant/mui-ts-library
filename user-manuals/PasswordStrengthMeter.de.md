@@ -17,7 +17,7 @@ Der `PasswordStrengthMeter` ist eine Passwort-Eingabe-Komponente auf Basis von R
 
 ---
 
-> ### ✨ Neu in v1.5.0
+> ### Neu in v1.5.0
 >
 > | Feature | Beschreibung | Springe zu |
 > |---|---|---|
