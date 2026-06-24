@@ -9,7 +9,7 @@ type RichTextEditorEmojiPickerProps = {
   open:        boolean;
   onClose:     () => void;
   onSelect:    (emoji: string) => void;
-  translation: RichTextEditorTranslation;
+  translation: Required<RichTextEditorTranslation>;
 };
 
 export function RichTextEditorEmojiPicker({

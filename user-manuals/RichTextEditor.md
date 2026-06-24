@@ -8,11 +8,10 @@
 
 The `RichTextEditor` is a full-featured WYSIWYG text editor built on [TipTap v3](https://tiptap.dev) and Material UI. It provides a rich input interface for content such as CMS texts, email templates, comments, and description fields — fully integrated with the MUI theme, without any external CSS dependencies.
 
-| New in v2.1.0 | |
+| New in v3.8.0 | |
 |---|---|
-| **Table editing** | Insert tables, manage rows/columns via toolbar dropdown (`showTableButton`) |
-| **Image embed** | Insert images by URL or Base64 (`showImageButton`) |
-| **Emoji picker** | ~200 curated emojis, live search, no external dependency (`showEmojiButton`) |
+| **Paste as plain text** | Toolbar toggle that strips formatting from pasted content (`showPasteAsPlainTextButton`) |
+| **Markdown import/export** | Dialog to convert between the current content and Markdown, plus a live `onMarkdownChange` callback (`showMarkdownButton`) |
 
 **Typical use cases:**
 
@@ -98,6 +97,7 @@ function App() {
 | `onBlur` | `() => void` | — | Called when the editor loses focus |
 | `onChange` | `(value: string) => void` | — | Called on every content change |
 | `onFocus` | `() => void` | — | Called when the editor gains focus |
+| `onMarkdownChange` | `(markdown: string) => void` | — | Called alongside `onChange` on every content change, with the content as Markdown |
 
 ---
 
@@ -132,10 +132,14 @@ type RichTextEditorToolbarConfig = {
   showImageButton?:      boolean;
   /** Emoji picker popover — opt-in, default false */
   showEmojiButton?:      boolean;
+  /** Toggle that strips formatting from pasted content — opt-in, default false */
+  showPasteAsPlainTextButton?: boolean;
+  /** Markdown import/export dialog — opt-in, default false */
+  showMarkdownButton?:   boolean;
 };
 ```
 
-Default: all formatting buttons `true`, `showFullscreenButton: false`.
+Default: all formatting buttons `true`, all opt-in buttons (`showFullscreenButton`, `showTableButton`, `showImageButton`, `showEmojiButton`, `showPasteAsPlainTextButton`, `showMarkdownButton`) `false`.
 
 ```tsx
 import { DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG } from '@thebuoyant-tsdev/mui-ts-library';
@@ -200,6 +204,17 @@ type RichTextEditorTranslation = {
   // Emoji picker (showEmojiButton)
   emoji:                  string;
   emojiSearchPlaceholder: string;
+  // Paste as plain text (showPasteAsPlainTextButton) — optional, see compatibility note below
+  pasteAsPlainText?:        string;
+  pasteAsHtml?:             string;
+  // Markdown dialog (showMarkdownButton) — optional, see compatibility note below
+  markdown?:                string;
+  markdownDialogTitle?:       string;
+  markdownDialogDescription?: string;
+  markdownDialogApply?:       string;
+  markdownDialogCancel?:      string;
+  markdownDialogCopy?:        string;
+  markdownDialogCopied?:      string;
 };
 ```
 
@@ -208,6 +223,8 @@ English defaults:
 ```tsx
 import { DEFAULT_RICH_TEXT_EDITOR_TRANSLATION } from '@thebuoyant-tsdev/mui-ts-library';
 ```
+
+> **⚠️ Compatibility note:** the 8 keys above (added in `v3.8.0`) are optional on this type — unlike the other keys, which are required. This is intentional: it lets older code that declares a full `RichTextEditorTranslation` literal (instead of passing a partial object to the `translation` prop) keep compiling without changes when we add new keys in the future. Internally, the component always resolves missing keys against `DEFAULT_RICH_TEXT_EDITOR_TRANSLATION`, so you never need to provide them.
 
 ---
 
@@ -447,6 +464,47 @@ The editor automatically converts pasted Markdown text into rich text. Content c
 
 ---
 
+## Paste as Plain Text
+
+Enable the toggle via `showPasteAsPlainTextButton`:
+
+```tsx
+<RichTextEditor
+  toolbarConfig={{ showPasteAsPlainTextButton: true }}
+/>
+```
+
+Click the clipboard icon to activate it (the icon and tooltip switch to indicate the active state). While active, **any** pasted content — formatted HTML from a website, a Word document, another rich text editor — is stripped of all formatting and inserted as plain text. This also overrides the [Markdown Paste](#markdown-paste) auto-conversion described above, since plain-text paste takes precedence while the toggle is on. Click the icon again to return to normal paste behavior.
+
+---
+
+## Markdown Import/Export
+
+Enable the toolbar button via `showMarkdownButton`:
+
+```tsx
+<RichTextEditor
+  toolbarConfig={{ showMarkdownButton: true }}
+/>
+```
+
+Click the **MD** icon to open a dialog pre-filled with the current content converted to Markdown:
+
+- **Copy** — copies the Markdown text to the clipboard, for exporting into a `.md` file or another tool.
+- **Apply** — replaces the editor content with whatever is currently in the text field (edit it first if you want to import different Markdown).
+- **Cancel** — closes the dialog without changing the editor content.
+
+For a live export without opening the dialog, use `onMarkdownChange` — it fires alongside `onChange` on every content change, with the content already converted to Markdown:
+
+```tsx
+<RichTextEditor
+  onChange={(html) => setHtml(html)}
+  onMarkdownChange={(markdown) => setMarkdown(markdown)}
+/>
+```
+
+---
+
 ## Readonly and Disabled
 
 ```tsx
@@ -570,7 +628,7 @@ The editor border appears in `error.main` (MUI error color), and the `helperText
 >
 > | Action | Callbacks fired |
 > |---|---|
-> | Typing, formatting, pasting, toolbar action | `onChange` |
+> | Typing, formatting, pasting, toolbar action | `onChange`, `onMarkdownChange` |
 > | Editor gains focus | `onFocus` |
 > | Editor loses focus | `onBlur` |
 > | `value` prop updated externally | *(none — prevents infinite loops)* |
@@ -578,6 +636,7 @@ The editor border appears in `error.main` (MUI error color), and the `helperText
 | Callback | Signature | When it fires | Use it when... |
 |---|---|---|---|
 | `onChange` | `(value: string) => void` | Every user-driven content change (typing, formatting, paste, toolbar buttons) | Controlled mode state sync — update your `value` state here |
+| `onMarkdownChange` | `(markdown: string) => void` | Same as `onChange`, fired immediately after it | You need the content as Markdown without opening the Markdown dialog |
 | `onFocus` | `() => void` | The editor area gains keyboard focus | Highlighting an active editor, showing toolbars conditionally |
 | `onBlur` | `() => void` | The editor area loses keyboard focus | Triggering validation, auto-saving on leave |
 
@@ -594,6 +653,9 @@ The editor border appears in `error.main` (MUI error color), and the `helperText
 | **TipTap v3** | StarterKit already includes `Link` and `Underline` — no separate imports needed |
 | **`shouldRerenderOnTransaction: true`** | Required in TipTap v3 so toolbar buttons reflect their active state |
 | **`onMouseDown` preventDefault** | Every toolbar button prevents the editor from losing focus when clicked |
+| **Ref-mirrored state for paste handling** | `editorProps.handlePaste` is bound once when `useEditor` is called — reading React state directly inside it would always see the value from that first render. The toggle's state is mirrored into a ref via `useEffect` so the handler always reads the current value. |
+| **`editorProps.handlePaste` over a plugin** | ProseMirror checks the view's own `handlePaste` prop before any plugin-registered handler, so this approach reliably overrides `tiptap-markdown`'s paste-to-richtext conversion while the toggle is active, without disabling the extension. |
+| **Module augmentation for `editor.storage.markdown`** | `tiptap-markdown` doesn't ship a `Storage` interface augmentation, so the library declares one locally to keep `editor.storage.markdown.getMarkdown()` fully typed instead of falling back to `any`. |
 | **`height` on `Paper`** | The total height (toolbar + content) sits on the `Paper` wrapper; the content area fills the rest via `flex: 1` |
 | **`normalizeSize()`** | Converts numeric strings (`"300"`) to numbers so MUI appends `px` — enables Storybook text controls |
 | **`tiptap-markdown`** | Free community package (`transformPastedText: true`) — no TipTap Pro required |

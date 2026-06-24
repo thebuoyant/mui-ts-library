@@ -8,11 +8,10 @@
 
 Der `RichTextEditor` ist ein vollständiger WYSIWYG-Texteditor auf Basis von [TipTap v3](https://tiptap.dev) und Material UI. Er bietet eine formatreiche Eingabeoberfläche für Inhalte wie CMS-Texte, E-Mail-Templates, Kommentare und Beschreibungsfelder — vollständig in das MUI-Theme integriert, ohne externe CSS-Abhängigkeiten.
 
-| Neu in v2.1.0 | |
+| Neu in v3.8.0 | |
 |---|---|
-| **Tabellen-Bearbeitung** | Tabellen einfügen, Zeilen/Spalten per Toolbar-Dropdown verwalten (`showTableButton`) |
-| **Bild-Embed** | Bilder per URL oder Base64 einfügen (`showImageButton`) |
-| **Emoji-Picker** | ~200 kuratierte Emojis, Live-Suche, keine externe Abhängigkeit (`showEmojiButton`) |
+| **Einfügen als Klartext** | Toolbar-Toggle, das eingefügten Inhalt von Formatierung befreit (`showPasteAsPlainTextButton`) |
+| **Markdown-Import/Export** | Dialog zum Konvertieren zwischen aktuellem Inhalt und Markdown, plus ein Live-`onMarkdownChange`-Callback (`showMarkdownButton`) |
 
 **Typische Einsatzgebiete:**
 
@@ -98,6 +97,7 @@ function App() {
 | `onBlur` | `() => void` | — | Wird aufgerufen wenn der Editor den Fokus verliert |
 | `onChange` | `(value: string) => void` | — | Wird bei jeder Inhaltsänderung aufgerufen |
 | `onFocus` | `() => void` | — | Wird aufgerufen wenn der Editor den Fokus erhält |
+| `onMarkdownChange` | `(markdown: string) => void` | — | Wird zusätzlich zu `onChange` bei jeder Inhaltsänderung mit dem Inhalt als Markdown aufgerufen |
 
 ---
 
@@ -132,10 +132,14 @@ type RichTextEditorToolbarConfig = {
   showImageButton?:      boolean;
   /** Emoji-Picker-Popover — opt-in, Standard false */
   showEmojiButton?:      boolean;
+  /** Toggle, das eingefügten Inhalt von Formatierung befreit — opt-in, Standard false */
+  showPasteAsPlainTextButton?: boolean;
+  /** Markdown-Import/Export-Dialog — opt-in, Standard false */
+  showMarkdownButton?:   boolean;
 };
 ```
 
-Standard: alle Formatierungs-Buttons `true`, `showFullscreenButton: false`.
+Standard: alle Formatierungs-Buttons `true`, alle opt-in-Buttons (`showFullscreenButton`, `showTableButton`, `showImageButton`, `showEmojiButton`, `showPasteAsPlainTextButton`, `showMarkdownButton`) `false`.
 
 ```tsx
 import { DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG } from '@thebuoyant-tsdev/mui-ts-library';
@@ -200,6 +204,17 @@ type RichTextEditorTranslation = {
   // Emoji-Picker (showEmojiButton)
   emoji:                  string;
   emojiSearchPlaceholder: string;
+  // Einfügen als Klartext (showPasteAsPlainTextButton) — optional, siehe Kompatibilitätshinweis unten
+  pasteAsPlainText?:        string;
+  pasteAsHtml?:             string;
+  // Markdown-Dialog (showMarkdownButton) — optional, siehe Kompatibilitätshinweis unten
+  markdown?:                string;
+  markdownDialogTitle?:       string;
+  markdownDialogDescription?: string;
+  markdownDialogApply?:       string;
+  markdownDialogCancel?:      string;
+  markdownDialogCopy?:        string;
+  markdownDialogCopied?:      string;
 };
 ```
 
@@ -208,6 +223,8 @@ Englische Standardwerte:
 ```tsx
 import { DEFAULT_RICH_TEXT_EDITOR_TRANSLATION } from '@thebuoyant-tsdev/mui-ts-library';
 ```
+
+> **⚠️ Kompatibilitätshinweis:** die 8 Keys oben (hinzugefügt in `v3.8.0`) sind auf diesem Typ optional — im Gegensatz zu den anderen Keys, die required sind. Das ist beabsichtigt: dadurch bleibt älterer Code, der ein vollständiges `RichTextEditorTranslation`-Literal deklariert (statt ein partielles Objekt an die `translation`-Prop zu übergeben), auch bei zukünftigen neuen Keys kompilierbar. Intern löst die Komponente fehlende Keys immer gegen `DEFAULT_RICH_TEXT_EDITOR_TRANSLATION` auf — sie müssen also nie angegeben werden.
 
 ---
 
@@ -447,6 +464,47 @@ Der Editor konvertiert eingefügten Markdown-Text automatisch in Rich-Text. Kopi
 
 ---
 
+## Einfügen als Klartext
+
+Den Toggle über `showPasteAsPlainTextButton` aktivieren:
+
+```tsx
+<RichTextEditor
+  toolbarConfig={{ showPasteAsPlainTextButton: true }}
+/>
+```
+
+Klick auf das Clipboard-Symbol aktiviert den Modus (Icon und Tooltip wechseln, um den aktiven Zustand anzuzeigen). Im aktiven Zustand wird **jeder** eingefügte Inhalt — formatiertes HTML von einer Website, ein Word-Dokument, ein anderer Rich-Text-Editor — von sämtlicher Formatierung befreit und als reiner Text eingefügt. Das überschreibt auch die oben beschriebene automatische [Markdown-Einfügen](#markdown-einfügen-paste)-Konvertierung, da das Klartext-Einfügen Vorrang hat, solange der Toggle aktiv ist. Erneuter Klick kehrt zum normalen Einfüge-Verhalten zurück.
+
+---
+
+## Markdown-Import/Export
+
+Den Toolbar-Button über `showMarkdownButton` aktivieren:
+
+```tsx
+<RichTextEditor
+  toolbarConfig={{ showMarkdownButton: true }}
+/>
+```
+
+Klick auf das **MD**-Symbol öffnet einen Dialog, vorbefüllt mit dem aktuellen Inhalt als Markdown:
+
+- **Kopieren** — kopiert den Markdown-Text in die Zwischenablage, zum Export in eine `.md`-Datei oder ein anderes Tool.
+- **Anwenden** — ersetzt den Editor-Inhalt durch den aktuellen Inhalt des Textfelds (vorher bearbeiten, um anderen Markdown-Inhalt zu importieren).
+- **Abbrechen** — schließt den Dialog ohne Änderung am Editor-Inhalt.
+
+Für einen Live-Export ohne den Dialog zu öffnen: `onMarkdownChange` verwenden — wird zusätzlich zu `onChange` bei jeder Inhaltsänderung mit dem bereits in Markdown konvertierten Inhalt aufgerufen:
+
+```tsx
+<RichTextEditor
+  onChange={(html) => setHtml(html)}
+  onMarkdownChange={(markdown) => setMarkdown(markdown)}
+/>
+```
+
+---
+
 ## Readonly und Disabled
 
 ```tsx
@@ -570,7 +628,7 @@ Der Editor-Rahmen erscheint in `error.main` (MUI-Fehlerfarbe), der `helperText` 
 >
 > | Aktion | Ausgelöste Callbacks |
 > |---|---|
-> | Tippen, Formatieren, Einfügen, Toolbar-Aktion | `onChange` |
+> | Tippen, Formatieren, Einfügen, Toolbar-Aktion | `onChange`, `onMarkdownChange` |
 > | Editor erhält Fokus | `onFocus` |
 > | Editor verliert Fokus | `onBlur` |
 > | `value`-Prop von außen aktualisiert | *(keiner — verhindert Endlosschleifen)* |
@@ -578,6 +636,7 @@ Der Editor-Rahmen erscheint in `error.main` (MUI-Fehlerfarbe), der `helperText` 
 | Callback | Signatur | Wann ausgelöst | Verwenden wenn... |
 |---|---|---|---|
 | `onChange` | `(value: string) => void` | Jede nutzerseitige Inhaltsänderung (Tippen, Formatieren, Einfügen, Toolbar) | State-Sync im kontrollierten Modus — `value`-State hier aktualisieren |
+| `onMarkdownChange` | `(markdown: string) => void` | Gleichzeitig mit `onChange`, direkt danach ausgelöst | Inhalt als Markdown benötigt, ohne den Markdown-Dialog zu öffnen |
 | `onFocus` | `() => void` | Der Editor-Bereich erhält Tastatur-Fokus | Aktiven Editor hervorheben, Toolbar bedingt anzeigen |
 | `onBlur` | `() => void` | Der Editor-Bereich verliert Tastatur-Fokus | Validierung auslösen, Auto-Save beim Verlassen |
 
@@ -597,3 +656,6 @@ Der Editor-Rahmen erscheint in `error.main` (MUI-Fehlerfarbe), der `helperText` 
 | **`height` auf `Paper`** | Die Gesamthöhe (Toolbar + Inhalt) sitzt auf dem `Paper`-Wrapper; der Inhaltsbereich füllt den Rest über `flex: 1` |
 | **`normalizeSize()`** | Konvertiert numerische Strings (`"300"`) zu Zahlen, damit MUI `px` anhängt — ermöglicht Storybook-Text-Controls |
 | **`tiptap-markdown`** | Freies Community-Paket (`transformPastedText: true`) — kein TipTap-Pro erforderlich |
+| **Per Ref gespiegelter State für Paste-Handling** | `editorProps.handlePaste` wird einmalig beim Aufruf von `useEditor` gebunden — ein direktes Lesen von React-State darin würde immer den Wert aus diesem ersten Render sehen. Der Toggle-State wird per `useEffect` in einen Ref gespiegelt, damit der Handler stets den aktuellen Wert liest. |
+| **`editorProps.handlePaste` statt Plugin** | ProseMirror prüft den `handlePaste`-Prop der View selbst vor jedem Plugin-registrierten Handler — dadurch überschreibt dieser Ansatz zuverlässig die Paste-zu-Richtext-Konvertierung von `tiptap-markdown`, solange der Toggle aktiv ist, ohne die Extension zu deaktivieren. |
+| **Modulerweiterung für `editor.storage.markdown`** | `tiptap-markdown` liefert keine `Storage`-Interface-Erweiterung mit, daher deklariert die Library eine lokal, damit `editor.storage.markdown.getMarkdown()` vollständig typisiert ist statt auf `any` zurückzufallen. |

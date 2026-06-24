@@ -14,7 +14,7 @@ type RichTextEditorImageDialogProps = {
   open:        boolean;
   onClose:     () => void;
   editor:      Editor;
-  translation: RichTextEditorTranslation;
+  translation: Required<RichTextEditorTranslation>;
 };
 
 export function RichTextEditorImageDialog({

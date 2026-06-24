@@ -9,7 +9,7 @@ type RichTextEditorFooterProps = {
   maxCharacters?:      number;
   showWordCount?:      boolean;
   wordCount:           number;
-  translation:         RichTextEditorTranslation;
+  translation: Required<RichTextEditorTranslation>;
 };
 
 export function RichTextEditorFooter({

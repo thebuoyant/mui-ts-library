@@ -24,6 +24,10 @@ export type RichTextEditorToolbarConfig = {
   showImageButton?:      boolean;
   /** Emoji-Picker — standardmäßig deaktiviert (opt-in) */
   showEmojiButton?:      boolean;
+  /** Toggle: eingefügter Inhalt wird von Formatierung befreit — standardmäßig deaktiviert (opt-in) */
+  showPasteAsPlainTextButton?: boolean;
+  /** Markdown-Import/Export-Dialog — standardmäßig deaktiviert (opt-in) */
+  showMarkdownButton?:   boolean;
 };
 
 export const DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG: Required<RichTextEditorToolbarConfig> = {
@@ -48,6 +52,8 @@ export const DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG: Required<RichTextEditorToo
   showTableButton:      false,
   showImageButton:      false,
   showEmojiButton:      false,
+  showPasteAsPlainTextButton: false,
+  showMarkdownButton:   false,
 };
 
 export type RichTextEditorTranslation = {
@@ -104,9 +110,27 @@ export type RichTextEditorTranslation = {
   // Emoji
   emoji:                  string;
   emojiSearchPlaceholder: string;
+  /** Tooltip wenn Klartext-Paste AUS ist (Klick aktiviert es) @since 3.8.0 */
+  pasteAsPlainText?:        string;
+  /** Tooltip wenn Klartext-Paste AN ist (Klick deaktiviert es) @since 3.8.0 */
+  pasteAsHtml?:             string;
+  /** Tooltip für den Markdown-Button @since 3.8.0 */
+  markdown?:                string;
+  /** @since 3.8.0 */
+  markdownDialogTitle?:       string;
+  /** @since 3.8.0 */
+  markdownDialogDescription?: string;
+  /** @since 3.8.0 */
+  markdownDialogApply?:       string;
+  /** @since 3.8.0 */
+  markdownDialogCancel?:      string;
+  /** @since 3.8.0 */
+  markdownDialogCopy?:        string;
+  /** @since 3.8.0 */
+  markdownDialogCopied?:      string;
 };
 
-export const DEFAULT_RICH_TEXT_EDITOR_TRANSLATION: RichTextEditorTranslation = {
+export const DEFAULT_RICH_TEXT_EDITOR_TRANSLATION: Required<RichTextEditorTranslation> = {
   bold:             "Bold",
   italic:           "Italic",
   underline:        "Underline",
@@ -154,6 +178,15 @@ export const DEFAULT_RICH_TEXT_EDITOR_TRANSLATION: RichTextEditorTranslation = {
   imageDialogCancel: "Cancel",
   emoji:                  "Emoji",
   emojiSearchPlaceholder: "Search emoji…",
+  pasteAsPlainText:          "Paste as plain text",
+  pasteAsHtml:               "Paste with formatting",
+  markdown:                  "Markdown",
+  markdownDialogTitle:       "Markdown",
+  markdownDialogDescription: "Edit as Markdown, then apply to replace the editor content. Copy to export.",
+  markdownDialogApply:       "Apply",
+  markdownDialogCancel:      "Cancel",
+  markdownDialogCopy:        "Copy",
+  markdownDialogCopied:      "Copied!",
 };
 
 export type RichTextEditorProps = {
@@ -180,4 +213,6 @@ export type RichTextEditorProps = {
   onBlur?:   () => void;
   onChange?:  (value: string) => void;
   onFocus?:  () => void;
+  /** Wird bei jeder Änderung zusätzlich zu onChange mit dem Inhalt als Markdown aufgerufen */
+  onMarkdownChange?: (markdown: string) => void;
 };

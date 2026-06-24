@@ -30,6 +30,7 @@ const meta: Meta<typeof RichTextEditor> = {
     onBlur:        { control: false },
     onChange:      { control: false },
     onFocus:       { control: false },
+    onMarkdownChange: { control: false },
   },
   args: {
     // A–Z
@@ -49,6 +50,7 @@ const meta: Meta<typeof RichTextEditor> = {
     onBlur:             fn(),
     onChange:           fn(),
     onFocus:            fn(),
+    onMarkdownChange:   fn(),
   },
   parameters: {
     controls: { sort: 'alpha' },
@@ -86,7 +88,7 @@ export const Default: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Full toolbar with all features enabled — including tables, image embed, and emoji picker. All new buttons are opt-in (`false` by default); this story enables them all so you can explore the complete feature set.',
+        story: 'Full toolbar with all features enabled — including tables, image embed, emoji picker, paste-as-plain-text, and Markdown import/export. All new buttons are opt-in (`false` by default); this story enables them all so you can explore the complete feature set.',
       },
     },
   },
@@ -97,6 +99,8 @@ export const Default: Story = {
       showImageButton: true,
       showEmojiButton: true,
       showFullscreenButton: true,
+      showPasteAsPlainTextButton: true,
+      showMarkdownButton: true,
     },
   },
 };
@@ -344,6 +348,43 @@ export const WithFullscreen: Story = {
     toolbarConfig: { showFullscreenButton: true },
     value:         SAMPLE_HTML,
     placeholder:   "Fullscreen-Button in der Toolbar rechts oben …",
+  },
+};
+
+export const WithPasteAsPlainText: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Enables the **Paste as plain text** toggle (`showPasteAsPlainTextButton: true`). ' +
+          'When active, any pasted content — rich HTML from a website, a Word doc, another editor — ' +
+          'is stripped of all formatting and inserted as plain text. Click the button again to return to normal paste behavior.',
+      },
+    },
+  },
+  args: {
+    toolbarConfig: { showPasteAsPlainTextButton: true },
+    value: `<p>Toggle the clipboard icon, then paste some <strong>formatted</strong> <em>content</em> here.</p>`,
+    height: "250",
+  },
+};
+
+export const WithMarkdownImportExport: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Enables the **Markdown** toolbar button (`showMarkdownButton: true`). ' +
+          'Opens a dialog pre-filled with the current content converted to Markdown — copy it to export, ' +
+          'or edit it and click Apply to replace the editor content. ' +
+          'Use `onMarkdownChange` to receive the Markdown representation on every change, independent of the dialog.',
+      },
+    },
+  },
+  args: {
+    toolbarConfig: { showMarkdownButton: true },
+    value: SAMPLE_HTML,
+    height: "300",
   },
 };
 

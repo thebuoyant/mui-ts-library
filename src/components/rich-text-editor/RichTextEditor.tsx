@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 import { TextStyle } from "@tiptap/extension-text-style";
@@ -8,8 +8,16 @@ import { Placeholder } from "@tiptap/extension-placeholder";
 import { CharacterCount } from "@tiptap/extension-character-count";
 import { TableKit } from "@tiptap/extension-table";
 import { Image } from "@tiptap/extension-image";
-import { Markdown } from "tiptap-markdown";
+import { Markdown, type MarkdownStorage } from "tiptap-markdown";
 import { Box, Divider, Paper } from "@mui/material";
+
+// tiptap-markdown liefert keine Storage-Modulerweiterung mit — ohne das wäre
+// editor.storage.markdown überall im Programm als `any`/unbekannt typisiert.
+declare module "@tiptap/core" {
+  interface Storage {
+    markdown: MarkdownStorage;
+  }
+}
 import {
   type RichTextEditorProps,
   DEFAULT_RICH_TEXT_EDITOR_TRANSLATION,
@@ -39,11 +47,18 @@ export function RichTextEditor({
   onBlur,
   onChange,
   onFocus,
+  onMarkdownChange,
 }: RichTextEditorProps) {
   const t = { ...DEFAULT_RICH_TEXT_EDITOR_TRANSLATION, ...translation };
   const tc = { ...DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG, ...toolbarConfig };
 
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Per Ref statt nur State gespiegelt, da editorProps.handlePaste einmalig beim
+  // useEditor-Aufruf gebunden wird und sonst auf einen veralteten Wert zugreifen würde.
+  const [pasteAsPlainText, setPasteAsPlainText] = useState(false);
+  const pasteAsPlainTextRef = useRef(pasteAsPlainText);
+  useEffect(() => { pasteAsPlainTextRef.current = pasteAsPlainText; }, [pasteAsPlainText]);
 
   const normH      = normalizeSize(height);
   const normW      = normalizeSize(width);
@@ -79,8 +94,22 @@ export function RichTextEditor({
     ],
     content: value ?? "",
     editable: !disabled && !readonly,
+    // editorProps.handlePaste wird vor den Plugin-Handlern der Markdown-Extension geprüft
+    // (ProseMirror someProp-Reihenfolge) — überschreibt deren Auto-Konvertierung gezielt.
+    editorProps: {
+      handlePaste(view, event) {
+        if (!pasteAsPlainTextRef.current) return false;
+        const text = event.clipboardData?.getData("text/plain");
+        if (text == null) return false;
+        event.preventDefault();
+        const { state } = view;
+        view.dispatch(state.tr.insertText(text, state.selection.from, state.selection.to));
+        return true;
+      },
+    },
     onUpdate({ editor: e }) {
       onChange?.(e.getHTML());
+      onMarkdownChange?.(e.storage.markdown.getMarkdown());
     },
     onBlur() { onBlur?.(); },
     onFocus() { onFocus?.(); },
@@ -151,6 +180,8 @@ export function RichTextEditor({
               disabled={disabled}
               isFullscreen={isFullscreen}
               onToggleFullscreen={() => setIsFullscreen((prev) => !prev)}
+              pasteAsPlainText={pasteAsPlainText}
+              onTogglePasteAsPlainText={() => setPasteAsPlainText((prev) => !prev)}
             />
             <Divider />
           </>

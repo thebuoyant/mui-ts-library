@@ -20,6 +20,8 @@ import BorderColorIcon from "@mui/icons-material/BorderColor";
 import UndoIcon from "@mui/icons-material/Undo";
 import RedoIcon from "@mui/icons-material/Redo";
 import FormatClearIcon from "@mui/icons-material/FormatClear";
+import ContentPasteIcon from "@mui/icons-material/ContentPaste";
+import ContentPasteOffIcon from "@mui/icons-material/ContentPasteOff";
 import {
   type RichTextEditorTranslation,
   type RichTextEditorToolbarConfig,
@@ -29,15 +31,18 @@ import { RichTextEditorColorPicker } from "./RichTextEditorColorPicker";
 import { RichTextEditorTableMenu } from "./RichTextEditorTableMenu";
 import { RichTextEditorImageDialog } from "./RichTextEditorImageDialog";
 import { RichTextEditorEmojiPicker } from "./RichTextEditorEmojiPicker";
+import { RichTextEditorMarkdownDialog } from "./RichTextEditorMarkdownDialog";
 import { ToolbarButton } from "../shared/ToolbarButton";
 
 type RichTextEditorToolbarProps = {
-  editor:               Editor | null;
-  toolbarConfig:        Required<RichTextEditorToolbarConfig>;
-  translation:          RichTextEditorTranslation;
-  disabled?:            boolean;
-  isFullscreen:         boolean;
-  onToggleFullscreen:   () => void;
+  editor:                    Editor | null;
+  toolbarConfig:             Required<RichTextEditorToolbarConfig>;
+  translation:               Required<RichTextEditorTranslation>;
+  disabled?:                 boolean;
+  isFullscreen:              boolean;
+  onToggleFullscreen:        () => void;
+  pasteAsPlainText:          boolean;
+  onTogglePasteAsPlainText:  () => void;
 };
 
 // Farb-Button mit farbiger Indikatorlinie unter dem Icon
@@ -93,9 +98,12 @@ export function RichTextEditorToolbar({
   disabled,
   isFullscreen,
   onToggleFullscreen,
+  pasteAsPlainText,
+  onTogglePasteAsPlainText,
 }: RichTextEditorToolbarProps) {
   const [linkDialogOpen, setLinkDialogOpen]               = useState(false);
   const [imageDialogOpen, setImageDialogOpen]             = useState(false);
+  const [markdownDialogOpen, setMarkdownDialogOpen]       = useState(false);
   const [emojiPickerAnchor, setEmojiPickerAnchor]         = useState<HTMLElement | null>(null);
   const [colorPickerAnchor, setColorPickerAnchor]         = useState<HTMLElement | null>(null);
   const [highlightPickerAnchor, setHighlightPickerAnchor] = useState<HTMLElement | null>(null);
@@ -379,26 +387,48 @@ export function RichTextEditorToolbar({
         {/* Verhindert Layout-Shift wenn activeGroupCount 0 ist */}
         {activeGroupCount === 0 && <Box sx={{ height: 32 }} />}
 
-        {/* Fullscreen-Button: ml: "auto" schiebt ihn an den rechten Rand */}
-        {tc.showFullscreenButton && (
-          <Box sx={{ ml: "auto" }}>
-            <Tooltip title={isFullscreen ? t.exitFullscreen : t.fullscreen} arrow>
-              <span>
-                <IconButton
-                  size="small"
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={onToggleFullscreen}
-                  disabled={disabled || !editor}
-                  sx={{ borderRadius: 1 }}
-                  aria-label={isFullscreen ? t.exitFullscreen : t.fullscreen}
-                >
-                  {isFullscreen
-                    ? <FullscreenExitIcon fontSize="small" />
-                    : <FullscreenIcon fontSize="small" />
-                  }
-                </IconButton>
-              </span>
-            </Tooltip>
+        {/* Rechtsbündige Gruppe: Paste-as-Plain-Text, Markdown, Fullscreen */}
+        {(tc.showPasteAsPlainTextButton || tc.showMarkdownButton || tc.showFullscreenButton) && (
+          <Box sx={{ ml: "auto", display: "flex", gap: 0.25 }}>
+            {tc.showPasteAsPlainTextButton && (
+              <ToolbarButton
+                label={pasteAsPlainText ? t.pasteAsHtml : t.pasteAsPlainText}
+                icon={pasteAsPlainText
+                  ? <ContentPasteOffIcon fontSize="small" />
+                  : <ContentPasteIcon fontSize="small" />
+                }
+                onClick={onTogglePasteAsPlainText}
+                active={pasteAsPlainText}
+                disabled={disabled || !editor}
+              />
+            )}
+            {tc.showMarkdownButton && (
+              <ToolbarButton
+                label={t.markdown}
+                icon={<Box component="span" sx={{ fontWeight: "bold", fontSize: "0.7rem", lineHeight: 1 }}>MD</Box>}
+                onClick={() => setMarkdownDialogOpen(true)}
+                disabled={disabled || !editor}
+              />
+            )}
+            {tc.showFullscreenButton && (
+              <Tooltip title={isFullscreen ? t.exitFullscreen : t.fullscreen} arrow>
+                <span>
+                  <IconButton
+                    size="small"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={onToggleFullscreen}
+                    disabled={disabled || !editor}
+                    sx={{ borderRadius: 1 }}
+                    aria-label={isFullscreen ? t.exitFullscreen : t.fullscreen}
+                  >
+                    {isFullscreen
+                      ? <FullscreenExitIcon fontSize="small" />
+                      : <FullscreenIcon fontSize="small" />
+                    }
+                  </IconButton>
+                </span>
+              </Tooltip>
+            )}
           </Box>
         )}
       </Box>
@@ -442,6 +472,15 @@ export function RichTextEditorToolbar({
         <RichTextEditorImageDialog
           open={imageDialogOpen}
           onClose={() => setImageDialogOpen(false)}
+          editor={editor}
+          translation={t}
+        />
+      )}
+
+      {tc.showMarkdownButton && editor && (
+        <RichTextEditorMarkdownDialog
+          open={markdownDialogOpen}
+          onClose={() => setMarkdownDialogOpen(false)}
           editor={editor}
           translation={t}
         />

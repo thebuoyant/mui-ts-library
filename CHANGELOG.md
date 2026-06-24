@@ -13,6 +13,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.8.0] — 2026-06-23
+
+### Added
+
+#### RichTextEditor — Paste as Plain Text
+
+- `showPasteAsPlainTextButton` (default `false`): adds a toolbar toggle. When active, all pasted content — rich HTML from a website, a Word document, another editor — is stripped of formatting and inserted as plain text. Overrides the existing Markdown-paste auto-conversion while active.
+
+#### RichTextEditor — Markdown Import/Export
+
+- `showMarkdownButton` (default `false`): adds a toolbar button that opens a dialog pre-filled with the current content converted to Markdown. Copy it out to export, or edit it and click Apply to replace the editor content.
+- `onMarkdownChange?: (markdown: string) => void`: new callback, fired alongside `onChange` on every content change, with the content as Markdown — independent of the dialog.
+
+---
+
 ## [3.7.1] — 2026-06-23
 
 ### Fixed

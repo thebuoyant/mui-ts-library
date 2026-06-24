@@ -16,7 +16,7 @@ import { type RichTextEditorTranslation } from "./RichTextEditor.types";
 
 type RichTextEditorTableMenuProps = {
   editor:      Editor | null;
-  translation: RichTextEditorTranslation;
+  translation: Required<RichTextEditorTranslation>;
   disabled?:   boolean;
 };
 
