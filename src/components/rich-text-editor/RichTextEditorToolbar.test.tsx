@@ -26,6 +26,8 @@ function TestWrapper({
       disabled={disabled}
       isFullscreen={false}
       onToggleFullscreen={() => {}}
+      pasteAsPlainText={false}
+      onTogglePasteAsPlainText={() => {}}
     />
   );
 }

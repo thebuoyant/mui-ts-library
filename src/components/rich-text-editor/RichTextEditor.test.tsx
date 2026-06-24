@@ -213,6 +213,88 @@ describe("RichTextEditor", () => {
     expect(screen.getByRole("button", { name: "Vollbild" })).toBeInTheDocument();
   });
 
+  // ── Paste as Plain Text ──────────────────────────────────────────────────────
+
+  it("Should not show the paste-as-plain-text button by default", () => {
+    render(<RichTextEditor />);
+    expect(screen.queryByRole("button", { name: "Paste as plain text" })).not.toBeInTheDocument();
+  });
+
+  it("Should show the paste-as-plain-text button when showPasteAsPlainTextButton is true", () => {
+    render(<RichTextEditor toolbarConfig={{ showPasteAsPlainTextButton: true }} />);
+    expect(screen.getByRole("button", { name: "Paste as plain text" })).toBeInTheDocument();
+  });
+
+  it("Should toggle the button label and pressed state on click", async () => {
+    render(<RichTextEditor toolbarConfig={{ showPasteAsPlainTextButton: true }} />);
+    const btn = screen.getByRole("button", { name: "Paste as plain text" });
+    await act(async () => { fireEvent.click(btn); });
+    await waitFor(() => {
+      const toggled = screen.getByRole("button", { name: "Paste with formatting" });
+      expect(toggled).toHaveAttribute("aria-pressed", "true");
+    });
+  });
+
+  it("Should strip formatting from pasted content when the toggle is active", async () => {
+    render(<RichTextEditor toolbarConfig={{ showPasteAsPlainTextButton: true }} />);
+    const toggleBtn = screen.getByRole("button", { name: "Paste as plain text" });
+    await act(async () => { fireEvent.click(toggleBtn); });
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Paste with formatting" })).toBeInTheDocument();
+    });
+
+    const editorEl = document.querySelector(".ProseMirror") as HTMLElement;
+    editorEl.focus();
+    const pasteEvent = Object.assign(new Event("paste", { bubbles: true, cancelable: true }), {
+      clipboardData: { getData: () => "Hello plain" },
+    });
+    await act(async () => { editorEl.dispatchEvent(pasteEvent); });
+
+    await waitFor(() => {
+      expect(editorEl.textContent).toContain("Hello plain");
+    });
+    // Inhalt landet als reiner Text, nicht als <strong>/<em>/etc.
+    expect(editorEl.innerHTML).not.toContain("<strong>");
+  });
+
+  // ── Markdown ─────────────────────────────────────────────────────────────────
+
+  it("Should not show the markdown button by default", () => {
+    render(<RichTextEditor />);
+    expect(screen.queryByRole("button", { name: "Markdown" })).not.toBeInTheDocument();
+  });
+
+  it("Should show the markdown button when showMarkdownButton is true", () => {
+    render(<RichTextEditor toolbarConfig={{ showMarkdownButton: true }} />);
+    expect(screen.getByRole("button", { name: "Markdown" })).toBeInTheDocument();
+  });
+
+  it("Should open the markdown dialog when the markdown button is clicked", async () => {
+    render(<RichTextEditor toolbarConfig={{ showMarkdownButton: true }} />);
+    const btn = screen.getByRole("button", { name: "Markdown" });
+    await act(async () => { fireEvent.click(btn); });
+    await waitFor(() => {
+      expect(screen.getByText("Markdown", { selector: "h2" })).toBeInTheDocument();
+    });
+  });
+
+  it("Should call onMarkdownChange with Markdown content alongside onChange", async () => {
+    const onMarkdownChange = vi.fn();
+    render(<RichTextEditor onMarkdownChange={onMarkdownChange} />);
+
+    const editorEl = document.querySelector(".ProseMirror") as HTMLElement;
+    await act(async () => {
+      editorEl.innerHTML = "<p>Hello</p>";
+      editorEl.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+
+    await waitFor(() => {
+      expect(onMarkdownChange).toHaveBeenCalled();
+      const output = onMarkdownChange.mock.calls[onMarkdownChange.mock.calls.length - 1][0] as string;
+      expect(output).toContain("Hello");
+    }, { timeout: 3000 });
+  });
+
   // ── Table ────────────────────────────────────────────────────────────────────
 
   it("Should render the table button when showTableButton is true", () => {

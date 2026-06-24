@@ -53,8 +53,8 @@ Priorisierung nach User-Nutzen und Implementierungsaufwand.
 | ~~Tabellen~~ | ~~Tiptap Table Extension — Zeilen/Spalten einfügen~~ | ~~Mittel~~ | ✅ v2.1.0 |
 | ~~Bild-Embed~~ | ~~`<img>` per URL oder Base64 einfügen~~ | ~~Mittel~~ | ✅ v2.1.0 |
 | ~~Emoji Picker~~ | ~~😀 Button mit Such-Emoji-Popover~~ | ~~Mittel~~ | ✅ v2.1.0 |
-| ⭐ Einfügen als Klartext | Toggle: Eingefügter Inhalt wird automatisch von Formatierung befreit — häufigste Nutzer-Frustration bei RTE | Niedrig | — |
-| ⭐ Markdown-Import/Export | Zwischen HTML-Inhalt und Markdown per Klick konvertieren — Entwickler erwarten das | Mittel | — |
+| ~~Einfügen als Klartext~~ | ~~Toggle: Eingefügter Inhalt wird automatisch von Formatierung befreit~~ | ~~Niedrig~~ | ✅ v3.8.0 |
+| ~~Markdown-Import/Export~~ | ~~Zwischen HTML-Inhalt und Markdown per Klick konvertieren~~ | ~~Mittel~~ | ✅ v3.8.0 |
 | Mention (@) | Personen oder Entitäten per `@` referenzieren mit Autocomplete | Hoch | — |
 | Slash Commands (/) | Kontextmenü beim Tippen von `/` — Blöcke einfügen (Notion-Pattern) | Hoch | — |
 | Custom Content Blocks | Eigene Block-Typen registrieren (Callout-Box, Alert, Info-Panel) | Hoch | — |

@@ -343,6 +343,14 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/). In der Praxis b
 
 ## Changelog
 
+### [3.8.0] — 2026-06-23
+
+**RichTextEditor**
+- `showPasteAsPlainTextButton`: Toolbar-Toggle, das eingefügten Inhalt von Formatierung befreit.
+- `showMarkdownButton` + `onMarkdownChange`: Markdown-Import/Export-Dialog und ein Live-Markdown-Callback.
+
+---
+
 ### [3.7.1] — 2026-06-23
 
 **Re-Publish — fehlende README auf npm**

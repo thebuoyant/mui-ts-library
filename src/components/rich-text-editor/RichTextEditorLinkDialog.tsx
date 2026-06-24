@@ -14,7 +14,7 @@ type RichTextEditorLinkDialogProps = {
   open:        boolean;
   onClose:     () => void;
   editor:      Editor;
-  translation: RichTextEditorTranslation;
+  translation: Required<RichTextEditorTranslation>;
 };
 
 export function RichTextEditorLinkDialog({
