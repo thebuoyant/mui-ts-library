@@ -12,7 +12,7 @@ import { ROW_HEIGHT, HEADER_HEIGHT, ACTIONS_COL_WIDTH, STATUS_COL_WIDTH, ASSIGNE
 import { GanttTaskDialog } from "./GanttTaskDialog";
 import { GanttDeleteDialog } from "./GanttDeleteDialog";
 
-function getStatusLabel(status: GanttTaskStatus, t: GanttTranslations): string {
+function getStatusLabel(status: GanttTaskStatus, t: Required<GanttTranslations>): string {
   const map: Record<GanttTaskStatus, string> = {
     planned: t.statusPlanned,
     "in-progress": t.statusInProgress,

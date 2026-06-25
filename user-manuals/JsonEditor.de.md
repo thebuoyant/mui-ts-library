@@ -18,11 +18,13 @@ Der `JsonEditor` ist ein vollständiger JSON-Code-Editor auf Basis von [CodeMirr
 
 ---
 
-> ### Neu in v1.5.0
+> ### Neu in v3.7.0
 >
 > | Feature | Beschreibung | Springe zu |
 > |---|---|---|
-> | **`showMinimap`** | Minimap-Panel für schnelle Navigation in großen Dokumenten | [→ Minimap](#minimap) |
+> | **`enablePathFinder`** | `Ctrl/Cmd+Click` auf einen Wert oder Key kopiert den vollständigen JSON-Path | [→ JSON Path Finder](#json-path-finder) |
+> | **`showFolding`** | Objects und Arrays inline ein-/ausklappen | [→ Folding](#folding) |
+> | **`schema`** | Strukturelle Validierung (Typ, Required, Enum) mit Inline-Fehlermarkern | [→ Schema-Validierung](#schema-validierung) |
 
 ---
 

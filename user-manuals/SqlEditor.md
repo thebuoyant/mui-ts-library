@@ -17,12 +17,11 @@ The `SqlEditor` is a full-featured SQL code editor built on [CodeMirror 6](https
 
 ---
 
-> ### New in v1.5.0
+> ### New in v3.5.0
 >
 > | Feature | Description | Jump to |
 > |---|---|---|
-> | **`Cmd+Enter` / `Ctrl+Enter`** | Execute query with keyboard shortcut — works even without the toolbar button | [→ Execute & Shortcut](#execute-button-and-keyboard-shortcut) |
-> | **Auto-sizing gutter** | Line-number column adjusts its width automatically to the digit count | [→ Props](#props) |
+> | **Query History** | Save and reload the last N queries (`toolbarConfig.showHistory`) | [→ Query History](#query-history) |
 
 ---
 

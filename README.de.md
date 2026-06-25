@@ -337,11 +337,18 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/). In der Praxis b
 
 **Bisher nur ein Breaking Release:** [`3.0.0`](#300--2026-06-15--breaking-changes) hat `ConfirmDialog` / `ConfirmDialogProvider` / `useConfirm` entfernt und die Signatur von `TagSelection`s `onTagCreate` geändert. Jedes Release seitdem war additiv.
 
-**TypeScript-Hinweis:** Translation-Typen (z.B. `TagSelectionTranslation`, `SqlEditorTranslation`) bekommen mit der Zeit neue optionale Felder, wenn Features hinzukommen — ein `Partial<...>`-Objekt direkt an die `translation`-Prop zu übergeben (das in dieser README durchgängig verwendete Muster) ist immer vorwärtskompatibel. Eine eigenständige Variable, die gegen den vollen benannten Typ deklariert wird, bleibt nur kompatibel, solange neue Felder optional sind — was seit `3.6.1` der Fall ist (siehe [Changelog](#361--2026-06-22)).
+**TypeScript-Hinweis:** Translation-Typen (z.B. `TagSelectionTranslation`, `SqlEditorTranslation`, `GanttTranslations`) bekommen mit der Zeit neue optionale Felder, wenn Features hinzukommen — ein `Partial<...>`-Objekt direkt an die `translation`/`translations`-Prop zu übergeben (das in dieser README durchgängig verwendete Muster) ist immer vorwärtskompatibel. Eine eigenständige Variable, die gegen den vollen benannten Typ deklariert wird, bleibt nur kompatibel, solange neue Felder optional sind. Ein Audit über alle Komponenten fand eine Lücke — `GanttTranslations` hatte 3 nach Release ergänzte required Felder — behoben in `3.9.1` (siehe [Changelog](#391--2026-06-25)). Seit dieser Version ist jeder Translation-Typ optional-sicher.
 
 ---
 
 ## Changelog
+
+### [3.9.1] — 2026-06-25
+
+**Behoben**
+- GanttChart: `GanttTranslations` hatte 3 required Keys, die nach Release ergänzt wurden (`todayLabel`, `columnAssignee`, `exportCsvTooltip`) — jetzt optional, konsistent mit jedem anderen Translation-Typ. Siehe [Versionierung & Abwärtskompatibilität](#versionierung--abwärtskompatibilität).
+
+---
 
 ### [3.9.0] — 2026-06-24
 

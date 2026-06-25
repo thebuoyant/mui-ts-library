@@ -17,12 +17,11 @@ Der `SqlEditor` ist ein vollwertiger SQL-Code-Editor auf Basis [CodeMirror 6](ht
 
 ---
 
-> ### Neu in v1.5.0
+> ### Neu in v3.5.0
 >
 > | Feature | Beschreibung | Springe zu |
 > |---|---|---|
-> | **`Cmd+Enter` / `Ctrl+Enter`** | Abfrage per Tastenkürzel ausführen — funktioniert auch ohne Toolbar-Button | [→ Execute & Shortcut](#execute-button-und-tastaturkürzel) |
-> | **Auto-Sizing-Gutter** | Zeilennummern-Spalte passt Breite automatisch an die Anzahl der Stellen an | [→ Props](#props) |
+> | **Query-Verlauf** | Letzte N Abfragen speichern und nachladen (`toolbarConfig.showHistory`) | [→ Query-Verlauf](#query-verlauf) |
 
 ---
 

@@ -18,11 +18,13 @@
 
 ---
 
-> ### New in v1.5.0
+> ### New in v3.7.0
 >
 > | Feature | Description | Jump to |
 > |---|---|---|
-> | **`showMinimap`** | Bird's-eye minimap panel for fast navigation in large documents | [→ Minimap](#minimap) |
+> | **`enablePathFinder`** | `Ctrl/Cmd+Click` a value or key to copy its full JSON path | [→ JSON Path Finder](#json-path-finder) |
+> | **`showFolding`** | Collapse/expand objects and arrays inline | [→ Folding](#folding) |
+> | **`schema`** | Structural validation (type, required, enum) with inline error diagnostics | [→ Schema Validation](#schema-validation) |
 
 ---
 

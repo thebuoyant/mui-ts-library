@@ -337,11 +337,18 @@ This project follows [Semantic Versioning](https://semver.org/). In practice:
 
 **Only one breaking release to date:** [`3.0.0`](#300--2026-06-15--breaking-changes) removed `ConfirmDialog` / `ConfirmDialogProvider` / `useConfirm` and changed `TagSelection`'s `onTagCreate` signature. Every other release since has been additive.
 
-**TypeScript note:** translation types (e.g. `TagSelectionTranslation`, `SqlEditorTranslation`) gain new optional fields over time as features are added — passing a `Partial<...>` object straight to the `translation` prop (the pattern used throughout this README) is always forward-compatible. Declaring a standalone variable typed against the full named type only stays compatible if new fields are optional, which they are as of `3.6.1` (see [Changelog](#361--2026-06-22)).
+**TypeScript note:** translation types (e.g. `TagSelectionTranslation`, `SqlEditorTranslation`, `GanttTranslations`) gain new optional fields over time as features are added — passing a `Partial<...>` object straight to the `translation`/`translations` prop (the pattern used throughout this README) is always forward-compatible. Declaring a standalone variable typed against the full named type only stays compatible if new fields are optional. An audit across all components turned up one gap — `GanttTranslations` had 3 required fields added after release — fixed in `3.9.1` (see [Changelog](#391--2026-06-25)). Every translation type is optional-safe as of that version.
 
 ---
 
 ## Changelog
+
+### [3.9.1] — 2026-06-25
+
+**Fixed**
+- GanttChart: `GanttTranslations` had 3 required keys added after release (`todayLabel`, `columnAssignee`, `exportCsvTooltip`) — now optional, matching every other translation type. See [Versioning & Compatibility](#versioning--compatibility).
+
+---
 
 ### [3.9.0] — 2026-06-24
 

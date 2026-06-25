@@ -13,6 +13,18 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [3.9.1] — 2026-06-25
+
+### Behoben
+
+#### GanttChart — TypeScript-Abwärtskompatibilitätslücke in `GanttTranslations`
+
+`todayLabel` (hinzugefügt in `v2.0.0`) und `columnAssignee`/`exportCsvTooltip` (hinzugefügt in `v2.7.0`) waren required Felder auf `GanttTranslations` — im Gegensatz zu jedem anderen Translation-Typ dieser Library, der neue Keys bewusst optional macht, um genau das zu vermeiden. Wer ein vollständiges `GanttTranslations`-Literal deklariert hat (statt ein partielles Objekt an die `translations`-Prop zu übergeben), wäre vor `v2.0.0` kompilierfähig gewesen, aber gegen `v2.0.0`–`v3.9.0` nicht mehr. Gefunden durch ein Audit aller Translation-Typen, nicht durch eine Nutzermeldung.
+
+Alle drei Keys sind jetzt optional mit `@since`-Tags; `DEFAULT_GANTT_TRANSLATIONS` ist jetzt als `Required<GanttTranslations>` typisiert. Empirisch mit einem Literal im Pre-`v2.0.0`-Stil verifiziert. Keine Laufzeit-Änderung — die Komponente hat fehlende Keys schon immer gegen die Defaults aufgelöst.
+
+---
+
 ## [3.9.0] — 2026-06-24
 
 ### Hinzugefügt
