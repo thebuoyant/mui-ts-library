@@ -20,6 +20,7 @@ const meta: Meta<typeof PasswordStrengthMeter> = {
     showPasswordGenerator:  false,
     showSegmentedBar:       false,
     showSummary:            true,
+    showCopyButton:         false,
     // Callbacks
     onPasswordChange:       fn(),
     onPasswordGenerated:    fn(),
@@ -45,6 +46,7 @@ const meta: Meta<typeof PasswordStrengthMeter> = {
     showPasswordGenerator:  { control: "boolean" },
     showSegmentedBar:       { control: "boolean" },
     showSummary:            { control: "boolean" },
+    showCopyButton:         { control: "boolean" },
     translation:            { control: false },
     value:                  { control: false },
     // Callbacks A–Z
@@ -280,6 +282,30 @@ export const WithPasswordGenerator: Story = {
     showPasswordGenerator: true,
     showSegmentedBar: true,
     generatorOptions: { length: 20, upper: true, lower: true, numbers: true, symbols: true },
+  },
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <PasswordStrengthMeter {...args} />
+    </Box>
+  ),
+};
+
+export const WithCopyButton: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`showCopyButton={true}` — adds a copy-to-clipboard icon next to the password field, ' +
+          'visible once a password is present. Pairs naturally with `showPasswordGenerator`: ' +
+          'without a copy button, a generated password is awkward to get out of the field on mobile, ' +
+          'where selecting text manually is fiddly. Shows a brief checkmark confirmation after copying.',
+      },
+    },
+  },
+  args: {
+    showPasswordGenerator: true,
+    showCopyButton: true,
+    generatorOptions: { length: 20 },
   },
   render: (args) => (
     <Box sx={{ maxWidth: 420 }}>

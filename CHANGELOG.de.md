@@ -13,6 +13,16 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [3.9.0] — 2026-06-24
+
+### Hinzugefügt
+
+#### PasswordStrengthMeter — In Zwischenablage kopieren
+
+- `showCopyButton` (Standard `false`): ergänzt ein Kopier-Icon neben dem Passwortfeld, sichtbar sobald ein Passwort vorhanden ist. Passt natürlich zu `showPasswordGenerator` — ohne diesen Button ist es auf Mobile umständlich, ein generiertes Passwort aus dem Feld zu bekommen, da manuelles Text-Markieren fiddly ist. Zeigt nach dem Kopieren kurz eine Haken-Bestätigung.
+
+---
+
 ## [3.8.0] — 2026-06-23
 
 ### Hinzugefügt

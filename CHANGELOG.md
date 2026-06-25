@@ -13,6 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.9.0] — 2026-06-24
+
+### Added
+
+#### PasswordStrengthMeter — Copy to Clipboard
+
+- `showCopyButton` (default `false`): adds a copy-to-clipboard icon next to the password field, visible once a password is present. Pairs naturally with `showPasswordGenerator` — without it, getting a generated password out of the field on mobile means manually selecting text, which is fiddly. Shows a brief checkmark confirmation after copying.
+
+---
+
 ## [3.8.0] — 2026-06-23
 
 ### Added

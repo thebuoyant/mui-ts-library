@@ -17,12 +17,11 @@ Der `PasswordStrengthMeter` ist eine Passwort-Eingabe-Komponente auf Basis von R
 
 ---
 
-> ### Neu in v1.5.0
+> ### Neu in v3.9.0
 >
 > | Feature | Beschreibung | Springe zu |
 > |---|---|---|
-> | **`showSegmentedBar`** | Stärkebalken als 4 einzeln animierte Segmente statt einem wachsenden Balken | [→ Segmentierter Stärkebalken](#segmentierter-stärkebalken) |
-> | **`customRequirements`** | Eigene Passwort-Anforderungen mit Live-Auswertung via `(password) => boolean` | [→ Eigene Anforderungen](#eigene-anforderungen) |
+> | **`showCopyButton`** | Kopier-Icon neben dem Passwortfeld, sichtbar sobald ein Passwort vorhanden ist — passt natürlich zu `showPasswordGenerator` | [→ In Zwischenablage kopieren](#in-zwischenablage-kopieren) |
 
 ---
 
@@ -90,6 +89,7 @@ function App() {
 | `showMeter` | `boolean` | `true` | Zeigt den animierten Stärke-Balken unterhalb des Eingabefelds an. |
 | `generatorOptions` | `PasswordGeneratorOptions` | — | Konfiguriert den eingebauten Generator (bei `showPasswordGenerator=true`). Felder: `length`, `upper`, `lower`, `numbers`, `symbols`. |
 | `showConfirmField` | `boolean` | `false` | Zeigt ein zweites "Passwort bestätigen"-Eingabefeld — grünes ✓ / rotes ✗ mit Hilfstext beim Tippen. Funktioniert kontrolliert (`confirmValue`) und unkontrolliert. |
+| `showCopyButton` | `boolean` | `false` | Zeigt ein Kopier-Icon neben dem Passwortfeld, sichtbar sobald ein Passwort vorhanden ist. |
 | `showPasswordAdornment` | `boolean` | `true` | Zeigt einen Button zum Sichtbar-Machen des Passworts im Klartext. |
 | `showPasswordGenerator` | `boolean` | `false` | Zeigt einen "Sicheres Passwort generieren"-Button — generiert ein starkes Passwort und füllt das Eingabefeld. Das generierte Passwort wird automatisch sichtbar gemacht. |
 | `showSegmentedBar` | `boolean` | `false` | Zeigt den Stärke-Balken als 4 separate animierte Segmente statt als einen wachsenden Balken. |
@@ -167,8 +167,29 @@ type PasswordStrengthMeterTranslation = {
   showPasswordLabel:    string;
   hidePasswordLabel:    string;
   meterAriaLabel:       string;
+  generatePasswordLabel: string;
+  confirmLabel:          string;
+  confirmMatchLabel:     string;
+  confirmMismatchLabel:  string;
+  copyPasswordLabel?:    string; // @since 3.9.0 — siehe Kompatibilitätshinweis unten
+  copiedLabel?:          string; // @since 3.9.0 — siehe Kompatibilitätshinweis unten
 };
 ```
+
+> **⚠️ Kompatibilitätshinweis:** `copyPasswordLabel` und `copiedLabel` (hinzugefügt in `v3.9.0`) sind auf diesem Typ optional — im Gegensatz zu den anderen Keys, die required sind. Das ist beabsichtigt: dadurch bleibt älterer Code, der ein vollständiges `PasswordStrengthMeterTranslation`-Literal deklariert (statt ein partielles Objekt an die `translation`-Prop zu übergeben), auch bei zukünftigen neuen Keys kompilierbar. Intern löst die Komponente fehlende Keys immer gegen `DEFAULT_PASSWORD_TRANSLATIONS` auf — sie müssen also nie angegeben werden.
+
+---
+
+## In Zwischenablage kopieren
+
+```tsx
+<PasswordStrengthMeter
+  showPasswordGenerator
+  showCopyButton
+/>
+```
+
+`showCopyButton` aktivieren, um ein Kopier-Icon neben dem Passwortfeld anzuzeigen — es erscheint erst, wenn das Feld tatsächlich einen Wert hat, damit ein leeres Eingabefeld nicht überladen wirkt. Passt natürlich zu `showPasswordGenerator`: ohne eine Ein-Klick-Kopierfunktion ist es auf Mobile umständlich, ein generiertes Passwort aus dem Feld zu bekommen, da manuelles Text-Markieren auf einem Touchscreen fiddly ist. Klick auf das Icon kopiert das aktuelle Passwort in die Zwischenablage und wechselt kurz (2 Sekunden) zu einem Haken als visuelle Bestätigung — unabhängig davon, ob das Passwort eingetippt oder generiert wurde.
 
 ---
 
@@ -310,6 +331,7 @@ Für automatisierte Tests stehen folgende stabile Test-IDs zur Verfügung:
 | `psm-summary` | `<div>` (äußere Box) | Container der Anforderungscheckliste. Nur vorhanden wenn `showSummary={true}`. |
 | `psm-req-success` | `<svg>` (CheckCircle-Icon) | Grüner Haken für eine erfüllte Anforderung. Mehrfach vorhanden. |
 | `psm-req-failure` | `<svg>` (ErrorOutline-Icon) | Rotes Warnsymbol für eine nicht erfüllte Anforderung. Mehrfach vorhanden. |
+| `psm-copy` | `<button>` (IconButton) | Kopier-Button. Nur vorhanden bei `showCopyButton={true}` und nicht-leerem Passwort. |
 
 ---
 

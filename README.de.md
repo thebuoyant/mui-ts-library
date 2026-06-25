@@ -343,6 +343,13 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/). In der Praxis b
 
 ## Changelog
 
+### [3.9.0] — 2026-06-24
+
+**PasswordStrengthMeter**
+- `showCopyButton`: Kopier-Icon neben dem Passwortfeld, passt zu `showPasswordGenerator`.
+
+---
+
 ### [3.8.0] — 2026-06-23
 
 **RichTextEditor**

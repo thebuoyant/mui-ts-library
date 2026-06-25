@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRef } from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -305,6 +305,56 @@ describe("Password Generator", () => {
     );
     await user.click(screen.getByTestId("psm-generate"));
     expect(onGenerated.mock.calls[0][0].length).toBe(24);
+  });
+});
+
+describe("Copy Button", () => {
+  it("Should not render the copy button by default", () => {
+    render(<PasswordStrengthMeter value="hunter2" />);
+    expect(screen.queryByTestId("psm-copy")).not.toBeInTheDocument();
+  });
+
+  it("Should not render the copy button when the password is empty, even if enabled", () => {
+    render(<PasswordStrengthMeter showCopyButton value="" />);
+    expect(screen.queryByTestId("psm-copy")).not.toBeInTheDocument();
+  });
+
+  it("Should render the copy button once a password is present", () => {
+    render(<PasswordStrengthMeter showCopyButton value="hunter2" />);
+    expect(screen.getByTestId("psm-copy")).toBeInTheDocument();
+  });
+
+  it("Should copy the current password to the clipboard on click", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+
+    render(<PasswordStrengthMeter showCopyButton value="hunter2" />);
+    fireEvent.click(screen.getByTestId("psm-copy"));
+
+    expect(writeText).toHaveBeenCalledWith("hunter2");
+  });
+
+  it("Should show the copied confirmation after a successful copy", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+
+    render(<PasswordStrengthMeter showCopyButton value="hunter2" />);
+    fireEvent.click(screen.getByTestId("psm-copy"));
+
+    expect(await screen.findByRole("button", { name: "Copied!" })).toBeInTheDocument();
+  });
+
+  it("Should disable the copy button when disabled is true", () => {
+    render(<PasswordStrengthMeter showCopyButton disabled value="hunter2" />);
+    expect(screen.getByTestId("psm-copy")).toBeDisabled();
+  });
+
+  it("Should render alongside the password generator", async () => {
+    const user = userEvent.setup();
+    render(<PasswordStrengthMeter showCopyButton showPasswordGenerator />);
+    expect(screen.queryByTestId("psm-copy")).not.toBeInTheDocument();
+    await user.click(screen.getByTestId("psm-generate"));
+    expect(screen.getByTestId("psm-copy")).toBeInTheDocument();
   });
 });
 

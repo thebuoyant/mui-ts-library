@@ -47,6 +47,10 @@ export type PasswordStrengthMeterTranslation = {
   confirmMatchLabel: string;
   /** Shown when passwords do not match */
   confirmMismatchLabel: string;
+  /** Tooltip for the copy-to-clipboard button @since 3.9.0 */
+  copyPasswordLabel?: string;
+  /** Tooltip shown briefly after a successful copy @since 3.9.0 */
+  copiedLabel?:       string;
 };
 
 /**
@@ -66,7 +70,7 @@ export type PasswordGeneratorOptions = {
   symbols?: boolean;
 };
 
-export const DEFAULT_PASSWORD_TRANSLATIONS: PasswordStrengthMeterTranslation = {
+export const DEFAULT_PASSWORD_TRANSLATIONS: Required<PasswordStrengthMeterTranslation> = {
   label: "Password",
   summaryHeaderLabel: "Requirements for your password",
   summaryMinChars: "At least {n} characters",
@@ -81,6 +85,8 @@ export const DEFAULT_PASSWORD_TRANSLATIONS: PasswordStrengthMeterTranslation = {
   confirmLabel: "Confirm password",
   confirmMatchLabel: "Passwords match",
   confirmMismatchLabel: "Passwords do not match",
+  copyPasswordLabel: "Copy password",
+  copiedLabel:       "Copied!",
 };
 
 export const DEFAULT_METER_COLORS: MeterColors = {
@@ -132,6 +138,8 @@ export type PasswordStrengthMeterProps = {
   showSummary?:             boolean;
   /** Render the strength bar as 4 animated segments instead of a single growing bar. */
   showSegmentedBar?:        boolean;
+  /** Show a copy-to-clipboard button next to the password field (visible once a password is entered). */
+  showCopyButton?:          boolean;
   // Nur abweichende Keys angeben — Rest fällt auf DEFAULT_PASSWORD_TRANSLATIONS zurück.
   translation?:             Partial<PasswordStrengthMeterTranslation>;
   // Wenn gesetzt, wird die Komponente kontrolliert: das Passwort kommt von außen,
