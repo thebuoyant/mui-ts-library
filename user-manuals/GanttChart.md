@@ -17,12 +17,12 @@ The `GanttChart` is a fully interactive project planning component built on Reac
 
 ---
 
-> ### New in v1.5.0
+> ### New in v2.7.0
 >
 > | Feature | Description | Jump to |
 > |---|---|---|
-> | **Today chip** | Labeled chip at the top of the dashed today line — label via `translations.todayLabel`, color via `ganttTheme.todayLineColor` | [→ Today Line & Chip](#today-line--chip) |
-> | **`zoomable`** | `Ctrl / Cmd ⌘+Scroll` cycles through days / weeks / months / quarters directly in the timeline | [→ Ctrl+Scroll Zoom](#ctrlscroll-zoom) |
+> | **`showAssigneeColumn`** | Adds an Assignee column to the task panel | [→ Props](#props-reference) |
+> | **`showExportCSV`** | CSV download button for the current task list | [→ Props](#props-reference) |
 
 ---
 
@@ -337,14 +337,16 @@ type GanttTranslations = {
   collapseAllTooltip: string;
   resetViewTooltip: string;
   weekColumnPrefix: string;
-  todayLabel: string;       // Set to "" to hide the chip
+  todayLabel?: string;      // Set to "" to hide the chip — @since 2.0.0, see compatibility note below
   dateLocale: string;
   columnName: string;
   columnStatus: string;
   columnActions: string;
+  columnAssignee?: string;  // @since 2.7.0, see compatibility note below
   addTaskTooltip: string;
   editTaskTooltip: string;
   deleteTaskTooltip: string;
+  exportCsvTooltip?: string; // @since 2.7.0, see compatibility note below
   statusPlanned: string;
   statusInProgress: string;
   statusDone: string;
@@ -368,6 +370,8 @@ type GanttTranslations = {
 };
 ```
 
+> **⚠️ Compatibility note:** `todayLabel` (added in `v2.0.0`) and `columnAssignee`/`exportCsvTooltip` (added in `v2.7.0`) are optional on this type — unlike the other keys, which are required. This is intentional: it lets older code that declares a full `GanttTranslations` literal (instead of passing a partial object to the `translations` prop) keep compiling without changes when we add new keys in the future. Internally, the component always resolves missing keys against `DEFAULT_GANTT_TRANSLATIONS`, so you never need to provide them.
+
 | Key | Default value | Description |
 |---|---|---|
 | `scaleDays` | `"Tage"` | Toolbar button for days scale |
@@ -387,9 +391,11 @@ type GanttTranslations = {
 | `columnName` | `"Name"` | Column header of the left panel |
 | `columnStatus` | `"Status"` | Column header for the status chip |
 | `columnActions` | `"Aktionen"` | Column header for the action icons |
+| `columnAssignee` | `"Assignee"` | Header label for the Assignee column — shown when `showAssigneeColumn={true}` |
 | `addTaskTooltip` | `"Aufgabe hinzufügen"` | Tooltip for the plus icon in a row |
 | `editTaskTooltip` | `"Aufgabe bearbeiten"` | Tooltip for the edit icon |
 | `deleteTaskTooltip` | `"Aufgabe löschen"` | Tooltip for the delete icon |
+| `exportCsvTooltip` | `"Als CSV exportieren"` | Toolbar tooltip for the CSV export button — shown when `showExportCSV={true}` |
 | `statusPlanned` | `"Planned"` | Label for "planned" status |
 | `statusInProgress` | `"In Progress"` | Label for "in progress" status |
 | `statusDone` | `"Done"` | Label for "done" status |

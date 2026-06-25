@@ -16,6 +16,8 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import CheckIcon from "@mui/icons-material/Check";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutlined";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutlined";
 import { useId, useMemo, useState } from "react";
@@ -114,6 +116,7 @@ export function PasswordStrengthMeter({
   showPasswordGenerator = false,
   showSegmentedBar = false,
   showSummary = true,
+  showCopyButton = false,
   inputSize = "medium",
   translation,
   meterColors,
@@ -123,7 +126,7 @@ export function PasswordStrengthMeter({
   onConfirmChange,
   onPasswordGenerated,
 }: PasswordStrengthMeterProps) {
-  const t: PasswordStrengthMeterTranslation = { ...DEFAULT_PASSWORD_TRANSLATIONS, ...translation };
+  const t: Required<PasswordStrengthMeterTranslation> = { ...DEFAULT_PASSWORD_TRANSLATIONS, ...translation };
   const resolvedMeterColors: MeterColors = { ...DEFAULT_METER_COLORS, ...meterColors };
   // useId() erzeugt eine pro-Instanz eindeutige ID – verhindert Konflikte
   // wenn mehrere PasswordStrengthMeter auf der gleichen Seite gerendert werden.
@@ -134,6 +137,7 @@ export function PasswordStrengthMeter({
   const [showConfirm, setShowConfirm] = useState(false);
   const [internalPassword, setInternalPassword] = useState("");
   const [internalConfirm, setInternalConfirm] = useState("");
+  const [copied, setCopied] = useState(false);
 
   // Im kontrollierten Modus kommt der Wert von außen (value-Prop),
   // im unkontrollierten Modus wird der interne State genutzt.
@@ -202,6 +206,13 @@ export function PasswordStrengthMeter({
     setShowPassword(true);
   };
 
+  const handleCopy = () => {
+    navigator.clipboard.writeText(password).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
   const calculateStrengthColor = (result: StrengthResult): string => {
     switch (result.meterStatus) {
       case "weak":    return resolvedMeterColors.weak;
@@ -230,19 +241,38 @@ export function PasswordStrengthMeter({
           inputRef={inputRef}
           inputProps={{ "data-testid": "psm-input", name, autoComplete }}
           endAdornment={
-            showPasswordAdornment ? (
+            showPasswordAdornment || (showCopyButton && password.length > 0) ? (
               <InputAdornment position="end">
-                <IconButton
-                  data-testid="psm-toggle"
-                  disabled={disabled}
-                  aria-label={showPassword ? t.hidePasswordLabel : t.showPasswordLabel}
-                  onClick={handleClickShowPassword}
-                  onMouseDown={handleMouseDownPassword}
-                  onMouseUp={handleMouseUpPassword}
-                  edge="end"
-                >
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
+                {showCopyButton && password.length > 0 && (
+                  <Tooltip title={copied ? t.copiedLabel : t.copyPasswordLabel} arrow>
+                    <span>
+                      <IconButton
+                        data-testid="psm-copy"
+                        disabled={disabled}
+                        aria-label={copied ? t.copiedLabel : t.copyPasswordLabel}
+                        onClick={handleCopy}
+                        onMouseDown={handleMouseDownPassword}
+                        onMouseUp={handleMouseUpPassword}
+                        edge={showPasswordAdornment ? false : "end"}
+                      >
+                        {copied ? <CheckIcon fontSize="small" color="success" /> : <ContentCopyIcon fontSize="small" />}
+                      </IconButton>
+                    </span>
+                  </Tooltip>
+                )}
+                {showPasswordAdornment && (
+                  <IconButton
+                    data-testid="psm-toggle"
+                    disabled={disabled}
+                    aria-label={showPassword ? t.hidePasswordLabel : t.showPasswordLabel}
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                    onMouseUp={handleMouseUpPassword}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                )}
               </InputAdornment>
             ) : null
           }

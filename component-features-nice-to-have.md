@@ -100,11 +100,11 @@ Innerhalb jeder Sektion stehen offene Items zuerst (⭐ oben), erledigte (durchg
 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
-| ⭐ Passwort in Zwischenablage | Copy-Button neben generiertem Passwort — ohne diesen ist der Generator auf Mobile unbenutzbar | Niedrig | — |
 | Sichtbarkeit nach Stärke | "Anzeigen"-Button erst ab konfigurierbarer Stärke freischalten | Niedrig | — |
 | Requirements einklappen | Anforderungs-Checkliste auf- und zuklappen | Niedrig | — |
 | HaveIBeenPwned-Prüfung | Async-Check ob Passwort in bekannten Datenlecks vorkommt | Hoch | — |
 | ~~Passwort-Generator~~ | ~~Button generiert ein sicheres Passwort~~ | ~~Mittel~~ | ✅ v2.7.0 |
+| ~~Passwort in Zwischenablage~~ | ~~Copy-Button neben generiertem Passwort~~ | ~~Niedrig~~ | ✅ v3.9.0 |
 | ~~Confirm-Feld~~ | ~~Zweites Eingabefeld mit Match-Validierung~~ | ~~Mittel~~ | ✅ v2.7.0 |
 | ~~Custom Requirements~~ | ~~Eigene Anforderungen als Array-Prop~~ | ~~Niedrig~~ | ✅ v1.5.0 |
 | ~~Animated Segments~~ | ~~Strength-Bar als 4 separate Segmente~~ | ~~Niedrig~~ | ✅ v1.5.0 |

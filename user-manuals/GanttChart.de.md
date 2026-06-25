@@ -17,12 +17,12 @@ Der `GanttChart` ist eine vollständig interaktive Projektplanungs-Komponente au
 
 ---
 
-> ### Neu in v1.5.0
+> ### Neu in v2.7.0
 >
 > | Feature | Beschreibung | Springe zu |
 > |---|---|---|
-> | **Heute-Chip** | Beschrifteter Chip am oberen Ende der gestrichelten Heute-Linie — Label via `translations.todayLabel`, Farbe via `ganttTheme.todayLineColor` | [→ Heute-Linie & Chip](#heute-linie--chip) |
-> | **`zoomable`** | `Ctrl / Cmd ⌘+Scroll` wechselt zwischen Tage / Wochen / Monate / Quartale direkt in der Timeline | [→ Ctrl+Scroll-Zoom](#ctrlscroll-zoom) |
+> | **`showAssigneeColumn`** | Fügt eine Assignee-Spalte im Task-Panel hinzu | [→ Props](#props-referenz) |
+> | **`showExportCSV`** | CSV-Download-Button für die aktuelle Task-Liste | [→ Props](#props-referenz) |
 
 ---
 
@@ -337,14 +337,16 @@ type GanttTranslations = {
   collapseAllTooltip: string;
   resetViewTooltip: string;
   weekColumnPrefix: string;
-  todayLabel: string;       // "" = Chip ausblenden
+  todayLabel?: string;      // "" = Chip ausblenden — @since 2.0.0, siehe Kompatibilitätshinweis unten
   dateLocale: string;
   columnName: string;
   columnStatus: string;
   columnActions: string;
+  columnAssignee?: string;  // @since 2.7.0, siehe Kompatibilitätshinweis unten
   addTaskTooltip: string;
   editTaskTooltip: string;
   deleteTaskTooltip: string;
+  exportCsvTooltip?: string; // @since 2.7.0, siehe Kompatibilitätshinweis unten
   statusPlanned: string;
   statusInProgress: string;
   statusDone: string;
@@ -368,6 +370,8 @@ type GanttTranslations = {
 };
 ```
 
+> **⚠️ Kompatibilitätshinweis:** `todayLabel` (hinzugefügt in `v2.0.0`) und `columnAssignee`/`exportCsvTooltip` (hinzugefügt in `v2.7.0`) sind auf diesem Typ optional — im Gegensatz zu den anderen Keys, die required sind. Das ist beabsichtigt: dadurch bleibt älterer Code, der ein vollständiges `GanttTranslations`-Literal deklariert (statt ein partielles Objekt an die `translations`-Prop zu übergeben), auch bei zukünftigen neuen Keys kompilierbar. Intern löst die Komponente fehlende Keys immer gegen `DEFAULT_GANTT_TRANSLATIONS` auf — sie müssen also nie angegeben werden.
+
 | Key | Standard-Wert | Beschreibung |
 |---|---|---|
 | `scaleDays` | `"Tage"` | Toolbar-Button für Tages-Skala |
@@ -387,9 +391,11 @@ type GanttTranslations = {
 | `columnName` | `"Name"` | Spaltenheader des linken Panels |
 | `columnStatus` | `"Status"` | Spaltenheader des Status-Chips |
 | `columnActions` | `"Aktionen"` | Spaltenheader der Aktions-Icons |
+| `columnAssignee` | `"Assignee"` | Spaltenheader der Assignee-Spalte — sichtbar bei `showAssigneeColumn={true}` |
 | `addTaskTooltip` | `"Aufgabe hinzufügen"` | Tooltip des Plus-Icons in einer Zeile |
 | `editTaskTooltip` | `"Aufgabe bearbeiten"` | Tooltip des Stift-Icons |
 | `deleteTaskTooltip` | `"Aufgabe löschen"` | Tooltip des Papierkorb-Icons |
+| `exportCsvTooltip` | `"Als CSV exportieren"` | Toolbar-Tooltip des CSV-Export-Buttons — sichtbar bei `showExportCSV={true}` |
 | `statusPlanned` | `"Planned"` | Label für Status „geplant" |
 | `statusInProgress` | `"In Progress"` | Label für Status „in Bearbeitung" |
 | `statusDone` | `"Done"` | Label für Status „erledigt" |

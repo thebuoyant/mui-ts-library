@@ -44,10 +44,10 @@ export function useRawGanttChartStore(): GanttChartStore {
 // Translations-Kontext
 // ---------------------------------------------------------------------------
 
-const GanttTranslationsContext = createContext<GanttTranslations>(DEFAULT_GANTT_TRANSLATIONS);
+const GanttTranslationsContext = createContext<Required<GanttTranslations>>(DEFAULT_GANTT_TRANSLATIONS);
 
 // eslint-disable-next-line react-refresh/only-export-components
-export function useGanttTranslations(): GanttTranslations {
+export function useGanttTranslations(): Required<GanttTranslations> {
   return useContext(GanttTranslationsContext);
 }
 

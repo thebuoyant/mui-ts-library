@@ -13,6 +13,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.9.1] — 2026-06-25
+
+### Fixed
+
+#### GanttChart — TypeScript backward-compatibility gap in `GanttTranslations`
+
+`todayLabel` (added in `v2.0.0`) and `columnAssignee`/`exportCsvTooltip` (added in `v2.7.0`) were required fields on `GanttTranslations` — unlike every other translation type in this library, which marks new keys optional precisely to avoid this. A consumer who declared a full `GanttTranslations` literal (instead of passing a partial object to the `translations` prop) before `v2.0.0` would have failed to compile against `v2.0.0`–`v3.9.0`. Found via an audit of all translation types, not a user report.
+
+All three keys are now optional with `@since` tags; `DEFAULT_GANTT_TRANSLATIONS` is now typed `Required<GanttTranslations>`. Verified empirically with a pre-`v2.0.0`-style literal. No runtime change — the component already resolved missing keys against the defaults.
+
+---
+
+## [3.9.0] — 2026-06-24
+
+### Added
+
+#### PasswordStrengthMeter — Copy to Clipboard
+
+- `showCopyButton` (default `false`): adds a copy-to-clipboard icon next to the password field, visible once a password is present. Pairs naturally with `showPasswordGenerator` — without it, getting a generated password out of the field on mobile means manually selecting text, which is fiddly. Shows a brief checkmark confirmation after copying.
+
+---
+
 ## [3.8.0] — 2026-06-23
 
 ### Added

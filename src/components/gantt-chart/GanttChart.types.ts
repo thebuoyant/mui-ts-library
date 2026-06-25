@@ -52,7 +52,8 @@ export type GanttTranslations = {
   // Timeline — Wochen-Prefix (z. B. "KW" → "W" für Englisch)
   weekColumnPrefix: string;
   // Timeline — Heute-Chip über der gestrichelten Linie (leer = kein Chip)
-  todayLabel: string;
+  /** @since 2.0.0 */
+  todayLabel?: string;
   // Locale für die Datums-Formatierung im Timeline-Header
   dateLocale: string;
   // Dialoge — Titel und Buttons
@@ -77,8 +78,8 @@ export type GanttTranslations = {
   dialogFieldDependenciesNone: string;
   // Task-Panel — Aktions-Spalten-Header
   columnActions: string;
-  /** Header label for the Assignee column — shown when showAssigneeColumn=true */
-  columnAssignee: string;
+  /** Header label for the Assignee column — shown when showAssigneeColumn=true @since 2.7.0 */
+  columnAssignee?: string;
   // Task-Panel — Zeilen-Icon-Tooltips
   addTaskTooltip: string;
   editTaskTooltip: string;
@@ -88,12 +89,12 @@ export type GanttTranslations = {
   expandAllTooltip: string;
   collapseAllTooltip: string;
   resetViewTooltip: string;
-  /** Toolbar tooltip for the CSV export button */
-  exportCsvTooltip: string;
+  /** Toolbar tooltip for the CSV export button @since 2.7.0 */
+  exportCsvTooltip?: string;
 };
 
 // Standardwerte entsprechen dem aktuell gerenderten Verhalten (DE Toolbar, EN Status).
-export const DEFAULT_GANTT_TRANSLATIONS: GanttTranslations = {
+export const DEFAULT_GANTT_TRANSLATIONS: Required<GanttTranslations> = {
   scaleDays: "Tage",
   scaleWeeks: "Wochen",
   scaleMonths: "Monate",

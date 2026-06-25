@@ -17,12 +17,11 @@ The `PasswordStrengthMeter` is a password input component built on React and Mat
 
 ---
 
-> ### New in v1.5.0
+> ### New in v3.9.0
 >
 > | Feature | Description | Jump to |
 > |---|---|---|
-> | **`showSegmentedBar`** | Renders the strength bar as 4 individual animated segments instead of a single growing bar | [→ Segmented strength bar](#segmented-strength-bar) |
-> | **`customRequirements`** | Add your own password rules with live evaluation via `(password) => boolean` | [→ Custom requirements](#custom-requirements) |
+> | **`showCopyButton`** | Copy-to-clipboard icon next to the password field, visible once a password is present — pairs naturally with `showPasswordGenerator` | [→ Copy to Clipboard](#copy-to-clipboard) |
 
 ---
 
@@ -91,6 +90,7 @@ function App() {
 | `name` | `string` | — | Native `name` attribute of the `<input>`. For form libraries. |
 | `passwordMinLength` | `number` | `8` | Minimum length for the "At least {n} characters" requirement. |
 | `showConfirmField` | `boolean` | `false` | Shows a second "Confirm password" input — green ✓ / red ✗ with helper text when typing. Works controlled (`confirmValue`) and uncontrolled. |
+| `showCopyButton` | `boolean` | `false` | Shows a copy-to-clipboard icon next to the password field, visible once a password is present. |
 | `showMeter` | `boolean` | `true` | Shows the animated strength bar below the input. |
 | `showPasswordAdornment` | `boolean` | `true` | Shows the show/hide password toggle button. |
 | `showPasswordGenerator` | `boolean` | `false` | Shows a "Generate secure password" button — generates a strong password and fills the input. The generated password is revealed automatically. |
@@ -186,8 +186,29 @@ type PasswordStrengthMeterTranslation = {
   showPasswordLabel:    string;
   hidePasswordLabel:    string;
   meterAriaLabel:       string;
+  generatePasswordLabel: string;
+  confirmLabel:          string;
+  confirmMatchLabel:     string;
+  confirmMismatchLabel:  string;
+  copyPasswordLabel?:    string; // @since 3.9.0 — see compatibility note below
+  copiedLabel?:          string; // @since 3.9.0 — see compatibility note below
 };
 ```
+
+> **⚠️ Compatibility note:** `copyPasswordLabel` and `copiedLabel` (added in `v3.9.0`) are optional on this type — unlike the other keys, which are required. This is intentional: it lets older code that declares a full `PasswordStrengthMeterTranslation` literal (instead of passing a partial object to the `translation` prop) keep compiling without changes when we add new keys in the future. Internally, the component always resolves missing keys against `DEFAULT_PASSWORD_TRANSLATIONS`, so you never need to provide them.
+
+---
+
+## Copy to Clipboard
+
+```tsx
+<PasswordStrengthMeter
+  showPasswordGenerator
+  showCopyButton
+/>
+```
+
+Enable `showCopyButton` to show a copy icon next to the password field — it only appears once the field actually has a value, so it doesn't clutter an empty input. Pairs naturally with `showPasswordGenerator`: without a one-click copy action, getting a generated password out of the field on mobile means manually selecting the text, which is fiddly on a touchscreen. Clicking the icon copies the current password to the clipboard and briefly swaps to a checkmark for visual confirmation (2 seconds), independent of whether the password was typed or generated.
 
 ---
 
@@ -331,6 +352,7 @@ The following stable test IDs are available for automated tests:
 | `psm-summary` | `<div>` (outer box) | Container of the requirements checklist. Only present when `showSummary={true}`. |
 | `psm-req-success` | `<svg>` (CheckCircle icon) | Green checkmark for a met requirement. Present multiple times. |
 | `psm-req-failure` | `<svg>` (ErrorOutline icon) | Red warning symbol for an unmet requirement. Present multiple times. |
+| `psm-copy` | `<button>` (IconButton) | Copy-to-clipboard button. Only present when `showCopyButton={true}` and the password is non-empty. |
 
 ---
 
