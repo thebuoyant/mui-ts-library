@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import * as d3 from "d3";
 import { Box, Tooltip, Typography, useTheme } from "@mui/material";
 import {
@@ -88,6 +88,7 @@ export function SunburstChart({
   valueDecimalSeparator = ".",
   valueThousandsSeparator = ",",
   zoomable = false,
+  duration = 750,
   disabled = false,
 }: SunburstChartProps) {
   const theme = useTheme();
@@ -144,7 +145,26 @@ export function SunburstChart({
 
   const [focusNode, setFocusNode] = useState(root);
   const [prevRoot,  setPrevRoot]  = useState(root);
-  if (prevRoot !== root) { setPrevRoot(root); setFocusNode(root); }
+
+  // Visual projection params derived from focusNode — x0/x1 (angle window) + yShift (radial offset).
+  // Kept separate from focusNode so the shape can animate smoothly toward it instead of jump-cutting.
+  const viewFor = (node: d3.HierarchyRectangularNode<SunburstChartData>) => ({
+    x0: node.x0,
+    x1: node.x1,
+    yShift: node.depth === 0 ? 0 : (node.depth - 1) * ringThickness,
+  });
+
+  const [renderView, setRenderView] = useState(() => viewFor(root));
+  const renderViewRef = useRef(renderView);
+
+  if (prevRoot !== root) {
+    setPrevRoot(root);
+    setFocusNode(root);
+    // Data changed — jump to the new root's view instantly, no animation.
+    const resetView = viewFor(root);
+    renderViewRef.current = resetView;
+    setRenderView(resetView);
+  }
 
   const topLevelNames = useMemo(
     () => root.children?.map((c) => c.data.name) ?? [root.data.name],
@@ -177,14 +197,52 @@ export function SunburstChart({
 
   const toLocal = useCallback(
     (node: d3.HierarchyRectangularNode<SunburstChartData>) => {
-      const angleScale = TWO_PI / (focusNode.x1 - focusNode.x0);
-      const x0    = Math.max(0, Math.min(TWO_PI, (node.x0 - focusNode.x0) * angleScale));
-      const x1    = Math.max(0, Math.min(TWO_PI, (node.x1 - focusNode.x0) * angleScale));
-      const yShift = focusNode.depth === 0 ? 0 : (focusNode.depth - 1) * ringThickness;
-      return { x0, x1, y0: Math.max(0, node.y0 - yShift), y1: Math.max(0, node.y1 - yShift) };
+      const angleScale = TWO_PI / (renderView.x1 - renderView.x0);
+      const x0 = Math.max(0, Math.min(TWO_PI, (node.x0 - renderView.x0) * angleScale));
+      const x1 = Math.max(0, Math.min(TWO_PI, (node.x1 - renderView.x0) * angleScale));
+      return {
+        x0, x1,
+        y0: Math.max(0, node.y0 - renderView.yShift),
+        y1: Math.max(0, node.y1 - renderView.yShift),
+      };
     },
-    [focusNode, ringThickness],
+    [renderView],
   );
+
+  // Animate renderView toward focusNode's projection whenever the focus changes
+  // (Ctrl+Click drill in/out, Escape). Skipped entirely when duration <= 0.
+  useEffect(() => {
+    const target = viewFor(focusNode);
+    const from   = renderViewRef.current;
+    if (from.x0 === target.x0 && from.x1 === target.x1 && from.yShift === target.yShift) return;
+
+    if (duration <= 0) {
+      renderViewRef.current = target;
+      setRenderView(target);
+      return;
+    }
+
+    let frame: number | null = null;
+    const x0i = d3.interpolateNumber(from.x0, target.x0);
+    const x1i = d3.interpolateNumber(from.x1, target.x1);
+    const yi  = d3.interpolateNumber(from.yShift, target.yShift);
+    const start = performance.now();
+
+    const tick = (now: number) => {
+      const t     = Math.min(1, (now - start) / duration);
+      const eased = d3.easeCubic(t);
+      const next  = { x0: x0i(eased), x1: x1i(eased), yShift: yi(eased) };
+      renderViewRef.current = next;
+      setRenderView(next);
+      frame = t < 1 ? requestAnimationFrame(tick) : null;
+    };
+    frame = requestAnimationFrame(tick);
+
+    return () => {
+      if (frame != null) cancelAnimationFrame(frame);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusNode, ringThickness, duration]);
 
   const arcVisible = (d: { x0: number; x1: number; y0: number; y1: number }) =>
     d.x1 > d.x0 && d.y1 > d.y0;

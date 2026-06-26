@@ -343,6 +343,13 @@ This project follows [Semantic Versioning](https://semver.org/). In practice:
 
 ## Changelog
 
+### [3.10.0] — 2026-06-25
+
+**SunburstChart**
+- `duration`: drill-in/out now animates smoothly between focus levels (default 750ms, `0` disables).
+
+---
+
 ### [3.9.1] — 2026-06-25
 
 **Fixed**

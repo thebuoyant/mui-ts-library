@@ -343,6 +343,13 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/). In der Praxis b
 
 ## Changelog
 
+### [3.10.0] — 2026-06-25
+
+**SunburstChart**
+- `duration`: Rein-/Rauszoomen animiert jetzt sanft zwischen Fokus-Ebenen (Standard 750ms, `0` deaktiviert).
+
+---
+
 ### [3.9.1] — 2026-06-25
 
 **Behoben**

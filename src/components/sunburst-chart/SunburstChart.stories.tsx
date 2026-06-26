@@ -11,6 +11,7 @@ const meta: Meta<typeof SunburstChart> = {
     chartColors:             { control: false },
     data:                    { control: false },
     disabled:                { control: "boolean" },
+    duration:                { control: "number" },
     innerRadius:             { control: "number" },
     showRootLabel:           { control: "boolean" },
     showSegmentLabels:       { control: "boolean" },
@@ -32,6 +33,7 @@ const meta: Meta<typeof SunburstChart> = {
     sortBy:                  "value",
     showRootLabel:           true,
     zoomable:                false,
+    duration:                750,
     disabled:                false,
     valueDecimalCount:       0,
     valueDecimalSeparator:   ".",
@@ -317,6 +319,25 @@ export const DeepHierarchy: Story = {
   play: async ({ canvasElement }) => {
     const firstSegment = canvasElement.querySelector<SVGPathElement>('path[data-idx="0"]');
     if (firstSegment) fireEvent.click(firstSegment, { ctrlKey: true });
+  },
+};
+
+export const AnimatedTransitions: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Drill-down (`Ctrl+Click`) and drill-out (`Ctrl+Click` the center, or `Escape`) animate smoothly ' +
+          'between focus levels instead of jump-cutting — set via `duration` (ms). ' +
+          'This story slows it down to 2000ms so the effect is easy to see; the default is 750ms. ' +
+          'Set `duration={0}` to disable the animation entirely.',
+      },
+    },
+  },
+  args: {
+    data:     DEEP_DATA,
+    size:     500,
+    duration: 2000,
   },
 };
 

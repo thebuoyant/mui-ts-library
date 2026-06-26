@@ -13,6 +13,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.10.0] — 2026-06-25
+
+### Added
+
+#### SunburstChart — Animated Drill-Down Transitions
+
+- `duration?: number` prop (default `750`, set to `0` to disable): drill-in (`Ctrl+Click`) and drill-out (center click, `Escape`) now animate smoothly between focus levels instead of jump-cutting, using `requestAnimationFrame` + `d3.interpolateNumber`/`d3.easeCubic` to tween the angle window and radial offset that drive every segment's arc. `onZoomChange` still fires immediately on interaction — only the visual transition is animated, not the callback timing. Data prop changes reset instantly without animating.
+- Implemented as a React-state + `requestAnimationFrame` tween rather than a `d3 selection.transition()` chain, since the component renders segments declaratively via JSX rather than imperative DOM selections (unlike `CirclePackingChart`, which already had `.transition()`-based zoom). Same visual result, no architecture change.
+
+---
+
 ## [3.9.1] — 2026-06-25
 
 ### Fixed

@@ -20,6 +20,7 @@ The `SunburstChart` visualizes **hierarchical data as concentric rings** — the
 |---|---|
 | **SunburstChart** | First D3 chart — Ctrl / Cmd ⌘+Click drill-down zoom, donut mode, MUI theme palette |
 | **`zoomable`** *(v2.4.0)* | `Ctrl / Cmd ⌘ + Scroll` visual zoom — content clipped at `size` boundary |
+| **`duration`** *(v3.10.0)* | Drill-in/out now animates smoothly between focus levels — [→ Interaction Model](#interaction-model) |
 
 > **macOS keyboard shortcuts:** Use `Cmd ⌘` instead of `Ctrl` — e.g. `Cmd ⌘+Click`, `Cmd ⌘+Scroll`.  
 > All interactions check `ctrlKey || metaKey`, so both keys work on every platform.
@@ -110,6 +111,7 @@ function App() {
 | `onSegmentClick` | `(info, event) => void` | — | Fires on every regular click |
 | `onZoomChange` | `(zoom: SunburstZoomInfo) => void` | — | Fires when drill-down focus changes (Ctrl / Cmd ⌘+Click, Ctrl / Cmd ⌘+DblClick, Escape) |
 | `zoomable` | `boolean` | `false` | Enable `Ctrl / Cmd ⌘ + Scroll` visual zoom — clips content at `size` boundary |
+| `duration` | `number` | `750` | Drill-in/out transition duration in ms. `0` disables the animation (instant jump). |
 | `valueDecimalCount` | `number` | `0` | Decimal places in tooltip values |
 | `valueDecimalSeparator` | `string` | `'.'` | Decimal separator |
 | `valueThousandsSeparator` | `string` | `','` | Thousands separator |
@@ -170,6 +172,8 @@ type SunburstChartTranslation = {
 > This eliminates the classic 200ms click-delay hack. `onSegmentClick` fires instantly on every click. Zoom is an explicit, intentional action that can never happen accidentally.
 
 The center label always shows the **current focus node name** — when drilled in, it acts as a breadcrumb. Use `Ctrl / Cmd ⌘+Click` on the center to step back up.
+
+**Animated transitions:** every drill-in, drill-out, and Escape-reset smoothly tweens between focus levels over `duration` ms (default `750`) instead of jump-cutting. `onZoomChange` still fires the instant the interaction is triggered — only the visual rendering animates, so consumers reacting to the callback don't need to wait for the transition to finish. Set `duration={0}` to disable the animation and snap directly to the new focus.
 
 ---
 
@@ -348,16 +352,16 @@ Currently the only translation key is `noData` (shown when the data has no value
 
 ---
 
-## D3 Charts Roadmap
+## D3 Charts Family
 
-`SunburstChart` is the first component in the **D3 Charts family**. Planned next:
+`SunburstChart` was the first component in the **D3 Charts family** — all 5 have since shipped:
 
 | Component | Description | Status |
 |---|---|---|
 | `SunburstChart` | Concentric ring hierarchy chart | ✅ v2.2.0 |
-| `TreemapChart` | Nested rectangles — proportional hierarchy | Planned |
-| `ZoomableCirclePackingChart` | Nested circles with zoom | Planned |
-| `ChordChart` | Flow and relationship diagram between groups | Planned |
-| `RadialTreeChart` | Radial tree with custom node icons | Planned |
+| `ChordChart` | Flow and relationship diagram between groups | ✅ v2.3.0 |
+| `RadialTreeChart` | Radial tree with custom node icons | ✅ v2.4.0 |
+| `CirclePackingChart` | Nested circles with animated zoom | ✅ v2.5.0 |
+| `HorizontalTreeChart` | Decision trees in 4 orientations | ✅ v2.6.0 |
 
-All D3 charts follow the same conventions: `chartColors`, `translation`, `disabled`, `onXxxClick`, MUI theme integration, and dark mode support.
+All D3 charts follow the same conventions: `chartColors`, `translation`, `disabled`, `onXxxClick`, MUI theme integration, and dark mode support. See [`component-features-nice-to-have.md`](../component-features-nice-to-have.md) for open feature ideas per chart.

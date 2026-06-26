@@ -20,6 +20,7 @@ Der `SunburstChart` visualisiert **hierarchische Daten als konzentrische Ringe**
 |---|---|
 | **SunburstChart** | Erstes D3-Chart — Ctrl / Cmd ⌘+Click Drill-Down, Donut-Modus, MUI-Theme-Palette |
 | **`zoomable`** *(v2.4.0)* | `Ctrl / Cmd ⌘ + Scroll` visueller Zoom — Inhalt wird am `size`-Rand abgeschnitten |
+| **`duration`** *(v3.10.0)* | Rein-/Rauszoomen animiert jetzt sanft zwischen Fokus-Ebenen — [→ Interaktionsmodell](#interaktionsmodell) |
 
 > **macOS-Tastaturkürzel:** `Cmd ⌘` statt `Ctrl` verwenden — z. B. `Cmd ⌘+Click`, `Cmd ⌘+Scroll`.  
 > Alle Interaktionen prüfen `ctrlKey || metaKey`, funktionieren also auf beiden Plattformen.
@@ -110,6 +111,7 @@ function App() {
 | `onSegmentClick` | `(info, event) => void` | — | Wird bei jedem normalen Klick ausgelöst |
 | `onZoomChange` | `(zoom: SunburstZoomInfo) => void` | — | Wird bei Drill-Down-Wechsel ausgelöst (Ctrl / Cmd ⌘+Click, Ctrl / Cmd ⌘+DblClick, Escape) |
 | `zoomable` | `boolean` | `false` | `Ctrl / Cmd ⌘ + Scroll` visueller Zoom — clippt am `size`-Rand |
+| `duration` | `number` | `750` | Dauer des Drill-in/out-Übergangs in ms. `0` deaktiviert die Animation (sofortiger Sprung). |
 | `valueDecimalCount` | `number` | `0` | Dezimalstellen in Tooltip-Werten |
 | `valueDecimalSeparator` | `string` | `'.'` | Dezimaltrennzeichen |
 | `valueThousandsSeparator` | `string` | `','` | Tausendertrennzeichen |
@@ -170,6 +172,8 @@ type SunburstChartTranslation = {
 > Eliminiert den klassischen 200ms-Delay-Hack. `onSegmentClick` feuert sofort bei jedem Klick. Zoom ist eine bewusste, explizite Aktion die nie versehentlich passiert.
 
 Das Center-Label zeigt immer den **aktuellen Fokus-Knotennamen** — beim Zoom-Zustand funktioniert es als Breadcrumb.
+
+**Animierte Übergänge:** Jeder Drill-in, Drill-out und Escape-Reset interpoliert sanft zwischen Fokus-Ebenen über `duration` ms (Standard `750`) statt abrupt zu wechseln. `onZoomChange` feuert weiterhin sofort bei Auslösung der Interaktion — nur die visuelle Darstellung animiert, Konsumenten, die auf den Callback reagieren, müssen also nicht auf das Ende des Übergangs warten. `duration={0}` deaktiviert die Animation und springt direkt zum neuen Fokus.
 
 ---
 
@@ -341,16 +345,16 @@ Aktuell ist `noData` der einzige Translation-Key (wird angezeigt wenn die Daten 
 
 ---
 
-## D3-Charts-Roadmap
+## D3-Charts-Familie
 
-Der `SunburstChart` ist die erste Komponente der **D3-Charts-Familie**. Geplante Folgekomponenten:
+Der `SunburstChart` war die erste Komponente der **D3-Charts-Familie** — alle 5 sind inzwischen erschienen:
 
 | Komponente | Beschreibung | Status |
 |---|---|---|
 | `SunburstChart` | Konzentrische Ringe-Hierarchie-Chart | ✅ v2.2.0 |
-| `TreemapChart` | Verschachtelte Rechtecke — proportionale Hierarchie | Geplant |
-| `ZoomableCirclePackingChart` | Verschachtelte Kreise mit Zoom | Geplant |
-| `ChordChart` | Fluss- und Beziehungsdiagramm zwischen Gruppen | Geplant |
-| `RadialTreeChart` | Radialer Baum mit eigenen Knoten-Icons | Geplant |
+| `ChordChart` | Fluss- und Beziehungsdiagramm zwischen Gruppen | ✅ v2.3.0 |
+| `RadialTreeChart` | Radialer Baum mit eigenen Knoten-Icons | ✅ v2.4.0 |
+| `CirclePackingChart` | Verschachtelte Kreise mit animiertem Zoom | ✅ v2.5.0 |
+| `HorizontalTreeChart` | Entscheidungsbäume in 4 Ausrichtungen | ✅ v2.6.0 |
 
-Alle D3-Charts folgen denselben Konventionen: `chartColors`, `translation`, `disabled`, `onXxxClick`, MUI-Theme-Integration und Dark-Mode-Unterstützung.
+Alle D3-Charts folgen denselben Konventionen: `chartColors`, `translation`, `disabled`, `onXxxClick`, MUI-Theme-Integration und Dark-Mode-Unterstützung. Offene Feature-Ideen pro Chart: [`component-features-nice-to-have.md`](../component-features-nice-to-have.md).

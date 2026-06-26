@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { SunburstChart } from "./SunburstChart";
 import type { SunburstChartData } from "./SunburstChart.types";
@@ -110,5 +110,90 @@ describe("SunburstChart", () => {
       />,
     );
     expect(document.querySelector("svg")).toBeInTheDocument();
+  });
+
+  describe("Animated drill-down transitions", () => {
+    it("Should fire onZoomChange after the Ctrl+Click disambiguation delay, regardless of duration", () => {
+      vi.useFakeTimers();
+      const handler = vi.fn();
+      render(<SunburstChart data={SIMPLE_DATA} onZoomChange={handler} />);
+      const alphaPath = document.querySelector<SVGPathElement>("path[data-idx='0']");
+      act(() => { fireEvent.click(alphaPath!, { ctrlKey: true }); });
+      expect(handler).not.toHaveBeenCalled(); // gated behind the 250ms drill timer
+      act(() => { vi.advanceTimersByTime(250); });
+      expect(handler).toHaveBeenCalledTimes(1);
+      const [info] = handler.mock.calls[0];
+      expect(info.focusNode.name).toBe("Alpha");
+      expect(info.isRoot).toBe(false);
+      vi.useRealTimers();
+    });
+
+    it("Should settle on the final geometry immediately when duration=0", () => {
+      vi.useFakeTimers();
+      render(<SunburstChart data={SIMPLE_DATA} duration={0} />);
+      const alphaPath = document.querySelector<SVGPathElement>("path[data-idx='0']");
+      const dBefore = alphaPath!.getAttribute("d");
+      act(() => { fireEvent.click(alphaPath!, { ctrlKey: true }); });
+      act(() => { vi.advanceTimersByTime(250); });
+      const dAfter = document.querySelector<SVGPathElement>("path[data-idx='0']")!.getAttribute("d");
+      // Alpha now fills the full circle (it's the new focus) — its arc must have changed.
+      expect(dAfter).not.toBe(dBefore);
+      vi.useRealTimers();
+    });
+
+    it("Should settle on the same final geometry after the animation completes (default duration)", () => {
+      vi.useFakeTimers();
+      render(<SunburstChart data={SIMPLE_DATA} />);
+      const alphaPath = document.querySelector<SVGPathElement>("path[data-idx='0']");
+      const dBefore = alphaPath!.getAttribute("d");
+      act(() => { fireEvent.click(alphaPath!, { ctrlKey: true }); });
+      act(() => { vi.advanceTimersByTime(250); }); // drill disambiguation
+      act(() => { vi.advanceTimersByTime(750); }); // full transition duration
+      const dAfter = document.querySelector<SVGPathElement>("path[data-idx='0']")!.getAttribute("d");
+      expect(dAfter).not.toBe(dBefore);
+      vi.useRealTimers();
+    });
+
+    it("Should not throw when unmounted mid-animation", () => {
+      vi.useFakeTimers();
+      const { unmount } = render(<SunburstChart data={SIMPLE_DATA} />);
+      const alphaPath = document.querySelector<SVGPathElement>("path[data-idx='0']");
+      act(() => { fireEvent.click(alphaPath!, { ctrlKey: true }); });
+      act(() => { vi.advanceTimersByTime(250); });
+      act(() => { vi.advanceTimersByTime(100); }); // mid-transition
+      expect(() => unmount()).not.toThrow();
+      vi.useRealTimers();
+    });
+
+    it("Should animate back to the root view on Escape", () => {
+      vi.useFakeTimers();
+      const handler = vi.fn();
+      render(<SunburstChart data={SIMPLE_DATA} duration={0} onZoomChange={handler} />);
+      const alphaPath = document.querySelector<SVGPathElement>("path[data-idx='0']");
+      act(() => { fireEvent.click(alphaPath!, { ctrlKey: true }); });
+      act(() => { vi.advanceTimersByTime(250); });
+      expect(handler).toHaveBeenLastCalledWith(expect.objectContaining({ isRoot: false }));
+
+      act(() => { fireEvent.keyDown(window, { key: "Escape" }); });
+      expect(handler).toHaveBeenLastCalledWith(expect.objectContaining({ isRoot: true }));
+      vi.useRealTimers();
+    });
+
+    it("Should reset to the new root instantly (no animation) when the data prop changes", () => {
+      vi.useFakeTimers();
+      const { rerender } = render(<SunburstChart data={SIMPLE_DATA} />);
+      const alphaPath = document.querySelector<SVGPathElement>("path[data-idx='0']");
+      act(() => { fireEvent.click(alphaPath!, { ctrlKey: true }); });
+      act(() => { vi.advanceTimersByTime(250); }); // now focused on Alpha
+
+      const OTHER_DATA: SunburstChartData = {
+        id: "root2", name: "Root2",
+        children: [{ id: "x", name: "X", value: 1 }],
+      };
+      act(() => { rerender(<SunburstChart data={OTHER_DATA} />); });
+      // No pending timers should be needed — the reset is synchronous, not animated.
+      expect(screen.getByRole("img", { name: "Root2" })).toBeInTheDocument();
+      vi.useRealTimers();
+    });
   });
 });
