@@ -125,9 +125,9 @@ Cross-Cutting-Ideen, die für alle 5 D3-Charts gleich umgesetzt werden würden �
 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
-| ⭐ Animierte Drill-Down-Übergänge | Zoom passiert aktuell als Hard-Cut (kein `.transition()`) — Arc-Tweening wie im klassischen D3-Zoomable-Sunburst würde sich deutlich poliert anfühlen | Mittel | — |
 | ⭐ Eingebautes Breadcrumb | `CirclePackingChart` zeigt beim Reinzoomen automatisch ein Breadcrumb — Sunburst hat trotz Drill-down keins | Niedrig | — |
 | Legende | Farbzuordnung Kategorie ↔ Farbe als eigene Komponente — bei vielen Segmenten schwer zuordenbar | Mittel | — |
+| ~~Animierte Drill-Down-Übergänge~~ | ~~Zoom passierte als Hard-Cut (kein `.transition()`)~~ — Als React-State+rAF-Tween umgesetzt (kein D3-Imperativ-Umbau nötig), `duration`-Prop, Default 750ms. | ~~Mittel~~ | ✅ v3.10.0 |
 
 ---
 

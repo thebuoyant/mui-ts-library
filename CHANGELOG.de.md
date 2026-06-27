@@ -13,6 +13,17 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [3.10.0] — 2026-06-25
+
+### Hinzugefügt
+
+#### SunburstChart — Animierte Drill-Down-Übergänge
+
+- `duration?: number`-Prop (Standard `750`, `0` deaktiviert die Animation): Reinzoomen (`Ctrl+Click`) und Rauszoomen (Klick auf die Mitte, `Escape`) animieren jetzt sanft zwischen Fokus-Ebenen statt abrupt zu wechseln — via `requestAnimationFrame` + `d3.interpolateNumber`/`d3.easeCubic`, die das Winkelfenster und den radialen Versatz interpolieren, aus denen jedes Segment seinen Arc berechnet. `onZoomChange` feuert weiterhin sofort bei der Interaktion — nur die visuelle Darstellung ist animiert, nicht das Callback-Timing. Änderungen der `data`-Prop setzen sofort zurück, ohne zu animieren.
+- Umgesetzt als React-State + `requestAnimationFrame`-Tween statt einer `d3 selection.transition()`-Kette, da die Komponente Segmente deklarativ über JSX rendert statt über imperative DOM-Selections (anders als `CirclePackingChart`, das bereits `.transition()`-basierten Zoom hatte). Gleiches visuelles Ergebnis, kein Architektur-Umbau.
+
+---
+
 ## [3.9.1] — 2026-06-25
 
 ### Behoben

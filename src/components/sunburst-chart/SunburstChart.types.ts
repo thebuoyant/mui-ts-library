@@ -70,6 +70,8 @@ export type SunburstChartProps = {
   valueThousandsSeparator?: string;
   /** Enable Ctrl+Scroll zoom — content outside `size` is clipped (default: false) */
   zoomable?:                boolean;
+  /** Drill-down/out transition duration in ms — set to 0 to disable animation (default: 750) */
+  duration?:                number;
   /** Disables all interactions (default: false) */
   disabled?:                boolean;
   /** Override any translation string */
