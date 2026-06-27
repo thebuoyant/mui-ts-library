@@ -280,12 +280,16 @@ Alle Interaktionen (Hover-Highlight, Click-Callbacks) sind deaktiviert. Das Char
 
 ---
 
-## D3-Charts-Roadmap
+## D3-Charts-Familie
+
+Alle 5 D3-Charts sind erschienen:
 
 | Komponente | Beschreibung | Status |
 |---|---|---|
 | `SunburstChart` | Konzentrische Ringe-Hierarchie-Chart | ✅ v2.2.0 |
 | `ChordChart` | Fluss- und Beziehungsdiagramm | ✅ v2.3.0 |
-| `TreemapChart` | Verschachtelte Rechtecke — proportionale Hierarchie | Geplant |
-| `ZoomableCirclePackingChart` | Verschachtelte Kreise mit Zoom | Geplant |
-| `RadialTreeChart` | Radialer Baum mit eigenen Knoten-Icons | Geplant |
+| `RadialTreeChart` | Radialer Baum mit eigenen Knoten-Icons | ✅ v2.4.0 |
+| `CirclePackingChart` | Verschachtelte Kreise mit animiertem Zoom | ✅ v2.5.0 |
+| `HorizontalTreeChart` | Entscheidungsbäume in 4 Ausrichtungen | ✅ v2.6.0 |
+
+Offene Feature-Ideen pro Chart: [`component-features-nice-to-have.md`](../component-features-nice-to-have.md).

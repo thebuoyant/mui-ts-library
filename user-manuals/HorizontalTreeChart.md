@@ -11,6 +11,7 @@ The `HorizontalTreeChart` renders hierarchical data using [D3 v7](https://d3js.o
 | New in v2.6.0 | |
 |---|---|
 | **HorizontalTreeChart** | 4 orientations, D3 tree layout, drill-down, zoom, MUI theme |
+| **`duration`** *(v3.11.0)* | Drill in/out now crossfades the layout instead of jump-cutting — [→ Interaction Model](#interaction-model) |
 
 > **macOS:** Use `Cmd ⌘` instead of `Ctrl` for all keyboard shortcuts.
 
@@ -91,6 +92,7 @@ const data: HorizontalTreeData = {
 | `linkColor` | `string` | theme text.secondary | Link color |
 | `zoomable` | `boolean` | `false` | `Ctrl / Cmd ⌘+Scroll` visual zoom |
 | `drillable` | `boolean` | `false` | `Ctrl / Cmd ⌘+Click` drill-down |
+| `duration` | `number` | `750` | Drill-in/out crossfade duration in ms. `0` disables it (instant jump). |
 | `onFocusChange` | `(zoom) => void` | — | Fires when drill-down changes |
 | `showNodePopover` | `boolean` | `false` | Built-in MUI Popover on click |
 | `renderNodePopoverContent` | `(info) => ReactNode` | — | Custom popover content |
@@ -155,6 +157,8 @@ type HorizontalTreeOrientation = 'LR' | 'RL' | 'TB' | 'BT';
 | **Ctrl / Cmd ⌘+Scroll** | Visual zoom — clips at boundary | `zoomable` |
 | **Escape** | Reset drill-down + zoom | both |
 
+**Drill transitions:** drilling in/out re-roots the underlying D3 hierarchy entirely — each focus level has its own, differently-sized node set. Rather than tweening individual node positions (which would need enter/update/exit matching by node ID), the previous layout crossfades out on top of the new one over `duration` ms (default `750`), rendered as a static, non-interactive ghost layer. `onFocusChange`/`onNodeClick` fire immediately on interaction regardless of `duration` — only the visual transition is animated. Set `duration={0}` to disable it and jump directly to the new focus.
+
 ---
 
 ## Colors & `colorConfig`
@@ -195,7 +199,9 @@ const data: HorizontalTreeData = {
 
 ---
 
-## D3 Charts Roadmap
+## D3 Charts Family
+
+All 5 D3 charts have shipped:
 
 | Component | Status |
 |---|---|
@@ -204,4 +210,5 @@ const data: HorizontalTreeData = {
 | `RadialTreeChart` | ✅ v2.4.0 |
 | `CirclePackingChart` | ✅ v2.5.0 |
 | `HorizontalTreeChart` | ✅ v2.6.0 |
-| `TreemapChart` | Planned |
+
+Open feature ideas per chart: [`component-features-nice-to-have.md`](../component-features-nice-to-have.md).

@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import * as d3 from "d3";
 import type { HierarchyPointNode, HierarchyPointLink } from "d3-hierarchy";
 import {
@@ -94,6 +94,7 @@ export function HorizontalTreeChart({
   showNodePopover = false,
   renderNodePopoverContent,
   onNodeClick,
+  duration = 750,
   disabled = false,
   translation,
 }: HorizontalTreeChartProps) {
@@ -123,7 +124,12 @@ export function HorizontalTreeChart({
   const [focusStack, setFocusStack] = useState<HorizontalTreeData[]>([data]);
   const focusData = focusStack[focusStack.length - 1];
   const [prevData, setPrevData] = useState(data);
-  if (prevData !== data) { setPrevData(data); setFocusStack([data]); }
+  const [skipNextFade, setSkipNextFade] = useState(false);
+  if (prevData !== data) {
+    setPrevData(data);
+    setFocusStack([data]);
+    setSkipNextFade(true); // brand-new data — jump instantly, don't crossfade
+  }
 
   // ── D3 tree layout ─────────────────────────────────────────────────────────
   const root = useMemo(() => {
@@ -141,6 +147,49 @@ export function HorizontalTreeChart({
 
   const nodes = root.descendants();
   const links = root.links();
+
+  // ── Drill transition: crossfade the previous layout out on top of the new one ──
+  // Same rationale as RadialTreeChart: drilling re-roots the hierarchy entirely
+  // (different node set per focus level), so a crossfade avoids needing
+  // enter/update/exit node-matching for a smooth transition.
+  const prevRootRef    = useRef(root);
+  const fadeFrameRef   = useRef<number | null>(null);
+  const [fadeFrom,    setFadeFrom]    = useState<typeof root | null>(null);
+  const [fadeOpacity, setFadeOpacity] = useState(0);
+
+  useEffect(() => {
+    const old = prevRootRef.current;
+    prevRootRef.current = root;
+    if (old === root) return;
+
+    if (fadeFrameRef.current != null) { cancelAnimationFrame(fadeFrameRef.current); fadeFrameRef.current = null; }
+
+    if (skipNextFade || duration <= 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSkipNextFade(false);
+      setFadeFrom(null);
+      return;
+    }
+
+    setFadeFrom(old);
+    setFadeOpacity(1);
+    const start = performance.now();
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / duration);
+      setFadeOpacity(1 - d3.easeCubic(t));
+      if (t < 1) {
+        fadeFrameRef.current = requestAnimationFrame(tick);
+      } else {
+        fadeFrameRef.current = null;
+        setFadeFrom(null);
+      }
+    };
+    fadeFrameRef.current = requestAnimationFrame(tick);
+
+    return () => {
+      if (fadeFrameRef.current != null) cancelAnimationFrame(fadeFrameRef.current);
+    };
+  }, [root, duration, skipNextFade]);
 
   // ── Color per depth ────────────────────────────────────────────────────────
   const nodeColor = useCallback(
@@ -298,6 +347,33 @@ export function HorizontalTreeChart({
 
   const iSize = Math.round(nodeRadius * 1.3);
 
+  // Static, non-interactive render of a (now superseded) layout, fading out on
+  // top of the live one during a drill transition. No labels/tooltips/handlers
+  // — kept deliberately minimal so two layers never visually compete for clarity.
+  const renderGhostLayer = (ghostRoot: typeof root, opacity: number) => (
+    <g data-testid="drill-ghost-layer" opacity={opacity} pointerEvents="none">
+      <g fill="none" stroke={resolvedLink} strokeOpacity={linkStrokeOpacity} strokeWidth={linkStrokeWidth}>
+        {ghostRoot.links().map((link, i) => (
+          <path key={`ghost-link-${i}`} d={linkPath(link)} />
+        ))}
+      </g>
+      <g>
+        {ghostRoot.descendants().map((node, i) => {
+          const pos = toSvg(node);
+          return (
+            <g key={`ghost-node-${i}`} transform={`translate(${pos.x},${pos.y})`}>
+              <circle r={nodeRadius + 2} fill={nodeColor(node)} fillOpacity={0.15} />
+              <circle r={nodeRadius} fill={nodeColor(node)} />
+              {showIcons && (
+                <NodeIcon path={node.children ? ICON_PATHS.folder : ICON_PATHS.person} size={iSize} />
+              )}
+            </g>
+          );
+        })}
+      </g>
+    </g>
+  );
+
   return (
     <Box
       ref={containerRef}
@@ -410,6 +486,9 @@ export function HorizontalTreeChart({
               </Tooltip>
             );
           })}
+
+          {/* ── Drill transition ghost — previous layout fading out on top ─── */}
+          {fadeFrom && renderGhostLayer(fadeFrom, fadeOpacity)}
         </g>
       </svg>
 

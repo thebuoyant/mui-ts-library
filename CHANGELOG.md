@@ -13,6 +13,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.11.0] — 2026-06-25
+
+### Added
+
+#### RadialTreeChart & HorizontalTreeChart — Drill Transition Crossfade
+
+- `duration?: number` prop (default `750`, set to `0` to disable) on both components: drilling in (`Ctrl+Click`), drilling out (`Ctrl+DblClick`/center, `Escape`), and root resets now crossfade the previous layout out on top of the new one instead of jump-cutting.
+- Unlike `SunburstChart` (which reuses one hierarchy and only animates the angle/radius view window), drilling here re-roots the D3 hierarchy entirely — a different node set per focus level — so there's no shared coordinate space to tween node-by-node without enter/update/exit matching by ID. A crossfade (old layout fades out via `requestAnimationFrame` + `d3.easeCubic`, rendered as a static, non-interactive ghost layer) removes the hard cut with substantially less complexity and regression risk than full position-tweening.
+- `onFocusChange`/`onNodeClick` still fire immediately on interaction — only the visual transition is animated. Data prop changes reset instantly without crossfading.
+
+---
+
 ## [3.10.0] — 2026-06-25
 
 ### Added

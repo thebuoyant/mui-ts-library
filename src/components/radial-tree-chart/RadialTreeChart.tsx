@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import * as d3 from "d3";
 import type { HierarchyPointNode, HierarchyPointLink } from "d3-hierarchy";
 import {
@@ -113,6 +113,7 @@ export function RadialTreeChart({
   zoomable = false,
   drillable = false,
   onFocusChange,
+  duration = 750,
   showNodePopover = false,
   renderNodePopoverContent,
   onNodeClick,
@@ -155,7 +156,12 @@ export function RadialTreeChart({
 
   // Reset stack when root data changes
   const [prevData, setPrevData] = useState(data);
-  if (prevData !== data) { setPrevData(data); setFocusStack([data]); }
+  const [skipNextFade, setSkipNextFade] = useState(false);
+  if (prevData !== data) {
+    setPrevData(data);
+    setFocusStack([data]);
+    setSkipNextFade(true); // brand-new data — jump instantly, don't crossfade
+  }
 
   const margin = 70;
   const radius = Math.max(1, size / 2 - margin);
@@ -180,6 +186,50 @@ export function RadialTreeChart({
 
   const links = root.links();
   const nodes = root.descendants();
+
+  // ── Drill transition: crossfade the previous layout out on top of the new one ──
+  // Drilling re-roots the hierarchy entirely (different node set per focus level),
+  // so unlike SunburstChart's view-window animation, there's no shared coordinate
+  // space to tween node-by-node without enter/update/exit matching. A crossfade
+  // gets rid of the hard cut with much less risk/complexity.
+  const prevRootRef    = useRef(root);
+  const fadeFrameRef   = useRef<number | null>(null);
+  const [fadeFrom,    setFadeFrom]    = useState<typeof root | null>(null);
+  const [fadeOpacity, setFadeOpacity] = useState(0);
+
+  useEffect(() => {
+    const old = prevRootRef.current;
+    prevRootRef.current = root;
+    if (old === root) return;
+
+    if (fadeFrameRef.current != null) { cancelAnimationFrame(fadeFrameRef.current); fadeFrameRef.current = null; }
+
+    if (skipNextFade || duration <= 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSkipNextFade(false);
+      setFadeFrom(null);
+      return;
+    }
+
+    setFadeFrom(old);
+    setFadeOpacity(1);
+    const start = performance.now();
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / duration);
+      setFadeOpacity(1 - d3.easeCubic(t));
+      if (t < 1) {
+        fadeFrameRef.current = requestAnimationFrame(tick);
+      } else {
+        fadeFrameRef.current = null;
+        setFadeFrom(null);
+      }
+    };
+    fadeFrameRef.current = requestAnimationFrame(tick);
+
+    return () => {
+      if (fadeFrameRef.current != null) cancelAnimationFrame(fadeFrameRef.current);
+    };
+  }, [root, duration, skipNextFade]);
 
   const linkGen = useMemo(
     () =>
@@ -329,6 +379,36 @@ export function RadialTreeChart({
   const resolvedLink = linkColor  || theme.palette.text.secondary;
   const bgColor      = theme.palette.background.paper;
   const fontFamily   = theme.typography.fontFamily;
+
+  // Static, non-interactive render of a (now superseded) layout, fading out on
+  // top of the live one during a drill transition. No labels/tooltips/handlers
+  // — kept deliberately minimal so two layers never visually compete for clarity.
+  const renderGhostLayer = (ghostRoot: typeof root, opacity: number) => (
+    <g data-testid="drill-ghost-layer" opacity={opacity} pointerEvents="none">
+      <g fill="none" stroke={resolvedLink} strokeOpacity={linkStrokeOpacity} strokeWidth={linkStrokeWidth}>
+        {ghostRoot.links().map((link, i) => (
+          <path key={`ghost-link-${i}`} d={linkGen(link) as string} />
+        ))}
+      </g>
+      <g>
+        {ghostRoot.descendants().map((node, i) => (
+          <g
+            key={`ghost-node-${i}`}
+            transform={`rotate(${(node.x * 180) / Math.PI - 90}) translate(${node.y},0)`}
+          >
+            <circle r={nodeR(node) + 2} fill={nodeColor(node)} fillOpacity={0.15} />
+            <circle r={nodeR(node)} fill={nodeColor(node)} />
+            {showIcons && (
+              <NodeIcon
+                path={node.children ? ICON_PATHS.folder : ICON_PATHS.person}
+                size={Math.round(nodeR(node) * 1.3)}
+              />
+            )}
+          </g>
+        ))}
+      </g>
+    </g>
+  );
 
   return (
     <Box
@@ -506,6 +586,9 @@ export function RadialTreeChart({
               );
             })}
           </g>
+
+          {/* ── Drill transition ghost — previous layout fading out on top ─── */}
+          {fadeFrom && renderGhostLayer(fadeFrom, fadeOpacity)}
 
           {/* ── Labels ───────────────────────────────────────────────────── */}
           {showLabels && (

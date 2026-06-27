@@ -11,6 +11,7 @@ Der `HorizontalTreeChart` stellt hierarchische Daten mit D3 v7's Tree-Layout und
 | Neu in v2.6.0 | |
 |---|---|
 | **HorizontalTreeChart** | 4 Orientierungen, D3-Tree-Layout, Drill-Down, Zoom, MUI-Theme |
+| **`duration`** *(v3.11.0)* | Drill in/out crossfaded jetzt statt abrupt zu wechseln — [→ Interaktionsmodell](#interaktionsmodell) |
 
 > **macOS:** `Cmd ⌘` statt `Ctrl` für alle Tastaturkürzel verwenden.
 
@@ -32,6 +33,7 @@ Der `HorizontalTreeChart` stellt hierarchische Daten mit D3 v7's Tree-Layout und
 | `chartColors` | `string[]` | MUI-Palette | Farben pro Tiefenebene |
 | `zoomable` | `boolean` | `false` | `Ctrl / Cmd ⌘+Scroll` visueller Zoom |
 | `drillable` | `boolean` | `false` | `Ctrl / Cmd ⌘+Click` Drill-Down |
+| `duration` | `number` | `750` | Dauer des Drill-in/out-Crossfades in ms. `0` deaktiviert ihn (sofortiger Sprung). |
 | `showNodePopover` | `boolean` | `false` | Eingebautes MUI-Popover bei Klick |
 | `onNodeClick` | `(info, event) => void` | — | Bei normalem Klick ausgelöst |
 | `disabled` | `boolean` | `false` | Deaktiviert alle Interaktionen |
@@ -47,6 +49,8 @@ Der `HorizontalTreeChart` stellt hierarchische Daten mit D3 v7's Tree-Layout und
 | **Ctrl / Cmd ⌘+Doppelklick** | Zoom out | `drillable` |
 | **Ctrl / Cmd ⌘+Scroll** | Visueller Zoom | `zoomable` |
 | **Escape** | Alles zurücksetzen | beide |
+
+**Drill-Übergänge:** Drill-in/out verwurzelt die zugrundeliegende D3-Hierarchie komplett neu — jede Fokus-Ebene hat ihren eigenen, unterschiedlich großen Knoten-Satz. Statt einzelne Knoten-Positionen zu interpolieren (was Enter/Update/Exit-Matching per Knoten-ID bräuchte), blendet der vorherige Layout-Zustand über `duration` ms (Standard `750`) aus, während der neue darunter erscheint — gerendert als statischer, nicht-interaktiver Ghost-Layer. `onFocusChange`/`onNodeClick` feuern unabhängig von `duration` sofort bei der Interaktion. `duration={0}` deaktiviert das und springt direkt zum neuen Fokus.
 
 ---
 
@@ -79,7 +83,9 @@ Der `HorizontalTreeChart` stellt hierarchische Daten mit D3 v7's Tree-Layout und
 
 ---
 
-## D3-Charts-Roadmap
+## D3-Charts-Familie
+
+Alle 5 D3-Charts sind erschienen:
 
 | Komponente | Status |
 |---|---|
@@ -88,4 +94,5 @@ Der `HorizontalTreeChart` stellt hierarchische Daten mit D3 v7's Tree-Layout und
 | `RadialTreeChart` | ✅ v2.4.0 |
 | `CirclePackingChart` | ✅ v2.5.0 |
 | `HorizontalTreeChart` | ✅ v2.6.0 |
-| `TreemapChart` | Geplant |
+
+Offene Feature-Ideen pro Chart: [`component-features-nice-to-have.md`](../component-features-nice-to-have.md).

@@ -20,6 +20,7 @@ Der `RadialTreeChart` stellt hierarchische Daten als kreisförmigen radialen Bau
 | **RadialTreeChart** | D3 radialer Baum, MUI-Icons, eingebautes Knoten-Popover |
 | **`zoomable`** | `Ctrl / Cmd ⌘ + Scroll` visueller Zoom — Inhalt am `size`-Rand abschneiden |
 | **`drillable`** | `Ctrl / Cmd ⌘ + Click` Drill-Down in Teilbäume, `Ctrl / Cmd ⌘ + DblClick` zurück |
+| **`duration`** *(v3.11.0)* | Drill in/out crossfaded jetzt statt abrupt zu wechseln — [→ Interaktionsmodell](#interaktionsmodell) |
 
 > **macOS-Tastaturkürzel:** `Cmd ⌘` statt `Ctrl` verwenden — z. B. `Cmd ⌘+Click`, `Cmd ⌘+Scroll`.  
 > Alle Interaktionen prüfen `ctrlKey || metaKey`, funktionieren also auf beiden Plattformen.
@@ -108,6 +109,7 @@ function App() {
 | `renderNodeIcon` | `(info) => ReactElement \| null` | — | Vollständig custom Icon-Renderer pro Knoten |
 | `zoomable` | `boolean` | `false` | `Ctrl / Cmd ⌘ + Scroll` visueller Zoom — clippt am `size`-Rand |
 | `drillable` | `boolean` | `false` | `Ctrl / Cmd ⌘ + Click` Drill-Down in Teilbäume |
+| `duration` | `number` | `750` | Dauer des Drill-in/out-Crossfades in ms. `0` deaktiviert ihn (sofortiger Sprung). |
 | `onFocusChange` | `(info \| null) => void` | — | Wird bei Drill-Down-Wechsel ausgelöst |
 | `showNodePopover` | `boolean` | `false` | Eingebautes MUI-Popover bei Knotenklick öffnen |
 | `renderNodePopoverContent` | `(info) => ReactNode` | — | Custom Popover-Inhalt (ersetzt Standard) |
@@ -261,6 +263,8 @@ type RadialTreeChartTranslation = {
 | **Ctrl / Cmd ⌘ + Scroll runter** | Visueller Zoom out | `zoomable` |
 | **Escape** | Drill-Down + visuellen Zoom zurücksetzen | `drillable` / `zoomable` |
 
+**Drill-Übergänge:** Drill-in/out verwurzelt die zugrundeliegende D3-Hierarchie komplett neu — jede Fokus-Ebene hat ihren eigenen, unterschiedlich großen Knoten-Satz. Statt einzelne Knoten-Positionen zu interpolieren (was Enter/Update/Exit-Matching per Knoten-ID bräuchte), blendet der vorherige Layout-Zustand über `duration` ms (Standard `750`) aus, während der neue darunter erscheint — gerendert als statischer, nicht-interaktiver Ghost-Layer. `onFocusChange`/`onNodeClick` feuern unabhängig von `duration` sofort bei der Interaktion — nur die visuelle Darstellung ist animiert. `duration={0}` deaktiviert das und springt direkt zum neuen Fokus.
+
 ---
 
 ## Eingebautes Knoten-Popover
@@ -308,12 +312,16 @@ Das Standard-Popover zeigt Avatar mit Namenskürzel, Namen, Subname und beide So
 
 ---
 
-## D3-Charts-Roadmap
+## D3-Charts-Familie
+
+Alle 5 D3-Charts sind erschienen:
 
 | Komponente | Beschreibung | Status |
 |---|---|---|
 | `SunburstChart` | Konzentrische Ringe-Hierarchie-Chart | ✅ v2.2.0 |
 | `ChordChart` | Fluss- und Beziehungsdiagramm | ✅ v2.3.0 |
 | `RadialTreeChart` | Radialer Baum mit Icons und Popover | ✅ v2.4.0 |
-| `TreemapChart` | Verschachtelte Rechtecke | Geplant |
-| `ZoomableCirclePackingChart` | Verschachtelte Kreise mit Zoom | Geplant |
+| `CirclePackingChart` | Verschachtelte Kreise mit animiertem Zoom | ✅ v2.5.0 |
+| `HorizontalTreeChart` | Entscheidungsbäume in 4 Ausrichtungen | ✅ v2.6.0 |
+
+Offene Feature-Ideen pro Chart: [`component-features-nice-to-have.md`](../component-features-nice-to-have.md).

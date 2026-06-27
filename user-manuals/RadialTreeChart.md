@@ -21,6 +21,7 @@ The `RadialTreeChart` renders hierarchical data as a circular radial tree built 
 | **RadialTreeChart** | D3 radial tree, MUI icons, built-in node popover |
 | **`zoomable`** | `Ctrl / Cmd ⌘ + Scroll` visual zoom — clips content at `size` boundary |
 | **`drillable`** | `Ctrl / Cmd ⌘ + Click` drill-down into subtrees, `Ctrl / Cmd ⌘ + DblClick` back out |
+| **`duration`** *(v3.11.0)* | Drill in/out now crossfades the layout instead of jump-cutting — [→ Interaction Model](#interaction-model) |
 
 > **macOS keyboard shortcuts:** Use `Cmd ⌘` instead of `Ctrl` — e.g. `Cmd ⌘+Click`, `Cmd ⌘+Scroll`.  
 > All interactions check `ctrlKey || metaKey`, so both keys work on every platform.
@@ -109,6 +110,7 @@ function App() {
 | `renderNodeIcon` | `(info) => ReactElement \| null` | — | Fully custom icon renderer per node |
 | `zoomable` | `boolean` | `false` | Enable `Ctrl / Cmd ⌘ + Scroll` visual zoom — clips at `size` |
 | `drillable` | `boolean` | `false` | Enable `Ctrl / Cmd ⌘ + Click` drill-down into subtrees |
+| `duration` | `number` | `750` | Drill-in/out crossfade duration in ms. `0` disables it (instant jump). |
 | `onFocusChange` | `(info \| null) => void` | — | Fires when drill-down focus changes |
 | `showNodePopover` | `boolean` | `false` | Open built-in MUI Popover on node click |
 | `renderNodePopoverContent` | `(info) => ReactNode` | — | Custom popover content (replaces default) |
@@ -269,6 +271,8 @@ type RadialTreeChartTranslation = {
 | **Ctrl / Cmd ⌘ + Scroll down** | Visual zoom out | `zoomable` |
 | **Escape** | Reset drill-down to root + reset visual zoom | `drillable` / `zoomable` |
 
+**Drill transitions:** drilling in/out re-roots the underlying D3 hierarchy entirely — each focus level has its own, differently-sized node set. Rather than tweening individual node positions (which would need enter/update/exit matching by node ID), the previous layout crossfades out on top of the new one over `duration` ms (default `750`), rendered as a static, non-interactive ghost layer. `onFocusChange`/`onNodeClick` fire immediately on interaction regardless of `duration` — only the visual transition is animated. Set `duration={0}` to disable it and jump directly to the new focus.
+
 ---
 
 ## Node Icons
@@ -363,12 +367,16 @@ All interactions (hover tooltip, click, popover) are muted. The chart renders at
 
 ---
 
-## D3 Charts Roadmap
+## D3 Charts Family
+
+All 5 D3 charts have shipped:
 
 | Component | Description | Status |
 |---|---|---|
 | `SunburstChart` | Concentric ring hierarchy chart | ✅ v2.2.0 |
 | `ChordChart` | Flow and relationship diagram | ✅ v2.3.0 |
 | `RadialTreeChart` | Radial tree with node icons and popover | ✅ v2.4.0 |
-| `TreemapChart` | Nested rectangles — proportional hierarchy | Planned |
-| `ZoomableCirclePackingChart` | Nested circles with zoom | Planned |
+| `CirclePackingChart` | Nested circles with animated zoom | ✅ v2.5.0 |
+| `HorizontalTreeChart` | Decision trees in 4 orientations | ✅ v2.6.0 |
+
+Open feature ideas per chart: [`component-features-nice-to-have.md`](../component-features-nice-to-have.md).

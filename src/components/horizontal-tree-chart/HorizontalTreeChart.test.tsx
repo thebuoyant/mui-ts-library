@@ -1,4 +1,4 @@
-import { render, fireEvent } from "@testing-library/react";
+import { render, fireEvent, act, screen } from "@testing-library/react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { HorizontalTreeChart } from "./HorizontalTreeChart";
 import type { HorizontalTreeData } from "./HorizontalTreeChart.types";
@@ -105,5 +105,73 @@ describe("HorizontalTreeChart", () => {
     render(<HorizontalTreeChart data={SIMPLE_DATA} linkStrokeOpacity={0.4} />);
     const linkGroup = document.querySelector<SVGGElement>("g[fill='none']");
     expect(linkGroup?.getAttribute("stroke-opacity")).toBe("0.4");
+  });
+
+  describe("Drill transition (crossfade)", () => {
+    // Sorted by name: Platform(0), Backend(1), Frontend(2, has children), Mobile(3), Web App(4)
+    function getFrontendNode() {
+      return document.querySelectorAll<SVGGElement>("g[style*='cursor']")[2];
+    }
+
+    it("Should fire onFocusChange after the Ctrl+Click disambiguation delay", () => {
+      vi.useFakeTimers();
+      const handler = vi.fn();
+      render(<HorizontalTreeChart data={SIMPLE_DATA} drillable onFocusChange={handler} />);
+      act(() => { fireEvent.click(getFrontendNode(), { ctrlKey: true }); });
+      expect(handler).not.toHaveBeenCalled();
+      act(() => { vi.advanceTimersByTime(250); });
+      expect(handler).toHaveBeenCalledTimes(1);
+      expect(handler.mock.calls[0][0].focusedNode.name).toBe("Frontend");
+      vi.useRealTimers();
+    });
+
+    it("Should render a fading ghost layer of the previous tree during the transition", () => {
+      vi.useFakeTimers();
+      render(<HorizontalTreeChart data={SIMPLE_DATA} drillable />);
+      expect(screen.queryByTestId("drill-ghost-layer")).not.toBeInTheDocument();
+
+      act(() => { fireEvent.click(getFrontendNode(), { ctrlKey: true }); });
+      act(() => { vi.advanceTimersByTime(250); }); // drill fires, crossfade starts
+      expect(screen.getByTestId("drill-ghost-layer")).toBeInTheDocument();
+
+      act(() => { vi.advanceTimersByTime(100); }); // mid-transition — still fading
+      expect(screen.getByTestId("drill-ghost-layer")).toBeInTheDocument();
+
+      act(() => { vi.runAllTimers(); }); // drain the rAF chain to completion
+      expect(screen.queryByTestId("drill-ghost-layer")).not.toBeInTheDocument();
+      vi.useRealTimers();
+    });
+
+    it("Should not render a ghost layer when duration=0", () => {
+      vi.useFakeTimers();
+      render(<HorizontalTreeChart data={SIMPLE_DATA} drillable duration={0} />);
+      act(() => { fireEvent.click(getFrontendNode(), { ctrlKey: true }); });
+      act(() => { vi.advanceTimersByTime(250); });
+      expect(screen.queryByTestId("drill-ghost-layer")).not.toBeInTheDocument();
+      vi.useRealTimers();
+    });
+
+    it("Should not throw when unmounted mid-transition", () => {
+      vi.useFakeTimers();
+      const { unmount } = render(<HorizontalTreeChart data={SIMPLE_DATA} drillable />);
+      act(() => { fireEvent.click(getFrontendNode(), { ctrlKey: true }); });
+      act(() => { vi.advanceTimersByTime(250); });
+      act(() => { vi.advanceTimersByTime(100); }); // mid-transition
+      expect(() => unmount()).not.toThrow();
+      vi.useRealTimers();
+    });
+
+    it("Should reset instantly (no ghost layer) when the data prop changes", () => {
+      vi.useFakeTimers();
+      const { rerender } = render(<HorizontalTreeChart data={SIMPLE_DATA} drillable />);
+      act(() => { fireEvent.click(getFrontendNode(), { ctrlKey: true }); });
+      act(() => { vi.advanceTimersByTime(250); }); // now focused on Frontend's subtree
+
+      const OTHER_DATA: HorizontalTreeData = { id: "root2", name: "Root2", children: [{ id: "x", name: "X" }] };
+      act(() => { rerender(<HorizontalTreeChart data={OTHER_DATA} drillable />); });
+      expect(screen.queryByTestId("drill-ghost-layer")).not.toBeInTheDocument();
+      expect(document.querySelector("svg[aria-label='Root2']")).toBeInTheDocument();
+      vi.useRealTimers();
+    });
   });
 });
