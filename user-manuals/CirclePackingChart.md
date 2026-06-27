@@ -134,7 +134,7 @@ type CirclePackingSortBy = 'value' | 'name';
 | **Alt+Double-click** | Same as double-click but 10× slower — great for demos |
 | **Single click** a circle | Fires `onCircleClick` immediately |
 
-The zoom uses D3's `d3.interpolateZoom` — a genuine smooth "wipe" animation that repositions and resizes all circles, not a simple SVG scale. Labels of the newly focused node's direct children fade in; all others fade out.
+The zoom uses D3's `d3.interpolateZoom` — a genuine smooth "wipe" animation that repositions and resizes all circles, not a simple SVG scale. Labels of the newly focused node's direct children fade in; all others fade out. Set `duration={0}` to make the zoom effectively instant.
 
 A **breadcrumb hint** appears when zoomed in, showing the current focus circle's name.
 
@@ -275,7 +275,9 @@ All interactions are muted. The chart renders at reduced opacity (`0.5`).
 
 ---
 
-## D3 Charts Roadmap
+## D3 Charts Family
+
+All 5 D3 charts have shipped:
 
 | Component | Description | Status |
 |---|---|---|
@@ -283,4 +285,6 @@ All interactions are muted. The chart renders at reduced opacity (`0.5`).
 | `ChordChart` | Flow and relationship diagram | ✅ v2.3.0 |
 | `RadialTreeChart` | Radial tree with node icons and popover | ✅ v2.4.0 |
 | `CirclePackingChart` | Nested circles with animated zoom | ✅ v2.5.0 |
-| `TreemapChart` | Nested rectangles — proportional hierarchy | Planned |
+| `HorizontalTreeChart` | Decision trees in 4 orientations | ✅ v2.6.0 |
+
+Open feature ideas per chart: [`component-features-nice-to-have.md`](../component-features-nice-to-have.md).

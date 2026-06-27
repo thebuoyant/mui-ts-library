@@ -94,6 +94,8 @@ export type HorizontalTreeChartProps = {
   renderNodePopoverContent?: (info: HorizontalTreeNodeInfo) => React.ReactNode;
   /** Fires on every node click */
   onNodeClick?:              (info: HorizontalTreeNodeInfo, event: React.MouseEvent<SVGGElement>) => void;
+  /** Drill-down/out crossfade duration in ms — set to 0 to disable (default: 750) */
+  duration?:                 number;
   /** Disables all interactions (default: false) */
   disabled?:                 boolean;
   /** Override translation strings */

@@ -1,4 +1,4 @@
-import { render, fireEvent } from "@testing-library/react";
+import { render, fireEvent, act, screen } from "@testing-library/react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { RadialTreeChart } from "./RadialTreeChart";
 import type { RadialTreeChartData } from "./RadialTreeChart.types";
@@ -108,5 +108,73 @@ describe("RadialTreeChart", () => {
       expect(info).toHaveProperty("path");
       expect(Array.isArray(info.path)).toBe(true);
     }
+  });
+
+  describe("Drill transition (crossfade)", () => {
+    it("Should fire onFocusChange after the Ctrl+Click disambiguation delay", () => {
+      vi.useFakeTimers();
+      const handler = vi.fn();
+      render(<RadialTreeChart data={SIMPLE_DATA} drillable onFocusChange={handler} />);
+      const alphaNode = document.querySelector<SVGGElement>("g[data-idx='1']");
+      act(() => { fireEvent.click(alphaNode!, { ctrlKey: true }); });
+      expect(handler).not.toHaveBeenCalled();
+      act(() => { vi.advanceTimersByTime(250); });
+      expect(handler).toHaveBeenCalledTimes(1);
+      expect(handler.mock.calls[0][0].name).toBe("Alpha");
+      vi.useRealTimers();
+    });
+
+    it("Should render a fading ghost layer of the previous tree during the transition", () => {
+      vi.useFakeTimers();
+      render(<RadialTreeChart data={SIMPLE_DATA} drillable />);
+      expect(screen.queryByTestId("drill-ghost-layer")).not.toBeInTheDocument();
+
+      const alphaNode = document.querySelector<SVGGElement>("g[data-idx='1']");
+      act(() => { fireEvent.click(alphaNode!, { ctrlKey: true }); });
+      act(() => { vi.advanceTimersByTime(250); }); // drill fires, crossfade starts
+      expect(screen.getByTestId("drill-ghost-layer")).toBeInTheDocument();
+
+      act(() => { vi.advanceTimersByTime(100); }); // mid-transition — still fading
+      expect(screen.getByTestId("drill-ghost-layer")).toBeInTheDocument();
+
+      act(() => { vi.runAllTimers(); }); // drain the rAF chain to completion
+      expect(screen.queryByTestId("drill-ghost-layer")).not.toBeInTheDocument();
+      vi.useRealTimers();
+    });
+
+    it("Should not render a ghost layer when duration=0", () => {
+      vi.useFakeTimers();
+      render(<RadialTreeChart data={SIMPLE_DATA} drillable duration={0} />);
+      const alphaNode = document.querySelector<SVGGElement>("g[data-idx='1']");
+      act(() => { fireEvent.click(alphaNode!, { ctrlKey: true }); });
+      act(() => { vi.advanceTimersByTime(250); });
+      expect(screen.queryByTestId("drill-ghost-layer")).not.toBeInTheDocument();
+      vi.useRealTimers();
+    });
+
+    it("Should not throw when unmounted mid-transition", () => {
+      vi.useFakeTimers();
+      const { unmount } = render(<RadialTreeChart data={SIMPLE_DATA} drillable />);
+      const alphaNode = document.querySelector<SVGGElement>("g[data-idx='1']");
+      act(() => { fireEvent.click(alphaNode!, { ctrlKey: true }); });
+      act(() => { vi.advanceTimersByTime(250); });
+      act(() => { vi.advanceTimersByTime(100); }); // mid-transition
+      expect(() => unmount()).not.toThrow();
+      vi.useRealTimers();
+    });
+
+    it("Should reset instantly (no ghost layer) when the data prop changes", () => {
+      vi.useFakeTimers();
+      const { rerender } = render(<RadialTreeChart data={SIMPLE_DATA} drillable />);
+      const alphaNode = document.querySelector<SVGGElement>("g[data-idx='1']");
+      act(() => { fireEvent.click(alphaNode!, { ctrlKey: true }); });
+      act(() => { vi.advanceTimersByTime(250); }); // now focused on Alpha's subtree
+
+      const OTHER_DATA: RadialTreeChartData = { id: "root2", name: "Root2", children: [{ id: "x", name: "X" }] };
+      act(() => { rerender(<RadialTreeChart data={OTHER_DATA} drillable />); });
+      expect(screen.queryByTestId("drill-ghost-layer")).not.toBeInTheDocument();
+      expect(document.querySelector("svg[aria-label='Root2']")).toBeInTheDocument();
+      vi.useRealTimers();
+    });
   });
 });

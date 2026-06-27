@@ -284,6 +284,71 @@ const data: RadialTreeChartData = {
 
 ---
 
+### CirclePackingChart
+
+Hierarchische Daten als verschachtelte Kreise, proportional zum Wert skaliert. Ideal für Speicherplatz-Auswertungen, Budget-Übersichten oder jede Hierarchie, bei der relative Größe auf einen Blick zählt. `Ctrl / Cmd ⌘+Click` (oder Doppelklick) auf einen Kreis mit Kindern zoomt mit sanfter animierter Transition hinein; Klick auf den Hintergrund oder `Escape` zoomt zurück.
+
+```tsx
+import { CirclePackingChart } from '@thebuoyant-tsdev/mui-ts-library';
+import type { CirclePackingData } from '@thebuoyant-tsdev/mui-ts-library';
+
+const data: CirclePackingData = {
+  id: 'disk', name: 'Festplatte',
+  children: [
+    { id: 'photos', name: 'Fotos', value: 120 },
+    { id: 'videos', name: 'Videos', value: 340 },
+    { id: 'apps', name: 'Apps',
+      children: [
+        { id: 'xcode', name: 'Xcode', value: 48 },
+        { id: 'docker', name: 'Docker', value: 12 },
+      ]},
+  ],
+};
+
+<CirclePackingChart
+  data={data}
+  size={500}
+  onCircleClick={(info) => console.log(info.name, info.value)}
+/>
+```
+
+→ [Vollständige Dokumentation](user-manuals/CirclePackingChart.de.md)
+
+---
+
+### HorizontalTreeChart
+
+Hierarchische Daten als links-nach-rechts (oder eine der 4 Ausrichtungen) Entscheidungsbaum mit geschwungenen Links. Ideal für Entscheidungslogik, Eskalationspfade oder Org-Charts, die natürlicher von oben nach unten oder seitlich gelesen werden als radial. `Ctrl / Cmd ⌘+Click` bohrt in Teilbäume, `Ctrl / Cmd ⌘+Scroll` zoomt.
+
+```tsx
+import { HorizontalTreeChart } from '@thebuoyant-tsdev/mui-ts-library';
+import type { HorizontalTreeData } from '@thebuoyant-tsdev/mui-ts-library';
+
+const data: HorizontalTreeData = {
+  id: 'ticket', name: 'Neues Ticket',
+  children: [
+    { id: 'bug', name: 'Bug', specialValueA: 'P1 — 4h SLA',
+      children: [
+        { id: 'bug-fe', name: 'Frontend-Team' },
+        { id: 'bug-be', name: 'Backend-Team'  },
+      ]},
+    { id: 'feature', name: 'Feature-Anfrage', specialValueA: 'P3 — Backlog' },
+  ],
+};
+
+<HorizontalTreeChart
+  data={data}
+  orientation="LR"
+  width={700}
+  drillable
+  onNodeClick={(info) => console.log(info.name, info.depth)}
+/>
+```
+
+→ [Vollständige Dokumentation](user-manuals/HorizontalTreeChart.de.md)
+
+---
+
 ## TypeScript
 
 Alle Typen und Defaults werden direkt exportiert — kein separates `@types/...`-Paket nötig.
@@ -342,6 +407,13 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/). In der Praxis b
 ---
 
 ## Changelog
+
+### [3.11.0] — 2026-06-25
+
+**RadialTreeChart & HorizontalTreeChart**
+- `duration`: Rein-/Rauszoomen und Escape-Resets crossfaden jetzt statt abrupt zu wechseln (Standard 750ms, `0` deaktiviert).
+
+---
 
 ### [3.10.0] — 2026-06-25
 

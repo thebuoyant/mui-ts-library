@@ -104,7 +104,7 @@ function App() {
 | **Alt+Doppelklick** | Zeitlupe (10× Dauer) — ideal für Präsentationen |
 | **Einfacher Klick** auf Kreis | Löst `onCircleClick` sofort aus |
 
-Der Zoom nutzt `d3.interpolateZoom` — eine echte Wipe-Animation, die alle Kreise neu positioniert und skaliert. Labels der direkten Kinder des neuen Fokus blenden ein; alle anderen blenden aus.
+Der Zoom nutzt `d3.interpolateZoom` — eine echte Wipe-Animation, die alle Kreise neu positioniert und skaliert. Labels der direkten Kinder des neuen Fokus blenden ein; alle anderen blenden aus. `duration={0}` macht den Zoom effektiv sofort.
 
 Ein **Breadcrumb-Hinweis** erscheint unten rechts wenn hereingezoomt wurde.
 
@@ -205,7 +205,9 @@ Konsistent mit `SunburstChart`, `RadialTreeChart` und `ChordChart` — alle D3-C
 
 ---
 
-## D3-Charts-Roadmap
+## D3-Charts-Familie
+
+Alle 5 D3-Charts sind erschienen:
 
 | Komponente | Beschreibung | Status |
 |---|---|---|
@@ -213,4 +215,6 @@ Konsistent mit `SunburstChart`, `RadialTreeChart` und `ChordChart` — alle D3-C
 | `ChordChart` | Fluss- und Beziehungsdiagramm | ✅ v2.3.0 |
 | `RadialTreeChart` | Radialer Baum mit Icons und Popover | ✅ v2.4.0 |
 | `CirclePackingChart` | Verschachtelte Kreise mit animiertem Zoom | ✅ v2.5.0 |
-| `TreemapChart` | Verschachtelte Rechtecke | Geplant |
+| `HorizontalTreeChart` | Entscheidungsbäume in 4 Ausrichtungen | ✅ v2.6.0 |
+
+Offene Feature-Ideen pro Chart: [`component-features-nice-to-have.md`](../component-features-nice-to-have.md).

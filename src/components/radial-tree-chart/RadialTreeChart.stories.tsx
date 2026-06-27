@@ -14,6 +14,7 @@ const meta: Meta<typeof RadialTreeChart> = {
     data:                    { control: false },
     disabled:                { control: "boolean" },
     drillable:               { control: "boolean" },
+    duration:                { control: "number" },
     labelColor:              { control: "color" },
     labelFontSize:           { control: "number" },
     leafNodeRadius:          { control: "number" },
@@ -40,6 +41,7 @@ const meta: Meta<typeof RadialTreeChart> = {
     branchNodeRadius:  16,
     disabled:          false,
     drillable:         false,
+    duration:          750,
     labelColor:        "",
     labelFontSize:     12,
     leafNodeRadius:    11,
@@ -398,6 +400,33 @@ export const DeepTree: Story = {
     leafNodeRadius:   8,
     separationCousin: 2.5,
     translation: { specialValueA: "Version", specialValueB: "Focus area" },
+  },
+};
+
+export const AnimatedDrillTransitions: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Drilling in/out (`Ctrl+Click` / `Ctrl+DblClick` / `Escape`) now crossfades the previous layout ' +
+          'out on top of the new one instead of jump-cutting, via `duration` (ms). ' +
+          'Unlike `SunburstChart` — which reuses one hierarchy and just animates the view window — drilling here ' +
+          're-roots the hierarchy entirely (a different node set per focus level), so a position-tween isn\'t ' +
+          'straightforward without enter/update/exit node matching. A crossfade gets rid of the hard cut with much ' +
+          'less complexity. This story slows it down to 2000ms so the effect is easy to see; the default is 750ms. ' +
+          'Set `duration={0}` to disable it entirely.',
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const firstBranchNode = canvasElement.querySelector<SVGGElement>('g[data-idx="1"]');
+    if (firstBranchNode) fireEvent.click(firstBranchNode, { ctrlKey: true });
+  },
+  args: {
+    data:       DEEP_TREE_DATA,
+    size:       700,
+    drillable:  true,
+    duration:   2000,
   },
 };
 

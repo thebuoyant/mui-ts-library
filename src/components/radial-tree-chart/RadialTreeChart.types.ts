@@ -93,6 +93,8 @@ export type RadialTreeChartProps = {
   drillable?:                boolean;
   /** Fired when drill-down focus changes — null when reset to root */
   onFocusChange?:            (focusedNode: RadialTreeNodeInfo | null) => void;
+  /** Drill-down/out crossfade duration in ms — set to 0 to disable (default: 750) */
+  duration?:                 number;
   /** Disables all interactions (default: false) */
   disabled?:                 boolean;
   /** Override translation strings */

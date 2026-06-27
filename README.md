@@ -284,6 +284,71 @@ const data: RadialTreeChartData = {
 
 ---
 
+### CirclePackingChart
+
+Hierarchical data as nested circles, sized proportionally to value. Use `CirclePackingChart` for disk usage, org budgets, or any hierarchy where relative size matters at a glance. `Ctrl / Cmd ⌘+Click` (or double-click) a circle with children to zoom in with a smooth animated transition; click the background or `Escape` to zoom back out.
+
+```tsx
+import { CirclePackingChart } from '@thebuoyant-tsdev/mui-ts-library';
+import type { CirclePackingData } from '@thebuoyant-tsdev/mui-ts-library';
+
+const data: CirclePackingData = {
+  id: 'disk', name: 'Disk',
+  children: [
+    { id: 'photos', name: 'Photos', value: 120 },
+    { id: 'videos', name: 'Videos', value: 340 },
+    { id: 'apps', name: 'Apps',
+      children: [
+        { id: 'xcode', name: 'Xcode', value: 48 },
+        { id: 'docker', name: 'Docker', value: 12 },
+      ]},
+  ],
+};
+
+<CirclePackingChart
+  data={data}
+  size={500}
+  onCircleClick={(info) => console.log(info.name, info.value)}
+/>
+```
+
+→ [Full documentation](user-manuals/CirclePackingChart.md)
+
+---
+
+### HorizontalTreeChart
+
+Hierarchical data as a left-to-right (or any of 4 orientations) decision tree with curved links. Use `HorizontalTreeChart` for decision logic, escalation paths, or org charts that read more naturally top-to-bottom or side-to-side than radially. `Ctrl / Cmd ⌘+Click` drills into subtrees, `Ctrl / Cmd ⌘+Scroll` zooms.
+
+```tsx
+import { HorizontalTreeChart } from '@thebuoyant-tsdev/mui-ts-library';
+import type { HorizontalTreeData } from '@thebuoyant-tsdev/mui-ts-library';
+
+const data: HorizontalTreeData = {
+  id: 'ticket', name: 'New Ticket',
+  children: [
+    { id: 'bug', name: 'Bug', specialValueA: 'P1 — 4h SLA',
+      children: [
+        { id: 'bug-fe', name: 'Frontend Team' },
+        { id: 'bug-be', name: 'Backend Team'  },
+      ]},
+    { id: 'feature', name: 'Feature Request', specialValueA: 'P3 — Backlog' },
+  ],
+};
+
+<HorizontalTreeChart
+  data={data}
+  orientation="LR"
+  width={700}
+  drillable
+  onNodeClick={(info) => console.log(info.name, info.depth)}
+/>
+```
+
+→ [Full documentation](user-manuals/HorizontalTreeChart.md)
+
+---
+
 ## TypeScript
 
 All types and defaults are exported directly — no separate `@types/...` package needed.
@@ -342,6 +407,13 @@ This project follows [Semantic Versioning](https://semver.org/). In practice:
 ---
 
 ## Changelog
+
+### [3.11.0] — 2026-06-25
+
+**RadialTreeChart & HorizontalTreeChart**
+- `duration`: drill in/out and Escape resets now crossfade instead of jump-cutting (default 750ms, `0` disables).
+
+---
 
 ### [3.10.0] — 2026-06-25
 

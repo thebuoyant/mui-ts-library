@@ -145,9 +145,9 @@ Cross-Cutting-Ideen, die für alle 5 D3-Charts gleich umgesetzt werden würden �
 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
-| ⭐ Animierte Fokus-Übergänge | Kein `.transition()` — Fokus-Wechsel beim Drill-down passiert als Hard-Cut | Mittel | — |
 | ⭐ Eingebautes Breadcrumb | Fehlt trotz vorhandenem `onFocusChange`/Drill-down — Storybook-Demo baut sich aktuell ein eigenes | Niedrig | — |
 | Mini-Map | Übersicht bei sehr tiefen/breiten Bäumen | Hoch | — |
+| ~~Animierte Fokus-Übergänge~~ | ~~Fokus-Wechsel beim Drill-down passierte als Hard-Cut~~ — Als Crossfade umgesetzt (alter Layout-Zustand blendet aus, neuer darunter) statt Positions-Tweening, da Drill-down die Hierarchie komplett neu verwurzelt. `duration`-Prop, Default 750ms. | ~~Mittel~~ | ✅ v3.11.0 |
 
 ---
 
@@ -165,8 +165,8 @@ Cross-Cutting-Ideen, die für alle 5 D3-Charts gleich umgesetzt werden würden �
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
 | ⭐ Eingebautes Breadcrumb | Fehlt trotz `focusedNode`/`onFocusChange` — Storybook-Demo baut sich aktuell ein eigenes | Niedrig | — |
-| ⭐ Animierte Fokus-Übergänge | Kein `.transition()` — Fokus-Wechsel passiert als Hard-Cut | Mittel | — |
 | Teilbaum Ein-/Ausklappen | Aktuell nur globaler Fokus-Wechsel — kein unabhängiges Collapse pro Knoten | Mittel | — |
+| ~~Animierte Fokus-Übergänge~~ | ~~Fokus-Wechsel passierte als Hard-Cut~~ — Als Crossfade umgesetzt, gleiches Muster wie RadialTreeChart. `duration`-Prop, Default 750ms. | ~~Mittel~~ | ✅ v3.11.0 |
 
 ---
 

@@ -13,6 +13,18 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [3.11.0] — 2026-06-25
+
+### Hinzugefügt
+
+#### RadialTreeChart & HorizontalTreeChart — Drill-Übergangs-Crossfade
+
+- `duration?: number`-Prop (Standard `750`, `0` deaktiviert) auf beiden Komponenten: Reinzoomen (`Ctrl+Click`), Rauszoomen (`Ctrl+DblClick`/Mitte, `Escape`) und Root-Resets blenden den vorherigen Layout-Zustand jetzt sanft aus, während der neue darunter erscheint, statt abrupt zu wechseln.
+- Anders als bei `SunburstChart` (das eine Hierarchie wiederverwendet und nur das Winkel-/Radius-Sichtfenster animiert) verwurzelt das Drill-down hier die D3-Hierarchie komplett neu — ein anderer Knoten-Satz pro Fokus-Ebene — daher gibt es keinen gemeinsamen Koordinatenraum für eine Knoten-für-Knoten-Interpolation ohne Enter/Update/Exit-Matching per ID. Ein Crossfade (alter Layout-Zustand blendet via `requestAnimationFrame` + `d3.easeCubic` aus, gerendert als statischer, nicht-interaktiver Ghost-Layer) beseitigt den harten Schnitt mit deutlich weniger Komplexität und Regressionsrisiko als vollständiges Positions-Tweening.
+- `onFocusChange`/`onNodeClick` feuern weiterhin sofort bei der Interaktion — nur die visuelle Darstellung ist animiert. Änderungen der `data`-Prop setzen sofort zurück, ohne zu crossfaden.
+
+---
+
 ## [3.10.0] — 2026-06-25
 
 ### Hinzugefügt

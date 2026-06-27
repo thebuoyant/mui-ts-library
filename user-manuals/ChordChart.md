@@ -283,12 +283,16 @@ All interactions (hover highlight, click callbacks) are muted. The chart renders
 
 ---
 
-## D3 Charts Roadmap
+## D3 Charts Family
+
+All 5 D3 charts have shipped:
 
 | Component | Description | Status |
 |---|---|---|
 | `SunburstChart` | Concentric ring hierarchy chart | ✅ v2.2.0 |
 | `ChordChart` | Flow and relationship diagram | ✅ v2.3.0 |
-| `TreemapChart` | Nested rectangles — proportional hierarchy | Planned |
-| `ZoomableCirclePackingChart` | Nested circles with zoom | Planned |
-| `RadialTreeChart` | Radial tree with custom node icons | Planned |
+| `RadialTreeChart` | Radial tree with custom node icons | ✅ v2.4.0 |
+| `CirclePackingChart` | Nested circles with animated zoom | ✅ v2.5.0 |
+| `HorizontalTreeChart` | Decision trees in 4 orientations | ✅ v2.6.0 |
+
+Open feature ideas per chart: [`component-features-nice-to-have.md`](../component-features-nice-to-have.md).
