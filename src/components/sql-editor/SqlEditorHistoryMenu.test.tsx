@@ -5,8 +5,8 @@ import { DEFAULT_SQL_EDITOR_TRANSLATION as t } from "./SqlEditor.types";
 import type { SqlQueryHistoryEntry } from "./util/sqlQueryHistory.util";
 
 const HISTORY: SqlQueryHistoryEntry[] = [
-  { sql: "SELECT * FROM users;", timestamp: 2000 },
-  { sql: "SELECT * FROM orders;", timestamp: 1000 },
+  { id: "a", sql: "SELECT * FROM users;", timestamp: 2000 },
+  { id: "b", sql: "SELECT * FROM orders;", timestamp: 1000 },
 ];
 
 describe("SqlEditorHistoryMenu", () => {
@@ -47,7 +47,7 @@ describe("SqlEditorHistoryMenu", () => {
     const longSql = "SELECT " + "col, ".repeat(30) + "id FROM very_long_table_name;";
     render(
       <SqlEditorHistoryMenu
-        history={[{ sql: longSql, timestamp: 1 }]}
+        history={[{ id: "c", sql: longSql, timestamp: 1 }]}
         onSelect={vi.fn()}
         onClear={vi.fn()}
         translation={t}

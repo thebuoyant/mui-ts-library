@@ -5,6 +5,7 @@ import {
   type ChordChartProps,
   type ChordGroupInfo,
   type ChordInfo,
+  DEFAULT_CHORD_CHART_TRANSLATION,
 } from "./ChordChart.types";
 
 function formatNumber(
@@ -97,8 +98,11 @@ export function ChordChart({
   onChordClick,
   zoomable = false,
   disabled = false,
+  translation,
 }: ChordChartProps) {
   const theme = useTheme();
+  const t = { ...DEFAULT_CHORD_CHART_TRANSLATION, ...translation };
+  const isEmpty = data.length === 0;
   const resolvedBlendMode = ribbonBlendMode ?? (theme.palette.mode === "dark" ? "normal" : "multiply");
 
   const defaultColors = [
@@ -229,14 +233,29 @@ export function ChordChart({
   const [hoverGroup, setHoverGroup] = useState<number | null>(null);
 
   // ── serializers ─────────────────────────────────────────────────────────
+  // d3.chordDirected() emits one Chord PER direction (source.value and
+  // target.value both equal that single flow amount) — checking only the
+  // source side per group was already correct there. d3.chord() (undirected)
+  // instead emits one Chord per unordered PAIR representing the COMBINED
+  // bidirectional flow: source.value = matrix[source.index][target.index]
+  // (flow i→j), target.value = matrix[target.index][source.index] (flow j→i)
+  // — see d3-chord's ChordSubgroup docs. A group can be on EITHER side of such
+  // a merged chord, so undirected mode must check both sides (additively, not
+  // else-if, since a self-loop chord — index i === j — can match both).
   const serializeGroup = useCallback(
     (group: D3ChordGroup): ChordGroupInfo => ({
-      name:     names[group.index],
-      index:    group.index,
-      valueOut: d3.sum(chords, (c) => (c.source.index === group.index ? c.source.value : 0)),
-      valueIn:  d3.sum(chords, (c) => (c.target.index === group.index ? c.source.value : 0)),
+      name:  names[group.index],
+      index: group.index,
+      valueOut: d3.sum(chords, (c) =>
+        (c.source.index === group.index ? c.source.value : 0) +
+        (!directed && c.target.index === group.index ? c.target.value : 0),
+      ),
+      valueIn: d3.sum(chords, (c) =>
+        (c.target.index === group.index ? c.source.value : 0) +
+        (!directed && c.source.index === group.index ? c.target.value : 0),
+      ),
     }),
-    [names, chords],
+    [names, chords, directed],
   );
 
   const serializeChord = useCallback(
@@ -306,6 +325,12 @@ export function ChordChart({
         aria-label="Chord chart"
       >
         <g ref={contentRef}>
+          {isEmpty && (
+            <text textAnchor="middle" dy="0.35em" fontSize={13} fill={theme.palette.text.secondary}>
+              {t.noData}
+            </text>
+          )}
+
           {/* Group arcs */}
           <g>
             {chords.groups.map((group: D3ChordGroup) => {

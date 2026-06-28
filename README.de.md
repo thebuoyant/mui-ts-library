@@ -408,6 +408,20 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/). In der Praxis b
 
 ## Changelog
 
+### [3.11.2] — 2026-06-28
+
+**Behoben**
+- Eine tiefgreifende Bug-Prüfung über alle 11 Komponenten — veraltete Timer/Listener bei Unmount, `maxTags`-Umgehung, fehlendes `noData`-Rendering auf allen 5 D3-Charts, ChordChart valueIn/valueOut-Fehlzählung im undirected-Modus, HorizontalTreeChart RL/BT-Spiegelung außermittig bei flachen Bäumen, und mehr. Jeder Fix ist mit einem Regressionstest abgesichert. Vollständige Liste siehe [Changelog](#3112--2026-06-28).
+
+---
+
+### [3.11.1] — 2026-06-27
+
+**Behoben**
+- TagSelection: doppeltes Tag in der `WithCustomColorCreation`-Storybook-Story — ein Story-Bug, kein Komponenten-Bug. Siehe [Changelog](#3111--2026-06-27).
+
+---
+
 ### [3.11.0] — 2026-06-25
 
 **RadialTreeChart & HorizontalTreeChart**

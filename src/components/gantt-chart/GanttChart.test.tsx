@@ -939,6 +939,39 @@ describe("GanttChart — drag (draggable prop)", () => {
     );
   });
 
+  // Regression: document-level mousemove/mouseup listeners registered on
+  // mousedown were only ever removed inside the mouseup handler itself —
+  // unmounting mid-drag (e.g. the row disappears via a collapse or filter)
+  // left them attached to `document` forever, leaking memory and continuing
+  // to read from a possibly-stale closure on every future mouse move anywhere
+  // on the page.
+  it("Should remove the document-level drag listeners when unmounted mid-drag", () => {
+    const removeEventListenerSpy = vi.spyOn(document, "removeEventListener");
+    const onTaskMoved = vi.fn();
+    const { unmount } = render(
+      <GanttChart tasks={tasks} draggable onTaskMoved={onTaskMoved} />,
+    );
+
+    const bar = screen.getByTestId("gantt-bar-root");
+    fireEvent.mouseDown(bar, { clientX: 100 });
+    fireEvent.mouseMove(document, { clientX: 140 }); // mid-drag, never reaches mouseup
+
+    unmount();
+
+    expect(removeEventListenerSpy).toHaveBeenCalledWith("mousemove", expect.any(Function));
+    expect(removeEventListenerSpy).toHaveBeenCalledWith("mouseup", expect.any(Function));
+
+    // Firing the events post-unmount must be a no-op now, not a crash or a
+    // callback firing against an unmounted component.
+    expect(() => {
+      fireEvent.mouseMove(document, { clientX: 200 });
+      fireEvent.mouseUp(document);
+    }).not.toThrow();
+    expect(onTaskMoved).not.toHaveBeenCalled();
+
+    removeEventListenerSpy.mockRestore();
+  });
+
   it("Should not call onTaskMoved when drag movement is below threshold", () => {
     const onTaskMoved = vi.fn();
     render(

@@ -102,14 +102,31 @@ describe("SunburstChart", () => {
     expect(box).toBeTruthy();
   });
 
-  it("Should use custom translation for noData", () => {
-    render(
-      <SunburstChart
-        data={SIMPLE_DATA}
-        translation={{ noData: "Keine Daten vorhanden" }}
-      />,
-    );
-    expect(document.querySelector("svg")).toBeInTheDocument();
+  // Regression: `translation` wasn't even destructured by the component — the
+  // documented "shown when data has no children and no value" noData message
+  // was entirely dead code, on top of the missing prop wiring.
+  describe("No data", () => {
+    const EMPTY_DATA: SunburstChartData = { id: "root", name: "Root" };
+
+    it("Should show the default noData message when data has no children and no value", () => {
+      render(<SunburstChart data={EMPTY_DATA} />);
+      expect(screen.getByText("No data")).toBeInTheDocument();
+    });
+
+    it("Should use a custom translation for noData", () => {
+      render(<SunburstChart data={EMPTY_DATA} translation={{ noData: "Keine Daten vorhanden" }} />);
+      expect(screen.getByText("Keine Daten vorhanden")).toBeInTheDocument();
+    });
+
+    it("Should not show the noData message when data has children", () => {
+      render(<SunburstChart data={SIMPLE_DATA} />);
+      expect(screen.queryByText("No data")).not.toBeInTheDocument();
+    });
+
+    it("Should not show the noData message when data has a value but no children", () => {
+      render(<SunburstChart data={{ id: "root", name: "Root", value: 10 }} />);
+      expect(screen.queryByText("No data")).not.toBeInTheDocument();
+    });
   });
 
   describe("Animated drill-down transitions", () => {

@@ -257,6 +257,31 @@ describe("RichTextEditor", () => {
     expect(editorEl.innerHTML).not.toContain("<strong>");
   });
 
+  // Regression: getData("text/plain") returns "" (not null/undefined) when the
+  // clipboard holds non-text data (e.g. an image or file). The handler's old
+  // `== null` check let that empty string through, called preventDefault(), and
+  // dispatched insertText("", from, to) — silently swallowing the paste instead
+  // of falling through to let TipTap's own (image/file) paste handling run.
+  it("Should not intercept the paste when the clipboard has no text payload, even with the toggle active", async () => {
+    render(<RichTextEditor toolbarConfig={{ showPasteAsPlainTextButton: true }} />);
+    const toggleBtn = screen.getByRole("button", { name: "Paste as plain text" });
+    await act(async () => { fireEvent.click(toggleBtn); });
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Paste with formatting" })).toBeInTheDocument();
+    });
+
+    const editorEl = document.querySelector(".ProseMirror") as HTMLElement;
+    editorEl.focus();
+    const pasteEvent = Object.assign(new Event("paste", { bubbles: true, cancelable: true }), {
+      clipboardData: { getData: () => "" }, // e.g. an image/file paste — no text payload
+    });
+    await act(async () => { editorEl.dispatchEvent(pasteEvent); });
+
+    // The handler must return false (not call preventDefault), letting ProseMirror's
+    // / TipTap's default paste handling decide what to do with the non-text data.
+    expect(pasteEvent.defaultPrevented).toBe(false);
+  });
+
   // ── Markdown ─────────────────────────────────────────────────────────────────
 
   it("Should not show the markdown button by default", () => {

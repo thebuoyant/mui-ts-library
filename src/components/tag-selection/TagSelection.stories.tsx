@@ -232,8 +232,9 @@ function CustomColorCreationStory(args: ComponentProps<typeof TagSelection>) {
         {...args}
         tags={localTags}
         onTagCreate={(tag) => {
+          // onTagsChange below already fires for the same creation event and carries
+          // the full next tag list — adding the tag here too would duplicate it.
           args.onTagCreate?.(tag);
-          setLocalTags((prev) => [...prev, tag]);
         }}
         onTagsChange={(selected, all) => {
           args.onTagsChange?.(selected, all);

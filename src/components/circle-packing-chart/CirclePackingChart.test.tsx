@@ -1,4 +1,4 @@
-import { render, fireEvent } from "@testing-library/react";
+import { render, fireEvent, act } from "@testing-library/react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { CirclePackingChart } from "./CirclePackingChart";
 import type { CirclePackingData } from "./CirclePackingChart.types";
@@ -97,5 +97,90 @@ describe("CirclePackingChart", () => {
   it("Should apply disabled opacity", () => {
     const { container } = render(<CirclePackingChart data={SIMPLE_DATA} disabled />);
     expect(container.firstChild).toBeTruthy();
+  });
+
+  // Regression: the Escape key listener deliberately excludes `performZoom`
+  // from its effect deps (to avoid re-registering on every focus change), so
+  // it used to close over a stale performZoom from whenever the effect last
+  // ran — reporting the WRONG previousName (captured inside performZoom's own
+  // closure) once the user had zoomed deeper without disabled/root/duration
+  // changing in between.
+  it("Should report the actual current focus as previousName on Escape, even after zooming twice without other prop changes", () => {
+    // Needs two levels of zoomable (non-leaf) nesting, unlike SIMPLE_DATA where
+    // only Alpha has children — zooming into a leaf is a no-op.
+    const NESTED_DATA: CirclePackingData = {
+      name: "Root",
+      children: [
+        { name: "Alpha", value: 50, children: [
+          { name: "Beta", value: 30, children: [
+            { name: "Gamma", value: 20 },
+          ]},
+        ]},
+      ],
+    };
+    vi.useFakeTimers();
+    const handler = vi.fn();
+    render(<CirclePackingChart data={NESTED_DATA} onZoomChange={handler} />);
+    const circles = document.querySelectorAll<SVGCircleElement>("circle");
+
+    // Pre-order: Alpha(0), Beta(1), Gamma(2)
+    act(() => { fireEvent.click(circles[0], { ctrlKey: true }); }); // zoom into Alpha
+    act(() => { vi.advanceTimersByTime(250); });
+    act(() => { fireEvent.click(circles[1], { ctrlKey: true }); }); // zoom into Beta
+    act(() => { vi.advanceTimersByTime(250); });
+    expect(handler).toHaveBeenLastCalledWith(expect.objectContaining({ currentName: "Beta" }));
+
+    act(() => { fireEvent.keyDown(window, { key: "Escape" }); });
+    expect(handler).toHaveBeenLastCalledWith(expect.objectContaining({ previousName: "Beta", isRoot: true }));
+    vi.useRealTimers();
+  });
+
+  // Regression: the focus-reset guard only checked whether the `data` prop
+  // reference changed, but `root` (the actual tree of node objects `focus`
+  // points into) is ALSO recomputed when size/padding/sortBy change — leaving
+  // `focus` pointing at orphaned nodes from the old layout.
+  it("Should reset focus to the new root when sortBy changes while zoomed in (no spurious re-navigation)", () => {
+    vi.useFakeTimers();
+    const handler = vi.fn();
+    const { rerender } = render(<CirclePackingChart data={SIMPLE_DATA} sortBy="value" onZoomChange={handler} />);
+    const firstCircle = document.querySelector<SVGCircleElement>("circle");
+    act(() => { fireEvent.click(firstCircle!, { ctrlKey: true }); }); // zoom into Alpha
+    act(() => { vi.advanceTimersByTime(250); });
+    expect(handler).toHaveBeenCalledTimes(1);
+    expect(handler).toHaveBeenLastCalledWith(expect.objectContaining({ isRoot: false }));
+
+    expect(() => {
+      rerender(<CirclePackingChart data={SIMPLE_DATA} sortBy="name" onZoomChange={handler} />);
+    }).not.toThrow();
+
+    // With the fix, focus is reset to the (recomputed) root, so a Ctrl+DblClick
+    // zoom-out is a no-op there (target === focus) and fires no extra callback.
+    // Without the fix, `focus` still points at the OLD Alpha node, whose
+    // `.parent` is the OLD orphaned root object (!== the new `root`) — so the
+    // stale guard would have let a spurious extra navigation fire here with
+    // isRoot: false.
+    const circleAfterResort = document.querySelector<SVGCircleElement>("circle")!;
+    act(() => { fireEvent.doubleClick(circleAfterResort, { ctrlKey: true }); });
+    expect(handler).toHaveBeenCalledTimes(1);
+    vi.useRealTimers();
+  });
+
+  describe("No data", () => {
+    const EMPTY_DATA: CirclePackingData = { name: "Root" };
+
+    it("Should show the default noData message when data has no children and no value", () => {
+      render(<CirclePackingChart data={EMPTY_DATA} />);
+      expect(document.querySelector("svg")?.textContent).toContain("No data");
+    });
+
+    it("Should use a custom translation for noData", () => {
+      render(<CirclePackingChart data={EMPTY_DATA} translation={{ noData: "Keine Daten" }} />);
+      expect(document.querySelector("svg")?.textContent).toContain("Keine Daten");
+    });
+
+    it("Should not show the noData message when data has children", () => {
+      render(<CirclePackingChart data={SIMPLE_DATA} />);
+      expect(document.querySelector("svg")?.textContent).not.toContain("No data");
+    });
   });
 });

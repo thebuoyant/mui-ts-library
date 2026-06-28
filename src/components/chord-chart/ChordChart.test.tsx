@@ -49,6 +49,61 @@ describe("ChordChart", () => {
     expect(info).toHaveProperty("index");
   });
 
+  // Regression: valueOut/valueIn only checked one side of each d3 Chord object
+  // (which represents the COMBINED bidirectional flow between two nodes), so
+  // a node's contribution as the *other* side of an asymmetric pair was
+  // silently dropped. A→B(10) and the reverse B→A(4) is exactly that case.
+  describe("valueOut/valueIn for asymmetric bidirectional flows", () => {
+    const BIDIRECTIONAL_DATA: ChordChartData[] = [
+      { source: "A", target: "B", value: 10 },
+      { source: "B", target: "A", value: 4 },
+    ];
+
+    it("Should compute correct totals for both groups when directed", () => {
+      const handler = vi.fn();
+      render(<ChordChart data={BIDIRECTIONAL_DATA} onGroupClick={handler} directed />);
+      const groups = document.querySelectorAll<SVGGElement>("g[style*='cursor']");
+      fireEvent.click(groups[0]); // group A (first name to appear in the data)
+      const [infoA] = handler.mock.calls[0];
+      expect(infoA.name).toBe("A");
+      expect(infoA.valueOut).toBe(10); // A → B
+      expect(infoA.valueIn).toBe(4);   // B → A
+
+      fireEvent.click(groups[1]); // group B
+      const [infoB] = handler.mock.calls[1];
+      expect(infoB.name).toBe("B");
+      expect(infoB.valueOut).toBe(4);  // B → A
+      expect(infoB.valueIn).toBe(10); // A → B
+    });
+
+    it("Should compute correct totals for both groups when undirected", () => {
+      const handler = vi.fn();
+      render(<ChordChart data={BIDIRECTIONAL_DATA} onGroupClick={handler} directed={false} />);
+      const groups = document.querySelectorAll<SVGGElement>("g[style*='cursor']");
+      fireEvent.click(groups[0]);
+      const [infoA] = handler.mock.calls[0];
+      expect(infoA.valueOut).toBe(10);
+      expect(infoA.valueIn).toBe(4);
+    });
+  });
+
+  describe("No data", () => {
+    it("Should show the default noData message when data is empty", () => {
+      render(<ChordChart data={[]} />);
+      expect(document.querySelector("svg")?.textContent).toContain("No data");
+    });
+
+    it("Should use a custom translation for noData", () => {
+      render(<ChordChart data={[]} translation={{ noData: "Keine Daten" }} />);
+      expect(document.querySelector("svg")?.textContent).toContain("Keine Daten");
+    });
+
+    it("Should not show the noData message when data has entries", () => {
+      render(<ChordChart data={SIMPLE_DATA} />);
+      expect(document.querySelector("svg")?.textContent).not.toContain("No data");
+    });
+  });
+
   it("Should not fire callbacks when disabled", () => {
     const groupHandler = vi.fn();
     render(<ChordChart data={SIMPLE_DATA} onGroupClick={groupHandler} disabled />);

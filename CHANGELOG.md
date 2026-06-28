@@ -13,6 +13,88 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.11.2] — 2026-06-28
+
+### Fixed
+
+A deep, deliberate bug audit across all 11 components, prompted by the TagSelection issue in 3.11.1 — every finding below is backed by a regression test, each empirically verified to fail against the pre-fix code and pass against the fix.
+
+#### PasswordStrengthMeter
+
+- `generateSecurePassword` silently produced a password longer (or, for `length: 0`, non-empty) than the requested `generatorOptions.length` whenever the requested length was smaller than the number of active character classes — the guaranteed-one-of-each-class characters were never trimmed down to fit.
+- The "Copied!" feedback timeout was never cleared on unmount or on rapid re-copy (stacked instead of restarted). Extracted into a shared `useTimedFlag` hook, reused by JsonEditor's and RichTextEditor's identical copy-feedback pattern.
+
+#### TagSelection
+
+- `maxTags` could be bypassed by opening the custom-color create-mode, then having `tags` reach the limit from outside (e.g. another tab/component) before confirming — the confirm checkmark and Enter key now respect `maxTags` even while create-mode is already open.
+
+#### GanttChart
+
+- The document-level `mousemove`/`mouseup` listeners registered on drag-start were only removed by the matching `mouseup` handler — unmounting (or collapsing the row) mid-drag leaked them. Now also cleaned up on unmount.
+
+#### RichTextEditor
+
+- Pasting non-text clipboard content (e.g. an image) while "paste as plain text" was active deleted the current selection — `DataTransfer.getData("text/plain")` returns `""`, not `null`, for non-text payloads, and the code only guarded against `null`.
+
+#### SqlEditor
+
+- Changing `queryHistoryKey` on a live instance kept showing the previous key's history (the `useState` initializer only runs once on mount).
+- History entries were keyed by `timestamp` for React's `key` prop — two entries added within the same millisecond collided. Entries now carry a `crypto.randomUUID()`-based `id` (with a counter fallback), migrated transparently for entries persisted before this change.
+
+#### JsonEditor
+
+- `showFolding`, `showLineNumbers`, and `placeholder` were baked into the CodeMirror extensions array at editor-creation time only — toggling them after mount silently did nothing, unlike `disabled`/`readonly`, which already used CodeMirror `Compartment`s to stay reactive. All three now use the same compartment pattern.
+
+#### SunburstChart, ChordChart, RadialTreeChart, CirclePackingChart, HorizontalTreeChart
+
+- `translation.noData` was documented ("shown when data is empty") on all five D3 chart components but never rendered anywhere — the empty-data message was dead code across the board. All five now render it (and accept `translation` at all, where it wasn't even destructured yet).
+
+#### ChordChart
+
+- A group's `valueIn`/`valueOut` only counted one side of each d3 Chord object. `d3.chord()` (undirected mode) merges both directions of a pair into a single Chord, so a group's contribution as the *other* side of an asymmetric, bidirectional pair was silently dropped. `d3.chordDirected()` (the default) already emits one Chord per direction and was unaffected — the fix is conditional on the `directed` prop.
+
+#### RadialTreeChart
+
+- `autoFit={false}` was accepted as a prop and listed as an effect dependency, but never actually consulted — toggling it had no effect on the rendered viewBox.
+- `Escape` reset focus/zoom but never cancelled a drill still inside its 250ms Ctrl+Click disambiguation window — the stale timer fired afterwards and silently re-drilled in, contradicting the reset and firing a second, contradictory `onFocusChange`. The same pending timer was also never cleared on unmount.
+
+#### CirclePackingChart
+
+- The focus-reset guard only checked whether the `data` prop reference changed, but the underlying node tree (`root`) is also recomputed when `size`/`padding`/`sortBy` change — leaving `focus` pointing at orphaned nodes from the old layout whenever one of those other props changed while zoomed in.
+- The `Escape` listener deliberately excludes `performZoom` from its effect dependencies (to avoid re-registering on every focus change), so it closed over a stale `performZoom` — reporting the wrong `previousName` once the user had zoomed deeper without `disabled`/`root`/`duration` changing in between. Now reads the latest `performZoom` via a ref.
+
+#### HorizontalTreeChart
+
+- The `RL`/`BT` orientation mirror transform pivoted around a hardcoded `layoutH * 0.85` cap, but the tree layout's actual depth-axis extent is `min(maxDepth * levelSpacing, layoutH * 0.85)` — for shallower trees these values diverge, rendering the mirrored tree off-center.
+- The same Escape-doesn't-cancel-a-pending-drill and timer-leak-on-unmount issues as RadialTreeChart, fixed the same way.
+
+### Documentation
+
+- Fixed two prop-doc/code default mismatches found during the audit: `ChordChart.labelOffset` (documented 6, actual 8), `HorizontalTreeChart.linkStrokeOpacity` (documented 0.4, actual and test-locked 1).
+
+### Known, deliberately deferred
+
+Two lower-confidence/lower-impact findings from the audit were flagged but not fixed in this pass:
+
+- **HorizontalTreeChart** — the fading "ghost" layer of the previous tree (shown during a drill transition) re-applies the *current* orientation's coordinate transform if `orientation` changes mid-transition, instead of staying frozen in its original orientation. Cosmetic only — no crash, no incorrect data.
+- **GanttChart** — editing a task's dates/dependencies via the task dialog can create a dependency cycle without a guard rail. Flagged for a future pass; not a regression introduced by this audit.
+
+---
+
+## [3.11.1] — 2026-06-27
+
+### Fixed
+
+#### TagSelection — duplicate tag in the `WithCustomColorCreation` Storybook story
+
+Reported by a real visitor on the live Storybook deployment: creating a tag with a custom color made it appear twice. The bug was in the story, not the component — `TagSelection` correctly fires both `onTagCreate` (the new tag alone) and `onTagsChange` (the full next list, already including the new tag) for a single creation event; the story's `onTagCreate` handler additionally appended the tag to its local state, double-adding it. Fixed by letting `onTagsChange` be the single source of truth for the story's local tag list.
+
+Added a regression test locking in the "both callbacks fire, with consistent data, for one creation" contract, since this is the exact shape that caused the bug and could recur in a future story or consumer integration.
+
+Audited all other components for the same dual-callback pattern (a story subscribing to two callbacks that co-fire for one action, each independently mutating the same state) — no other live instance found.
+
+---
+
 ## [3.11.0] — 2026-06-25
 
 ### Added

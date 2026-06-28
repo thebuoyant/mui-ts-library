@@ -76,7 +76,7 @@ export type HorizontalTreeChartProps = {
   showIcons?:                boolean;
   /** Per-depth color palette — falls back to MUI theme palette */
   chartColors?:              string[];
-  /** Link stroke opacity (default: 0.4) */
+  /** Link stroke opacity (default: 1) */
   linkStrokeOpacity?:        number;
   /** Link stroke width in px (default: 1.5) */
   linkStrokeWidth?:          number;

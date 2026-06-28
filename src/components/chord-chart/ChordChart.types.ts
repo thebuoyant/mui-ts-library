@@ -69,7 +69,7 @@ export type ChordChartProps = {
   groupColorConfigs?:       ChordGroupColorConfigs;
   /** Show group name labels outside the arc ring (default: true) */
   showGroupLabels?:         boolean;
-  /** Gap between arc outer edge and label text in px (default: 6) */
+  /** Gap between arc outer edge and label text in px (default: 8) */
   labelOffset?:             number;
   /** Opacity of ribbons — 0 to 1 (default: 0.75) */
   ribbonOpacity?:           number;

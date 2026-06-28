@@ -13,6 +13,88 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [3.11.2] — 2026-06-28
+
+### Behoben
+
+Eine tiefgreifende, gezielte Bug-Prüfung aller 11 Komponenten, ausgelöst durch den TagSelection-Bug aus 3.11.1 — jeder Fund unten ist mit einem Regressionstest abgesichert, jeweils empirisch verifiziert: schlägt gegen den alten Code fehl, läuft gegen den Fix durch.
+
+#### PasswordStrengthMeter
+
+- `generateSecurePassword` erzeugte stillschweigend ein längeres Passwort (bei `length: 0` sogar ein nicht-leeres) als die angeforderte `generatorOptions.length`, sobald die angeforderte Länge kleiner war als die Anzahl aktiver Zeichenklassen — die garantierten Ein-pro-Klasse-Zeichen wurden nie auf die Ziellänge zurückgeschnitten.
+- Das "Kopiert!"-Feedback-Timeout wurde beim Unmount oder bei schnellem erneutem Kopieren nie aufgeräumt (gestapelt statt neu gestartet). In einen gemeinsamen `useTimedFlag`-Hook ausgelagert, der jetzt auch vom identischen Copy-Feedback-Muster in JsonEditor und RichTextEditor genutzt wird.
+
+#### TagSelection
+
+- `maxTags` ließ sich umgehen: Custom-Color-Create-Modus öffnen, dann `tags` von außen (z. B. einer anderen Tab/Komponente) das Limit erreichen lassen, bevor bestätigt wird — der Bestätigungs-Haken und Enter respektieren `maxTags` jetzt auch, wenn der Create-Modus bereits offen ist.
+
+#### GanttChart
+
+- Die beim Drag-Start registrierten document-weiten `mousemove`/`mouseup`-Listener wurden nur vom passenden `mouseup`-Handler entfernt — Unmount (oder Einklappen der Zeile) während eines Drags hat sie geleakt. Werden jetzt auch beim Unmount aufgeräumt.
+
+#### RichTextEditor
+
+- Einfügen von Nicht-Text-Clipboard-Inhalten (z. B. einem Bild) bei aktivem "Als Plain Text einfügen" löschte die aktuelle Selektion — `DataTransfer.getData("text/plain")` liefert für Nicht-Text-Inhalte `""`, nicht `null`, und der Code prüfte nur auf `null`.
+
+#### SqlEditor
+
+- Ein Wechsel von `queryHistoryKey` an einer laufenden Instanz zeigte weiterhin die History des vorherigen Keys (der `useState`-Initializer läuft nur einmal beim Mount).
+- History-Einträge wurden für Reacts `key`-Prop über `timestamp` identifiziert — zwei Einträge innerhalb derselben Millisekunde kollidierten. Einträge tragen jetzt eine auf `crypto.randomUUID()` basierende `id` (mit Counter-Fallback), transparent migriert für bereits zuvor gespeicherte Einträge.
+
+#### JsonEditor
+
+- `showFolding`, `showLineNumbers` und `placeholder` wurden nur beim Erstellen des Editors fest ins CodeMirror-Extensions-Array gebacken — ein Umschalten nach dem Mount hatte stillschweigend keine Wirkung, anders als `disabled`/`readonly`, die bereits CodeMirror-`Compartment`s zur Reaktivität nutzten. Alle drei nutzen jetzt das gleiche Compartment-Muster.
+
+#### SunburstChart, ChordChart, RadialTreeChart, CirclePackingChart, HorizontalTreeChart
+
+- `translation.noData` war auf allen fünf D3-Chart-Komponenten dokumentiert ("wird angezeigt, wenn die Daten leer sind"), aber nirgends gerendert — die Leer-Daten-Meldung war durchgängig toter Code. Alle fünf rendern sie jetzt (und nehmen `translation` überhaupt an, wo es noch nicht einmal destrukturiert war).
+
+#### ChordChart
+
+- `valueIn`/`valueOut` einer Gruppe zählte nur eine Seite jedes d3-Chord-Objekts. `d3.chord()` (undirected-Modus) verschmilzt beide Richtungen eines Paares in eine einzige Chord — der Beitrag einer Gruppe als die *andere* Seite eines asymmetrischen, bidirektionalen Paares wurde stillschweigend verworfen. `d3.chordDirected()` (der Default) erzeugt bereits eine Chord pro Richtung und war nicht betroffen — der Fix greift bedingt über die `directed`-Prop.
+
+#### RadialTreeChart
+
+- `autoFit={false}` wurde als Prop angenommen und in einem Effekt-Dependency-Array gelistet, aber nie tatsächlich abgefragt — ein Umschalten hatte keine Wirkung auf die gerenderte viewBox.
+- `Escape` setzte Fokus/Zoom zurück, brach aber einen noch innerhalb seines 250ms-Ctrl+Click-Disambiguierungsfensters laufenden Drill nicht ab — der veraltete Timer feuerte danach und drillte stillschweigend wieder hinein, im Widerspruch zum Reset, und löste ein zweites, widersprüchliches `onFocusChange` aus. Derselbe ausstehende Timer wurde auch beim Unmount nie aufgeräumt.
+
+#### CirclePackingChart
+
+- Der Fokus-Reset-Guard prüfte nur, ob sich die `data`-Prop-Referenz geändert hat — der zugrundeliegende Node-Baum (`root`) wird aber auch neu berechnet, wenn sich `size`/`padding`/`sortBy` ändern. Das ließ `focus` auf verwaiste Nodes des alten Layouts zeigen, sobald sich eine dieser anderen Props während des Hineinzoomens änderte.
+- Der `Escape`-Listener schließt `performZoom` bewusst aus seinen Effekt-Dependencies aus (um nicht bei jedem Fokuswechsel neu zu registrieren) und schloss daher über ein veraltetes `performZoom` — das den falschen `previousName` meldete, sobald tiefer gezoomt wurde, ohne dass sich `disabled`/`root`/`duration` dazwischen geändert hatten. Liest jetzt das aktuellste `performZoom` über eine Ref.
+
+#### HorizontalTreeChart
+
+- Die `RL`/`BT`-Orientierungs-Spiegelung drehte sich um eine fest codierte `layoutH * 0.85`-Obergrenze, aber der tatsächlich genutzte Tiefen-Extent des Tree-Layouts ist `min(maxDepth * levelSpacing, layoutH * 0.85)` — bei flacheren Bäumen weichen diese Werte voneinander ab, wodurch der gespiegelte Baum außermittig gerendert wurde.
+- Dieselben Escape-bricht-laufenden-Drill-nicht-ab- und Timer-Leak-bei-Unmount-Probleme wie bei RadialTreeChart, auf die gleiche Weise gefixt.
+
+### Dokumentation
+
+- Zwei Prop-Doku/Code-Default-Abweichungen aus der Prüfung behoben: `ChordChart.labelOffset` (dokumentiert 6, tatsächlich 8), `HorizontalTreeChart.linkStrokeOpacity` (dokumentiert 0.4, tatsächlich und testfixiert 1).
+
+### Bekannt, bewusst zurückgestellt
+
+Zwei Befunde mit geringerer Konfidenz/Auswirkung aus der Prüfung wurden markiert, aber in diesem Durchgang nicht gefixt:
+
+- **HorizontalTreeChart** — die ausblendende "Ghost"-Ebene des vorherigen Baums (während einer Drill-Transition sichtbar) wendet bei einem Orientierungswechsel mitten in der Transition die *aktuelle* Koordinatentransformation an, statt in ihrer ursprünglichen Orientierung einzufrieren. Rein kosmetisch — kein Absturz, keine falschen Daten.
+- **GanttChart** — das Bearbeiten von Datums-/Abhängigkeitsangaben einer Aufgabe über den Aufgaben-Dialog kann ohne Schutzmechanismus einen Abhängigkeitszyklus erzeugen. Für einen zukünftigen Durchgang markiert; keine durch diese Prüfung eingeführte Regression.
+
+---
+
+## [3.11.1] — 2026-06-27
+
+### Behoben
+
+#### TagSelection — doppeltes Tag in der `WithCustomColorCreation`-Storybook-Story
+
+Gemeldet von einem echten Besucher auf dem live Storybook-Deployment: Ein Tag mit Custom Color anlegen ließ es zweimal erscheinen. Der Bug saß in der Story, nicht in der Komponente — `TagSelection` feuert bei einer Erstellung korrekt sowohl `onTagCreate` (nur das neue Tag) als auch `onTagsChange` (die vollständige nächste Liste, die das neue Tag bereits enthält); der `onTagCreate`-Handler der Story hat das Tag zusätzlich zum lokalen State hinzugefügt — doppelt. Gefixt, indem `onTagsChange` jetzt die einzige Quelle der Wahrheit für die lokale Tag-Liste der Story ist.
+
+Ein Regressionstest schreibt den Vertrag "beide Callbacks feuern mit konsistenten Daten fürs gleiche Erstellungs-Event" fest, da genau dieses Muster den Bug verursacht hat und in einer zukünftigen Story oder Konsumenten-Integration wieder auftreten könnte.
+
+Alle anderen Komponenten auf dasselbe Dual-Callback-Muster geprüft (eine Story, die zwei für eine Aktion gemeinsam feuernde Callbacks abonniert und beide unabhängig denselben State mutieren) — keine weitere aktive Instanz gefunden.
+
+---
+
 ## [3.11.0] — 2026-06-25
 
 ### Hinzugefügt

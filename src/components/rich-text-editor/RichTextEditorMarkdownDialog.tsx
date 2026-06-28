@@ -13,6 +13,7 @@ import {
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import CheckIcon from "@mui/icons-material/Check";
 import { type RichTextEditorTranslation } from "./RichTextEditor.types";
+import { useTimedFlag } from "../shared/useTimedFlag";
 
 type RichTextEditorMarkdownDialogProps = {
   open:        boolean;
@@ -28,7 +29,7 @@ export function RichTextEditorMarkdownDialog({
   translation: t,
 }: RichTextEditorMarkdownDialogProps) {
   const [markdown, setMarkdown] = useState("");
-  const [copied, setCopied]     = useState(false);
+  const [copied, triggerCopied] = useTimedFlag();
 
   // Inhalt bei jedem Öffnen neu aus dem aktuellen Editor-Inhalt befüllen
   useEffect(() => {
@@ -45,8 +46,7 @@ export function RichTextEditorMarkdownDialog({
 
   function handleCopy() {
     navigator.clipboard.writeText(markdown).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      triggerCopied();
     });
   }
 

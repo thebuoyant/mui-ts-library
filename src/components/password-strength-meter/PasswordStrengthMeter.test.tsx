@@ -306,6 +306,41 @@ describe("Password Generator", () => {
     await user.click(screen.getByTestId("psm-generate"));
     expect(onGenerated.mock.calls[0][0].length).toBe(24);
   });
+
+  // Regression: generateSecurePassword always added one guaranteed char per
+  // active class (up to 4) on top of an array sized to `length`, so requesting
+  // a length smaller than the number of active classes silently produced a
+  // LONGER password than requested instead of respecting the request.
+  it("Should not exceed the requested length when it is smaller than the number of active character classes", async () => {
+    const user = userEvent.setup();
+    const onGenerated = vi.fn();
+    render(
+      <PasswordStrengthMeter
+        showPasswordGenerator
+        generatorOptions={{ length: 2, upper: true, lower: true, numbers: true, symbols: true }}
+        onPasswordGenerated={onGenerated}
+      />,
+    );
+    await user.click(screen.getByTestId("psm-generate"));
+    // 4 active classes can't be guaranteed within length 2 — the guarantee wins,
+    // but the result must be deterministic (== number of active classes), not
+    // silently exceed an arbitrary larger number.
+    expect(onGenerated.mock.calls[0][0].length).toBe(4);
+  });
+
+  it("Should not produce an empty password when generatorOptions.length is 0", async () => {
+    const user = userEvent.setup();
+    const onGenerated = vi.fn();
+    render(
+      <PasswordStrengthMeter
+        showPasswordGenerator
+        generatorOptions={{ length: 0 }}
+        onPasswordGenerated={onGenerated}
+      />,
+    );
+    await user.click(screen.getByTestId("psm-generate"));
+    expect(onGenerated.mock.calls[0][0].length).toBeGreaterThan(0);
+  });
 });
 
 describe("Copy Button", () => {

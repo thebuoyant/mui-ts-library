@@ -107,11 +107,62 @@ describe("HorizontalTreeChart", () => {
     expect(linkGroup?.getAttribute("stroke-opacity")).toBe("0.4");
   });
 
+  // Regression: the RL/BT mirror pivot used the hardcoded layoutH * 0.85 cap,
+  // but the tree layout's actual depth-axis extent is
+  // min(maxDepth * levelSpacing, layoutH * 0.85) — for a shallow tree (here:
+  // maxDepth=2, levelSpacing=200 → 400, vs. layoutH=500 * 0.85 = 425) those
+  // values diverge, so the mirrored tree rendered 25px off-center.
+  it("Should mirror RL orientation around the actual used depth extent, not the hardcoded layoutH*0.85 cap", () => {
+    render(<HorizontalTreeChart data={SIMPLE_DATA} orientation="RL" width={800} height={500} levelSpacing={200} />);
+    const rootGroup = document.querySelectorAll<SVGGElement>("g[style*='cursor']")[0];
+    // Root node: depth=0 → node.y=0 → x = depthExtent - 0 = min(2*200, 500*0.85) = 400
+    const [x] = rootGroup.getAttribute("transform")!.match(/-?\d+(\.\d+)?/g)!;
+    expect(Number(x)).toBe(400);
+  });
+
+  it("Should mirror BT orientation around the actual used depth extent, not the hardcoded layoutH*0.85 cap", () => {
+    render(<HorizontalTreeChart data={SIMPLE_DATA} orientation="BT" width={800} height={500} levelSpacing={200} />);
+    const rootGroup = document.querySelectorAll<SVGGElement>("g[style*='cursor']")[0];
+    // BT: isVertical → layoutH = width = 800; depthExtent = min(2*200, 800*0.85) = 400
+    const [, y] = rootGroup.getAttribute("transform")!.match(/-?\d+(\.\d+)?/g)!;
+    expect(Number(y)).toBe(400);
+  });
+
   describe("Drill transition (crossfade)", () => {
     // Sorted by name: Platform(0), Backend(1), Frontend(2, has children), Mobile(3), Web App(4)
     function getFrontendNode() {
       return document.querySelectorAll<SVGGElement>("g[style*='cursor']")[2];
     }
+
+    // Regression: Escape reset focus/zoom but never cancelled a drill still
+    // inside its 250ms disambiguation window — the stale timer fired
+    // afterwards and silently re-drilled in, contradicting the reset.
+    it("Should cancel a pending drill when Escape is pressed inside the disambiguation window", () => {
+      vi.useFakeTimers();
+      const handler = vi.fn();
+      render(<HorizontalTreeChart data={SIMPLE_DATA} drillable onFocusChange={handler} />);
+      act(() => { fireEvent.click(getFrontendNode(), { ctrlKey: true }); });
+      act(() => { fireEvent.keyDown(window, { key: "Escape" }); });
+      // Escape itself fires onFocusChange(root) synchronously — that's expected.
+      expect(handler).toHaveBeenCalledTimes(1);
+      expect(handler).toHaveBeenLastCalledWith(expect.objectContaining({ isRoot: true }));
+
+      act(() => { vi.advanceTimersByTime(250); });
+      expect(handler).toHaveBeenCalledTimes(1);
+      vi.useRealTimers();
+    });
+
+    it("Should not throw or fire onFocusChange when unmounted inside the disambiguation window", () => {
+      vi.useFakeTimers();
+      const handler = vi.fn();
+      const { unmount } = render(<HorizontalTreeChart data={SIMPLE_DATA} drillable onFocusChange={handler} />);
+      act(() => { fireEvent.click(getFrontendNode(), { ctrlKey: true }); });
+
+      expect(() => unmount()).not.toThrow();
+      expect(() => act(() => { vi.advanceTimersByTime(250); })).not.toThrow();
+      expect(handler).not.toHaveBeenCalled();
+      vi.useRealTimers();
+    });
 
     it("Should fire onFocusChange after the Ctrl+Click disambiguation delay", () => {
       vi.useFakeTimers();
@@ -172,6 +223,25 @@ describe("HorizontalTreeChart", () => {
       expect(screen.queryByTestId("drill-ghost-layer")).not.toBeInTheDocument();
       expect(document.querySelector("svg[aria-label='Root2']")).toBeInTheDocument();
       vi.useRealTimers();
+    });
+  });
+
+  describe("No data", () => {
+    const EMPTY_DATA: HorizontalTreeData = { id: "root", name: "Root" };
+
+    it("Should show the default noData message when data has no children and no value", () => {
+      render(<HorizontalTreeChart data={EMPTY_DATA} />);
+      expect(screen.getByText("No data")).toBeInTheDocument();
+    });
+
+    it("Should use a custom translation for noData", () => {
+      render(<HorizontalTreeChart data={EMPTY_DATA} translation={{ noData: "Keine Daten" }} />);
+      expect(screen.getByText("Keine Daten")).toBeInTheDocument();
+    });
+
+    it("Should not show the noData message when data has children", () => {
+      render(<HorizontalTreeChart data={SIMPLE_DATA} />);
+      expect(screen.queryByText("No data")).not.toBeInTheDocument();
     });
   });
 });

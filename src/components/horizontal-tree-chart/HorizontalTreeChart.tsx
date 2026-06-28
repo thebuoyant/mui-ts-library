@@ -115,6 +115,8 @@ export function HorizontalTreeChart({
   const bgColor         = theme.palette.background.paper;
   const fontFamily      = theme.typography.fontFamily;
 
+  const isEmpty = !data.children?.length && !data.value;
+
   // TB/BT swap width & height for the layout
   const isVertical = orientation === "TB" || orientation === "BT";
   const layoutW    = isVertical ? height : width;
@@ -144,6 +146,15 @@ export function HorizontalTreeChart({
     return d3.tree<HorizontalTreeData>()
       .size([layoutW * 0.8, Math.min(maxDepth * levelSpacing, layoutH * 0.85)])(h);
   }, [focusData, sortBy, layoutW, layoutH, levelSpacing]);
+
+  // The actual depth-axis extent used by the layout above — it's clamped to
+  // maxDepth * levelSpacing for shallow trees, NOT always the full layoutH *
+  // 0.85. The RL/BT mirror transform below must pivot around this same value,
+  // not the hardcoded cap, or shallow trees render off-center in those orientations.
+  const depthExtent = useMemo(() => {
+    const maxDepth = d3.max(d3.hierarchy<HorizontalTreeData>(focusData).descendants(), (d) => d.depth) ?? 1;
+    return Math.min(maxDepth * levelSpacing, layoutH * 0.85);
+  }, [focusData, levelSpacing, layoutH]);
 
   const nodes = root.descendants();
   const links = root.links();
@@ -204,12 +215,12 @@ export function HorizontalTreeChart({
     (node: HierarchyPointNode<HorizontalTreeData>): { x: number; y: number } => {
       switch (orientation) {
         case "LR": return { x: node.y, y: node.x - layoutW * 0.4 };
-        case "RL": return { x: layoutH * 0.85 - node.y, y: node.x - layoutW * 0.4 };
+        case "RL": return { x: depthExtent - node.y, y: node.x - layoutW * 0.4 };
         case "TB": return { x: node.x - layoutW * 0.4, y: node.y };
-        case "BT": return { x: node.x - layoutW * 0.4, y: layoutH * 0.85 - node.y };
+        case "BT": return { x: node.x - layoutW * 0.4, y: depthExtent - node.y };
       }
     },
-    [orientation, layoutW, layoutH],
+    [orientation, layoutW, depthExtent],
   );
 
   // ── Link generator ─────────────────────────────────────────────────────────
@@ -287,6 +298,13 @@ export function HorizontalTreeChart({
     if (zoomTimerRef.current) { clearTimeout(zoomTimerRef.current); zoomTimerRef.current = null; }
   };
 
+  // Clears any pending drill timer on unmount — without this, drilling
+  // (Ctrl+Click) immediately followed by unmounting within the 250ms
+  // disambiguation window would fire setFocusStack/onFocusChange post-unmount.
+  useEffect(() => {
+    return () => cancelDrill();
+  }, []);
+
   const drillOut = useCallback(() => {
     setFocusStack((prev) => {
       if (prev.length <= 1) return prev;
@@ -301,7 +319,14 @@ export function HorizontalTreeChart({
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         if (zoomable) setZoomScale(1);
-        if (drillable) { setFocusStack([data]); onFocusChange?.({ focusedNode: { id: data.id ?? null, name: data.name, subname: data.subname ?? null, value: null, specialValueA: null, specialValueB: null, depth: 0, path: [data.name], childrenCount: data.children?.length ?? 0, data }, isRoot: true }); }
+        if (drillable) {
+          // Without this, a drill scheduled just before Escape (still within
+          // its 250ms disambiguation window) would fire afterwards and
+          // silently re-drill in, contradicting the reset the user just asked for.
+          cancelDrill();
+          setFocusStack([data]);
+          onFocusChange?.({ focusedNode: { id: data.id ?? null, name: data.name, subname: data.subname ?? null, value: null, specialValueA: null, specialValueB: null, depth: 0, path: [data.name], childrenCount: data.children?.length ?? 0, data }, isRoot: true });
+        }
       }
     };
     window.addEventListener("keydown", onKey);
@@ -399,6 +424,12 @@ export function HorizontalTreeChart({
         aria-label={data.name}
       >
         <g ref={contentRef}>
+          {isEmpty && (
+            <text textAnchor="middle" dy="0.35em" fontSize={13} fill={resolvedLabel}>
+              {t.noData}
+            </text>
+          )}
+
           {/* Links */}
           <g fill="none" stroke={resolvedLink} strokeOpacity={linkStrokeOpacity} strokeWidth={linkStrokeWidth}>
             {links.map((link, i) => (

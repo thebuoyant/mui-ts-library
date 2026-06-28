@@ -189,6 +189,10 @@ export function TagSelectionAutocomplete({
     : undefined;
 
   const handleConfirmCreate = () => {
+    // Guards the action itself, not just its triggers (button/Enter key) — maxTags
+    // can be reached by an external prop change while create-mode is already open.
+    if (isDisabled) return;
+
     const label = searchValue.trim();
     const id = label.toLowerCase().replace(/\s+/g, "-");
     const newTag: TagSelectionItem = isCustomColorSelected && customBgColor
@@ -300,7 +304,7 @@ export function TagSelectionAutocomplete({
             placeholder={translation.placeholder}
             helperText={isMaxReached && !disabled ? translation.maxTagsReachedText : undefined}
             onKeyDown={(e) => {
-              if (isCreateMode && e.key === "Enter") {
+              if (isCreateMode && !isDisabled && e.key === "Enter") {
                 e.preventDefault();
                 handleConfirmCreate();
               }
@@ -318,6 +322,7 @@ export function TagSelectionAutocomplete({
                           sx={{ color: "success.main" }}
                           onMouseDown={preventBlur}
                           onClick={handleConfirmCreate}
+                          disabled={isDisabled}
                           aria-label={translation.confirmCreateLabel}
                         >
                           <CheckIcon fontSize="small" />

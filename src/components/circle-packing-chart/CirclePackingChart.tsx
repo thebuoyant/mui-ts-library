@@ -1,10 +1,11 @@
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import * as d3 from "d3";
 import type { HierarchyCircularNode } from "d3-hierarchy";
 import { Box, Tooltip, Typography, useTheme } from "@mui/material";
 import {
   type CirclePackingChartProps,
   type CirclePackingNodeInfo,
+  DEFAULT_CIRCLE_PACKING_TRANSLATION,
 } from "./CirclePackingChart.types";
 import type { CirclePackingData } from "./CirclePackingChart.types";
 
@@ -39,8 +40,11 @@ export function CirclePackingChart({
   disabled = false,
   onCircleClick,
   onZoomChange,
+  translation,
 }: CirclePackingChartProps) {
   const theme = useTheme();
+  const t = { ...DEFAULT_CIRCLE_PACKING_TRANSLATION, ...translation };
+  const isEmpty = !data.children?.length && !data.value;
 
   // MUI palette as default (same order as all other D3 charts)
   const defaultPalette = [
@@ -160,8 +164,13 @@ export function CirclePackingChart({
     setFocusState(node);
   }, []);
 
-  const [prevData, setPrevData] = useState(data);
-  if (prevData !== data) { setPrevData(data); setFocus(root); focusRef.current = root; }
+  // Tracks `root` itself, not just `data` — root is also recomputed when
+  // size/padding/sortBy change (see its useMemo deps below), which produces
+  // entirely new node objects. Guarding on `data` alone left `focus` pointing
+  // at stale, orphaned nodes from the old layout whenever one of those other
+  // props changed while zoomed in, breaking `focus === root`/ancestor checks.
+  const [prevRoot, setPrevRoot] = useState(root);
+  if (prevRoot !== root) { setPrevRoot(root); setFocus(root); focusRef.current = root; }
 
   // ── Apply view to DOM (D3 imperative index-based) ─────────────────────────
   const applyView = useCallback(
@@ -288,15 +297,23 @@ export function CirclePackingChart({
     if (zoomTimerRef.current) { clearTimeout(zoomTimerRef.current); zoomTimerRef.current = null; }
   };
 
+  // performZoom is recreated whenever `focus` changes (it's in its own deps),
+  // but this effect deliberately doesn't re-run on every focus change — so the
+  // listener below would otherwise close over a stale performZoom from
+  // whichever focus was active when the effect last ran, reporting the wrong
+  // previousName (captured inside performZoom's own closure) once the user
+  // had zoomed deeper without disabled/root/duration changing in between.
+  const performZoomRef = useRef(performZoom);
+  useEffect(() => { performZoomRef.current = performZoom; }, [performZoom]);
+
   // ── Escape → reset to root ────────────────────────────────────────────────
   useLayoutEffect(() => {
     if (disabled) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { cancelZoom(); performZoom(root, duration); }
+      if (e.key === "Escape") { cancelZoom(); performZoomRef.current(root, duration); }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [disabled, root, duration]);
 
   // ── Event handlers ────────────────────────────────────────────────────────
@@ -336,6 +353,12 @@ export function CirclePackingChart({
         aria-label={data.name}
         onDoubleClick={handleSvgDblClick}
       >
+        {isEmpty && (
+          <text textAnchor="middle" dy="0.35em" fontSize={13} fill={theme.palette.text.secondary}>
+            {t.noData}
+          </text>
+        )}
+
         {/* ── Circles ── */}
         <g data-role="nodes">
           {nodes.map((d, i) => {

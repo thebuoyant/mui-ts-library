@@ -136,6 +136,38 @@ describe("JsonEditor", () => {
     expect(document.querySelector(".cm-foldGutter")).not.toBeInTheDocument();
   });
 
+  // Regression: showFolding/showLineNumbers/placeholder were baked into the
+  // extensions array at editor-creation time only (an explicit eslint-disable
+  // suppressed the missing-deps warning), so toggling them on an already-mounted
+  // editor silently did nothing — unlike disabled/readonly, which already used
+  // CodeMirror Compartments to stay reactive.
+  it("toggles the fold gutter live when showFolding changes after mount", () => {
+    const { rerender } = render(<JsonEditor value={VALID_JSON} showFolding={false} />);
+    expect(document.querySelector(".cm-foldGutter")).not.toBeInTheDocument();
+
+    rerender(<JsonEditor value={VALID_JSON} showFolding={true} />);
+    expect(document.querySelector(".cm-foldGutter")).toBeInTheDocument();
+
+    rerender(<JsonEditor value={VALID_JSON} showFolding={false} />);
+    expect(document.querySelector(".cm-foldGutter")).not.toBeInTheDocument();
+  });
+
+  it("toggles the line-number gutter live when showLineNumbers changes after mount", () => {
+    const { rerender } = render(<JsonEditor value={VALID_JSON} showLineNumbers={false} />);
+    expect(document.querySelector(".cm-lineNumbers")).not.toBeInTheDocument();
+
+    rerender(<JsonEditor value={VALID_JSON} showLineNumbers={true} />);
+    expect(document.querySelector(".cm-lineNumbers")).toBeInTheDocument();
+  });
+
+  it("updates the placeholder text live when the prop changes after mount", () => {
+    const { rerender } = render(<JsonEditor value="" placeholder="First" />);
+    expect(document.querySelector(".cm-placeholder")?.textContent).toBe("First");
+
+    rerender(<JsonEditor value="" placeholder="Second" />);
+    expect(document.querySelector(".cm-placeholder")?.textContent).toBe("Second");
+  });
+
   it("does not copy a path on a plain click (no modifier key)", () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     Object.assign(navigator, { clipboard: { writeText } });

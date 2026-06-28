@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { TagSelection } from "./TagSelection";
@@ -224,6 +224,41 @@ describe("TagSelection", () => {
     expect(screen.getByText("Maximum number of tags reached.")).toBeInTheDocument();
   });
 
+  // Regression: isCreateMode (which gates the confirm-checkmark + Enter-key
+  // creation path) never factored in isMaxReached/disabled. If maxTags is
+  // reached WHILE create-mode is already open (e.g. another selection pushes
+  // the count to the limit while the user is still typing a new tag name),
+  // the stale checkmark stayed clickable and bypassed the limit entirely.
+  it("Should not create a tag via the checkmark once maxTags is reached mid-creation", async () => {
+    const user = userEvent.setup();
+    const handleTagCreate = vi.fn();
+
+    const { rerender } = render(
+      <TagSelection tags={tags} allowCreate={true} maxTags={2} onTagCreate={handleTagCreate} />,
+    );
+
+    const input = screen.getByLabelText("Search and add tags");
+    await user.type(input, "Vue");
+    const confirmButton = await screen.findByTestId("CheckIcon");
+
+    // Second tag gets selected externally, reaching maxTags while create-mode is still open.
+    const tagsAtLimit: TagSelectionItem[] = tags.map((t) =>
+      t.id === "typescript" ? { ...t, selected: true } : t,
+    );
+    rerender(
+      <TagSelection tags={tagsAtLimit} allowCreate={true} maxTags={2} onTagCreate={handleTagCreate} />,
+    );
+
+    expect(confirmButton.closest("button")).toBeDisabled();
+    // The button is correctly disabled — fireEvent bypasses that to verify the
+    // underlying handler also guards itself (defense in depth), not just the UI.
+    fireEvent.click(confirmButton);
+    expect(handleTagCreate).not.toHaveBeenCalled();
+
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(handleTagCreate).not.toHaveBeenCalled();
+  });
+
   it("Should call onTagCreate with the full TagSelectionItem when checkmark is clicked", async () => {
     const user = userEvent.setup();
     const handleTagCreate = vi.fn();
@@ -240,6 +275,40 @@ describe("TagSelection", () => {
     expect(handleTagCreate).toHaveBeenCalledWith(
       expect.objectContaining({ label: "Vue", color: "default", selected: true }),
     );
+  });
+
+  // Regression for a real bug: TagSelection.stories.tsx's WithCustomColorCreation
+  // story added the new tag to local state in BOTH the onTagCreate and the
+  // onTagsChange handler, since it assumed only one of them would fire for a
+  // creation event. Both fire — this test locks in that contract so a future
+  // consumer (or story) relying on only one of them doesn't get burned again.
+  it("Should call both onTagCreate and onTagsChange with the same new tag for a single creation", async () => {
+    const user = userEvent.setup();
+    const handleTagCreate = vi.fn();
+    const handleTagsChange = vi.fn();
+
+    render(
+      <TagSelection
+        tags={tags}
+        allowCreate={true}
+        onTagCreate={handleTagCreate}
+        onTagsChange={handleTagsChange}
+      />,
+    );
+
+    const input = screen.getByLabelText("Search and add tags");
+    await user.type(input, "Vue");
+    await user.click(await screen.findByTestId("CheckIcon"));
+
+    expect(handleTagCreate).toHaveBeenCalledTimes(1);
+    expect(handleTagsChange).toHaveBeenCalledTimes(1);
+
+    const createdTag = handleTagCreate.mock.calls[0][0];
+    const [, allTagsAfterCreate] = handleTagsChange.mock.calls[0];
+
+    // Both callbacks must agree on the new tag — and onTagsChange's "all" list
+    // must contain it exactly once, not zero or two times.
+    expect(allTagsAfterCreate.filter((t: TagSelectionItem) => t.id === createdTag.id)).toHaveLength(1);
   });
 
   it("Should auto-select the newly created tag and clear the input", async () => {

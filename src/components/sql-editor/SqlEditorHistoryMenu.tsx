@@ -76,7 +76,7 @@ export function SqlEditorHistoryMenu({
         )}
 
         {history.map((entry) => (
-          <MenuItem key={entry.timestamp} onClick={() => handleSelect(entry.sql)}>
+          <MenuItem key={entry.id} onClick={() => handleSelect(entry.sql)}>
             <ListItemText
               primary={truncate(entry.sql)}
               secondary={

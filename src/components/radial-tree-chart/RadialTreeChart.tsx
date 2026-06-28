@@ -163,6 +163,8 @@ export function RadialTreeChart({
     setSkipNextFade(true); // brand-new data — jump instantly, don't crossfade
   }
 
+  const isEmpty = !data.children?.length && !data.value;
+
   const margin = 70;
   const radius = Math.max(1, size / 2 - margin);
 
@@ -263,6 +265,13 @@ export function RadialTreeChart({
   const [zoomScale,   setZoomScale]   = useState(1);
 
   useLayoutEffect(() => {
+    // autoFit={false} was accepted as a prop and listed as an effect dependency,
+    // but never actually consulted — the viewBox always auto-fit regardless.
+    if (!autoFit) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setBaseViewBox(`-${size / 2} -${size / 2} ${size} ${size}`);
+      return;
+    }
     const g = contentRef.current;
     if (!g) return;
     const id = requestAnimationFrame(() => {
@@ -297,19 +306,6 @@ export function RadialTreeChart({
     [zoomable, disabled],
   );
 
-  // Escape resets zoom + drill-down
-  useLayoutEffect(() => {
-    if (!zoomable && !drillable) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        if (zoomable) setZoomScale(1);
-        if (drillable) { setFocusStack([data]); onFocusChange?.(null); }
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [zoomable, drillable, data, onFocusChange]);
-
   // ── Drill-Down: 250ms timer disambiguates Ctrl+Click vs Ctrl+DblClick ────
   const drillTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scheduleDrill = (fn: () => void) => {
@@ -319,6 +315,33 @@ export function RadialTreeChart({
   const cancelDrill = () => {
     if (drillTimerRef.current) { clearTimeout(drillTimerRef.current); drillTimerRef.current = null; }
   };
+
+  // Clears any pending drill timer on unmount — without this, drilling
+  // (Ctrl+Click) immediately followed by unmounting within the 250ms
+  // disambiguation window would fire setFocusStack/onFocusChange post-unmount.
+  useEffect(() => {
+    return () => cancelDrill();
+  }, []);
+
+  // Escape resets zoom + drill-down
+  useLayoutEffect(() => {
+    if (!zoomable && !drillable) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        if (zoomable) setZoomScale(1);
+        if (drillable) {
+          // Without this, a drill scheduled just before Escape (still within
+          // its 250ms disambiguation window) would fire afterwards and
+          // silently re-drill in, contradicting the reset the user just asked for.
+          cancelDrill();
+          setFocusStack([data]);
+          onFocusChange?.(null);
+        }
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [zoomable, drillable, data, onFocusChange]);
 
   // ── Hover state for subtle visual feedback ──────────────────────────────────
   const [hoverIdx, setHoverIdx] = useState<number | null>(null);
@@ -476,6 +499,11 @@ export function RadialTreeChart({
         aria-label={data.name}
       >
         <g ref={contentRef}>
+          {isEmpty && (
+            <text textAnchor="middle" dy="0.35em" fontSize={13} fill={textColor}>
+              {t.noData}
+            </text>
+          )}
 
           {/* ── Curved links ─────────────────────────────────────────────── */}
           <g

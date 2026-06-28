@@ -100,7 +100,10 @@ export function RichTextEditor({
       handlePaste(view, event) {
         if (!pasteAsPlainTextRef.current) return false;
         const text = event.clipboardData?.getData("text/plain");
-        if (text == null) return false;
+        // getData() returns "" (not null/undefined) when the clipboard has no text
+        // payload at all (e.g. an image or file) — falling through here lets TipTap's
+        // own paste handling take over instead of swallowing the paste into nothing.
+        if (!text) return false;
         event.preventDefault();
         const { state } = view;
         view.dispatch(state.tr.insertText(text, state.selection.from, state.selection.to));

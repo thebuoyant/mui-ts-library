@@ -1,4 +1,4 @@
-import { render, fireEvent, act, screen } from "@testing-library/react";
+import { render, fireEvent, act, screen, waitFor } from "@testing-library/react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { RadialTreeChart } from "./RadialTreeChart";
 import type { RadialTreeChartData } from "./RadialTreeChart.types";
@@ -40,6 +40,24 @@ describe("RadialTreeChart", () => {
     const svg = document.querySelector("svg");
     expect(svg?.getAttribute("width")).toBe("400");
     expect(svg?.getAttribute("height")).toBe("400");
+  });
+
+  // Regression: autoFit was accepted as a prop and listed in the viewBox
+  // effect's dependency array, but never actually consulted in the effect
+  // body — toggling it had zero effect on the rendered viewBox.
+  it("Should use the static size-based viewBox when autoFit=false, not the auto-fitted one", () => {
+    render(<RadialTreeChart data={SIMPLE_DATA} size={600} autoFit={false} />);
+    const svg = document.querySelector("svg");
+    expect(svg?.getAttribute("viewBox")).toBe("-300 -300 600 600");
+  });
+
+  it("Should use the auto-fitted viewBox (from getBBox) when autoFit=true (default)", async () => {
+    render(<RadialTreeChart data={SIMPLE_DATA} size={600} />);
+    const svg = document.querySelector("svg");
+    // mockBBox above is x:-300,y:-300,width:600,height:600 + 20px padding on each side
+    await waitFor(() => {
+      expect(svg?.getAttribute("viewBox")).toBe("-320 -320 640 640");
+    });
   });
 
   it("Should render node groups for each node", () => {
@@ -124,6 +142,41 @@ describe("RadialTreeChart", () => {
       vi.useRealTimers();
     });
 
+    // Regression: Escape reset focus/zoom but never cancelled a drill that was
+    // still inside its 250ms Ctrl+Click disambiguation window — the stale
+    // timer fired afterwards and silently re-drilled in, contradicting the
+    // reset and firing a second, contradictory onFocusChange.
+    it("Should cancel a pending drill when Escape is pressed inside the disambiguation window", () => {
+      vi.useFakeTimers();
+      const handler = vi.fn();
+      render(<RadialTreeChart data={SIMPLE_DATA} drillable onFocusChange={handler} />);
+      const alphaNode = document.querySelector<SVGGElement>("g[data-idx='1']");
+      act(() => { fireEvent.click(alphaNode!, { ctrlKey: true }); });
+      act(() => { fireEvent.keyDown(window, { key: "Escape" }); });
+      // Escape itself fires onFocusChange(null) synchronously — that's expected.
+      expect(handler).toHaveBeenCalledTimes(1);
+      expect(handler).toHaveBeenLastCalledWith(null);
+
+      // The pending drill timer must NOT fire a second, contradictory call
+      // re-drilling into Alpha after the reset.
+      act(() => { vi.advanceTimersByTime(250); });
+      expect(handler).toHaveBeenCalledTimes(1);
+      vi.useRealTimers();
+    });
+
+    it("Should not throw or fire onFocusChange when unmounted inside the disambiguation window", () => {
+      vi.useFakeTimers();
+      const handler = vi.fn();
+      const { unmount } = render(<RadialTreeChart data={SIMPLE_DATA} drillable onFocusChange={handler} />);
+      const alphaNode = document.querySelector<SVGGElement>("g[data-idx='1']");
+      act(() => { fireEvent.click(alphaNode!, { ctrlKey: true }); });
+
+      expect(() => unmount()).not.toThrow();
+      expect(() => act(() => { vi.advanceTimersByTime(250); })).not.toThrow();
+      expect(handler).not.toHaveBeenCalled();
+      vi.useRealTimers();
+    });
+
     it("Should render a fading ghost layer of the previous tree during the transition", () => {
       vi.useFakeTimers();
       render(<RadialTreeChart data={SIMPLE_DATA} drillable />);
@@ -175,6 +228,27 @@ describe("RadialTreeChart", () => {
       expect(screen.queryByTestId("drill-ghost-layer")).not.toBeInTheDocument();
       expect(document.querySelector("svg[aria-label='Root2']")).toBeInTheDocument();
       vi.useRealTimers();
+    });
+  });
+
+  // Regression: `translation.noData` was documented ("shown when data is
+  // empty") but never rendered anywhere.
+  describe("No data", () => {
+    const EMPTY_DATA: RadialTreeChartData = { id: "root", name: "Root" };
+
+    it("Should show the default noData message when data has no children and no value", () => {
+      render(<RadialTreeChart data={EMPTY_DATA} />);
+      expect(screen.getByText("No data")).toBeInTheDocument();
+    });
+
+    it("Should use a custom translation for noData", () => {
+      render(<RadialTreeChart data={EMPTY_DATA} translation={{ noData: "Keine Daten" }} />);
+      expect(screen.getByText("Keine Daten")).toBeInTheDocument();
+    });
+
+    it("Should not show the noData message when data has children", () => {
+      render(<RadialTreeChart data={SIMPLE_DATA} />);
+      expect(screen.queryByText("No data")).not.toBeInTheDocument();
     });
   });
 });

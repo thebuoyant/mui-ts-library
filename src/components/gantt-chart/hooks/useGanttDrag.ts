@@ -18,7 +18,7 @@
  *    wenn der User eigentlich gezogen hat (≥ 5px Bewegung).
  */
 
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useGanttChartStore, useRawGanttChartStore, useGanttTranslations } from "../GanttChart";
 import type { GanttTask, GanttTaskNode } from "../GanttChart.types";
 import { addDays } from "../util/gantt-chart.util";
@@ -110,6 +110,18 @@ export function useGanttDrag({
   // Suppress-Click (Muster 4)
   const suppressClickRef = useRef(false);
 
+  // Aktive Drag-Listener-Cleanup — wird normalerweise von onMouseUp selbst entfernt,
+  // aber falls die Komponente mitten im Drag unmountet (Zeile/Parent verschwindet,
+  // z.B. durch Collapse oder Filter), bleiben die document-Listener sonst für immer
+  // registriert. Dieses Ref + der Unmount-Effect darunter fängt genau das ab.
+  const activeDragCleanupRef = useRef<(() => void) | null>(null);
+
+  useEffect(() => {
+    return () => {
+      activeDragCleanupRef.current?.();
+    };
+  }, []);
+
   // ---------------------------------------------------------------------------
   // Move / Resize
   // ---------------------------------------------------------------------------
@@ -168,10 +180,16 @@ export function useGanttDrag({
       setActiveDrag(null);
       document.removeEventListener("mousemove", onMouseMove);
       document.removeEventListener("mouseup",   onMouseUp);
+      activeDragCleanupRef.current = null;
     };
 
     document.addEventListener("mousemove", onMouseMove);
     document.addEventListener("mouseup",   onMouseUp);
+    activeDragCleanupRef.current = () => {
+      document.body.style.cursor = "";
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup",   onMouseUp);
+    };
   };
 
   // ---------------------------------------------------------------------------
@@ -228,10 +246,16 @@ export function useGanttDrag({
       setActiveDrag(null);
       document.removeEventListener("mousemove", onMouseMove);
       document.removeEventListener("mouseup",   onMouseUp);
+      activeDragCleanupRef.current = null;
     };
 
     document.addEventListener("mousemove", onMouseMove);
     document.addEventListener("mouseup",   onMouseUp);
+    activeDragCleanupRef.current = () => {
+      document.body.style.cursor = "";
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup",   onMouseUp);
+    };
   };
 
   // ---------------------------------------------------------------------------

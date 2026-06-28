@@ -5,6 +5,7 @@ import {
   type SunburstChartProps,
   type SunburstSegmentInfo,
   type SunburstZoomInfo,
+  DEFAULT_SUNBURST_CHART_TRANSLATION,
 } from "./SunburstChart.types";
 import type { SunburstChartData } from "./SunburstChart.types";
 
@@ -90,8 +91,11 @@ export function SunburstChart({
   zoomable = false,
   duration = 750,
   disabled = false,
+  translation,
 }: SunburstChartProps) {
   const theme = useTheme();
+  const t = { ...DEFAULT_SUNBURST_CHART_TRANSLATION, ...translation };
+  const isEmpty = !data.children?.length && !data.value;
 
   const contentRef = useRef<SVGGElement>(null);
   const [baseViewBox, setBaseViewBox] = useState(`-${size / 2} -${size / 2} ${size} ${size}`);
@@ -412,6 +416,12 @@ export function SunburstChart({
         aria-label={data.name}
       >
         <g ref={contentRef}>
+          {isEmpty && (
+            <text textAnchor="middle" dy="0.35em" fontSize={13} fill={theme.palette.text.secondary}>
+              {t.noData}
+            </text>
+          )}
+
           {/* Center hole hit area (donut mode) */}
           {clampedInner > 0 && (
             <Tooltip
@@ -495,8 +505,8 @@ export function SunburstChart({
             </g>
           )}
 
-          {/* Center label — current focus node name */}
-          {showRootLabel && (
+          {/* Center label — current focus node name (hidden in the empty-data state, which shows t.noData instead) */}
+          {showRootLabel && !isEmpty && (
             <Tooltip
               {...tooltipProps}
               placement="top"

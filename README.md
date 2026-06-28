@@ -408,6 +408,20 @@ This project follows [Semantic Versioning](https://semver.org/). In practice:
 
 ## Changelog
 
+### [3.11.2] — 2026-06-28
+
+**Fixed**
+- A deep bug audit across all 11 components — stale timers/listeners on unmount, `maxTags` bypass, missing `noData` rendering on all 5 D3 charts, `ChordChart` valueIn/valueOut miscount in undirected mode, `HorizontalTreeChart` RL/BT mirror off-center for shallow trees, and more. Every fix is backed by a regression test. See [Changelog](#3112--2026-06-28) for the full list.
+
+---
+
+### [3.11.1] — 2026-06-27
+
+**Fixed**
+- TagSelection: duplicate tag in the `WithCustomColorCreation` Storybook story — a story bug, not a component bug. See [Changelog](#3111--2026-06-27).
+
+---
+
 ### [3.11.0] — 2026-06-25
 
 **RadialTreeChart & HorizontalTreeChart**

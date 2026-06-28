@@ -23,6 +23,7 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutlined";
 import { useId, useMemo, useState } from "react";
 import { scorePassword } from "./util/password-strength.util";
 import { PasswordStrengthBar } from "./PasswordStrengthBar";
+import { useTimedFlag } from "../shared/useTimedFlag";
 import type {
   CheckColors,
   CustomRequirement,
@@ -48,7 +49,11 @@ function generateSecurePassword(opts: Required<PasswordGeneratorOptions>): strin
   if (charSets.length === 0) charSets.push("abcdefghijklmnopqrstuvwxyz");
 
   const allChars = charSets.join("");
-  const array    = new Uint32Array(opts.length);
+  // Guaranteeing one char per active class can't be satisfied if length is
+  // smaller than the number of active classes — never produce fewer characters
+  // than that guarantee requires, even if a smaller length was requested.
+  const length = Math.max(opts.length, charSets.length);
+  const array   = new Uint32Array(Math.max(0, length - charSets.length));
   crypto.getRandomValues(array);
 
   // Guarantee at least one char from each active class
@@ -57,9 +62,7 @@ function generateSecurePassword(opts: Required<PasswordGeneratorOptions>): strin
     return set[idx];
   });
 
-  const remaining = Array.from(array.slice(guaranteed.length)).map(
-    (n) => allChars[n % allChars.length],
-  );
+  const remaining = Array.from(array).map((n) => allChars[n % allChars.length]);
 
   // Shuffle the result so the guaranteed chars aren't always at the start
   const combined = [...guaranteed, ...remaining];
@@ -137,7 +140,7 @@ export function PasswordStrengthMeter({
   const [showConfirm, setShowConfirm] = useState(false);
   const [internalPassword, setInternalPassword] = useState("");
   const [internalConfirm, setInternalConfirm] = useState("");
-  const [copied, setCopied] = useState(false);
+  const [copied, triggerCopied] = useTimedFlag();
 
   // Im kontrollierten Modus kommt der Wert von außen (value-Prop),
   // im unkontrollierten Modus wird der interne State genutzt.
@@ -208,8 +211,7 @@ export function PasswordStrengthMeter({
 
   const handleCopy = () => {
     navigator.clipboard.writeText(password).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      triggerCopied();
     });
   };
 

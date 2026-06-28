@@ -40,6 +40,19 @@ type JsonEditorContentProps = {
 
 type PathFeedback = { x: number; y: number; path: string };
 
+// Extracted so the same logic drives both the initial extensions array and the
+// live-reconfigure effect below — showFolding/showLineNumbers/placeholder used
+// to be baked in at editor-creation time only, silently ignoring later changes.
+function lineNumbersExtensions(show: boolean) {
+  return show ? [lineNumbers(), highlightActiveLineGutter()] : [];
+}
+function foldingExtensions(show: boolean) {
+  return show ? [foldGutter()] : [];
+}
+function placeholderExtensions(text: string | undefined) {
+  return text ? [cmPlaceholder(text)] : [];
+}
+
 export function JsonEditorContent({
   value,
   onChange,
@@ -72,8 +85,11 @@ export function JsonEditorContent({
 
   const [pathFeedback, setPathFeedback] = useState<PathFeedback | null>(null);
 
-  const editableCompartment = useRef(new Compartment());
-  const readOnlyCompartment = useRef(new Compartment());
+  const editableCompartment     = useRef(new Compartment());
+  const readOnlyCompartment     = useRef(new Compartment());
+  const foldingCompartment      = useRef(new Compartment());
+  const lineNumbersCompartment  = useRef(new Compartment());
+  const placeholderCompartment  = useRef(new Compartment());
 
   const muiTheme = useTheme();
   const isDark   = muiTheme.palette.mode === "dark";
@@ -205,9 +221,9 @@ export function JsonEditorContent({
       editableCompartment.current.of(EditorView.editable.of(!disabled && !readonly)),
       readOnlyCompartment.current.of(EditorState.readOnly.of(readonly)),
       highlightActiveLine(),
-      ...(showLineNumbers ? [lineNumbers(), highlightActiveLineGutter()] : []),
-      ...(showFolding ? [foldGutter()] : []),
-      ...(placeholder ? [cmPlaceholder(placeholder)] : []),
+      lineNumbersCompartment.current.of(lineNumbersExtensions(showLineNumbers)),
+      foldingCompartment.current.of(foldingExtensions(showFolding)),
+      placeholderCompartment.current.of(placeholderExtensions(placeholder)),
       ...minimapExtensions,
       EditorView.updateListener.of((update) => {
         if (update.docChanged) {
@@ -283,6 +299,24 @@ export function JsonEditorContent({
       ],
     });
   }, [disabled, readonly]);
+
+  useEffect(() => {
+    viewRef.current?.dispatch({
+      effects: lineNumbersCompartment.current.reconfigure(lineNumbersExtensions(showLineNumbers)),
+    });
+  }, [showLineNumbers]);
+
+  useEffect(() => {
+    viewRef.current?.dispatch({
+      effects: foldingCompartment.current.reconfigure(foldingExtensions(showFolding)),
+    });
+  }, [showFolding]);
+
+  useEffect(() => {
+    viewRef.current?.dispatch({
+      effects: placeholderCompartment.current.reconfigure(placeholderExtensions(placeholder)),
+    });
+  }, [placeholder]);
 
   useEffect(() => {
     if (!pathFeedback) return;

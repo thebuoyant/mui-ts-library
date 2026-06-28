@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Box, Divider } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import CheckIcon       from "@mui/icons-material/Check";
@@ -11,6 +10,7 @@ import { undo, redo } from "@codemirror/commands";
 import type { EditorView } from "@codemirror/view";
 import type { JsonEditorToolbarConfig, JsonEditorTranslation } from "./JsonEditor.types";
 import { ToolbarButton } from "../shared/ToolbarButton";
+import { useTimedFlag } from "../shared/useTimedFlag";
 
 type JsonEditorToolbarProps = {
   editorView:    EditorView | null;
@@ -27,7 +27,7 @@ export function JsonEditorToolbar({
   indent,
   disabled,
 }: JsonEditorToolbarProps) {
-  const [copied, setCopied] = useState(false);
+  const [copied, triggerCopied] = useTimedFlag();
   const isDisabled = disabled || !editorView;
 
   function handleFormat() {
@@ -59,8 +59,7 @@ export function JsonEditorToolbar({
   function handleCopy() {
     const text = editorView?.state.doc.toString() ?? "";
     navigator.clipboard.writeText(text).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      triggerCopied();
     });
   }
 
