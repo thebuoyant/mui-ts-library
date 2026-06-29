@@ -408,6 +408,13 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/). In der Praxis b
 
 ## Changelog
 
+### [3.11.3] — 2026-06-29
+
+**Behoben**
+- GanttChart: Der eingebaute Task-Dialog schließt jetzt Tasks, die bereits (direkt oder transitiv) vom bearbeiteten Task abhängen, aus dem Dependencies-Dropdown aus — der letzte zurückgestellte Punkt aus dem Bug-Audit von v3.11.2 (kein Schutz gegen Abhängigkeitszyklen). Siehe [Changelog](#3113--2026-06-29).
+
+---
+
 ### [3.11.2] — 2026-06-28
 
 **Behoben**

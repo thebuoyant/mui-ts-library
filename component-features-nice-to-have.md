@@ -16,7 +16,6 @@ Innerhalb jeder Sektion stehen offene Items zuerst (⭐ oben), erledigte (durchg
 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
-| 🟡 Dependency-Zyklus-Schutz | Bearbeiten der Task-Daten/Abhängigkeiten über den Task-Dialog kann ohne Warnung einen Abhängigkeitszyklus erzeugen — kein Guard Rail. Gefunden im Bug-Audit v3.11.2. | Mittel | — |
 | ⭐ Keyboard Navigation | Pfeiltasten für Task-Auswahl, Enter zum Öffnen — Accessibility-Grundlage | Mittel | — |
 | ⭐ Export PNG/PDF | Timeline als Bild oder PDF — meistgefragtes Feature in Gantt-Bibliotheken | Hoch | — |
 | Schnell-Hinzufügen | Task direkt aus der Toolbar anlegen mit Preset-Daten (kein Dialog) | Mittel | — |
@@ -27,6 +26,7 @@ Innerhalb jeder Sektion stehen offene Items zuerst (⭐ oben), erledigte (durchg
 | Resource View | Horizontale Ansicht: eine Zeile pro Person/Ressource | Hoch | — |
 | Touch / Mobile Drag | Drag & Drop auf Touch-Geräten (Pointer Events API) | Hoch | — |
 | Mini-Map | Kleine Übersichts-Timeline für schnelle Navigation bei vielen Tasks | Hoch | — |
+| ~~Dependency-Zyklus-Schutz~~ | ~~Bearbeiten der Task-Daten/Abhängigkeiten über den Task-Dialog konnte ohne Warnung einen Abhängigkeitszyklus erzeugen.~~ Tasks, die bereits (direkt oder transitiv) vom bearbeiteten Task abhängen, werden jetzt aus den Dependency-Optionen ausgeschlossen. | ~~Mittel~~ | ✅ v3.11.3 |
 | ~~Spalte: Assignee~~ | ~~Zusätzliche Spalte im Task-Panel für Verantwortliche~~ | ~~Mittel~~ | ✅ v2.7.0 |
 | ~~CSV / Excel Export~~ | ~~Tasks als Tabelle exportieren~~ | ~~Mittel~~ | ✅ v2.7.0 |
 | ~~Zoom per Scroll~~ | ~~Ctrl / Cmd ⌘+Scroll ändert TimeScale~~ | ~~Mittel~~ | ✅ v1.5.0 |

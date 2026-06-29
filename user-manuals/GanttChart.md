@@ -114,7 +114,7 @@ Each task is passed as a `GanttTask` object. The `tasks` prop expects a flat arr
 | `startDate` | `Date` | **Yes** | Start date of the task. Determines the left edge of the bar. |
 | `endDate` | `Date` | **Yes** | End date of the task. Determines the right edge of the bar. |
 | `parentId` | `string` | No | ID of the parent task. Omit for root tasks (top level). When set, creates an indented row in the panel and builds the tree. |
-| `dependencies` | `string[]` | No | IDs of predecessor tasks. Shown as a multi-select in the edit dialog. When used with `cascadeDependencies`, successors are automatically shifted when a predecessor moves. |
+| `dependencies` | `string[]` | No | IDs of predecessor tasks. Shown as a multi-select in the edit dialog — any task that already (directly or transitively) depends on the task being edited is excluded from the options, so the built-in dialog cannot create a dependency cycle. When used with `cascadeDependencies`, successors are automatically shifted when a predecessor moves. |
 | `isMilestone` | `boolean` | No | When `true`, the task is rendered as a diamond (♦) instead of a bar. Milestones should have `startDate ≈ endDate`. |
 | `progress` | `number` | No | Progress in percent (0–100). Rendered as a semi-transparent overlay bar on top of the task bar. Interactive when `progressDraggable={true}`. |
 | `color` | `string` | No | Overrides the status-based bar color for this individual task (highest priority). Any CSS color value (e.g. `"#e91e63"` or `"rgb(0,150,136)"`). |

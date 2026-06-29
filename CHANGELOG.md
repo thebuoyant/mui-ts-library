@@ -13,6 +13,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.11.3] — 2026-06-29
+
+### Fixed
+
+#### GanttChart — dependency cycle guard in the built-in task dialog
+
+The last deferred item from the v3.11.2 bug audit: editing a task's dependencies via the built-in dialog had no guard against creating a dependency cycle (two tasks transitively depending on each other — a scheduling deadlock). The dialog already excluded a task and its tree-descendants from the *parent* dropdown to prevent circular hierarchy; the *dependencies* dropdown reused that same exclusion set, which has nothing to do with the separate dependency graph.
+
+Added `getDependencyCycleCandidates()` (`gantt-chart.util.ts`): given the task being edited, returns every task that already (directly or transitively) depends on it — i.e. every task that would close a cycle if selected as a new dependency. The dependencies dropdown now excludes these candidates, so the built-in dialog cannot create a cycle in the first place. Factored the existing successor-map builder (previously inlined in `cascadeDateUpdate`) into a shared helper used by both functions.
+
+Covered by 6 new unit tests for the cycle-detection logic itself, plus 2 dialog-level regression tests confirming the conflicting task is excluded from the dropdown while unrelated tasks remain selectable.
+
+---
+
 ## [3.11.2] — 2026-06-28
 
 ### Fixed

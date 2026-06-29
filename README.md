@@ -408,6 +408,13 @@ This project follows [Semantic Versioning](https://semver.org/). In practice:
 
 ## Changelog
 
+### [3.11.3] — 2026-06-29
+
+**Fixed**
+- GanttChart: the built-in task dialog now excludes any task that already (directly or transitively) depends on the task being edited from the dependencies dropdown — closing the last deferred item from the v3.11.2 bug audit (no guard rail against creating a dependency cycle). See [Changelog](#3113--2026-06-29).
+
+---
+
 ### [3.11.2] — 2026-06-28
 
 **Fixed**

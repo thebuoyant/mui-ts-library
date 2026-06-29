@@ -13,6 +13,20 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [3.11.3] — 2026-06-29
+
+### Behoben
+
+#### GanttChart — Abhängigkeitszyklus-Schutz im eingebauten Task-Dialog
+
+Der letzte zurückgestellte Punkt aus dem Bug-Audit von v3.11.2: Das Bearbeiten der Abhängigkeiten eines Tasks über den eingebauten Dialog hatte keinen Schutz gegen einen Abhängigkeitszyklus (zwei Tasks, die transitiv voneinander abhängen — ein Scheduling-Deadlock). Der Dialog schloss den Task selbst und seine Baum-Nachkommen bereits aus dem *Eltern*-Dropdown aus, um eine zirkuläre Hierarchie zu verhindern; das *Dependencies*-Dropdown nutzte dieselbe Ausschlussmenge wieder — die aber nichts mit dem separaten Abhängigkeitsgraphen zu tun hat.
+
+`getDependencyCycleCandidates()` (`gantt-chart.util.ts`) hinzugefügt: liefert für den bearbeiteten Task alle Tasks, die bereits (direkt oder transitiv) von ihm abhängen — also alle, die bei Auswahl als neue Dependency einen Zyklus schließen würden. Das Dependencies-Dropdown schließt diese Kandidaten jetzt aus, sodass der eingebaute Dialog von vornherein keinen Zyklus erzeugen kann. Die bestehende Successor-Map-Erstellung (vorher in `cascadeDateUpdate` inline) wurde in einen von beiden Funktionen geteilten Helper ausgelagert.
+
+Abgesichert durch 6 neue Unit-Tests für die Zyklus-Erkennung selbst, plus 2 Dialog-Regressionstests, die bestätigen, dass der konfliktbehaftete Task aus dem Dropdown ausgeschlossen wird, während nicht betroffene Tasks weiterhin wählbar bleiben.
+
+---
+
 ## [3.11.2] — 2026-06-28
 
 ### Behoben

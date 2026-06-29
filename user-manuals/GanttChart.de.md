@@ -114,7 +114,7 @@ Jede Aufgabe wird als `GanttTask`-Objekt übergeben. Die `tasks`-Prop erwartet e
 | `startDate` | `Date` | **Ja** | Startdatum des Tasks. Bestimmt die linke Kante des Balkens. |
 | `endDate` | `Date` | **Ja** | Enddatum des Tasks. Bestimmt die rechte Kante des Balkens. |
 | `parentId` | `string` | Nein | ID des übergeordneten Tasks. Wird weggelassen für Root-Tasks (oberste Ebene). Erzeugt bei Angabe eine Einrückung im Panel und baut den Baum auf. |
-| `dependencies` | `string[]` | Nein | IDs von Vorgänger-Tasks. Wird im Bearbeiten-Dialog als Multiselect angezeigt. In Kombination mit `cascadeDependencies` werden Nachfolger automatisch verschoben. |
+| `dependencies` | `string[]` | Nein | IDs von Vorgänger-Tasks. Wird im Bearbeiten-Dialog als Multiselect angezeigt — Tasks, die bereits (direkt oder transitiv) vom bearbeiteten Task abhängen, werden aus den Optionen ausgeschlossen, sodass der eingebaute Dialog keinen Abhängigkeitszyklus erzeugen kann. In Kombination mit `cascadeDependencies` werden Nachfolger automatisch verschoben. |
 | `isMilestone` | `boolean` | Nein | Wenn `true`, wird der Task als Raute (♦) statt als Balken dargestellt. Meilensteine sollten `startDate ≈ endDate` haben. |
 | `progress` | `number` | Nein | Fortschritt in Prozent (0–100). Wird als halbopaker Overlay-Balken über den Task-Balken gerendert. Interaktiv wenn `progressDraggable={true}`. |
 | `color` | `string` | Nein | Überschreibt die statusbasierte Balkenfarbe für diesen einzelnen Task (höchste Priorität). Beliebiger CSS-Farbwert (z. B. `"#e91e63"` oder `"rgb(0,150,136)"`). |

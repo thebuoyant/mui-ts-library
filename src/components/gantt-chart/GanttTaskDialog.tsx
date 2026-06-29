@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 import { useGanttChartStore, useGanttTranslations } from "./GanttChart";
 import type { GanttTask, GanttTaskNode, GanttTaskStatus } from "./GanttChart.types";
+import { getDependencyCycleCandidates } from "./util/gantt-chart.util";
 
 type TaskFormState = {
   name: string;
@@ -100,7 +101,16 @@ export function GanttTaskDialog({
   }, [mode, initialTask, flattenedTasks]);
 
   const parentOptions = flattenedTasks.filter((n) => !excludedIds.has(n.id));
-  const dependencyOptions = parentOptions; // gleiche Ausschlussmenge wie Elternelement
+
+  // Zusätzlich zur Eltern-Ausschlussmenge: Tasks, die bereits (direkt oder transitiv)
+  // von initialTask abhängen, dürfen nicht als Dependency wählbar sein — sonst entsteht
+  // ein Zyklus (beide Tasks warten aufeinander).
+  const dependencyCycleIds = useMemo(() => {
+    if (mode === "add" || !initialTask) return new Set<string>();
+    return getDependencyCycleCandidates(flattenedTasks, initialTask.id);
+  }, [mode, initialTask, flattenedTasks]);
+
+  const dependencyOptions = parentOptions.filter((n) => !dependencyCycleIds.has(n.id));
 
   const defaultDate = toDateString(
     clampDate(new Date(), timelineRange.start, timelineRange.end),

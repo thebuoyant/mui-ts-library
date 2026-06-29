@@ -6,6 +6,7 @@ import {
   cascadeDateUpdate,
   computeCriticalPath,
   getDaysInRange,
+  getDependencyCycleCandidates,
   getISOWeekNumber,
   getMonthsInRange,
   getQuartersInRange,
@@ -546,5 +547,62 @@ describe("computeCriticalPath", () => {
     ];
 
     expect(() => computeCriticalPath(tasks)).not.toThrow();
+  });
+});
+
+describe("getDependencyCycleCandidates", () => {
+  it("Should return empty when no task depends on the given task", () => {
+    const tasks = [makeTask({ id: "a" }), makeTask({ id: "b" })];
+
+    expect(getDependencyCycleCandidates(tasks, "a")).toEqual(new Set());
+  });
+
+  it("Should return the direct successor — selecting it as a's dependency would close a 2-node cycle", () => {
+    const tasks = [
+      makeTask({ id: "a" }),
+      makeTask({ id: "b", dependencies: ["a"] }), // b depends on a
+    ];
+
+    // b already depends on a — if a were made to depend on b too, that's a deadlock.
+    expect(getDependencyCycleCandidates(tasks, "a")).toEqual(new Set(["b"]));
+  });
+
+  it("Should return transitive successors across multiple levels", () => {
+    const tasks = [
+      makeTask({ id: "a" }),
+      makeTask({ id: "b", dependencies: ["a"] }),
+      makeTask({ id: "c", dependencies: ["b"] }),
+    ];
+
+    expect(getDependencyCycleCandidates(tasks, "a")).toEqual(new Set(["b", "c"]));
+  });
+
+  it("Should not include unrelated tasks", () => {
+    const tasks = [
+      makeTask({ id: "a" }),
+      makeTask({ id: "b", dependencies: ["a"] }),
+      makeTask({ id: "unrelated" }),
+    ];
+
+    expect(getDependencyCycleCandidates(tasks, "a")).toEqual(new Set(["b"]));
+  });
+
+  it("Should not include predecessors — only successors create a cycle risk", () => {
+    const tasks = [
+      makeTask({ id: "a", dependencies: ["b"] }), // a depends on b — the other direction
+      makeTask({ id: "b" }),
+    ];
+
+    // b does NOT depend on a (a depends on b), so b is a safe dependency choice for a.
+    expect(getDependencyCycleCandidates(tasks, "a")).toEqual(new Set());
+  });
+
+  it("Should not throw and should terminate when the existing data already contains a cycle", () => {
+    const tasks = [
+      makeTask({ id: "a", dependencies: ["b"] }),
+      makeTask({ id: "b", dependencies: ["a"] }),
+    ];
+
+    expect(() => getDependencyCycleCandidates(tasks, "a")).not.toThrow();
   });
 });

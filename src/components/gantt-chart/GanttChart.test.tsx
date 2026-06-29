@@ -1295,6 +1295,37 @@ describe("GanttChart — dialog dependencies", () => {
     const created = onTaskCreated.mock.calls[0][0] as GanttTask;
     expect(created.dependencies).toBeUndefined();
   });
+
+  // The testid sits on MUI's hidden, aria-hidden/tabindex=-1 native input (for form
+  // value sync) — the actual clickable trigger is the sibling [role="combobox"] div.
+  function openDependenciesDropdown() {
+    const hiddenInput = screen.getByTestId("gantt-dialog-field-dependencies");
+    const combobox = hiddenInput.parentElement!.querySelector('[role="combobox"]')!;
+    fireEvent.mouseDown(combobox);
+  }
+
+  // Regression: nothing prevented selecting a dependency that already (directly or
+  // transitively) depends on the task being edited — a deadlock where both tasks wait
+  // on each other. "main" already depends on "pred", so editing "pred" must not offer
+  // "main" as a selectable dependency (would close a 2-node cycle).
+  it("Should not offer a task that already depends on the edited task as a dependency option (cycle guard)", () => {
+    render(<GanttChart tasks={depDialogTasks} enableBuiltinDialogs />);
+    fireEvent.click(screen.getByTestId("gantt-edit-task-pred"));
+    openDependenciesDropdown();
+    expect(screen.getByRole("listbox")).toBeInTheDocument(); // sanity: dropdown actually opened
+    expect(screen.queryByRole("option", { name: "Main Task" })).not.toBeInTheDocument();
+  });
+
+  it("Should still offer an unrelated task as a dependency option", () => {
+    const tasks: GanttTask[] = [
+      ...depDialogTasks,
+      { id: "other", name: "Other Task", status: "planned", startDate: new Date("2025-04-01"), endDate: new Date("2025-04-30") },
+    ];
+    render(<GanttChart tasks={tasks} enableBuiltinDialogs />);
+    fireEvent.click(screen.getByTestId("gantt-edit-task-pred"));
+    openDependenciesDropdown();
+    expect(screen.getByRole("option", { name: "Other Task" })).toBeInTheDocument();
+  });
 });
 
 // ---------------------------------------------------------------------------

@@ -163,6 +163,19 @@ export function addDays(date: Date, days: number): Date {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days, 0, 0, 0, 0);
 }
 
+// Vorgänger→Nachfolger-Map: successorMap[predId] = alle Tasks, die predId in ihren
+// dependencies haben. Von cascadeDateUpdate und getDependencyCycleCandidates geteilt.
+function buildSuccessorMap(tasks: GanttTask[]): Map<string, string[]> {
+  const successorMap = new Map<string, string[]>();
+  for (const task of tasks) {
+    for (const depId of task.dependencies ?? []) {
+      if (!successorMap.has(depId)) successorMap.set(depId, []);
+      successorMap.get(depId)!.push(task.id);
+    }
+  }
+  return successorMap;
+}
+
 /**
  * Verschiebt alle Finish-to-Start-Nachfolger des geänderten Tasks um dasselbe Zeit-Delta.
  * Läuft via BFS durch den Abhängigkeitsgraphen — zyklische Abhängigkeiten werden durch
@@ -175,15 +188,7 @@ export function cascadeDateUpdate(
 ): GanttTask[] {
   if (deltaMs === 0) return tasks;
 
-  // Vorgänger→Nachfolger-Map aufbauen.
-  const successorMap = new Map<string, string[]>();
-  for (const task of tasks) {
-    for (const depId of task.dependencies ?? []) {
-      if (!successorMap.has(depId)) successorMap.set(depId, []);
-      successorMap.get(depId)!.push(task.id);
-    }
-  }
-
+  const successorMap = buildSuccessorMap(tasks);
   const updatedMap = new Map<string, GanttTask>(tasks.map((t) => [t.id, t]));
   const queue = [...(successorMap.get(changedTaskId) ?? [])];
   const visited = new Set<string>();
@@ -205,6 +210,27 @@ export function cascadeDateUpdate(
 
   // Original-Reihenfolge beibehalten.
   return tasks.map((t) => updatedMap.get(t.id)!);
+}
+
+/**
+ * Liefert alle Task-IDs, die — direkt oder transitiv — bereits von `taskId` abhängen
+ * (d.h. taskId als Vorgänger in ihrer dependencies-Kette haben). Würde taskId selbst
+ * von einer dieser IDs abhängen, entstünde ein Zyklus (Deadlock: beide warten aufeinander) —
+ * diese IDs müssen also aus den für taskId wählbaren Dependency-Optionen ausgeschlossen werden.
+ */
+export function getDependencyCycleCandidates(tasks: GanttTask[], taskId: string): Set<string> {
+  const successorMap = buildSuccessorMap(tasks);
+  const reachable = new Set<string>();
+  const queue = [...(successorMap.get(taskId) ?? [])];
+
+  while (queue.length > 0) {
+    const id = queue.shift()!;
+    if (reachable.has(id)) continue;
+    reachable.add(id);
+    queue.push(...(successorMap.get(id) ?? []));
+  }
+
+  return reachable;
 }
 
 /**
