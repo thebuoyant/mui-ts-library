@@ -73,6 +73,17 @@ export type TagSelectionProps = {
   maxVisibleChips?: number;
   // Richtung in der der Overflow-Popover aufgeht. Standard: "bottom".
   popoverPlacement?: "top" | "bottom";
+  // Verzögert den onSearchChange-Aufruf um diese Zeit (ms) nach dem letzten Tastenanschlag —
+  // für serverseitige Suche, damit nicht bei jedem Zeichen ein Request rausgeht.
+  // Das Eingabefeld selbst bleibt sofort responsiv, nur der Callback wird debounced.
+  // Default: kein Debounce (0/undefined) — unverändertes Verhalten wie bisher.
+  searchDebounceMs?: number;
+  // Wenn true: `tags` wird als bereits korrekt gefiltert vertraut — die Komponente filtert
+  // selbst nicht mehr per Substring, und auch MUIs eigene interne Autocomplete-Filterung wird
+  // deaktiviert. Nötig für serverseitige Suche mit Fuzzy-/Tippfehler-Matching, wo Treffer den
+  // eingegebenen Suchstring nicht zwingend wörtlich enthalten. Default: false (clientseitiger
+  // Substring-Filter wie bisher).
+  serverSideFilter?: boolean;
   showAutoComplete?: boolean;
   showSelectedTags?: boolean;
   showSelectedTagsLabel?: boolean;

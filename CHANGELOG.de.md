@@ -13,6 +13,29 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [3.12.0] — 2026-06-29
+
+### Hinzugefügt
+
+#### TagSelection — `searchDebounceMs` und `serverSideFilter`
+
+Zwei neue Props für serverseitige Tag-Suche, die größte Lücke im bisherigen `onSearchChange`-Muster:
+
+- **`searchDebounceMs?: number`** — verzögert den `onSearchChange`-Aufruf um diese Zeit (ms) nach dem letzten Tastenanschlag. Das Eingabefeld selbst bleibt sofort responsiv — nur der Callback an deinen Code wird debounced, sodass nicht bei jedem Tastenanschlag ein Request rausgeht.
+- **`serverSideFilter?: boolean`** (Standard `false`) — wenn `true`, wird `tags` als bereits korrekt gefiltert vertraut. Ohne diese Prop filtert die Komponente (und MUIs eigene interne `Autocomplete`-Filterung) `tags` erneut per Substring-Abgleich gegen den eingegebenen Text — was korrekte Server-Ergebnisse stillschweigend versteckt, wenn der Server Fuzzy-Matching, Tippfehler-Toleranz oder Ranking macht, da diese Treffer den eingegebenen Text nicht zwingend wörtlich enthalten.
+
+### Behoben
+
+#### TagSelection — verirrter leerer `onSearchChange`-Aufruf nach jedem Tastenanschlag
+
+Gefunden bei der Umsetzung der obigen Props: MUIs `Autocomplete` feuert `onInputChange` ein zweites Mal mit `reason="reset"` und leerem Wert direkt nach jeder echten `reason="input"`-Änderung — ein Seiteneffekt davon, dass diese Komponente nie einen kontrollierten `value` trackt (Auswahl läuft über ein separates `onChange`/`onTagSelect`, nicht über den eigenen Wert des Autocomplete). Dieser zweite Aufruf wurde ungefiltert an `onSearchChange` weitergereicht — jede dokumentierte "Serverseitige Filterung"-Integration feuerte also zwei Aufrufe pro Tastenanschlag: einen echten mit dem eingegebenen Text, direkt gefolgt von einem mit `""`. Jetzt wird nur noch `reason === "input"` weitergereicht.
+
+(Das blieb bei manuellem Testen und in mit `@testing-library/user-event` geschriebenen Tests verdeckt, da die Simulation echter Tastendrücke MUIs internen Reset-Pfad nicht auf dieselbe Weise triggert wie das direkte Auslösen eines Change-Events — erst durch `searchDebounceMs` wurde das Zwei-Aufrufe-pro-Tastenanschlag-Muster überhaupt beobachtbar.)
+
+Abgesichert durch 5 neue Tests (sofortiges vs. debounced `onSearchChange`-Timing, Cleanup bei Unmount während des Debounce, Default- vs. `serverSideFilter`-Substring-Filterung), jeweils empirisch gegen den Vorher-Code verifiziert.
+
+---
+
 ## [3.11.3] — 2026-06-29
 
 ### Behoben

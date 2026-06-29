@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Box, Stack } from "@mui/material";
 import { useStore } from "zustand";
 import {
@@ -47,6 +47,8 @@ function TagSelectionInner({
   maxVisibleChips,
   popoverPlacement = "bottom",
   listboxMaxHeight,
+  searchDebounceMs,
+  serverSideFilter = false,
   translation,
   onTagSelect,
   onTagDelete,
@@ -140,12 +142,35 @@ function TagSelectionInner({
     emitTagsChange(nextTags);
   };
 
+  // Nur der onSearchChange-Aufruf an den Consumer wird debounced — der Suchwert selbst
+  // (für das Eingabefeld + den clientseitigen Filter) bleibt sofort responsiv.
+  const searchDebounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (searchDebounceTimerRef.current) clearTimeout(searchDebounceTimerRef.current);
+    };
+  }, []);
+
   const handleSearchChange = (value: string) => {
     setSearchValue(value);
 
-    if (onSearchChange) {
-      onSearchChange(value);
+    if (!onSearchChange) return;
+
+    if (searchDebounceTimerRef.current) {
+      clearTimeout(searchDebounceTimerRef.current);
+      searchDebounceTimerRef.current = null;
     }
+
+    if (!searchDebounceMs) {
+      onSearchChange(value);
+      return;
+    }
+
+    searchDebounceTimerRef.current = setTimeout(() => {
+      onSearchChange(value);
+      searchDebounceTimerRef.current = null;
+    }, searchDebounceMs);
   };
 
   const handleTagCreate = (newTag: TagSelectionItem) => {
@@ -192,6 +217,7 @@ function TagSelectionInner({
             isMaxReached={isMaxReached}
             allowCreate={allowCreate}
             listboxMaxHeight={listboxMaxHeight}
+            serverSideFilter={serverSideFilter}
           />
         )}
       </Stack>
@@ -214,6 +240,8 @@ export function TagSelection({
   maxVisibleChips,
   popoverPlacement = "bottom",
   listboxMaxHeight,
+  searchDebounceMs,
+  serverSideFilter = false,
   onTagSelect,
   onTagDelete,
   onTagsChange,
@@ -240,6 +268,8 @@ export function TagSelection({
         maxVisibleChips={maxVisibleChips}
         popoverPlacement={popoverPlacement}
         listboxMaxHeight={listboxMaxHeight}
+        searchDebounceMs={searchDebounceMs}
+        serverSideFilter={serverSideFilter}
         onTagSelect={onTagSelect}
         onTagDelete={onTagDelete}
         onTagsChange={onTagsChange}

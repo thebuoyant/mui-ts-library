@@ -127,6 +127,8 @@ type TagSelectionItem = {
 | `maxTags` | `number` | — | Maximale Anzahl gleichzeitig auswählbarer Tags. Wenn das Limit erreicht ist, wird das Autocomplete-Eingabefeld automatisch deaktiviert und ein Hinweistext erscheint. Das Entfernen eines ausgewählten Tags entsperrt das Feld wieder. |
 | `maxVisibleChips` | `number` | — | Maximale Anzahl sichtbarer Chips im Auswahl-Bereich. Überzählige Chips werden hinter einem `+N`-Chip verborgen. Ein Klick auf `+N` öffnet einen Popover mit den versteckten Chips — diese können dort auch gelöscht werden. Ohne diesen Prop werden alle Chips angezeigt. |
 | `popoverPlacement` | `"top" \| "bottom"` | `"bottom"` | Öffnungsrichtung des Overflow-Popovers (relativ zum `+N`-Chip). Nur relevant wenn `maxVisibleChips` gesetzt ist. |
+| `searchDebounceMs` | `number` | — | Verzögert den `onSearchChange`-Aufruf um diese Zeit (ms) nach dem letzten Tastenanschlag. Das Eingabefeld selbst bleibt sofort responsiv — nur der Callback wird debounced. Sinnvoll für serverseitige Suche, damit nicht bei jedem Zeichen ein Request rausgeht. |
+| `serverSideFilter` | `boolean` | `false` | Wenn `true`: `tags` wird als bereits korrekt gefiltert vertraut — die Komponente filtert selbst nicht mehr per Substring. Nötig für serverseitige Suche mit Fuzzy-/Tippfehler-Matching, wo Treffer den eingegebenen Suchstring nicht zwingend wörtlich enthalten. |
 | `showAutoComplete` | `boolean` | `true` | Zeigt das Such-Eingabefeld an. Wenn `false`, kann der Nutzer keine neuen Tags auswählen — der Chip-Bereich bleibt sichtbar (reine Anzeige). |
 | `showSelectedTags` | `boolean` | `true` | Zeigt den oberen Bereich mit den ausgewählten Tags als Chips an. Wenn `false`, wird der gesamte Chip-Bereich ausgeblendet — die Autocomplete bleibt sichtbar. |
 | `showSelectedTagsLabel` | `boolean` | `true` | Zeigt das Label-Heading über dem Chip-Bereich an (Standard: „Selected tags"). Kann versteckt werden wenn der Kontext selbsterklärend ist. |
@@ -154,7 +156,7 @@ type TagSelectionItem = {
 | `onTagSelect` | `(tag: TagSelectionItem, selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | Ein vorhandener Tag wurde aus dem Dropdown ausgewählt | Auf Auswählen vs. Erstellen vs. Löschen unterschiedlich reagiert werden soll |
 | `onTagDelete` | `(tag: TagSelectionItem, selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | Das Lösch-Icon eines ausgewählten Chips wurde geklickt | Speziell auf das Entfernen von Tags reagiert werden soll |
 | `onTagCreate` | `(tag: TagSelectionItem) => void` | Nutzer hat neuen Tag bestätigt (✓ oder Enter) | Neue Tags im Backend persistiert werden sollen |
-| `onSearchChange` | `(value: string) => void` | Jeder Tastendruck im Suchfeld | Serverseitige Filterung / asynchrones Tag-Laden |
+| `onSearchChange` | `(value: string) => void` | Jeder Tastendruck im Suchfeld — oder einmal pro Pause wenn `searchDebounceMs` gesetzt ist | Serverseitige Filterung / asynchrones Tag-Laden |
 
 > **Wichtig zu `onTagCreate`:** Der neue Tag wird von der Komponente intern sofort mit `selected: true` und der vom Nutzer gewählten Farbe in den Store eingefügt — entweder `color` (Theme-Farbe) oder `backgroundColor`/`foregroundColor` (Custom-Farbe). `onTagCreate` wird danach mit diesem vollständigen `TagSelectionItem`-Objekt ausgelöst, damit der Aufrufer es persistieren / seinen externen State synchronisieren kann:
 >
@@ -287,7 +289,7 @@ const [loading, setLoading] = useState(false);
 
 const handleSearchChange = async (query: string) => {
   setLoading(true);
-  const results = await api.searchTags(query);
+  const results = await api.searchTags(query); // Server liefert bereits die richtigen Treffer
   setTags(results);
   setLoading(false);
 };
@@ -296,8 +298,14 @@ const handleSearchChange = async (query: string) => {
   tags={tags}
   loading={loading}
   onSearchChange={handleSearchChange}
+  searchDebounceMs={300}     // 300ms nach dem letzten Tastenanschlag warten, bevor onSearchChange feuert
+  serverSideFilter           // tags wird als bereits gefiltert vertraut — keine erneute clientseitige Filterung
 />
 ```
+
+> **Warum `serverSideFilter`:** ohne diese Prop filtert die Komponente `tags` erneut, indem sie prüft, ob jedes Label den eingegebenen Text *enthält*. Macht dein Backend Fuzzy-Matching, Tippfehler-Toleranz oder Ranking, kann ein korrekter Treffer den eingegebenen Text nicht wörtlich enthalten — der clientseitige Filter würde ihn dann wieder verstecken. `serverSideFilter` vertraut den Server-Ergebnissen wie geliefert.
+>
+> **Race Conditions:** `searchDebounceMs` reduziert die Request-Menge, aber bei langsamem oder instabilem Netzwerk kann eine ältere Anfrage trotzdem nach einer neueren auflösen. Falls das für deinen Use Case relevant ist, die letzte Anfrage tracken und veraltete Antworten ignorieren (z.B. per Ref-Vergleich oder `AbortController` zum Abbrechen überholter Requests).
 
 ### Tag-Limit mit Hinweistext
 

@@ -69,6 +69,7 @@ type TagSelectionAutocompleteProps = {
   isMaxReached?: boolean;
   allowCreate?: boolean;
   listboxMaxHeight?: number;
+  serverSideFilter?: boolean;
 };
 
 function ColorSwatch({
@@ -165,6 +166,7 @@ export function TagSelectionAutocomplete({
   isMaxReached = false,
   allowCreate = false,
   listboxMaxHeight,
+  serverSideFilter = false,
 }: TagSelectionAutocompleteProps) {
   const [selectedColor, setSelectedColor] = useState<TagColor>("default");
   const [customBgColor, setCustomBgColor] = useState<string | null>(null);
@@ -178,9 +180,15 @@ export function TagSelectionAutocomplete({
   const isDisabled = disabled || isMaxReached;
   const isCustomColorSelected = customBgColor !== null;
 
-  const filteredOptions = availableTags.filter((tag) =>
-    tag.label.toLowerCase().includes(searchValue.trim().toLowerCase()),
-  );
+  // serverSideFilter: availableTags is trusted as already correctly filtered
+  // (e.g. fuzzy/typo-tolerant server search) — skip the substring re-filter,
+  // which would otherwise wrongly hide server results that don't literally
+  // contain the typed string.
+  const filteredOptions = serverSideFilter
+    ? availableTags
+    : availableTags.filter((tag) =>
+        tag.label.toLowerCase().includes(searchValue.trim().toLowerCase()),
+      );
   const isCreateMode = allowCreate && searchValue.trim() !== "" && filteredOptions.length === 0;
   const effectivePopupOpen = popupOpen && !isCreateMode;
 
@@ -270,6 +278,10 @@ export function TagSelectionAutocomplete({
     <Box sx={{ mb: 2 }}>
       <Autocomplete<TagSelectionItem, false, false, false>
         options={availableTags}
+        // Without this, MUI's own default filtering would additionally re-filter
+        // availableTags by inputValue — defeating serverSideFilter's whole point
+        // for non-substring (fuzzy/typo-tolerant) server search results.
+        filterOptions={serverSideFilter ? (options) => options : undefined}
         value={null}
         open={effectivePopupOpen}
         onOpen={() => { if (!isCreateMode) setPopupOpen(true); }}
@@ -279,7 +291,13 @@ export function TagSelectionAutocomplete({
         loading={loading}
         getOptionLabel={(option) => option.label}
         inputValue={searchValue}
-        onInputChange={(_, newInputValue) => onSearchChange(newInputValue)}
+        onInputChange={(_, newInputValue, reason) => {
+          // Only forward genuine typing — MUI can also fire this with other reasons
+          // ("reset", "clear", "blur", ...) that aren't the user typing a search term
+          // and would otherwise reach onSearchChange/searchValue as a spurious "" call.
+          if (reason !== "input") return;
+          onSearchChange(newInputValue);
+        }}
         onChange={(_: SyntheticEvent, value: TagSelectionItem | null) => {
           if (value) onTagSelect(value);
         }}

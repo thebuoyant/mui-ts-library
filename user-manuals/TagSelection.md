@@ -127,6 +127,8 @@ type TagSelectionItem = {
 | `maxTags` | `number` | — | Maximum number of simultaneously selectable tags. When the limit is reached, the autocomplete input is automatically disabled and a hint text appears. Removing a selected tag unlocks the field again. |
 | `maxVisibleChips` | `number` | — | Maximum number of visible chips in the selection area. Excess chips are hidden behind a `+N` chip. Clicking `+N` opens a popover with the hidden chips — they can also be deleted there. Without this prop, all chips are shown. |
 | `popoverPlacement` | `"top" \| "bottom"` | `"bottom"` | Opening direction of the overflow popover (relative to the `+N` chip). Only relevant when `maxVisibleChips` is set. |
+| `searchDebounceMs` | `number` | — | Delays the `onSearchChange` call by this many ms after the last keystroke. The input field itself stays immediately responsive — only the callback to your code is debounced. Use this for server-side search so you don't fire a request per keystroke. |
+| `serverSideFilter` | `boolean` | `false` | When `true`, `tags` is trusted as already correctly filtered — the component skips its own substring filtering. Needed for non-substring server search (fuzzy matching, typo tolerance, ranking) where results don't necessarily contain the typed text verbatim. |
 | `showAutoComplete` | `boolean` | `true` | Shows the search input field. When `false`, the user cannot add new tags — the chip area remains visible (display only). |
 | `showSelectedTags` | `boolean` | `true` | Shows the upper area with selected tags as chips. When `false`, the entire chip area is hidden — the autocomplete remains visible. |
 | `showSelectedTagsLabel` | `boolean` | `true` | Shows the label heading above the chip area (default: "Selected tags"). Can be hidden when the context is self-explanatory. |
@@ -154,7 +156,7 @@ type TagSelectionItem = {
 | `onTagSelect` | `(tag: TagSelectionItem, selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | An existing tag was selected from the dropdown | You need to react differently to select vs. create vs. delete |
 | `onTagDelete` | `(tag: TagSelectionItem, selectedTags: TagSelectionItem[], allTags: TagSelectionItem[]) => void` | A selected chip's delete icon was clicked | You need to react to tag removal specifically |
 | `onTagCreate` | `(tag: TagSelectionItem) => void` | User confirmed a new tag (✓ or Enter) | You need to persist new tags to a backend |
-| `onSearchChange` | `(value: string) => void` | Every keystroke in the search field | Server-side filtering / async tag loading |
+| `onSearchChange` | `(value: string) => void` | Every keystroke in the search field — or once per pause when `searchDebounceMs` is set | Server-side filtering / async tag loading |
 
 > **Important about `onTagCreate`:** The new tag is immediately inserted into the store by the component with `selected: true` and the color the user picked — either `color` (theme color) or `backgroundColor`/`foregroundColor` (custom color). `onTagCreate` then fires with that full `TagSelectionItem` object so the caller can persist it / sync external state:
 >
@@ -287,7 +289,7 @@ const [loading, setLoading] = useState(false);
 
 const handleSearchChange = async (query: string) => {
   setLoading(true);
-  const results = await api.searchTags(query);
+  const results = await api.searchTags(query); // server already returns the right matches
   setTags(results);
   setLoading(false);
 };
@@ -296,8 +298,14 @@ const handleSearchChange = async (query: string) => {
   tags={tags}
   loading={loading}
   onSearchChange={handleSearchChange}
+  searchDebounceMs={300}     // wait 300ms after the last keystroke before calling onSearchChange
+  serverSideFilter           // trust `tags` as already filtered — don't re-filter client-side
 />
 ```
+
+> **Why `serverSideFilter`:** without it, the component re-filters `tags` by checking whether each label *contains* the typed text. If your backend does fuzzy matching, typo tolerance, or ranking, a correct result might not literally contain what the user typed — the client-side filter would then hide it again. `serverSideFilter` trusts the server's results as-is.
+>
+> **Race conditions:** `searchDebounceMs` reduces request volume, but with a slow or flaky network, an older request can still resolve after a newer one. If that matters for your use case, track the latest query and ignore stale responses (e.g. compare against a ref, or use `AbortController` to cancel superseded requests).
 
 ### Tag limit with hint text
 

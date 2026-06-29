@@ -408,6 +408,18 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/). In der Praxis b
 
 ## Changelog
 
+### [3.12.0] — 2026-06-29
+
+**Hinzugefügt**
+- TagSelection: `searchDebounceMs` (debounced `onSearchChange`) und `serverSideFilter` (vertraut `tags` als bereits gefiltert, für Fuzzy-/Nicht-Substring-Server-Suche) — schließt die seit längerem offene "Async Search"-Lücke.
+
+**Behoben**
+- TagSelection: bei der Umsetzung oben gefunden — ein verirrter zweiter `onSearchChange("")`-Aufruf feuerte direkt nach jedem echten Tastenanschlag (MUIs internes `reason="reset"`-Event). Wird jetzt herausgefiltert.
+
+Details siehe [Changelog](#3120--2026-06-29).
+
+---
+
 ### [3.11.3] — 2026-06-29
 
 **Behoben**

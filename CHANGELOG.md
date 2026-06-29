@@ -13,6 +13,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.12.0] — 2026-06-29
+
+### Added
+
+#### TagSelection — `searchDebounceMs` and `serverSideFilter`
+
+Two new props for server-side tag search, the most-requested gap in the existing `onSearchChange`-based pattern:
+
+- **`searchDebounceMs?: number`** — delays the `onSearchChange` call by this many ms after the last keystroke. The input field itself stays immediately responsive; only the callback to your code is debounced, so you don't fire a network request per keystroke.
+- **`serverSideFilter?: boolean`** (default `false`) — when `true`, `tags` is trusted as already correctly filtered. Without it, the component (and MUI's own internal `Autocomplete` filtering) re-filters `tags` by substring match against the typed text — which silently hides correct results from a server that does fuzzy matching, typo tolerance, or ranking, since those results don't necessarily contain the typed text verbatim.
+
+### Fixed
+
+#### TagSelection — spurious empty `onSearchChange` call after every keystroke
+
+Found while implementing the above: MUI's `Autocomplete` fires `onInputChange` a second time with `reason="reset"` and an empty value immediately after every genuine `reason="input"` change (a side effect of this component never tracking a controlled `value` — selection is handled via a separate `onChange`/`onTagSelect`, not the Autocomplete's own value). This second call was being forwarded to `onSearchChange` unfiltered, meaning every documented "server-side filtering" integration was firing two calls per keystroke — a real one with the typed text, immediately followed by one with `""`. Now only `reason === "input"` is forwarded.
+
+(This was masked in manual testing and in tests written with `@testing-library/user-event`, since simulating real keystrokes doesn't trigger MUI's internal reset path the way directly dispatching a change event does — only surfaced once `searchDebounceMs` made the two-calls-per-keystroke pattern actually observable.)
+
+Covered by 5 new tests (immediate vs. debounced `onSearchChange` timing, cleanup on unmount mid-debounce, default vs. `serverSideFilter` substring filtering), each empirically verified against the pre-fix code.
+
+---
+
 ## [3.11.3] — 2026-06-29
 
 ### Fixed

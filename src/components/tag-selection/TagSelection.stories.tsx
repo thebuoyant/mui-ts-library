@@ -54,6 +54,8 @@ const meta: Meta<typeof TagSelection> = {
     maxTags:              { control: "number" },
     maxVisibleChips:      { control: "number" },
     popoverPlacement:     { control: "radio", options: ["top", "bottom"] },
+    searchDebounceMs:     { control: "number" },
+    serverSideFilter:     { control: "boolean" },
     showAutoComplete:     { control: "boolean" },
     showSelectedTags:     { control: "boolean" },
     showSelectedTagsLabel: { control: "boolean" },
@@ -299,6 +301,76 @@ export const SearchHighlight: Story = {
     await userEvent.click(input);
     await userEvent.type(input, "Reac", { delay: 80 });
   },
+};
+
+// Simulates a fuzzy/alias-aware server search with network latency. "ecma" doesn't
+// literally appear in "JavaScript", but ECMAScript is its spec name — exactly the kind
+// of match a real backend might return that a client-side substring filter would hide.
+const SERVER_TAGS: TagSelectionItem[] = [
+  { id: "javascript", label: "JavaScript" },
+  { id: "typescript", label: "TypeScript" },
+  { id: "python",     label: "Python" },
+  { id: "golang",     label: "Golang" },
+];
+const ALIASES: Record<string, string[]> = {
+  javascript: ["ecma", "ecmascript", "node"],
+  typescript: ["ts", "ms"],
+  python:     ["py"],
+  golang:     ["go"],
+};
+
+async function fakeServerSearch(query: string): Promise<TagSelectionItem[]> {
+  await new Promise((resolve) => setTimeout(resolve, 400)); // simulated network latency
+  const q = query.trim().toLowerCase();
+  if (!q) return SERVER_TAGS;
+  return SERVER_TAGS.filter(
+    (tag) =>
+      tag.label.toLowerCase().includes(q) ||
+      ALIASES[tag.id]?.some((alias) => alias.includes(q)),
+  );
+}
+
+function AsyncServerSearchStory(args: ComponentProps<typeof TagSelection>) {
+  const [tags, setTags] = useState<TagSelectionItem[]>(SERVER_TAGS);
+  const [loading, setLoading] = useState(false);
+
+  const handleSearchChange = async (query: string) => {
+    setLoading(true);
+    const results = await fakeServerSearch(query);
+    setTags(results);
+    setLoading(false);
+  };
+
+  return (
+    <Box sx={{ maxWidth: 420 }}>
+      <TagSelection
+        {...args}
+        tags={tags}
+        loading={loading}
+        onSearchChange={handleSearchChange}
+      />
+    </Box>
+  );
+}
+
+export const AsyncServerSearch: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Simulates server-side search with `searchDebounceMs={300}` (waits for a typing pause ' +
+          'before calling `onSearchChange`, instead of firing per keystroke) and `serverSideFilter` ' +
+          '(trusts the returned `tags` as-is — no client-side re-filtering). Try typing **"ecma"** — ' +
+          'it matches "JavaScript" via a server-side alias (ECMAScript) that the label itself never ' +
+          'contains, which only works because `serverSideFilter` is on.',
+      },
+    },
+  },
+  args: {
+    searchDebounceMs: 300,
+    serverSideFilter: true,
+  },
+  render: (args) => <AsyncServerSearchStory {...args} />,
 };
 
 // maxVisibleChips begrenzt die sichtbaren Chips. Überzählige Chips werden hinter

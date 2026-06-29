@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { TagSelection } from "./TagSelection";
@@ -392,5 +392,76 @@ describe("TagSelection", () => {
     await user.click(screen.getByLabelText("Tags suchen"));
 
     expect(await screen.findByText("Keine Tags verfügbar.")).toBeInTheDocument();
+  });
+
+  describe("searchDebounceMs", () => {
+    it("Should call onSearchChange immediately when searchDebounceMs is not set", () => {
+      const handleSearchChange = vi.fn();
+      render(<TagSelection tags={tags} onSearchChange={handleSearchChange} />);
+
+      fireEvent.change(screen.getByLabelText("Search and add tags"), { target: { value: "Ty" } });
+
+      expect(handleSearchChange).toHaveBeenCalledWith("Ty");
+    });
+
+    it("Should delay onSearchChange until searchDebounceMs has elapsed since the last keystroke", () => {
+      vi.useFakeTimers();
+      const handleSearchChange = vi.fn();
+      render(<TagSelection tags={tags} onSearchChange={handleSearchChange} searchDebounceMs={300} />);
+
+      const input = screen.getByLabelText("Search and add tags");
+      act(() => { fireEvent.change(input, { target: { value: "T" } }); });
+      act(() => { vi.advanceTimersByTime(150); });
+      act(() => { fireEvent.change(input, { target: { value: "Ty" } }); });
+      act(() => { vi.advanceTimersByTime(150); });
+      expect(handleSearchChange).not.toHaveBeenCalled(); // restarted by the second keystroke, not yet 300ms
+
+      act(() => { vi.advanceTimersByTime(150); });
+      expect(handleSearchChange).toHaveBeenCalledTimes(1);
+      expect(handleSearchChange).toHaveBeenCalledWith("Ty");
+      vi.useRealTimers();
+    });
+
+    it("Should not throw or call onSearchChange after unmounting mid-debounce", () => {
+      vi.useFakeTimers();
+      const handleSearchChange = vi.fn();
+      const { unmount } = render(
+        <TagSelection tags={tags} onSearchChange={handleSearchChange} searchDebounceMs={300} />,
+      );
+
+      fireEvent.change(screen.getByLabelText("Search and add tags"), { target: { value: "Ty" } });
+      expect(() => unmount()).not.toThrow();
+      expect(() => vi.advanceTimersByTime(300)).not.toThrow();
+      expect(handleSearchChange).not.toHaveBeenCalled();
+      vi.useRealTimers();
+    });
+  });
+
+  describe("serverSideFilter", () => {
+    // "Vue" doesn't contain "fe" — stands in for a fuzzy/typo-tolerant server match
+    // that wouldn't literally contain what the user typed.
+    const fuzzyTags: TagSelectionItem[] = [
+      { id: "react", label: "React" },
+      { id: "vue",    label: "Vue" },
+    ];
+
+    it("Should hide non-matching tags by default (client-side substring filter)", async () => {
+      render(<TagSelection tags={fuzzyTags} />);
+      const input = screen.getByLabelText("Search and add tags");
+      fireEvent.click(input);
+      fireEvent.change(input, { target: { value: "rea" } });
+
+      expect(await screen.findByRole("option", { name: "React" })).toBeInTheDocument();
+      expect(screen.queryByRole("option", { name: "Vue" })).not.toBeInTheDocument();
+    });
+
+    it("Should trust tags as already filtered and show non-matching results when serverSideFilter is true", async () => {
+      render(<TagSelection tags={fuzzyTags} serverSideFilter />);
+      const input = screen.getByLabelText("Search and add tags");
+      fireEvent.click(input);
+      fireEvent.change(input, { target: { value: "rea" } });
+
+      expect(await screen.findByRole("option", { name: "Vue" })).toBeInTheDocument();
+    });
   });
 });
