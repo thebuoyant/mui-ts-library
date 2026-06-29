@@ -118,6 +118,7 @@ Jede Aufgabe wird als `GanttTask`-Objekt übergeben. Die `tasks`-Prop erwartet e
 | `isMilestone` | `boolean` | Nein | Wenn `true`, wird der Task als Raute (♦) statt als Balken dargestellt. Meilensteine sollten `startDate ≈ endDate` haben. |
 | `progress` | `number` | Nein | Fortschritt in Prozent (0–100). Wird als halbopaker Overlay-Balken über den Task-Balken gerendert. Interaktiv wenn `progressDraggable={true}`. |
 | `color` | `string` | Nein | Überschreibt die statusbasierte Balkenfarbe für diesen einzelnen Task (höchste Priorität). Beliebiger CSS-Farbwert (z. B. `"#e91e63"` oder `"rgb(0,150,136)"`). |
+| `assignee` | `string` | Nein | Person oder Team, das für den Task verantwortlich ist — wird in der Assignee-Spalte angezeigt, wenn `showAssigneeColumn={true}`. |
 
 **TypeScript-Typen:**
 
@@ -136,6 +137,7 @@ type GanttTask = {
   isMilestone?:  boolean;
   progress?:     number;
   color?:        string;
+  assignee?:     string;
 };
 ```
 

@@ -283,6 +283,19 @@ All interactions (hover highlight, click callbacks) are muted. The chart renders
 
 ---
 
+## i18n — Translations
+
+```tsx
+<ChordChart
+  data={[]}
+  translation={{ noData: 'No data available' }}
+/>
+```
+
+Currently the only translation key is `noData` (default `'No data'`). It is shown centered in the SVG when `data` is an empty array. All keys are optional — unset keys fall back to the English defaults.
+
+---
+
 ## D3 Charts Family
 
 All 5 D3 charts have shipped:

@@ -47,7 +47,6 @@ import type {
   RadialTreeChartData,
   RadialTreeChartProps,
   RadialTreeNodeInfo,
-  RadialTreeNodeIconSpec,
   RadialTreeSortBy,
 } from '@thebuoyant-tsdev/mui-ts-library';
 ```
@@ -98,15 +97,17 @@ function App() {
 | `sortBy` | `RadialTreeSortBy` | `'name'` | Kinder alphabetisch oder nach Wert sortieren |
 | `showLabels` | `boolean` | `true` | Knoten-Name-Labels anzeigen |
 | `chartColors` | `string[]` | MUI-Palette | Farben pro Tiefenebene |
-| `linkStrokeOpacity` | `number` | `0.4` | Link-Linien-Opacity |
+| `rootNodeRadius` | `number` | `22` | Kreisradius des Root-Knotens in px |
+| `branchNodeRadius` | `number` | `16` | Kreisradius von Branch-Knoten (mit Kindern) in px |
+| `leafNodeRadius` | `number` | `11` | Kreisradius von Leaf-Knoten (ohne Kinder) in px |
+| `linkColor` | `string` | `theme.palette.text.secondary` | Link-Linienfarbe |
+| `linkStrokeOpacity` | `number` | `1` | Link-Linien-Opacity |
 | `linkStrokeWidth` | `number` | `1.5` | Link-Linienbreite in px |
-| `nodeRadius` | `number` | `4` | Knoten-Kreisradius in px (ohne Icon) |
+| `labelFontSize` | `number` | `12` | Label-Schriftgröße in px |
+| `labelColor` | `string` | `theme.palette.text.primary` | Label-Textfarbe |
 | `separationSibling` | `number` | `1` | Abstandsfaktor zwischen Geschwisterknoten |
 | `separationCousin` | `number` | `2` | Abstandsfaktor zwischen Cousin-Knoten |
-| `showIcons` | `boolean` | `true` | Icons auf Knoten anzeigen |
-| `iconSize` | `number` | `18` | Icon-Größe in px |
-| `nodeIconsByDepth` | `Record<number, RadialTreeNodeIconSpec>` | — | Icon-Overrides pro Tiefenebene |
-| `renderNodeIcon` | `(info) => ReactElement \| null` | — | Vollständig custom Icon-Renderer pro Knoten |
+| `showIcons` | `boolean` | `true` | Eingebaute Folder-/Person-Icons auf Knoten anzeigen |
 | `zoomable` | `boolean` | `false` | `Ctrl / Cmd ⌘ + Scroll` visueller Zoom — clippt am `size`-Rand |
 | `drillable` | `boolean` | `false` | `Ctrl / Cmd ⌘ + Click` Drill-Down in Teilbäume |
 | `duration` | `number` | `750` | Dauer des Drill-in/out-Crossfades in ms. `0` deaktiviert ihn (sofortiger Sprung). |
@@ -189,7 +190,7 @@ const data: RadialTreeChartData = {
 |---|---|
 | `fill` | Knoten-Kreisfarbe |
 | `textColor` | Label-Textfarbe (zukünftige Verwendung) |
-| `stroke` | Knoten-Rahmenfarbe |
+| `stroke` | Knoten-Rahmenfarbe (zukünftige Verwendung) |
 
 ### Link- und Label-Farben
 
@@ -234,10 +235,6 @@ type RadialTreeNodeInfo = {
   data:          RadialTreeChartData;
 };
 
-type RadialTreeNodeIconSpec =
-  | React.ElementType
-  | { icon: React.ElementType; color?: string };
-
 type RadialTreeSortBy = 'name' | 'value';
 
 type RadialTreeChartTranslation = {
@@ -264,6 +261,32 @@ type RadialTreeChartTranslation = {
 | **Escape** | Drill-Down + visuellen Zoom zurücksetzen | `drillable` / `zoomable` |
 
 **Drill-Übergänge:** Drill-in/out verwurzelt die zugrundeliegende D3-Hierarchie komplett neu — jede Fokus-Ebene hat ihren eigenen, unterschiedlich großen Knoten-Satz. Statt einzelne Knoten-Positionen zu interpolieren (was Enter/Update/Exit-Matching per Knoten-ID bräuchte), blendet der vorherige Layout-Zustand über `duration` ms (Standard `750`) aus, während der neue darunter erscheint — gerendert als statischer, nicht-interaktiver Ghost-Layer. `onFocusChange`/`onNodeClick` feuern unabhängig von `duration` sofort bei der Interaktion — nur die visuelle Darstellung ist animiert. `duration={0}` deaktiviert das und springt direkt zum neuen Fokus.
+
+---
+
+## Node-Icons
+
+Icons sind fest vorgegeben (nicht pro Tiefenebene oder pro Knoten anpassbar) — mit `showIcons` lassen sie sich komplett ein- oder ausschalten:
+
+- Branch-Knoten (mit Kindern): `FolderOutlined` aus `@mui/icons-material`
+- Leaf-Knoten (ohne Kinder): `PersonOutlined` aus `@mui/icons-material`
+
+```tsx
+<RadialTreeChart data={data} showIcons={false} />
+```
+
+---
+
+## Keine Daten
+
+Wenn `data` weder `children` noch `value` hat, rendert das Chart `translation.noData` (Standard `'No data'`) zentriert im SVG statt einer leeren Fläche:
+
+```tsx
+<RadialTreeChart
+  data={{ id: 'root', name: 'Root' }}
+  translation={{ noData: 'Keine Daten vorhanden' }}
+/>
+```
 
 ---
 
@@ -309,6 +332,16 @@ Das Standard-Popover zeigt Avatar mit Namenskürzel, Namen, Subname und beide So
 |---|---|---|---|
 | `onNodeClick` | `(info: RadialTreeNodeInfo, event: React.MouseEvent) => void` | Normaler Klick auf einen Knoten (ohne Strg/Cmd) | Detail-Panel oder Popover für den geklickten Knoten anzeigen |
 | `onFocusChange` | `(info: RadialTreeNodeInfo \| null) => void` | Drill-Down-Fokus wechselt via Strg/Cmd+Klick oder Escape. `null` bei Reset auf Root | Drill-Down-Tiefe verfolgen, Breadcrumb-Navigation |
+
+---
+
+## Disabled-Zustand
+
+```tsx
+<RadialTreeChart data={data} disabled />
+```
+
+Alle Interaktionen (Hover-Tooltip, Klick, Popover) werden deaktiviert. Das Chart wird mit reduzierter Opacity (`0.5`) dargestellt.
 
 ---
 

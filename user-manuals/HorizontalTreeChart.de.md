@@ -29,14 +29,54 @@ Der `HorizontalTreeChart` stellt hierarchische Daten mit D3 v7's Tree-Layout und
 | `nodeRadius` | `number` | `10` | Knotenkreis-Radius in px |
 | `sortBy` | `'name' \| 'value'` | `'name'` | Kinder-Sortierung |
 | `showLabels` | `boolean` | `true` | Knotenname-Labels anzeigen |
+| `labelFontSize` | `number` | `12` | Label-Schriftgröße in px |
+| `labelColor` | `string` | Theme-Text | Label-Farbe |
 | `showIcons` | `boolean` | `true` | Weißes Icon im Kreis (Folder/Person) |
 | `chartColors` | `string[]` | MUI-Palette | Farben pro Tiefenebene |
+| `linkStrokeOpacity` | `number` | `1` | Link-Linien-Opazität |
+| `linkStrokeWidth` | `number` | `1.5` | Link-Linien-Breite in px |
+| `linkColor` | `string` | Theme text.secondary | Link-Farbe |
 | `zoomable` | `boolean` | `false` | `Ctrl / Cmd ⌘+Scroll` visueller Zoom |
 | `drillable` | `boolean` | `false` | `Ctrl / Cmd ⌘+Click` Drill-Down |
 | `duration` | `number` | `750` | Dauer des Drill-in/out-Crossfades in ms. `0` deaktiviert ihn (sofortiger Sprung). |
+| `onFocusChange` | `(zoom) => void` | — | Feuert bei Wechsel des Drill-Down-Fokus |
 | `showNodePopover` | `boolean` | `false` | Eingebautes MUI-Popover bei Klick |
+| `renderNodePopoverContent` | `(info) => ReactNode` | — | Eigener Popover-Inhalt |
 | `onNodeClick` | `(info, event) => void` | — | Bei normalem Klick ausgelöst |
 | `disabled` | `boolean` | `false` | Deaktiviert alle Interaktionen |
+| `translation` | `Partial<HorizontalTreeTranslation>` | EN-Standard | Strings überschreiben |
+
+---
+
+## TypeScript-Typen
+
+```ts
+type HorizontalTreeData = {
+  id?:            string;
+  name:           string;
+  subname?:       string;
+  value?:         number;
+  specialValueA?: string | number;
+  specialValueB?: string | number;
+  colorConfig?:   { fill?: string; textColor?: string; stroke?: string } | null;
+  children?:      HorizontalTreeData[];
+};
+
+type HorizontalTreeNodeInfo = {
+  id:            string | null;
+  name:          string;
+  subname:       string | null;
+  value:         number | null;
+  specialValueA: string | number | null;
+  specialValueB: string | number | null;
+  depth:         number;
+  path:          string[];
+  childrenCount: number;
+  data:          HorizontalTreeData;
+};
+
+type HorizontalTreeOrientation = 'LR' | 'RL' | 'TB' | 'BT';
+```
 
 ---
 
@@ -80,6 +120,21 @@ Der `HorizontalTreeChart` stellt hierarchische Daten mit D3 v7's Tree-Layout und
 |---|---|---|---|
 | `onNodeClick` | `(info: HorizontalTreeNodeInfo, event: React.MouseEvent) => void` | Normaler Klick auf einen Knoten (ohne Strg/Cmd) | Detail-Panel oder Popover für den geklickten Knoten anzeigen |
 | `onFocusChange` | `(state: { focusedNode: HorizontalTreeNodeInfo; isRoot: boolean }) => void` | Drill-Down-Fokus wechselt via Strg/Cmd+Klick, Strg/Cmd+Doppelklick oder Escape | Drill-Down-Tiefe verfolgen, Breadcrumb-Navigation |
+
+---
+
+## Keine Daten
+
+Wenn `data` weder `children` noch `value` besitzt, rendert die Komponente den String `translation.noData` (Standard `'No data'`) zentriert im SVG anstelle eines leeren Baums:
+
+```tsx
+<HorizontalTreeChart
+  data={{ id: 'root', name: 'Root' }}
+  translation={{ noData: 'Noch keine Daten' }}
+/>
+```
+
+Alle Übersetzungsschlüssel sind optional — nicht gesetzte Schlüssel fallen auf die englischen Standardwerte zurück (`noData: 'No data'`, `specialValueA: 'Value A'`, `specialValueB: 'Value B'`).
 
 ---
 

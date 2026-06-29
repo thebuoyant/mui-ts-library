@@ -183,6 +183,23 @@ export const Disabled: Story = {
   args: { data: BUDGET_DATA, disabled: true },
 };
 
+export const EmptyData: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'When `data` has no `children` and no `value`, the chart renders the `translation.noData` ' +
+          'message (default `"No data"`) centered in the SVG instead of an empty circle. ' +
+          'Override it via `translation={{ noData: "..." }}`.',
+      },
+    },
+  },
+  args: {
+    data: { id: "root", name: "Root" },
+    translation: { noData: "Nothing to show yet" },
+  },
+};
+
 // ── colorConfig demo data — per-segment brand colors ─────────────────────────
 
 const COLOR_CONFIG_DATA: SunburstChartData = {

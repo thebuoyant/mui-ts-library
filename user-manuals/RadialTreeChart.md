@@ -48,7 +48,6 @@ import type {
   RadialTreeChartData,
   RadialTreeChartProps,
   RadialTreeNodeInfo,
-  RadialTreeNodeIconSpec,
   RadialTreeSortBy,
 } from '@thebuoyant-tsdev/mui-ts-library';
 ```
@@ -99,15 +98,17 @@ function App() {
 | `sortBy` | `RadialTreeSortBy` | `'name'` | Sort children alphabetically or by value |
 | `showLabels` | `boolean` | `true` | Show node name labels |
 | `chartColors` | `string[]` | MUI palette | Per-depth node colors |
-| `linkStrokeOpacity` | `number` | `0.4` | Link line opacity |
+| `rootNodeRadius` | `number` | `22` | Root node circle radius in px |
+| `branchNodeRadius` | `number` | `16` | Branch node (has children) circle radius in px |
+| `leafNodeRadius` | `number` | `11` | Leaf node (no children) circle radius in px |
+| `linkColor` | `string` | `theme.palette.text.secondary` | Link line color |
+| `linkStrokeOpacity` | `number` | `1` | Link line opacity |
 | `linkStrokeWidth` | `number` | `1.5` | Link line width in px |
-| `nodeRadius` | `number` | `4` | Node circle radius in px (when no icon) |
+| `labelFontSize` | `number` | `12` | Label font size in px |
+| `labelColor` | `string` | `theme.palette.text.primary` | Label text color |
 | `separationSibling` | `number` | `1` | Separation factor between sibling nodes |
 | `separationCousin` | `number` | `2` | Separation factor between cousin nodes |
-| `showIcons` | `boolean` | `true` | Show icons on nodes |
-| `iconSize` | `number` | `18` | Icon size in px |
-| `nodeIconsByDepth` | `Record<number, RadialTreeNodeIconSpec>` | — | Icon overrides per depth level |
-| `renderNodeIcon` | `(info) => ReactElement \| null` | — | Fully custom icon renderer per node |
+| `showIcons` | `boolean` | `true` | Show built-in folder/person icons on nodes |
 | `zoomable` | `boolean` | `false` | Enable `Ctrl / Cmd ⌘ + Scroll` visual zoom — clips at `size` |
 | `drillable` | `boolean` | `false` | Enable `Ctrl / Cmd ⌘ + Click` drill-down into subtrees |
 | `duration` | `number` | `750` | Drill-in/out crossfade duration in ms. `0` disables it (instant jump). |
@@ -196,7 +197,7 @@ const data: RadialTreeChartData = {
 |---|---|
 | `fill` | Node circle fill color |
 | `textColor` | Label text color (future use) |
-| `stroke` | Node circle border color |
+| `stroke` | Node circle border color (future use) |
 
 ### Link and label colors
 
@@ -241,11 +242,6 @@ type RadialTreeNodeInfo = {
   data:          RadialTreeChartData;
 };
 
-// Icon spec: either a React component or { icon, color }
-type RadialTreeNodeIconSpec =
-  | React.ElementType
-  | { icon: React.ElementType; color?: string };
-
 type RadialTreeSortBy = 'name' | 'value';
 
 type RadialTreeChartTranslation = {
@@ -277,36 +273,25 @@ type RadialTreeChartTranslation = {
 
 ## Node Icons
 
-### Default icons
+Icons are fixed (not customizable per-depth or per-node) — toggle them on or off entirely with `showIcons`:
 
 - Branch nodes (have children): `FolderOutlined` from `@mui/icons-material`
 - Leaf nodes (no children): `PersonOutlined` from `@mui/icons-material`
 
-### Per-depth icons
-
 ```tsx
-import BusinessCenterOutlinedIcon from '@mui/icons-material/BusinessCenterOutlined';
-import GroupsOutlinedIcon          from '@mui/icons-material/GroupsOutlined';
-
-<RadialTreeChart
-  data={data}
-  nodeIconsByDepth={{
-    0: { icon: BusinessCenterOutlinedIcon, color: '#1565C0' }, // root
-    1: { icon: GroupsOutlinedIcon,         color: '#6A1B9A' }, // first ring
-    // depth 2+ falls back to default
-  }}
-/>
+<RadialTreeChart data={data} showIcons={false} />
 ```
 
-### Fully custom icon renderer
+---
+
+## No Data
+
+When `data` has no `children` and no `value`, the chart renders `translation.noData` (default `'No data'`) centered in the SVG instead of an empty canvas:
 
 ```tsx
 <RadialTreeChart
-  data={data}
-  renderNodeIcon={(info) => {
-    if (info.depth === 0) return <MyRootIcon style={{ fontSize: 20 }} />;
-    return null; // fall through to default
-  }}
+  data={{ id: 'root', name: 'Root' }}
+  translation={{ noData: 'Keine Daten vorhanden' }}
 />
 ```
 

@@ -177,6 +177,23 @@ export const Disabled: Story = {
   args: { data: TEAM_DATA, disabled: true },
 };
 
+export const EmptyData: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'When `data` is an empty array, the chart renders the `translation.noData` message ' +
+          '(default `"No data"`) centered in the SVG instead of an empty ring. ' +
+          'Override it via `translation={{ noData: "..." }}`.',
+      },
+    },
+  },
+  args: {
+    data: [],
+    translation: { noData: "Nothing to show yet" },
+  },
+};
+
 // ── Use case: international trade flows ──────────────────────────────────────
 
 const TRADE_DATA: ChordChartData[] = [

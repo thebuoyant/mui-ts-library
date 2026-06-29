@@ -80,7 +80,9 @@ function App() {
 | `padding` | `number` | `3` | Spacing between nested circles in px |
 | `sortBy` | `CirclePackingSortBy` | `'value'` | Sort children by value (largest first) or alphabetically |
 | `showLabels` | `boolean` | `true` | Show centered name labels; fade in/out during zoom |
-| `labelFontSize` | `number` | `11` | Label font size in px |
+| `showAllLabels` | `boolean` | `false` | Also show truncated labels on all visible nested circles (≥14px radius) that aren't direct children of the current focus, not just the outer focused ring |
+| `labelFontSize` | `number` | `13` | Outer-ring label font size in px (bold) |
+| `innerLabelFontSize` | `number` | `9` | Inner circle label font size in px — used when `showAllLabels` is `true` |
 | `labelColor` | `string` | theme text | Label text color |
 | `chartColors` | `string[]` | — | Per-depth palette — overrides gradient |
 | `depthColorStart` | `string` | theme primary | Gradient start color (when no `chartColors`) |
@@ -272,6 +274,19 @@ This is consistent with `SunburstChart`, `RadialTreeChart`, and `ChordChart` —
 ```
 
 All interactions are muted. The chart renders at reduced opacity (`0.5`).
+
+---
+
+## No Data
+
+When `data` has no `children` and no `value`, the chart renders the `translation.noData` string (default `'No data'`) centered in the SVG instead of an empty circle:
+
+```tsx
+<CirclePackingChart
+  data={{ name: 'Root' }}
+  translation={{ noData: 'Nothing to show yet' }}
+/>
+```
 
 ---
 

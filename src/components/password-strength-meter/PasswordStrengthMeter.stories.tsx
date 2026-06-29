@@ -290,6 +290,32 @@ export const WithPasswordGenerator: Story = {
   ),
 };
 
+export const GeneratorShortLength: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Requesting a `generatorOptions.length` shorter than the number of active character classes ' +
+          '— here `length: 3` with all 4 classes (upper/lower/numbers/symbols) active. The generator ' +
+          'guarantees one character per active class, so the actual length is the larger of the two: ' +
+          'it never produces fewer characters than active classes, and never silently exceeds that ' +
+          'guaranteed minimum either. Click "Generate secure password" repeatedly to confirm the length ' +
+          'stays consistent.',
+      },
+    },
+  },
+  args: {
+    showPasswordGenerator: true,
+    showSegmentedBar: true,
+    generatorOptions: { length: 3, upper: true, lower: true, numbers: true, symbols: true },
+  },
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <PasswordStrengthMeter {...args} />
+    </Box>
+  ),
+};
+
 export const WithCopyButton: Story = {
   parameters: {
     docs: {

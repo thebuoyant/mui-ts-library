@@ -56,6 +56,11 @@ import {
   RichTextEditor,
   SqlEditor,
   JsonEditor,
+  SunburstChart,
+  ChordChart,
+  RadialTreeChart,
+  CirclePackingChart,
+  HorizontalTreeChart,
 } from "@thebuoyant-tsdev/mui-ts-library";
 ```
 

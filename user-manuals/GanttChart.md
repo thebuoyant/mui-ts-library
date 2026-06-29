@@ -118,6 +118,7 @@ Each task is passed as a `GanttTask` object. The `tasks` prop expects a flat arr
 | `isMilestone` | `boolean` | No | When `true`, the task is rendered as a diamond (♦) instead of a bar. Milestones should have `startDate ≈ endDate`. |
 | `progress` | `number` | No | Progress in percent (0–100). Rendered as a semi-transparent overlay bar on top of the task bar. Interactive when `progressDraggable={true}`. |
 | `color` | `string` | No | Overrides the status-based bar color for this individual task (highest priority). Any CSS color value (e.g. `"#e91e63"` or `"rgb(0,150,136)"`). |
+| `assignee` | `string` | No | Person or team responsible for the task — shown in the Assignee column when `showAssigneeColumn={true}`. |
 
 **TypeScript types:**
 
@@ -136,6 +137,7 @@ type GanttTask = {
   isMilestone?:  boolean;
   progress?:     number;
   color?:        string;
+  assignee?:     string;
 };
 ```
 

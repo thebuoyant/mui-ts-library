@@ -87,7 +87,7 @@ const data: HorizontalTreeData = {
 | `labelFontSize` | `number` | `12` | Label font size in px |
 | `labelColor` | `string` | theme text | Label color |
 | `chartColors` | `string[]` | MUI palette | Per-depth color palette |
-| `linkStrokeOpacity` | `number` | `0.4` | Link line opacity |
+| `linkStrokeOpacity` | `number` | `1` | Link line opacity |
 | `linkStrokeWidth` | `number` | `1.5` | Link line width in px |
 | `linkColor` | `string` | theme text.secondary | Link color |
 | `zoomable` | `boolean` | `false` | `Ctrl / Cmd ⌘+Scroll` visual zoom |
@@ -196,6 +196,21 @@ const data: HorizontalTreeData = {
 |---|---|---|---|
 | `onNodeClick` | `(info: HorizontalTreeNodeInfo, event: React.MouseEvent) => void` | Regular click on any node (not Ctrl/Cmd) | Showing a detail panel or popover for the clicked node |
 | `onFocusChange` | `(state: { focusedNode: HorizontalTreeNodeInfo; isRoot: boolean }) => void` | Drill-down focus changes via Ctrl/Cmd+Click, Ctrl/Cmd+DblClick or Escape | Tracking drill-down depth, breadcrumb navigation |
+
+---
+
+## No Data
+
+When `data` has no `children` and no `value`, the chart renders the `translation.noData` string (default `'No data'`) centered in the SVG instead of an empty tree:
+
+```tsx
+<HorizontalTreeChart
+  data={{ id: 'root', name: 'Root' }}
+  translation={{ noData: 'Nothing to show yet' }}
+/>
+```
+
+All translation keys are optional — unset keys fall back to the English defaults (`noData: 'No data'`, `specialValueA: 'Value A'`, `specialValueB: 'Value B'`).
 
 ---
 

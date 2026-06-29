@@ -16,6 +16,7 @@ Innerhalb jeder Sektion stehen offene Items zuerst (⭐ oben), erledigte (durchg
 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
+| 🟡 Dependency-Zyklus-Schutz | Bearbeiten der Task-Daten/Abhängigkeiten über den Task-Dialog kann ohne Warnung einen Abhängigkeitszyklus erzeugen — kein Guard Rail. Gefunden im Bug-Audit v3.11.2. | Mittel | — |
 | ⭐ Keyboard Navigation | Pfeiltasten für Task-Auswahl, Enter zum Öffnen — Accessibility-Grundlage | Mittel | — |
 | ⭐ Export PNG/PDF | Timeline als Bild oder PDF — meistgefragtes Feature in Gantt-Bibliotheken | Hoch | — |
 | Schnell-Hinzufügen | Task direkt aus der Toolbar anlegen mit Preset-Daten (kein Dialog) | Mittel | — |
@@ -164,8 +165,9 @@ Cross-Cutting-Ideen, die für alle 5 D3-Charts gleich umgesetzt werden würden �
 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
-| ⭐ Eingebautes Breadcrumb | Fehlt trotz `focusedNode`/`onFocusChange` — Storybook-Demo baut sich aktuell ein eigenes | Niedrig | — |
+| 🟡 Ghost-Layer bei Orientation-Wechsel | Wechselt `orientation` während einer laufenden Drill-Transition, springt die ausblendende Ghost-Ebene auf die neue Orientierung statt eingefroren zu bleiben. Rein kosmetisch, kein Crash/falsche Daten. Gefunden im Bug-Audit v3.11.2. | Niedrig | — |
 | Teilbaum Ein-/Ausklappen | Aktuell nur globaler Fokus-Wechsel — kein unabhängiges Collapse pro Knoten | Mittel | — |
+| ~~Eingebautes Breadcrumb~~ | ~~Fehlte trotz `focusedNode`/`onFocusChange`~~ | ~~Niedrig~~ | ✅ v2.4.0 |
 | ~~Animierte Fokus-Übergänge~~ | ~~Fokus-Wechsel passierte als Hard-Cut~~ — Als Crossfade umgesetzt, gleiches Muster wie RadialTreeChart. `duration`-Prop, Default 750ms. | ~~Mittel~~ | ✅ v3.11.0 |
 
 ---

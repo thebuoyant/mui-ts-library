@@ -42,6 +42,7 @@ import { PasswordStrengthMeter } from '@thebuoyant-tsdev/mui-ts-library';
 import type {
   PasswordStrengthMeterProps,
   PasswordStrengthMeterTranslation,
+  CustomRequirement,
   StrengthResult,
   StrengthScore,
   MeterStatus,
@@ -459,6 +460,53 @@ const [isStrong, setIsStrong] = useState(false);
   disabled={true}
   value="••••••••"
 />
+```
+
+### Segmentierter Stärke-Balken
+
+```tsx
+{/* 4 separate animierte Segmente statt eines einzelnen wachsenden Balkens */}
+<PasswordStrengthMeter
+  showSegmentedBar
+  passwordMinLength={8}
+/>
+```
+
+### Benutzerdefinierte Anforderungen
+
+```tsx
+import type { CustomRequirement } from '@thebuoyant-tsdev/mui-ts-library';
+
+const requirements: CustomRequirement[] = [
+  {
+    label:     'No spaces allowed',
+    fulfilled: (pw) => !pw.includes(' '),
+  },
+  {
+    label:     'Must start with a letter',
+    fulfilled: (pw) => /^[a-zA-Z]/.test(pw),
+  },
+];
+
+<PasswordStrengthMeter
+  customRequirements={requirements}
+  passwordMinLength={10}
+/>
+```
+
+Jede `CustomRequirement` hat:
+- `label: string` — Anforderungstext, der in der Checkliste angezeigt wird
+- `fulfilled: boolean | ((password: string) => boolean)` — Statischer Boolean oder eine Funktion, die auf dem aktuellen Passwort ausgewertet wird
+
+---
+
+## `CustomRequirement`-Typ
+
+```ts
+type CustomRequirement = {
+  label:     string;
+  fulfilled: boolean | ((password: string) => boolean);
+};
 ```
 
 ---

@@ -248,6 +248,39 @@ export const Disabled: Story = {
   args: { data: ORG_DATA, disabled: true },
 };
 
+export const EmptyData: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'When `data` has no `children` and no `value`, the chart renders the `translation.noData` ' +
+          'message (default `"No data"`) centered in the SVG instead of an empty canvas. ' +
+          'Override it via `translation={{ noData: "..." }}`.',
+      },
+    },
+  },
+  args: {
+    data: { id: "root", name: "Root" },
+    translation: { noData: "Nothing to show yet" },
+  },
+};
+
+export const StaticViewBox: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`autoFit={false}` disables the auto-fit viewBox computation — the chart uses a static, ' +
+          '`size`-based viewBox instead of measuring and fitting the rendered content. ' +
+          'Compare against **Default** (`autoFit={true}`, the default) to see the difference: with a small ' +
+          'tree like this one, auto-fit zooms in tighter around the actual nodes, while the static viewBox ' +
+          'always reserves the full `size × size` area.',
+      },
+    },
+  },
+  args: { data: ORG_DATA, autoFit: false },
+};
+
 // ── Deep tree dataset (5 levels, ~65 nodes) ───────────────────────────────
 // Technology skill taxonomy: Company → Domain → Category → Skill → Subskill
 

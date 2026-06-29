@@ -280,6 +280,19 @@ Alle Interaktionen (Hover-Highlight, Click-Callbacks) sind deaktiviert. Das Char
 
 ---
 
+## i18n — Übersetzungen
+
+```tsx
+<ChordChart
+  data={[]}
+  translation={{ noData: 'Keine Daten verfügbar' }}
+/>
+```
+
+Aktuell ist `noData` der einzige Translation-Key (Standard `'No data'`). Er wird zentriert im SVG angezeigt, wenn `data` ein leeres Array ist. Alle Keys sind optional — nicht gesetzte Keys verwenden die englischen Standardwerte.
+
+---
+
 ## D3-Charts-Familie
 
 Alle 5 D3-Charts sind erschienen:

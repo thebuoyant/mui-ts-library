@@ -80,7 +80,9 @@ function App() {
 | `padding` | `number` | `3` | Abstand zwischen verschachtelten Kreisen in px |
 | `sortBy` | `CirclePackingSortBy` | `'value'` | Sortierung nach Wert oder alphabetisch |
 | `showLabels` | `boolean` | `true` | Zentrierte Labels; blenden bei Zoom ein/aus |
-| `labelFontSize` | `number` | `11` | Label-Schriftgröße in px |
+| `showAllLabels` | `boolean` | `false` | Zeigt zusätzlich abgeschnittene Labels auf allen sichtbaren verschachtelten Kreisen (≥14px Radius), die keine direkten Kinder des aktuellen Fokus sind — nicht nur auf dem äußeren fokussierten Ring |
+| `labelFontSize` | `number` | `13` | Schriftgröße der äußeren Ring-Labels in px (fett) |
+| `innerLabelFontSize` | `number` | `9` | Schriftgröße der inneren Kreis-Labels in px — verwendet wenn `showAllLabels` auf `true` gesetzt ist |
 | `labelColor` | `string` | Theme-Text | Label-Textfarbe |
 | `chartColors` | `string[]` | — | Feste Tiefenpalette — überschreibt Gradient |
 | `depthColorStart` | `string` | Theme primary | Gradient-Startfarbe |
@@ -202,6 +204,19 @@ Konsistent mit `SunburstChart`, `RadialTreeChart` und `ChordChart` — alle D3-C
 |---|---|---|---|
 | `onCircleClick` | `(info: CirclePackingNodeInfo, event: React.MouseEvent) => void` | Normaler Klick auf einen Kreis (ohne Strg/Cmd) | Knoten-Details anzeigen, Dashboard filtern |
 | `onZoomChange` | `(zoom: CirclePackingZoomInfo) => void` | Fokus wechselt: Strg/Cmd+Klick Zoom-in, Strg/Cmd+Doppelklick Zoom-out, Escape-Reset | Drill-Down-State verfolgen, Breadcrumb-Navigation |
+
+---
+
+## Keine Daten
+
+Wenn `data` weder `children` noch `value` besitzt, rendert die Komponente den String `translation.noData` (Standard `'No data'`) zentriert im SVG anstelle eines leeren Kreises:
+
+```tsx
+<CirclePackingChart
+  data={{ name: 'Root' }}
+  translation={{ noData: 'Noch keine Daten' }}
+/>
+```
 
 ---
 

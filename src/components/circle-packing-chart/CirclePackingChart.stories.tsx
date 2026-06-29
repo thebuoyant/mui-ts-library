@@ -234,14 +234,20 @@ export const GradientMode: Story = {
     docs: {
       description: {
         story:
-          '`depthColorStart` + `depthColorEnd` enable HCL gradient mode — perceptually uniform color progression across depth levels.',
+          '`depthColorStart` + `depthColorEnd` enable HCL gradient mode — perceptually uniform color ' +
+          'progression across depth levels. Only circles **with children** participate in the gradient ' +
+          '(leaf circles stay background-colored so labels on top stay readable) — a deeper hierarchy like ' +
+          'this one shows the progression much more clearly than a shallow, mostly-leaves dataset would. ' +
+          'A larger `padding` also helps: it widens the colored "ring" each parent circle shows around its children.',
       },
     },
   },
   args: {
-    data: GLOBAL_SOFTWARE,
-    depthColorStart: "hsl(195, 100%, 85%)",
-    depthColorEnd:   "hsl(250, 70%, 30%)",
+    data: OSS_ECOSYSTEM,
+    size: 650,
+    padding: 8,
+    depthColorStart: "hsl(195, 100%, 80%)",
+    depthColorEnd:   "hsl(265, 75%, 35%)",
     background:      "#F8F9FA",
   },
 };
@@ -347,6 +353,23 @@ export const Disabled: Story = {
     },
   },
   args: { data: GLOBAL_SOFTWARE, disabled: true },
+};
+
+export const EmptyData: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'When `data` has no `children` and no `value`, the chart renders the `translation.noData` ' +
+          'message (default `"No data"`) centered in the SVG instead of an empty circle. ' +
+          'Override it via `translation={{ noData: "..." }}`.',
+      },
+    },
+  },
+  args: {
+    data: { name: "Root" },
+    translation: { noData: "Nothing to show yet" },
+  },
 };
 
 // ── Use case: disk usage breakdown ───────────────────────────────────────────

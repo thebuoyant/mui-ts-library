@@ -258,6 +258,23 @@ export const WithCustomColorCreation: Story = {
   render: (args) => <CustomColorCreationStory {...args} />,
 };
 
+export const MaxTagsWithCustomColorCreation: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`maxTags` is enforced even while a custom-color tag is being created — starting with 1 tag ' +
+          'and `maxTags={2}`, you can create exactly one more tag, then the input disables and the ' +
+          'create-mode confirm checkmark/Enter no longer create additional tags, regardless of color choice.',
+      },
+    },
+  },
+  args: {
+    maxTags: 2,
+  },
+  render: (args) => <CustomColorCreationStory {...args} />,
+};
+
 // Zeigt das Suchergebnis-Highlighting: Der übereinstimmende Teil jedes Tag-Labels
 // wird fett hervorgehoben während der Nutzer tippt. Die play-Funktion tippt
 // automatisch "Reac" — im Dropdown erscheint "Reac" fett + "t" normal.

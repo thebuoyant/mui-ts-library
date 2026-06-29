@@ -204,6 +204,57 @@ export const WithQueryHistory: Story = {
   },
 };
 
+function SwitchableQueryHistoryStory(args: ComponentProps<typeof SqlEditor>) {
+  const [activeKey, setActiveKey] = useState<"project-a" | "project-b">("project-a");
+  const [value, setValue] = useState(SAMPLE_SQL);
+
+  return (
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+      <Box sx={{ display: "flex", gap: 1 }}>
+        <button
+          type="button"
+          onClick={() => setActiveKey("project-a")}
+          disabled={activeKey === "project-a"}
+        >
+          Project A
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveKey("project-b")}
+          disabled={activeKey === "project-b"}
+        >
+          Project B
+        </button>
+      </Box>
+      <SqlEditor
+        {...args}
+        value={value}
+        onChange={setValue}
+        queryHistoryKey={`storybook-sql-history-switch-${activeKey}`}
+        onExecute={fn()}
+      />
+    </Box>
+  );
+}
+
+export const SwitchableQueryHistory: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Changing `queryHistoryKey` on an already-mounted editor reloads that key\'s own history — ' +
+          'switching between "Project A" and "Project B" here shows each keeps an independent history, ' +
+          'and switching back to a previously-used key restores its history instead of staying stuck on ' +
+          'whichever key was active at mount time.',
+      },
+    },
+  },
+  args: {
+    toolbarConfig: { showExecute: true, showHistory: true },
+  },
+  render: (args) => <SwitchableQueryHistoryStory {...args} />,
+};
+
 export const NoLineNumbers: Story = {
   args: {
     value:           SAMPLE_SQL,
