@@ -20,6 +20,7 @@ import {
   RadialTreeChart,
   CirclePackingChart,
   HorizontalTreeChart,
+  ColorPicker,
 } from "@thebuoyant-tsdev/mui-ts-library";
 import type {
   TagSelectionItem,
@@ -76,7 +77,7 @@ const INITIAL_JSON = JSON.stringify(
   {
     library: "@thebuoyant-tsdev/mui-ts-library",
     version: "3.x",
-    components: ["GanttChart", "TagSelection", "PasswordStrengthMeter", "RichTextEditor", "SqlEditor", "JsonEditor"],
+    components: ["GanttChart", "TagSelection", "PasswordStrengthMeter", "ColorPicker", "RichTextEditor", "SqlEditor", "JsonEditor"],
     charts: ["SunburstChart", "ChordChart", "RadialTreeChart", "CirclePackingChart", "HorizontalTreeChart"],
     peerDependencies: { react: "^19", "@mui/material": "^9" },
   },
@@ -250,6 +251,7 @@ export default function App() {
   const [sql, setSql]         = useState(INITIAL_SQL);
   const [json, setJson]       = useState(INITIAL_JSON);
   const [html, setHtml]       = useState(INITIAL_HTML);
+  const [brandColor, setBrandColor] = useState("#1976d2");
 
   const theme = useMemo(
     () => createTheme({ palette: { mode } }),
@@ -290,14 +292,14 @@ export default function App() {
           Production-ready components, not toy widgets
         </Typography>
         <Typography variant="h6" sx={{ opacity: 0.85, fontWeight: 400, mb: 1.5, maxWidth: 720, mx: "auto" }}>
-          Project planning, content editing, SQL &amp; JSON tooling, and D3 data visualization —
-          11 fully-typed React 19 + MUI v9 components, each built for a real use case below.
+          Project planning, content editing, SQL &amp; JSON tooling, D3 data visualization, and theme tooling —
+          12 fully-typed React 19 + MUI v9 components, each built for a real use case below.
         </Typography>
         <Typography variant="body2" sx={{ opacity: 0.7, mb: 3 }}>
           Edit any file on the left — changes hot-reload instantly. No setup, no install.
         </Typography>
         <Box sx={{ display: "flex", flexDirection: "row", gap: 1, justifyContent: "center", flexWrap: "wrap" }}>
-          {["ChordChart", "CirclePackingChart", "GanttChart", "HorizontalTreeChart", "JsonEditor",
+          {["ChordChart", "CirclePackingChart", "ColorPicker", "GanttChart", "HorizontalTreeChart", "JsonEditor",
             "PasswordStrengthMeter", "RadialTreeChart", "RichTextEditor", "SqlEditor", "SunburstChart", "TagSelection"]
             .map(name => (
               <Chip
@@ -344,6 +346,21 @@ export default function App() {
           >
             <Box sx={{ display: "flex", justifyContent: "center" }}>
               <CirclePackingChart data={CIRCLE_PACKING_DATA} size={380} showAllLabels zoomable />
+            </Box>
+          </DemoCard>
+
+          {/* ColorPicker */}
+          <DemoCard
+            title="ColorPicker"
+            useCase="Theme & Brand Customization"
+            subtitle="Saturation/hue/alpha color picker panel with an eyedropper tool — MUI ships no color picker at all. Drag, type a hex value, or pick a saved swatch."
+          >
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
+              <ColorPicker
+                value={brandColor}
+                onChange={(hex) => setBrandColor(hex)}
+                savedColors={["#1976d2", "#388e3c", "#d32f2f", "#f57c00", "#7b1fa2"]}
+              />
             </Box>
           </DemoCard>
 
