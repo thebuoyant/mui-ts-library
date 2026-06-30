@@ -258,6 +258,19 @@ describe("ColorPicker", () => {
       expect(hexField).toHaveClass("MuiInputBase-sizeSmall");
       expect(alphaField).toHaveClass("MuiInputBase-sizeSmall");
     });
+
+    it("Should render the format select at the same font-size (and therefore height) as the hex field", () => {
+      // A `size`/`MuiInputBase-size*` class match alone doesn't guarantee equal rendered
+      // height — MUI derives input height from padding *and* line-height, and line-height
+      // scales with font-size. A stray `fontSize` override on just one of the two fields
+      // (as previously existed on the format Select) makes it visibly shorter even though
+      // both report the same MUI size class.
+      render(<ColorPicker value="#ff0000" onChange={vi.fn()} />);
+      const formatSelect = screen.getByRole("combobox", { name: "Color format" });
+      const hexField = screen.getByLabelText("Hex value");
+      expect(formatSelect.closest(".MuiInputBase-root")).toHaveStyle({ fontSize: "1rem" });
+      expect(hexField.closest(".MuiInputBase-root")).toHaveStyle({ fontSize: "1rem" });
+    });
   });
 
   describe("showSliderSection / showInputSection", () => {

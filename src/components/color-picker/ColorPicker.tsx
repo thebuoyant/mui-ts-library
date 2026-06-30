@@ -374,7 +374,7 @@ export function ColorPicker({
             aria-label={t.formatLabel}
             disabled={disabled}
             onChange={(e) => handleFormatChange(e.target.value as ColorPickerFormat)}
-            sx={{ minWidth: 72, fontSize: "0.75rem", flexShrink: 0 }}
+            sx={{ minWidth: 80, flexShrink: 0 }}
           >
             <MenuItem value="hex">HEX</MenuItem>
             <MenuItem value="rgb">RGB</MenuItem>
