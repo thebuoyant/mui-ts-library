@@ -68,13 +68,17 @@ function App() {
 |---|---|---|---|
 | `value` | `string` | — | **Pflichtfeld.** Aktuelle Farbe. Akzeptiert Hex (`#rgb`, `#rgba`, `#rrggbb`, `#rrggbbaa`), `rgb()`/`rgba()` oder `hsl()`/`hsla()`. |
 | `onChange` | `(hex: string, info: ColorPickerColorInfo) => void` | — | **Pflichtfeld.** Feuert bei jeder Änderung — live während des Ziehens, nicht erst beim Loslassen. Siehe [Callbacks / Events](#callbacks--events). |
+| `onChangeCommitted` | `(hex: string, info: ColorPickerColorInfo) => void` | — | Feuert einmal pro "Geste" statt fortlaufend. Siehe [Callbacks / Events](#callbacks--events). |
 | `defaultFormat` | `'hex' \| 'rgb' \| 'hsl'` | `'hex'` | Initiales Anzeigeformat für das Wertefeld. Nach dem Mount unkontrolliert — das Format-Dropdown verwaltet seinen eigenen State danach selbst. |
 | `onFormatChange` | `(format: ColorPickerFormat) => void` | — | Feuert, wenn der Nutzer das Anzeigeformat über das Dropdown wechselt. |
 | `showAlpha` | `boolean` | `true` | Zeigt den Alpha-Slider und das Deckkraft-(%)-Feld an. Auf `false` setzen für reine Vollfarben-Anwendungsfälle. |
 | `showEyeDropper` | `boolean` | `true` | Zeigt das Pipette-Werkzeug an. Wird unabhängig von dieser Prop automatisch ausgeblendet, wenn der Browser die [EyeDropper-API](https://developer.mozilla.org/de/docs/Web/API/EyeDropper) nicht unterstützt (Stand jetzt nur Chromium-basierte Browser — nicht Safari/Firefox). |
+| `showSliderSection` | `boolean` | `true` | Zeigt den Pipette-Button und die Farbton-/Alpha-Slider-Zeile an. Auf `false` setzen für einen minimalen, nur-Gradient-Picker. |
+| `showInputSection` | `boolean` | `true` | Zeigt das Format-Dropdown und die Hex-/RGB-/HSL-/Alpha-Wertefelder-Zeile an. Auf `false` setzen für einen reinen Slider-Picker. |
 | `savedColors` | `string[]` | — | Unterhalb des Pickers gerenderte Swatches — Klick zum Auswählen. Reine Anzeige-/Auswahlliste; die Persistenz (z.B. in `localStorage` oder einem Backend) liegt beim Consumer. |
 | `disabled` | `boolean` | `false` | Deaktiviert alle Interaktionen (Ziehen, Tippen, Swatch-Klicks, Pipette) und reduziert die Deckkraft. |
-| `size` | `'small' \| 'medium'` | `'medium'` | Skaliert Gradient-Flächenhöhe, Slider-Dicke und Swatch-Größe. |
+| `colorGradientSize` | `'small' \| 'medium'` | `'medium'` | Skaliert Gradient-Flächenhöhe, Slider-Dicke und Swatch-Größe. |
+| `inputSize` | `'small' \| 'medium'` | `'medium'` | Größe des Format-Dropdowns und der Werte-/Alpha-Felder, unabhängig von `colorGradientSize` — entspricht der `inputSize`-Konvention von `TagSelection`/`PasswordStrengthMeter`. |
 | `width` | `number` | `280` | Gesamtbreite des Panels in px. |
 | `name` | `string` | — | Formular-Integration: rendert ein verstecktes `<input>` mit dem aktuellen Hex-Wert, sodass der Picker ohne zusätzliche Verdrahtung an nativen Formularen/React Hook Form/Formik teilnimmt. |
 | `translation` | `Partial<ColorPickerTranslation>` | Englische Defaults | Überschreibt barrierefreie Beschriftungen (Feld-/Slider-`aria-label`s und die Überschrift der gespeicherten Farben). Nur die gewünschten Keys angeben — siehe [Übersetzungen](#übersetzungen). |
@@ -83,14 +87,14 @@ function App() {
 
 ## Callbacks / Events
 
-`onChange` ist die einzige Quelle der Wahrheit — es gibt kein separates "Commit"-Event. Es feuert:
+`onChange` feuert live, fortlaufend, bei jeder Änderung:
 
 - Fortlaufend während des Ziehens an der Gradient-Fläche, dem Farbton-Slider oder dem Alpha-Slider (bei jedem Pointer-Move-Frame, nicht erst beim Loslassen)
 - Bei jedem gültigen Tastendruck in den Hex-/RGB-/HSL-/Alpha-Feldern (ungültige Zwischenzustände, wie ein halb getippter Hex-Code, werden lokal gehalten, ohne `onChange` auszulösen)
 - Beim Klick auf einen gespeicherten Farb-Swatch
 - Wenn die Pipette erfolgreich eine Farbe aufgenommen hat
 
-Es übergibt immer einen normalisierten Hex-String als ersten Parameter, plus ein sauberes `ColorPickerColorInfo`-Objekt als zweiten:
+Sowohl `onChange` als auch `onChangeCommitted` übergeben immer einen normalisierten Hex-String als ersten Parameter, plus ein sauberes `ColorPickerColorInfo`-Objekt als zweiten:
 
 ```ts
 type ColorPickerColorInfo = {
@@ -100,7 +104,25 @@ type ColorPickerColorInfo = {
 };
 ```
 
-Hex-/RGB-/HSL-Werte bleiben immer synchron, unabhängig davon, welches Format gerade im Wertefeld *angezeigt* wird — `defaultFormat` steuert nur, was der Nutzer sieht und eingibt, nicht, was `onChange` meldet.
+Hex-/RGB-/HSL-Werte bleiben immer synchron, unabhängig davon, welches Format gerade im Wertefeld *angezeigt* wird — `defaultFormat` steuert nur, was der Nutzer sieht und eingibt, nicht, was `onChange`/`onChangeCommitted` melden.
+
+### `onChange` vs. `onChangeCommitted`
+
+`onChange` ist bewusst **nicht** debounced — es bleibt live, damit Gradient-Thumb, Swatch-Vorschau usw. dem Pointer in Echtzeit folgen. Wenn nur Updates benötigt werden, sobald der Nutzer mit einer Interaktion "fertig" ist (z.B. um ein Backend nicht bei jedem Drag-Frame zu belasten), `onChangeCommitted` nutzen statt `onChange` selbst zu debouncen. Das spiegelt MUIs eigene `Slider`-Komponente, die genau dieselbe `onChange`/`onChangeCommitted`-Aufteilung hat.
+
+`onChangeCommitted` feuert:
+
+- Einmal bei Pointer-Up, nach einem Drag an der Gradient-Fläche, dem Farbton-Slider oder dem Alpha-Slider
+- Einmal bei Blur, nach Tippen in den Hex-/RGB-/HSL-/Alpha-Feldern
+- Sofort (gleicher Tick wie `onChange`) bei atomaren Einzelschritt-Aktionen — Klick auf einen gespeicherten Farb-Swatch oder erfolgreiche Pipetten-Aufnahme, da es dort keine separate Drag-/Tipp-Phase gibt, auf die gewartet werden müsste
+
+```tsx
+<ColorPicker
+  value={color}
+  onChange={(hex) => setColor(hex)}              // Live-Vorschau
+  onChangeCommitted={(hex) => saveToBackend(hex)} // einmal pro Geste
+/>
+```
 
 ---
 
@@ -167,6 +189,22 @@ Mit gesetztem `name` wird ein verstecktes `<input type="hidden" name="brandColor
 
 ---
 
+## Minimale Layouts
+
+`showSliderSection` und `showInputSection` schalten jeweils eine ganze Zeile unabhängig voneinander für kompakte Anwendungsfälle:
+
+```tsx
+{/* Nur Gradient-Fläche + Slider — kein Format-Dropdown oder Zahlenfelder */}
+<ColorPicker value={color} onChange={(hex) => setColor(hex)} showInputSection={false} />
+
+{/* Nur Gradient-Fläche + Zahlenfelder — keine Pipette oder Farbton-/Alpha-Slider */}
+<ColorPicker value={color} onChange={(hex) => setColor(hex)} showSliderSection={false} />
+```
+
+Die Gradient-Fläche selbst wird immer angezeigt — es gibt keine Prop, um sie auszublenden, da sie die primäre Interaktionsfläche des Pickers ist.
+
+---
+
 ## Deaktivierter Zustand
 
 ```tsx
@@ -226,18 +264,22 @@ type ColorPickerColorInfo = {
 };
 
 type ColorPickerProps = {
-  value:            string;
-  onChange:         (hex: string, info: ColorPickerColorInfo) => void;
-  defaultFormat?:   ColorPickerFormat;
-  onFormatChange?:  (format: ColorPickerFormat) => void;
-  showAlpha?:       boolean;
-  showEyeDropper?:  boolean;
-  savedColors?:     string[];
-  disabled?:        boolean;
-  size?:            'small' | 'medium';
-  width?:           number;
-  name?:            string;
-  translation?:     Partial<ColorPickerTranslation>;
+  value:              string;
+  onChange:           (hex: string, info: ColorPickerColorInfo) => void;
+  onChangeCommitted?: (hex: string, info: ColorPickerColorInfo) => void;
+  defaultFormat?:     ColorPickerFormat;
+  onFormatChange?:    (format: ColorPickerFormat) => void;
+  showAlpha?:         boolean;
+  showEyeDropper?:    boolean;
+  showSliderSection?: boolean;
+  showInputSection?:  boolean;
+  savedColors?:       string[];
+  disabled?:          boolean;
+  colorGradientSize?: 'small' | 'medium';
+  inputSize?:         'small' | 'medium';
+  width?:             number;
+  name?:              string;
+  translation?:       Partial<ColorPickerTranslation>;
 };
 ```
 

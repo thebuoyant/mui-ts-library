@@ -26,6 +26,14 @@ declare global {
   }
 }
 
+// A plain `${pct}%` thumb position lets the thumb's own radius push it past the track edge at
+// 0%/100% (the thumb is centered ON that position, not contained within it). Insetting by half
+// the thumb size keeps it fully within the track at both ends.
+function thumbPosition(pct: number, thumbSize: number): string {
+  const clamped = clamp(pct, 0, 100);
+  return `calc(${thumbSize / 2}px + (100% - ${thumbSize}px) * ${clamped / 100})`;
+}
+
 function buildColorInfo(hsva: HsvaColor): { hex: string; info: ColorPickerColorInfo } {
   const rgba = hsvaToRgba(hsva);
   const hsla = hsvaToHsla(hsva);
@@ -43,17 +51,20 @@ function buildColorInfo(hsva: HsvaColor): { hex: string; info: ColorPickerColorI
 // Controlled with a local draft buffer — commits on every valid keystroke, but lets the user
 // type freely (e.g. briefly clear the field) without each render snapping the text back.
 function NumberField({
-  value, onCommit, min, max, label, disabled,
+  value, onCommit, min, max, label, disabled, size, onBlurExtra, fullWidth,
 }: {
   value: number; onCommit: (n: number) => void; min: number; max: number;
-  label: string; disabled?: boolean;
+  label: string; disabled?: boolean; size: "small" | "medium"; onBlurExtra?: () => void;
+  // MUI's outlined input keeps ~14px horizontal padding on each side regardless of `size` —
+  // a fixed width has to leave room for that or 3-digit values ("100", "255", "360") clip.
+  fullWidth?: boolean;
 }) {
   const [draft, setDraft] = useState(String(Math.round(value)));
   useEffect(() => { setDraft(String(Math.round(value))); }, [value]);
 
   return (
     <TextField
-      size="small"
+      size={size}
       value={draft}
       disabled={disabled}
       onChange={(e) => {
@@ -62,9 +73,9 @@ function NumberField({
         const n = Number(next);
         if (next.trim() !== "" && !Number.isNaN(n)) onCommit(clamp(n, min, max));
       }}
-      onBlur={() => setDraft(String(Math.round(value)))}
-      slotProps={{ htmlInput: { "aria-label": label, style: { textAlign: "center", padding: "6px 4px" } } }}
-      sx={{ width: 48 }}
+      onBlur={() => { setDraft(String(Math.round(value))); onBlurExtra?.(); }}
+      slotProps={{ htmlInput: { "aria-label": label, style: { textAlign: "center" } } }}
+      sx={fullWidth ? { flex: 1, minWidth: 0 } : { width: 64, flexShrink: 0 }}
     />
   );
 }
@@ -72,13 +83,17 @@ function NumberField({
 export function ColorPicker({
   value,
   onChange,
+  onChangeCommitted,
   defaultFormat = "hex",
   onFormatChange,
   showAlpha = true,
   showEyeDropper = true,
+  showSliderSection = true,
+  showInputSection = true,
   savedColors,
   disabled = false,
-  size = "medium",
+  colorGradientSize = "medium",
+  inputSize = "medium",
   width = 280,
   name,
   translation,
@@ -118,10 +133,28 @@ export function ColorPicker({
     onChange(built.hex, built.info);
   };
 
-  const gradientHeight = size === "small" ? 130 : 160;
-  const swatchSize = size === "small" ? 20 : 24;
-  const trackThickness = size === "small" ? 10 : 12;
-  const thumbSize = size === "small" ? 13 : 16;
+  // For atomic, single-step actions (swatch click, eyedropper) — fires onChangeCommitted
+  // immediately alongside onChange, since there's no separate drag/typing phase to defer past.
+  const commitHsva = (next: HsvaColor) => {
+    updateHsva(next);
+    if (onChangeCommitted) {
+      const built = buildColorInfo(next);
+      onChangeCommitted(built.hex, built.info);
+    }
+  };
+
+  // For drag (pointer-up) and typing (blur) — fires once the "gesture" ends, reading the
+  // current hsva from this render's closure rather than re-deriving it from another source.
+  const fireCommitted = () => {
+    if (!onChangeCommitted) return;
+    const built = buildColorInfo(hsva);
+    onChangeCommitted(built.hex, built.info);
+  };
+
+  const gradientHeight = colorGradientSize === "small" ? 130 : 160;
+  const swatchSize = colorGradientSize === "small" ? 20 : 24;
+  const trackThickness = colorGradientSize === "small" ? 10 : 12;
+  const thumbSize = colorGradientSize === "small" ? 13 : 16;
 
   const handleGradientPointer = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (disabled || !gradientRef.current) return;
@@ -151,7 +184,7 @@ export function ColorPicker({
     try {
       const result = await new window.EyeDropper().open();
       const parsed = hexToRgba(result.sRGBHex);
-      if (parsed) updateHsva(rgbaToHsva({ ...parsed, a: hsva.a }));
+      if (parsed) commitHsva(rgbaToHsva({ ...parsed, a: hsva.a }));
     } catch {
       // User cancelled (Escape) — nothing to do.
     }
@@ -192,6 +225,7 @@ export function ColorPicker({
         aria-valuetext={`${Math.round(hsva.s)}, ${Math.round(hsva.v)}`}
         onPointerDown={(e) => { e.currentTarget.setPointerCapture?.(e.pointerId); handleGradientPointer(e); }}
         onPointerMove={(e) => { if (e.buttons === 1) handleGradientPointer(e); }}
+        onPointerUp={fireCommitted}
         sx={{
           position: "relative",
           width: "100%",
@@ -208,8 +242,8 @@ export function ColorPicker({
         <Box
           sx={{
             position: "absolute",
-            left: `${hsva.s}%`,
-            top: `${100 - hsva.v}%`,
+            left: thumbPosition(hsva.s, thumbSize),
+            top: thumbPosition(100 - hsva.v, thumbSize),
             width: thumbSize,
             height: thumbSize,
             borderRadius: "50%",
@@ -222,6 +256,7 @@ export function ColorPicker({
         />
       </Box>
 
+      {showSliderSection && (
       <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
         {showEyeDropper && eyeDropperSupported && (
           <Tooltip title={t.eyeDropperLabel}>
@@ -248,6 +283,7 @@ export function ColorPicker({
             aria-valuenow={Math.round(hsva.h)}
             onPointerDown={(e) => { e.currentTarget.setPointerCapture?.(e.pointerId); handleHuePointer(e); }}
             onPointerMove={(e) => { if (e.buttons === 1) handleHuePointer(e); }}
+            onPointerUp={fireCommitted}
             sx={{
               position: "relative",
               width: "100%",
@@ -261,7 +297,7 @@ export function ColorPicker({
             <Box
               sx={{
                 position: "absolute",
-                left: `${(hsva.h / 360) * 100}%`,
+                left: thumbPosition((hsva.h / 360) * 100, thumbSize),
                 top: "50%",
                 width: thumbSize,
                 height: thumbSize,
@@ -286,6 +322,7 @@ export function ColorPicker({
               aria-valuenow={Math.round(hsva.a * 100)}
               onPointerDown={(e) => { e.currentTarget.setPointerCapture?.(e.pointerId); handleAlphaPointer(e); }}
               onPointerMove={(e) => { if (e.buttons === 1) handleAlphaPointer(e); }}
+              onPointerUp={fireCommitted}
               sx={{
                 position: "relative",
                 width: "100%",
@@ -307,7 +344,7 @@ export function ColorPicker({
               <Box
                 sx={{
                   position: "absolute",
-                  left: `${hsva.a * 100}%`,
+                  left: thumbPosition(hsva.a * 100, thumbSize),
                   top: "50%",
                   width: thumbSize,
                   height: thumbSize,
@@ -323,65 +360,75 @@ export function ColorPicker({
           )}
         </Box>
       </Box>
+      )}
 
-      <Box sx={{ display: "flex", gap: 0.75, alignItems: "center" }}>
-        <Select
-          size="small"
-          value={format}
-          aria-label={t.formatLabel}
-          disabled={disabled}
-          onChange={(e) => handleFormatChange(e.target.value as ColorPickerFormat)}
-          sx={{ minWidth: 78, fontSize: "0.75rem" }}
-        >
-          <MenuItem value="hex">HEX</MenuItem>
-          <MenuItem value="rgb">RGB</MenuItem>
-          <MenuItem value="hsl">HSL</MenuItem>
-        </Select>
-
-        {format === "hex" && (
-          <TextField
-            size="small"
-            value={hexDraft}
+      {showInputSection && (
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75 }}>
+        {/* Row 1: format selector, hex field (HEX format only), and alpha — RGB/HSL's three
+            fields get their own full-width row below instead of squeezing in here, so none
+            of these fields are narrow enough to clip their own content (e.g. "100", "255"). */}
+        <Box sx={{ display: "flex", gap: 0.75, alignItems: "center" }}>
+          <Select
+            size={inputSize}
+            value={format}
+            aria-label={t.formatLabel}
             disabled={disabled}
-            onChange={(e) => {
-              const next = e.target.value;
-              setHexDraft(next);
-              const parsed = hexToRgba(next);
-              if (parsed) updateHsva(rgbaToHsva({ ...parsed, a: hsva.a }));
-            }}
-            onBlur={() => setHexDraft(hexNoAlpha)}
-            slotProps={{ htmlInput: { "aria-label": t.hexFieldLabel } }}
-            sx={{ flex: 1 }}
-          />
-        )}
+            onChange={(e) => handleFormatChange(e.target.value as ColorPickerFormat)}
+            sx={{ minWidth: 72, fontSize: "0.75rem", flexShrink: 0 }}
+          >
+            <MenuItem value="hex">HEX</MenuItem>
+            <MenuItem value="rgb">RGB</MenuItem>
+            <MenuItem value="hsl">HSL</MenuItem>
+          </Select>
+
+          {format === "hex" && (
+            <TextField
+              size={inputSize}
+              value={hexDraft}
+              disabled={disabled}
+              onChange={(e) => {
+                const next = e.target.value;
+                setHexDraft(next);
+                const parsed = hexToRgba(next);
+                if (parsed) updateHsva(rgbaToHsva({ ...parsed, a: hsva.a }));
+              }}
+              onBlur={() => { setHexDraft(hexNoAlpha); fireCommitted(); }}
+              slotProps={{ htmlInput: { "aria-label": t.hexFieldLabel } }}
+              sx={{ flex: 1, minWidth: 0 }}
+            />
+          )}
+
+          {format !== "hex" && <Box sx={{ flex: 1 }} />}
+
+          {showAlpha && (
+            <NumberField label={t.alphaFieldLabel} value={Math.round(hsva.a * 100)} min={0} max={100} disabled={disabled} size={inputSize} onBlurExtra={fireCommitted}
+              onCommit={(a) => updateHsva({ ...hsva, a: a / 100 })} />
+          )}
+        </Box>
 
         {format === "rgb" && (
-          <Box sx={{ display: "flex", gap: 0.5, flex: 1 }}>
-            <NumberField label={t.redLabel} value={rgba.r} min={0} max={255} disabled={disabled}
+          <Box sx={{ display: "flex", gap: 0.75 }}>
+            <NumberField label={t.redLabel} value={rgba.r} min={0} max={255} disabled={disabled} size={inputSize} onBlurExtra={fireCommitted} fullWidth
               onCommit={(r) => updateHsva(rgbaToHsva({ r, g: rgba.g, b: rgba.b, a: hsva.a }))} />
-            <NumberField label={t.greenLabel} value={rgba.g} min={0} max={255} disabled={disabled}
+            <NumberField label={t.greenLabel} value={rgba.g} min={0} max={255} disabled={disabled} size={inputSize} onBlurExtra={fireCommitted} fullWidth
               onCommit={(g) => updateHsva(rgbaToHsva({ r: rgba.r, g, b: rgba.b, a: hsva.a }))} />
-            <NumberField label={t.blueLabel} value={rgba.b} min={0} max={255} disabled={disabled}
+            <NumberField label={t.blueLabel} value={rgba.b} min={0} max={255} disabled={disabled} size={inputSize} onBlurExtra={fireCommitted} fullWidth
               onCommit={(b) => updateHsva(rgbaToHsva({ r: rgba.r, g: rgba.g, b, a: hsva.a }))} />
           </Box>
         )}
 
         {format === "hsl" && (
-          <Box sx={{ display: "flex", gap: 0.5, flex: 1 }}>
-            <NumberField label={t.hueFieldLabel} value={hsla.h} min={0} max={360} disabled={disabled}
+          <Box sx={{ display: "flex", gap: 0.75 }}>
+            <NumberField label={t.hueFieldLabel} value={hsla.h} min={0} max={360} disabled={disabled} size={inputSize} onBlurExtra={fireCommitted} fullWidth
               onCommit={(h) => updateHsva({ ...hsva, h })} />
-            <NumberField label={t.saturationFieldLabel} value={hsla.s} min={0} max={100} disabled={disabled}
+            <NumberField label={t.saturationFieldLabel} value={hsla.s} min={0} max={100} disabled={disabled} size={inputSize} onBlurExtra={fireCommitted} fullWidth
               onCommit={(s) => updateHsva(hslaToHsva({ h: hsla.h, s, l: hsla.l, a: hsla.a }))} />
-            <NumberField label={t.lightnessFieldLabel} value={hsla.l} min={0} max={100} disabled={disabled}
+            <NumberField label={t.lightnessFieldLabel} value={hsla.l} min={0} max={100} disabled={disabled} size={inputSize} onBlurExtra={fireCommitted} fullWidth
               onCommit={(l) => updateHsva(hslaToHsva({ h: hsla.h, s: hsla.s, l, a: hsla.a }))} />
           </Box>
         )}
-
-        {showAlpha && (
-          <NumberField label={t.alphaFieldLabel} value={Math.round(hsva.a * 100)} min={0} max={100} disabled={disabled}
-            onCommit={(a) => updateHsva({ ...hsva, a: a / 100 })} />
-        )}
       </Box>
+      )}
 
       {savedColors && savedColors.length > 0 && (
         <Box>
@@ -398,7 +445,7 @@ export function ColorPicker({
                 aria-label={color}
                 onClick={() => {
                   const parsed = parseColorString(color);
-                  if (parsed) updateHsva(rgbaToHsva(parsed));
+                  if (parsed) commitHsva(rgbaToHsva(parsed));
                 }}
                 sx={{
                   width: swatchSize,

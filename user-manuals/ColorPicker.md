@@ -68,13 +68,17 @@ function App() {
 |---|---|---|---|
 | `value` | `string` | — | **Required.** Current color. Accepts hex (`#rgb`, `#rgba`, `#rrggbb`, `#rrggbbaa`), `rgb()`/`rgba()`, or `hsl()`/`hsla()`. |
 | `onChange` | `(hex: string, info: ColorPickerColorInfo) => void` | — | **Required.** Fires on every change — live while dragging, not just on release. See [Callbacks / Events](#callbacks--events). |
+| `onChangeCommitted` | `(hex: string, info: ColorPickerColorInfo) => void` | — | Fires once per "gesture" instead of continuously. See [Callbacks / Events](#callbacks--events). |
 | `defaultFormat` | `'hex' \| 'rgb' \| 'hsl'` | `'hex'` | Initial display format for the value field. Uncontrolled after mount — the format dropdown manages its own state from there. |
 | `onFormatChange` | `(format: ColorPickerFormat) => void` | — | Fires when the user switches the display format via the dropdown. |
 | `showAlpha` | `boolean` | `true` | Shows the alpha slider and the opacity (%) field. Set `false` for opaque-only use cases. |
 | `showEyeDropper` | `boolean` | `true` | Shows the eyedropper tool. Auto-hidden regardless of this prop when the browser doesn't support the [EyeDropper API](https://developer.mozilla.org/en-US/docs/Web/API/EyeDropper) (Chromium-based browsers only as of writing — not Safari/Firefox). |
+| `showSliderSection` | `boolean` | `true` | Shows the eyedropper button and the hue/alpha slider row. Set `false` for a minimal gradient-area-only picker. |
+| `showInputSection` | `boolean` | `true` | Shows the format dropdown and the hex/RGB/HSL/alpha value fields row. Set `false` for a slider-only picker. |
 | `savedColors` | `string[]` | — | Swatches rendered below the picker — click to select. Purely a display/select list; you own persisting it (e.g. to `localStorage` or a backend). |
 | `disabled` | `boolean` | `false` | Mutes all interactions (drag, typing, swatch clicks, eyedropper) and reduces opacity. |
-| `size` | `'small' \| 'medium'` | `'medium'` | Scales the gradient area height, slider thickness, and swatch size. |
+| `colorGradientSize` | `'small' \| 'medium'` | `'medium'` | Scales the gradient area height, slider thickness, and swatch size. |
+| `inputSize` | `'small' \| 'medium'` | `'medium'` | Size of the format dropdown and value/alpha fields, independent of `colorGradientSize` — matches the `inputSize` convention used by `TagSelection`/`PasswordStrengthMeter`. |
 | `width` | `number` | `280` | Overall panel width in px. |
 | `name` | `string` | — | Form-integration: renders a hidden `<input>` carrying the current hex value, so the picker participates in native/React Hook Form/Formik form submission without extra wiring. |
 | `translation` | `Partial<ColorPickerTranslation>` | English defaults | Override accessible labels (field/slider `aria-label`s and the saved-colors heading). Only the keys you want to change — see [Translations](#translations). |
@@ -83,14 +87,14 @@ function App() {
 
 ## Callbacks / Events
 
-`onChange` is the single source of truth — there's no separate "commit" event. It fires:
+`onChange` fires live, continuously, with every change:
 
 - Continuously while dragging the gradient area, hue slider, or alpha slider (every pointer-move frame, not just on release)
 - On every valid keystroke in the hex/RGB/HSL/alpha fields (invalid in-progress input, like a half-typed hex code, is held locally without firing `onChange`)
 - When a saved-color swatch is clicked
 - When the eyedropper successfully picks a color
 
-It always passes a normalized hex string as the first argument, plus a clean `ColorPickerColorInfo` object as the second:
+Both `onChange` and `onChangeCommitted` pass a normalized hex string as the first argument, plus a clean `ColorPickerColorInfo` object as the second:
 
 ```ts
 type ColorPickerColorInfo = {
@@ -100,7 +104,25 @@ type ColorPickerColorInfo = {
 };
 ```
 
-The hex/rgb/hsl values are always kept in sync regardless of which format is currently *displayed* in the value field — `defaultFormat` only controls what the user sees and types, not what `onChange` reports.
+The hex/rgb/hsl values are always kept in sync regardless of which format is currently *displayed* in the value field — `defaultFormat` only controls what the user sees and types, not what `onChange`/`onChangeCommitted` report.
+
+### `onChange` vs. `onChangeCommitted`
+
+`onChange` is intentionally **not** debounced — it stays live so the gradient thumb, swatch preview, etc. track the pointer in real time. If you only need updates once the user is "done" with an interaction (e.g. to avoid hammering a backend on every drag frame), use `onChangeCommitted` instead of debouncing `onChange` yourself. This mirrors MUI's own `Slider` component, which has the exact same `onChange`/`onChangeCommitted` split.
+
+`onChangeCommitted` fires:
+
+- Once on pointer-up, after a drag on the gradient area, hue slider, or alpha slider
+- Once on blur, after typing in the hex/RGB/HSL/alpha fields
+- Immediately (same tick as `onChange`) for atomic, single-step actions — a saved-color swatch click or a successful eyedropper pick, since there's no separate drag/typing phase to defer past
+
+```tsx
+<ColorPicker
+  value={color}
+  onChange={(hex) => setColor(hex)}              // live preview
+  onChangeCommitted={(hex) => saveToBackend(hex)} // once per gesture
+/>
+```
 
 ---
 
@@ -167,6 +189,22 @@ With `name` set, a hidden `<input type="hidden" name="brandColor" value={...} />
 
 ---
 
+## Minimal Layouts
+
+`showSliderSection` and `showInputSection` each toggle a whole row independently, for compact use cases:
+
+```tsx
+{/* Gradient area + sliders only — no format dropdown or numeric fields */}
+<ColorPicker value={color} onChange={(hex) => setColor(hex)} showInputSection={false} />
+
+{/* Gradient area + numeric fields only — no eyedropper or hue/alpha sliders */}
+<ColorPicker value={color} onChange={(hex) => setColor(hex)} showSliderSection={false} />
+```
+
+The gradient area itself is always shown — there's no prop to hide it, since it's the picker's primary interaction surface.
+
+---
+
 ## Disabled State
 
 ```tsx
@@ -226,18 +264,22 @@ type ColorPickerColorInfo = {
 };
 
 type ColorPickerProps = {
-  value:            string;
-  onChange:         (hex: string, info: ColorPickerColorInfo) => void;
-  defaultFormat?:   ColorPickerFormat;
-  onFormatChange?:  (format: ColorPickerFormat) => void;
-  showAlpha?:       boolean;
-  showEyeDropper?:  boolean;
-  savedColors?:     string[];
-  disabled?:        boolean;
-  size?:            'small' | 'medium';
-  width?:           number;
-  name?:            string;
-  translation?:     Partial<ColorPickerTranslation>;
+  value:              string;
+  onChange:           (hex: string, info: ColorPickerColorInfo) => void;
+  onChangeCommitted?: (hex: string, info: ColorPickerColorInfo) => void;
+  defaultFormat?:     ColorPickerFormat;
+  onFormatChange?:    (format: ColorPickerFormat) => void;
+  showAlpha?:         boolean;
+  showEyeDropper?:    boolean;
+  showSliderSection?: boolean;
+  showInputSection?:  boolean;
+  savedColors?:       string[];
+  disabled?:          boolean;
+  colorGradientSize?: 'small' | 'medium';
+  inputSize?:         'small' | 'medium';
+  width?:             number;
+  name?:              string;
+  translation?:       Partial<ColorPickerTranslation>;
 };
 ```
 

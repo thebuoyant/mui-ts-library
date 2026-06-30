@@ -21,15 +21,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 A new, 12th component — a self-contained saturation/hue/alpha color picker panel, filling a real gap since MUI ships no color picker at all (extracted and generalized from the ad-hoc custom-color picker already used inside `TagSelection`'s tag-creation flow).
 
-- 2D saturation/brightness gradient area, hue slider, and an optional alpha slider — all pointer-draggable, live-updating on every move frame, not just on release.
+- 2D saturation/brightness gradient area, hue slider, and an optional alpha slider — all pointer-draggable, live-updating on every move frame, not just on release. Thumbs are inset by half their own size so they stay fully inside the track at both 0% and 100%, instead of overflowing the edge.
 - Eyedropper tool via the native [EyeDropper API](https://developer.mozilla.org/en-US/docs/Web/API/EyeDropper), auto-hidden when the browser doesn't support it (Chromium-only as of writing).
 - Format-switchable value field: `HEX`/`RGB`/`HSL`, each independently editable; `onChange` always reports a clean `{ hex, rgb, hsl }` breakdown regardless of which format is currently displayed.
+- `onChangeCommitted` — fires once per "gesture" (drag release, field blur, or immediately for atomic swatch/eyedropper picks) instead of continuously, the same dual-callback pattern as MUI's own `Slider`. Use it instead of debouncing `onChange` yourself for expensive side effects.
+- `colorGradientSize?: 'small' | 'medium'` (renamed from the initial `size`) and `inputSize?: 'small' | 'medium'` — sized independently: `colorGradientSize` scales the gradient area, sliders, and swatches, `inputSize` sizes the format dropdown and value/alpha fields, matching the `inputSize` convention already used by `TagSelection`/`PasswordStrengthMeter`. The format select, hex field, and numeric fields now consistently share one size instead of mismatched heights, and the alpha/RGB/HSL fields are wide enough that 3-digit values (`100`, `255`, `360`) no longer clip — the RGB/HSL fields now get their own full-width row below the format selector instead of squeezing into one line.
+- `showSliderSection?: boolean` / `showInputSection?: boolean` — independently toggle the eyedropper+slider row and the format+value-fields row, for compact layouts. The gradient area itself is always shown.
 - `savedColors?: string[]` swatch grid — display/select only, the caller owns persistence.
 - `name` prop renders a hidden input for native/React Hook Form/Formik form integration, consistent with `JsonEditor`/`SqlEditor`/`PasswordStrengthMeter`.
 - Fully controlled (`value`/`onChange`), themeable via MUI's `useTheme()` (border/radius tokens), `size`/`width`/`disabled` props, and full `translation` support for every accessible label.
 - Renders the picker panel only — no built-in trigger button or popover, by design (wrap it in MUI's own `Popover`/`Menu` for a "swatch + dropdown" UI, the same separation MUI's own date pickers use between field and calendar).
 
-New `colorConversion.util.ts` with HSV/RGB/HEX/HSL conversion functions, covered by 34 unit tests, plus 21 component-level tests covering drag interactions, format switching, the eyedropper (including its cancel path), saved colors, disabled state, controlled value re-sync, and form integration.
+New `colorConversion.util.ts` with HSV/RGB/HEX/HSL conversion functions, covered by 34 unit tests, plus 30 component-level tests covering drag interactions, format switching, the eyedropper (including its cancel path), saved colors, disabled state, controlled value re-sync, form integration, thumb-positioning bounds, `inputSize` consistency, section visibility toggles, and `onChangeCommitted` timing.
 
 ---
 

@@ -21,15 +21,18 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 Eine neue, 12. Komponente — ein eigenständiges Sättigung/Farbton/Alpha-Farbwähler-Panel, das eine echte Lücke schließt, da MUI überhaupt keinen Farbwähler mitbringt (extrahiert und verallgemeinert aus dem bereits in TagSelections Tag-Erstellungs-Flow genutzten Ad-hoc-Custom-Color-Picker).
 
-- 2D-Sättigung/Helligkeit-Gradient-Fläche, Farbton-Slider und optionaler Alpha-Slider — alle per Pointer ziehbar, mit Live-Update bei jedem Move-Frame, nicht erst beim Loslassen.
+- 2D-Sättigung/Helligkeit-Gradient-Fläche, Farbton-Slider und optionaler Alpha-Slider — alle per Pointer ziehbar, mit Live-Update bei jedem Move-Frame, nicht erst beim Loslassen. Thumbs sind um die halbe eigene Größe eingerückt, damit sie sowohl bei 0% als auch bei 100% vollständig innerhalb der Spur bleiben, statt über den Rand hinauszuragen.
 - Pipette-Werkzeug über die native [EyeDropper-API](https://developer.mozilla.org/de/docs/Web/API/EyeDropper), automatisch ausgeblendet, wenn der Browser sie nicht unterstützt (Stand jetzt nur Chromium).
 - Formatumschaltbares Wertefeld: `HEX`/`RGB`/`HSL`, jeweils unabhängig editierbar; `onChange` meldet immer einen sauberen `{ hex, rgb, hsl }`-Breakdown, unabhängig davon, welches Format gerade angezeigt wird.
+- `onChangeCommitted` — feuert einmal pro "Geste" (Drag-Loslassen, Feld-Blur, oder sofort bei atomaren Swatch-/Pipetten-Aktionen) statt fortlaufend, dieselbe Dual-Callback-Aufteilung wie MUIs eigene `Slider`-Komponente. Statt `onChange` selbst zu debouncen für teure Seiteneffekte.
+- `colorGradientSize?: 'small' | 'medium'` (umbenannt vom ursprünglichen `size`) und `inputSize?: 'small' | 'medium'` — unabhängig dimensioniert: `colorGradientSize` skaliert Gradient-Fläche, Slider und Swatches, `inputSize` dimensioniert Format-Dropdown und Werte-/Alpha-Felder, entspricht der bereits von `TagSelection`/`PasswordStrengthMeter` genutzten `inputSize`-Konvention. Format-Select, Hex-Feld und Zahlenfelder teilen sich jetzt konsistent eine Größe statt unterschiedlicher Höhen, und Alpha-/RGB-/HSL-Felder sind breit genug, dass dreistellige Werte (`100`, `255`, `360`) nicht mehr abgeschnitten werden — die RGB-/HSL-Felder bekommen jetzt eine eigene volle Zeile unter dem Format-Selector statt sich eine Zeile zu teilen.
+- `showSliderSection?: boolean` / `showInputSection?: boolean` — schalten die Pipette+Slider-Zeile und die Format+Werte-Zeile unabhängig voneinander, für kompakte Layouts. Die Gradient-Fläche selbst wird immer angezeigt.
 - `savedColors?: string[]`-Swatch-Raster — reine Anzeige/Auswahl, die Persistenz liegt beim Aufrufer.
 - `name`-Prop rendert ein verstecktes Input-Feld für native/React Hook Form/Formik-Formular-Integration, konsistent mit `JsonEditor`/`SqlEditor`/`PasswordStrengthMeter`.
 - Vollständig kontrolliert (`value`/`onChange`), themefähig über MUIs `useTheme()` (Border-/Radius-Tokens), `size`/`width`/`disabled`-Props und vollständige `translation`-Unterstützung für jede barrierefreie Beschriftung.
 - Rendert bewusst nur das Picker-Panel — kein eingebauter Auslöser-Button oder Popover (in MUIs eigenes `Popover`/`Menu` einbetten für eine "Swatch + Dropdown"-UI, dieselbe Trennung, die MUIs eigene Date-Picker zwischen Feld und Kalender nutzen).
 
-Neue `colorConversion.util.ts` mit HSV/RGB/HEX/HSL-Konvertierungsfunktionen, abgesichert durch 34 Unit-Tests, plus 21 Komponenten-Tests für Drag-Interaktionen, Format-Wechsel, die Pipette (inkl. Abbruch-Pfad), gespeicherte Farben, deaktivierten Zustand, Re-Sync des kontrollierten Werts und Formular-Integration.
+Neue `colorConversion.util.ts` mit HSV/RGB/HEX/HSL-Konvertierungsfunktionen, abgesichert durch 34 Unit-Tests, plus 30 Komponenten-Tests für Drag-Interaktionen, Format-Wechsel, die Pipette (inkl. Abbruch-Pfad), gespeicherte Farben, deaktivierten Zustand, Re-Sync des kontrollierten Werts, Formular-Integration, Thumb-Positionierungsgrenzen, `inputSize`-Konsistenz, Sektions-Sichtbarkeits-Toggles und `onChangeCommitted`-Timing.
 
 ---
 

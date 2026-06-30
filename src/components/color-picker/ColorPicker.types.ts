@@ -42,8 +42,10 @@ export const DEFAULT_COLOR_PICKER_TRANSLATION: Required<ColorPickerTranslation> 
 export type ColorPickerProps = {
   /** Current color — accepts hex (#rgb, #rgba, #rrggbb, #rrggbbaa), rgb()/rgba(), or hsl()/hsla(). */
   value:                string;
-  /** Fires on every change (live while dragging) with a normalized hex string plus a clean rgb/hsl breakdown. */
+  /** Fires on every change — live while dragging, on every valid keystroke, and on swatch/eyedropper picks — with a normalized hex string plus a clean rgb/hsl breakdown. */
   onChange:             (hex: string, info: ColorPickerColorInfo) => void;
+  /** Fires once per "gesture" instead of continuously: on pointer-up after a drag, on blur after typing, or immediately for atomic actions (swatch click, eyedropper). Same dual-callback pattern as MUI's own `Slider` — use this instead of debouncing `onChange` yourself for expensive side effects (persisting to a backend, etc.). */
+  onChangeCommitted?:   (hex: string, info: ColorPickerColorInfo) => void;
   /** Initial display format for the value field — uncontrolled after mount (default: 'hex'). */
   defaultFormat?:       ColorPickerFormat;
   /** Fires when the user switches the display format via the dropdown. */
@@ -52,10 +54,17 @@ export type ColorPickerProps = {
   showAlpha?:           boolean;
   /** Shows the eyedropper tool — auto-hidden when the browser doesn't support the EyeDropper API regardless of this prop (default: true). */
   showEyeDropper?:      boolean;
+  /** Shows the eyedropper button + hue/alpha slider row (default: true). Set `false` for a minimal gradient-area-only picker. */
+  showSliderSection?:   boolean;
+  /** Shows the format dropdown + hex/RGB/HSL/alpha value fields row (default: true). Set `false` for a slider-only picker. */
+  showInputSection?:    boolean;
   /** Swatches shown below the picker — click to select. Purely a display list; the caller owns persistence. */
   savedColors?:         string[];
   disabled?:            boolean;
-  size?:                "small" | "medium";
+  /** Scales the gradient area, slider thickness, and swatch size (default: 'medium'). */
+  colorGradientSize?:   "small" | "medium";
+  /** Size of the format dropdown and value/alpha input fields, independent of `colorGradientSize` (default: 'medium'). */
+  inputSize?:           "small" | "medium";
   /** Overall panel width in px (default: 280). */
   width?:               number;
   /** Form-integration: renders a hidden input so the value participates in native/React Hook Form/Formik form submission. */

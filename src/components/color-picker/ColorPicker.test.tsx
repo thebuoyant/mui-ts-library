@@ -1,6 +1,23 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { useState, type ComponentProps } from "react";
 import { ColorPicker } from "./ColorPicker";
+
+// ColorPicker is a standard controlled component: if onChange's output isn't fed back into
+// `value`, the next render correctly "fights back" to the unchanged value prop — same semantics
+// as any controlled <input>. Tests that span multiple sequential interactions (type, then blur)
+// need this wrapper so the second interaction sees the first one's committed value, exactly like
+// a real consumer.
+function ControlledColorPicker(props: Omit<ComponentProps<typeof ColorPicker>, "value"> & { initialValue: string }) {
+  const [value, setValue] = useState(props.initialValue);
+  return (
+    <ColorPicker
+      {...props}
+      value={value}
+      onChange={(hex, info) => { setValue(hex); props.onChange(hex, info); }}
+    />
+  );
+}
 
 // jsdom never computes real layout — every getBoundingClientRect() call returns a
 // zero-sized rect by default, which would divide-by-zero in the percentage math.
@@ -209,5 +226,117 @@ describe("ColorPicker", () => {
 
     rerender(<ColorPicker value="hsl(120, 100%, 50%)" onChange={vi.fn()} />);
     expect(screen.getByLabelText("Hex value")).toHaveValue("#00ff00");
+  });
+
+  // Regression: a plain `left: 100%` thumb position lets the thumb's own radius push half of
+  // it past the track edge — both the gradient-area thumb and the slider thumbs must stay
+  // fully inside the track at 0% and 100%.
+  describe("Thumb positioning stays within track bounds", () => {
+    // MUI's `sx` prop renders these as a generated CSS class, not an inline `style` attribute —
+    // `toHaveStyle` resolves the actual matched rule, an inline-style check would read empty.
+    it("Should inset the gradient-area thumb at full saturation (s=100)", () => {
+      render(<ColorPicker value="#ff0000" onChange={vi.fn()} />); // pure red: s=100, v=100
+      const thumb = screen.getByLabelText("Saturation and brightness").firstElementChild as HTMLElement;
+      // thumbSize=16 (default "medium" size) — center inset by 8px from each edge, never flush against it.
+      expect(thumb).toHaveStyle({ left: "calc(8px + 1 * (100% - 16px))" });
+    });
+
+    it("Should inset the hue-slider thumb at hue=0 (left edge)", () => {
+      render(<ColorPicker value="#ff0000" onChange={vi.fn()} />); // pure red: h=0
+      const hueThumb = screen.getByLabelText("Hue").firstElementChild as HTMLElement;
+      expect(hueThumb).toHaveStyle({ left: "calc(8px + 0 * (100% - 16px))" });
+    });
+  });
+
+  describe("inputSize", () => {
+    it("Should apply the same size to the format select, value field, and alpha field", () => {
+      render(<ColorPicker value="#ff0000" onChange={vi.fn()} inputSize="small" />);
+      const formatSelect = screen.getByLabelText("Color format").closest(".MuiInputBase-root");
+      const hexField = screen.getByLabelText("Hex value").closest(".MuiInputBase-root");
+      const alphaField = screen.getAllByLabelText("Alpha")[1].closest(".MuiInputBase-root"); // [0] is the slider
+      expect(formatSelect).toHaveClass("MuiInputBase-sizeSmall");
+      expect(hexField).toHaveClass("MuiInputBase-sizeSmall");
+      expect(alphaField).toHaveClass("MuiInputBase-sizeSmall");
+    });
+  });
+
+  describe("showSliderSection / showInputSection", () => {
+    it("Should hide the eyedropper and hue/alpha sliders when showSliderSection is false", () => {
+      const open = vi.fn().mockResolvedValue({ sRGBHex: "#abcdef" });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).EyeDropper = vi.fn().mockImplementation(function (this: { open: typeof open }) { this.open = open; });
+
+      render(<ColorPicker value="#ff0000" onChange={vi.fn()} showSliderSection={false} />);
+      expect(screen.queryByLabelText("Hue")).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Pick color from screen" })).not.toBeInTheDocument();
+      // The gradient area and the input section stay visible.
+      expect(screen.getByLabelText("Saturation and brightness")).toBeInTheDocument();
+      expect(screen.getByLabelText("Hex value")).toBeInTheDocument();
+    });
+
+    it("Should hide the format dropdown and value fields when showInputSection is false", () => {
+      render(<ColorPicker value="#ff0000" onChange={vi.fn()} showInputSection={false} />);
+      expect(screen.queryByLabelText("Hex value")).not.toBeInTheDocument();
+      expect(screen.queryByLabelText("Color format")).not.toBeInTheDocument();
+      // The gradient area and the slider section stay visible.
+      expect(screen.getByLabelText("Saturation and brightness")).toBeInTheDocument();
+      expect(screen.getByLabelText("Hue")).toBeInTheDocument();
+    });
+  });
+
+  describe("onChangeCommitted", () => {
+    it("Should not fire while dragging the gradient area, only on pointer-up", () => {
+      const handleCommitted = vi.fn();
+      render(<ColorPicker value="#ff0000" onChange={vi.fn()} onChangeCommitted={handleCommitted} />);
+      const gradient = screen.getByLabelText("Saturation and brightness");
+
+      fireEvent.pointerDown(gradient, { clientX: 100, clientY: 0, pointerId: 1 });
+      fireEvent.pointerMove(gradient, { clientX: 120, clientY: 0, pointerId: 1, buttons: 1 });
+      expect(handleCommitted).not.toHaveBeenCalled();
+
+      fireEvent.pointerUp(gradient, { pointerId: 1 });
+      expect(handleCommitted).toHaveBeenCalledTimes(1);
+    });
+
+    it("Should fire once on blur after typing in the hex field, not per keystroke", () => {
+      const handleCommitted = vi.fn();
+      render(<ControlledColorPicker initialValue="#ff0000" onChange={vi.fn()} onChangeCommitted={handleCommitted} />);
+      const hexField = screen.getByLabelText("Hex value");
+
+      fireEvent.change(hexField, { target: { value: "#00ff00" } });
+      expect(handleCommitted).not.toHaveBeenCalled();
+
+      fireEvent.blur(hexField);
+      expect(handleCommitted).toHaveBeenCalledTimes(1);
+      const [hex] = handleCommitted.mock.calls[0];
+      expect(hex).toBe("#00ff00");
+    });
+
+    it("Should fire immediately when a saved-color swatch is clicked", () => {
+      const handleCommitted = vi.fn();
+      render(
+        <ColorPicker
+          value="#ff0000"
+          onChange={vi.fn()}
+          onChangeCommitted={handleCommitted}
+          savedColors={["#0000ff"]}
+        />,
+      );
+      fireEvent.click(screen.getByRole("button", { name: "#0000ff" }));
+      expect(handleCommitted).toHaveBeenCalledTimes(1);
+      expect(handleCommitted.mock.calls[0][0]).toBe("#0000ff");
+    });
+
+    it("Should fire immediately when the eyedropper picks a color", async () => {
+      const open = vi.fn().mockResolvedValue({ sRGBHex: "#abcdef" });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).EyeDropper = vi.fn().mockImplementation(function (this: { open: typeof open }) { this.open = open; });
+
+      const handleCommitted = vi.fn();
+      render(<ColorPicker value="#ff0000" onChange={vi.fn()} onChangeCommitted={handleCommitted} />);
+      fireEvent.click(screen.getByRole("button", { name: "Pick color from screen" }));
+      await vi.waitFor(() => expect(handleCommitted).toHaveBeenCalled());
+      expect(handleCommitted.mock.calls[0][0]).toBe("#abcdef");
+    });
   });
 });

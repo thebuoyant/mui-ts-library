@@ -10,30 +10,37 @@ const meta: Meta<typeof ColorPicker> = {
   component: ColorPicker,
   args: {
     // A–Z
-    disabled:        false,
-    defaultFormat:   "hex",
-    showAlpha:       true,
-    showEyeDropper:  true,
-    size:            "medium",
-    width:           280,
+    colorGradientSize:  "medium",
+    disabled:           false,
+    defaultFormat:      "hex",
+    inputSize:          "medium",
+    showAlpha:          true,
+    showEyeDropper:     true,
+    showInputSection:   true,
+    showSliderSection:  true,
+    width:              280,
     // Callbacks
-    onChange:        fn(),
+    onChange:           fn(),
   },
   argTypes: {
     // A–Z
-    defaultFormat:   { control: "radio", options: ["hex", "rgb", "hsl"] },
-    disabled:        { control: "boolean" },
-    name:            { control: false },
-    savedColors:     { control: false },
-    showAlpha:       { control: "boolean" },
-    showEyeDropper:  { control: "boolean" },
-    size:            { control: "radio", options: ["small", "medium"] },
-    translation:     { control: false },
-    value:           { control: false },
-    width:           { control: "number" },
+    colorGradientSize:  { control: "radio", options: ["small", "medium"] },
+    defaultFormat:      { control: "radio", options: ["hex", "rgb", "hsl"] },
+    disabled:           { control: "boolean" },
+    inputSize:          { control: "radio", options: ["small", "medium"] },
+    name:               { control: false },
+    savedColors:        { control: false },
+    showAlpha:          { control: "boolean" },
+    showEyeDropper:     { control: "boolean" },
+    showInputSection:   { control: "boolean" },
+    showSliderSection:  { control: "boolean" },
+    translation:        { control: false },
+    value:              { control: false },
+    width:              { control: "number" },
     // Callbacks A–Z
-    onChange:        { control: false },
-    onFormatChange:  { control: false },
+    onChange:           { control: false },
+    onChangeCommitted:  { control: false },
+    onFormatChange:     { control: false },
   },
   parameters: {
     controls: { sort: 'alpha' },
@@ -79,7 +86,48 @@ export const WithoutAlpha: Story = {
 };
 
 export const SmallSize: Story = {
-  args: { size: "small", width: 240 },
+  args: { colorGradientSize: "small", width: 240 },
+  render: (args) => <ControlledColorPicker {...args} />,
+};
+
+export const SmallInputSize: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`inputSize` controls the format dropdown and value/alpha fields independently of `size` ' +
+          '(which scales the gradient area, sliders, and swatches) — useful for matching a denser form layout ' +
+          'without shrinking the picker itself.',
+      },
+    },
+  },
+  args: { inputSize: "small" },
+  render: (args) => <ControlledColorPicker {...args} />,
+};
+
+export const SlidersOnly: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: '`showInputSection={false}` hides the format dropdown and value/alpha fields — gradient area and sliders only.',
+      },
+    },
+  },
+  args: { showInputSection: false },
+  render: (args) => <ControlledColorPicker {...args} />,
+};
+
+export const InputsOnly: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`showSliderSection={false}` hides the eyedropper and the hue/alpha sliders — a compact picker driven ' +
+          'entirely by the gradient area plus typed values.',
+      },
+    },
+  },
+  args: { showSliderSection: false },
   render: (args) => <ControlledColorPicker {...args} />,
 };
 
@@ -138,6 +186,53 @@ export const FormIntegration: Story = {
   },
   args: { name: "brandColor" },
   render: (args) => <ControlledColorPicker {...args} />,
+};
+
+function ChangeCommittedStory(args: ComponentProps<typeof ColorPicker>) {
+  const [value, setValue] = useState("#1976d2");
+  const [liveCount, setLiveCount] = useState(0);
+  const [committedCount, setCommittedCount] = useState(0);
+  const [lastCommitted, setLastCommitted] = useState("#1976d2");
+
+  return (
+    <Box sx={{ display: "flex", gap: 3, alignItems: "flex-start" }}>
+      <ColorPicker
+        {...args}
+        value={value}
+        onChange={(hex) => { setValue(hex); setLiveCount((n) => n + 1); }}
+        onChangeCommitted={(hex) => { setCommittedCount((n) => n + 1); setLastCommitted(hex); }}
+      />
+      <Paper variant="outlined" sx={{ p: 2, width: 200 }}>
+        <Typography variant="caption" sx={{ display: "block", color: "text.secondary" }}>
+          onChange calls (every drag frame / keystroke)
+        </Typography>
+        <Typography variant="h6">{liveCount}</Typography>
+        <Typography variant="caption" sx={{ display: "block", color: "text.secondary", mt: 1.5 }}>
+          onChangeCommitted calls (per gesture — drag release, blur, swatch/eyedropper pick)
+        </Typography>
+        <Typography variant="h6">{committedCount}</Typography>
+        <Typography variant="caption" sx={{ display: "block", color: "text.secondary", mt: 1.5 }}>
+          Last committed: {lastCommitted}
+        </Typography>
+      </Paper>
+    </Box>
+  );
+}
+
+export const WithChangeCommitted: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`onChangeCommitted` fires once per "gesture" (drag release, field blur, swatch/eyedropper pick) — ' +
+          'compare the two counters while dragging the gradient area: `onChange` climbs on every frame, ' +
+          '`onChangeCommitted` only increments once you release. Use it instead of debouncing `onChange` ' +
+          'yourself for expensive side effects like persisting to a backend — same dual-callback pattern as ' +
+          "MUI's own `Slider` (`onChange` / `onChangeCommitted`).",
+      },
+    },
+  },
+  render: (args) => <ChangeCommittedStory {...args} />,
 };
 
 export const GermanTranslation: Story = {
