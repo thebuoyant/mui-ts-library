@@ -12,7 +12,7 @@ A type-safe React component library built on **TypeScript** and **MUI (Material 
 
 ## Components
 
-11 production-ready components across three categories. Each links to a live, interactive demo and a full manual covering every prop, type, and pattern.
+12 production-ready components across three categories. Each links to a live, interactive demo and a full manual covering every prop, type, and pattern.
 
 ### Interactive UI
 
@@ -21,6 +21,7 @@ A type-safe React component library built on **TypeScript** and **MUI (Material 
 | [`GanttChart`](#ganttchart) | Drag-and-drop project timelines with milestones, dependencies, and CSV export | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-ganttchart--default) · [Docs](user-manuals/GanttChart.md) |
 | [`TagSelection`](#tagselection) | Multi-tag autocomplete with free-form tag creation and search highlighting | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-tagselection--default) · [Docs](user-manuals/TagSelection.md) |
 | [`PasswordStrengthMeter`](#passwordstrengthmeter) | Real-time strength feedback with a built-in secure password generator | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-passwordstrengthmeter--default) · [Docs](user-manuals/PasswordStrengthMeter.md) |
+| [`ColorPicker`](#colorpicker) | Saturation/hue/alpha color picker panel with an eyedropper tool — MUI ships none | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-colorpicker--default) · [Docs](user-manuals/ColorPicker.md) |
 
 ### Code Editors
 
@@ -134,6 +135,31 @@ import { PasswordStrengthMeter } from '@thebuoyant-tsdev/mui-ts-library';
 ```
 
 → [Full documentation](user-manuals/PasswordStrengthMeter.md)
+
+---
+
+### ColorPicker
+
+A saturation/hue/alpha color picker panel — fills a real MUI gap, since MUI ships no color picker at all. Use it for theme customizers, brand-color pickers, or design-system playgrounds. Fully controlled; you own `value` and update it from `onChange`.
+
+```tsx
+import { useState } from 'react';
+import { ColorPicker } from '@thebuoyant-tsdev/mui-ts-library';
+
+function BrandColorPicker() {
+  const [color, setColor] = useState('#1976d2');
+
+  return (
+    <ColorPicker
+      value={color}
+      onChange={(hex) => setColor(hex)}
+      savedColors={['#f44336', '#2196f3', '#4caf50', '#ffeb3b']}
+    />
+  );
+}
+```
+
+→ [Full documentation](user-manuals/ColorPicker.md)
 
 ---
 
@@ -407,6 +433,13 @@ This project follows [Semantic Versioning](https://semver.org/). In practice:
 ---
 
 ## Changelog
+
+### [3.13.0] — 2026-06-29
+
+**Added**
+- New component: `ColorPicker` — a saturation/hue/alpha color picker panel with an eyedropper tool, fills a real MUI gap. See [Quick Start](#colorpicker) and the [Changelog](#3130--2026-06-29) for details.
+
+---
 
 ### [3.12.0] — 2026-06-29
 

@@ -33,7 +33,7 @@ auf eine Wand laufen — entweder gibt's nichts, oder nur in MUI X Pro/Premium g
 | **DataTable** (Sortierung, Filter, Spalten-Resize, CSV-Export, Virtualisierung) | MUI X `DataGrid` Community ist stark eingeschränkt — Sortierung über mehrere Spalten, Filter-UI und Export sind Pro/Premium-Features. Der mit Abstand meistgenannte MUI-Schmerzpunkt. | GanttChart hat bereits eine eigene Virtualisierungs-Lösung (`virtualizeRows`) — die Grundlagen sind im Projekt schon vorhanden. |
 | **DateRangePicker** | MUI X `DateRangePicker` ist exklusiv Pro — keine freie MUI-Lösung für "Start- und Enddatum in einem Picker". | GanttChart bringt bereits Datums-Range-Logik (`TimelineRange`, Clamping) mit — direkt wiederverwendbar. |
 | **FileUpload / Dropzone** | MUI hat **gar keine** Lösung — weder Community noch Pro. Drag & Drop, Progress, Vorschau muss jedes Projekt selbst bauen. | Komplementiert RichTextEditor (Bild-Embed nutzt aktuell nur URL/Base64) — ein Dropzone-Baustein würde dort direkt mit andocken. |
-| **ColorPicker** | MUI hat keinen eigenen Farbwähler. | Existiert bereits *ad-hoc* in TagSelection (Custom-Color-Picker bei Tag-Erstellung) — als eigenständige, wiederverwendbare Komponente extrahierbar, kein Neubau von Null. |
+| ~~**ColorPicker**~~ | ~~MUI hat keinen eigenen Farbwähler.~~ | ✅ v3.13.0 — als eigenständige Komponente umgesetzt (Sättigung/Farbton/Alpha, Pipette, HEX/RGB/HSL, Saved Colors). Siehe eigene Sektion unten. |
 
 ---
 
@@ -148,6 +148,16 @@ eigenen Tab-Layout des Consumers erreichen, ohne dass die Bibliothek selbst Tabs
 **Verworfen:** *Sichtbarkeit nach Stärke* (Anzeigen-Button erst ab Mindeststärke freischalten) bringt
 keinen Sicherheitsgewinn — der Nutzer tippt das Passwort ohnehin selbst in sein eigenes Browserfenster
 — und wäre nur eine zusätzliche, verwirrende Hürde ohne Nutzen.
+
+---
+
+## ColorPicker
+
+| Feature | Beschreibung | Aufwand | Status |
+|---|---|---|---|
+| PopoverColorPicker-Wrapper | Vorgefertigte Swatch-Button-+-Popover-Kombination als Convenience-Komponente — aktuell muss jeder Consumer das Popover selbst bauen (im Manual dokumentiert). | Niedrig | — |
+| "Aktuelle Farbe speichern"-Button | `savedColors` ist aktuell reine Anzeige/Auswahl — ein optionaler "+"-Button würde die aktuelle Farbe anhängen, bräuchte aber einen `onSavedColorsChange`-Callback (state bleibt beim Consumer). | Niedrig | — |
+| ~~ColorPicker als eigenständige Komponente~~ | ~~Existierte nur ad-hoc in TagSelection (Custom-Color-Picker bei Tag-Erstellung)~~ — als volle, eigenständige Komponente extrahiert: Sättigung/Farbton-Fläche, Hue-/Alpha-Slider, Pipette (EyeDropper-API), HEX/RGB/HSL-Format-Umschaltung, Saved-Colors-Raster, Formular-Integration via `name`. | ~~Mittel~~ | ✅ v3.13.0 |
 
 ---
 

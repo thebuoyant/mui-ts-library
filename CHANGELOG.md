@@ -13,6 +13,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.13.0] — 2026-06-29
+
+### Added
+
+#### New component: `ColorPicker`
+
+A new, 12th component — a self-contained saturation/hue/alpha color picker panel, filling a real gap since MUI ships no color picker at all (extracted and generalized from the ad-hoc custom-color picker already used inside `TagSelection`'s tag-creation flow).
+
+- 2D saturation/brightness gradient area, hue slider, and an optional alpha slider — all pointer-draggable, live-updating on every move frame, not just on release.
+- Eyedropper tool via the native [EyeDropper API](https://developer.mozilla.org/en-US/docs/Web/API/EyeDropper), auto-hidden when the browser doesn't support it (Chromium-only as of writing).
+- Format-switchable value field: `HEX`/`RGB`/`HSL`, each independently editable; `onChange` always reports a clean `{ hex, rgb, hsl }` breakdown regardless of which format is currently displayed.
+- `savedColors?: string[]` swatch grid — display/select only, the caller owns persistence.
+- `name` prop renders a hidden input for native/React Hook Form/Formik form integration, consistent with `JsonEditor`/`SqlEditor`/`PasswordStrengthMeter`.
+- Fully controlled (`value`/`onChange`), themeable via MUI's `useTheme()` (border/radius tokens), `size`/`width`/`disabled` props, and full `translation` support for every accessible label.
+- Renders the picker panel only — no built-in trigger button or popover, by design (wrap it in MUI's own `Popover`/`Menu` for a "swatch + dropdown" UI, the same separation MUI's own date pickers use between field and calendar).
+
+New `colorConversion.util.ts` with HSV/RGB/HEX/HSL conversion functions, covered by 34 unit tests, plus 21 component-level tests covering drag interactions, format switching, the eyedropper (including its cancel path), saved colors, disabled state, controlled value re-sync, and form integration.
+
+---
+
 ## [3.12.0] — 2026-06-29
 
 ### Added

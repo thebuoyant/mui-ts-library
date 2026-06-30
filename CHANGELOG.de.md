@@ -13,6 +13,26 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [3.13.0] — 2026-06-29
+
+### Hinzugefügt
+
+#### Neue Komponente: `ColorPicker`
+
+Eine neue, 12. Komponente — ein eigenständiges Sättigung/Farbton/Alpha-Farbwähler-Panel, das eine echte Lücke schließt, da MUI überhaupt keinen Farbwähler mitbringt (extrahiert und verallgemeinert aus dem bereits in TagSelections Tag-Erstellungs-Flow genutzten Ad-hoc-Custom-Color-Picker).
+
+- 2D-Sättigung/Helligkeit-Gradient-Fläche, Farbton-Slider und optionaler Alpha-Slider — alle per Pointer ziehbar, mit Live-Update bei jedem Move-Frame, nicht erst beim Loslassen.
+- Pipette-Werkzeug über die native [EyeDropper-API](https://developer.mozilla.org/de/docs/Web/API/EyeDropper), automatisch ausgeblendet, wenn der Browser sie nicht unterstützt (Stand jetzt nur Chromium).
+- Formatumschaltbares Wertefeld: `HEX`/`RGB`/`HSL`, jeweils unabhängig editierbar; `onChange` meldet immer einen sauberen `{ hex, rgb, hsl }`-Breakdown, unabhängig davon, welches Format gerade angezeigt wird.
+- `savedColors?: string[]`-Swatch-Raster — reine Anzeige/Auswahl, die Persistenz liegt beim Aufrufer.
+- `name`-Prop rendert ein verstecktes Input-Feld für native/React Hook Form/Formik-Formular-Integration, konsistent mit `JsonEditor`/`SqlEditor`/`PasswordStrengthMeter`.
+- Vollständig kontrolliert (`value`/`onChange`), themefähig über MUIs `useTheme()` (Border-/Radius-Tokens), `size`/`width`/`disabled`-Props und vollständige `translation`-Unterstützung für jede barrierefreie Beschriftung.
+- Rendert bewusst nur das Picker-Panel — kein eingebauter Auslöser-Button oder Popover (in MUIs eigenes `Popover`/`Menu` einbetten für eine "Swatch + Dropdown"-UI, dieselbe Trennung, die MUIs eigene Date-Picker zwischen Feld und Kalender nutzen).
+
+Neue `colorConversion.util.ts` mit HSV/RGB/HEX/HSL-Konvertierungsfunktionen, abgesichert durch 34 Unit-Tests, plus 21 Komponenten-Tests für Drag-Interaktionen, Format-Wechsel, die Pipette (inkl. Abbruch-Pfad), gespeicherte Farben, deaktivierten Zustand, Re-Sync des kontrollierten Werts und Formular-Integration.
+
+---
+
 ## [3.12.0] — 2026-06-29
 
 ### Hinzugefügt

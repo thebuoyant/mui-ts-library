@@ -12,7 +12,7 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 
 ## Komponenten
 
-11 produktionsreife Komponenten in drei Kategorien. Jede verlinkt zu einer interaktiven Live-Demo und einem vollständigen Manual mit allen Props, Typen und Mustern.
+12 produktionsreife Komponenten in drei Kategorien. Jede verlinkt zu einer interaktiven Live-Demo und einem vollständigen Manual mit allen Props, Typen und Mustern.
 
 ### Interaktive UI
 
@@ -21,6 +21,7 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 | [`GanttChart`](#ganttchart) | Drag-and-Drop-Projekt-Timelines mit Meilensteinen, Abhängigkeiten und CSV-Export | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-ganttchart--default) · [Docs](user-manuals/GanttChart.de.md) |
 | [`TagSelection`](#tagselection) | Multi-Tag-Autocomplete mit freier Tag-Erstellung und Suchergebnis-Highlighting | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-tagselection--default) · [Docs](user-manuals/TagSelection.de.md) |
 | [`PasswordStrengthMeter`](#passwordstrengthmeter) | Echtzeit-Stärke-Feedback mit eingebautem sicheren Passwort-Generator | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-passwordstrengthmeter--default) · [Docs](user-manuals/PasswordStrengthMeter.de.md) |
+| [`ColorPicker`](#colorpicker) | Sättigung/Farbton/Alpha-Farbwähler-Panel mit Pipette-Werkzeug — MUI bringt keinen mit | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-colorpicker--default) · [Docs](user-manuals/ColorPicker.de.md) |
 
 ### Code-Editoren
 
@@ -134,6 +135,31 @@ import { PasswordStrengthMeter } from '@thebuoyant-tsdev/mui-ts-library';
 ```
 
 → [Vollständige Dokumentation](user-manuals/PasswordStrengthMeter.de.md)
+
+---
+
+### ColorPicker
+
+Ein Sättigung/Farbton/Alpha-Farbwähler-Panel — schließt eine echte MUI-Lücke, denn MUI bringt überhaupt keinen Farbwähler mit. Nutze es für Theme-Customizer, Markenfarben-Auswahl oder Design-System-Playgrounds. Vollständig kontrolliert; du besitzt `value` und aktualisierst es über `onChange`.
+
+```tsx
+import { useState } from 'react';
+import { ColorPicker } from '@thebuoyant-tsdev/mui-ts-library';
+
+function BrandColorPicker() {
+  const [color, setColor] = useState('#1976d2');
+
+  return (
+    <ColorPicker
+      value={color}
+      onChange={(hex) => setColor(hex)}
+      savedColors={['#f44336', '#2196f3', '#4caf50', '#ffeb3b']}
+    />
+  );
+}
+```
+
+→ [Vollständige Dokumentation](user-manuals/ColorPicker.de.md)
 
 ---
 
@@ -407,6 +433,13 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/). In der Praxis b
 ---
 
 ## Changelog
+
+### [3.13.0] — 2026-06-29
+
+**Hinzugefügt**
+- Neue Komponente: `ColorPicker` — ein Sättigung/Farbton/Alpha-Farbwähler-Panel mit Pipette-Werkzeug, schließt eine echte MUI-Lücke. Siehe [Quick Start](#colorpicker) und [Changelog](#3130--2026-06-29) für Details.
+
+---
 
 ### [3.12.0] — 2026-06-29
 

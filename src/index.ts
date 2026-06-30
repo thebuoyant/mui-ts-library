@@ -20,3 +20,5 @@ export * from "./components/circle-packing-chart/CirclePackingChart";
 export * from "./components/circle-packing-chart/CirclePackingChart.types";
 export * from "./components/horizontal-tree-chart/HorizontalTreeChart";
 export * from "./components/horizontal-tree-chart/HorizontalTreeChart.types";
+export * from "./components/color-picker/ColorPicker";
+export * from "./components/color-picker/ColorPicker.types";
