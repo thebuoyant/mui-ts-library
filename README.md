@@ -434,6 +434,13 @@ This project follows [Semantic Versioning](https://semver.org/). In practice:
 
 ## Changelog
 
+### [3.14.0] — 2026-07-02
+
+**Added**
+- RichTextEditor: `@`-mention autocomplete (`mentionItems`, `onMentionSearch`, `mentionTriggerChar`, `translation.mentionNoResults`). Dropdown anchored to the cursor, keyboard navigation (↑/↓/Enter/Escape), serialised as `<span data-type="mention" data-id="…">` in HTML output. New export: `MentionItem`. New peer dependency: `@tiptap/extension-mention`. See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.
+
+---
+
 ### [3.13.0] — 2026-06-29
 
 **Added**
