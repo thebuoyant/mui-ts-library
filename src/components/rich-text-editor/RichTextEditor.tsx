@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useEditor } from "@tiptap/react";
+import { Mention } from "@tiptap/extension-mention";
 import { StarterKit } from "@tiptap/starter-kit";
 import { TextStyle } from "@tiptap/extension-text-style";
 import { Color } from "@tiptap/extension-color";
@@ -20,9 +21,11 @@ declare module "@tiptap/core" {
 }
 import {
   type RichTextEditorProps,
+  type MentionItem,
   DEFAULT_RICH_TEXT_EDITOR_TRANSLATION,
   DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG,
 } from "./RichTextEditor.types";
+import { buildMentionSuggestion } from "./RichTextEditorMentionSuggestion";
 import { RichTextEditorContent } from "./RichTextEditorContent";
 import { RichTextEditorToolbar } from "./RichTextEditorToolbar";
 import { RichTextEditorFooter } from "./RichTextEditorFooter";
@@ -34,7 +37,10 @@ export function RichTextEditor({
   height,
   helperText,
   maxCharacters,
+  mentionItems,
+  mentionTriggerChar = "@",
   name,
+  onMentionSearch,
   placeholder,
   readonly = false,
   showCharacterCount = false,
@@ -58,6 +64,11 @@ export function RichTextEditor({
   // useEditor-Aufruf gebunden wird und sonst auf einen veralteten Wert zugreifen würde.
   const [pasteAsPlainText, setPasteAsPlainText] = useState(false);
   const pasteAsPlainTextRef = useRef(pasteAsPlainText);
+
+  // Mention items ref so the suggestion closure always reads the latest prop without recreating
+  // the extension on every render.
+  const mentionItemsRef = useRef<MentionItem[]>(mentionItems ?? []);
+  useEffect(() => { mentionItemsRef.current = mentionItems ?? []; }, [mentionItems]);
   useEffect(() => { pasteAsPlainTextRef.current = pasteAsPlainText; }, [pasteAsPlainText]);
 
   const normH      = normalizeSize(height);
@@ -65,6 +76,29 @@ export function RichTextEditor({
   const isAutoH    = normH === "auto";
   // undefined → 200px Standardhöhe
   const effectiveH = isAutoH ? undefined : (normH ?? 200);
+
+  const hasMention = mentionItems !== undefined || onMentionSearch !== undefined;
+  const mentionExtension = useMemo(() => {
+    if (!hasMention) return null;
+    return Mention.configure({
+      HTMLAttributes: { class: "rte-mention" },
+      renderHTML({ options, node }) {
+        return [
+          "span",
+          { ...options.HTMLAttributes, "data-id": node.attrs.id, "data-label": node.attrs.label },
+          `${mentionTriggerChar}${node.attrs.label}`,
+        ];
+      },
+      suggestion: buildMentionSuggestion({
+        getItems: () => mentionItemsRef.current,
+        onMentionSearch,
+        noResultsLabel: t.mentionNoResults ?? "No results",
+      }),
+    });
+  // mentionItems changes go through mentionItemsRef — intentionally excluded from deps.
+  // Only recreate the extension if the feature is toggled, the trigger char, or search fn changes.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasMention, mentionTriggerChar, onMentionSearch]);
 
   // CharacterCount wird auch für showWordCount benötigt
   const needsCharacterCount =
@@ -86,6 +120,7 @@ export function RichTextEditor({
       Placeholder.configure({ placeholder: placeholder ?? "" }),
       ...(tc.showTableButton ? [TableKit] : []),
       ...(tc.showImageButton  ? [Image.configure({ inline: false, allowBase64: true })] : []),
+      ...(mentionExtension ? [mentionExtension] : []),
       ...(needsCharacterCount
         ? maxCharacters !== undefined && maxCharacters > 0
           ? [CharacterCount.configure({ limit: maxCharacters })]

@@ -15,6 +15,26 @@ Der `PasswordStrengthMeter` ist eine Passwort-Eingabe-Komponente auf Basis von R
 - Onboarding-Flows mit Sicherheitshinweisen
 - Admin-Bereiche mit strengen Passwortrichtlinien
 
+### Was macht diese Komponente?
+
+Wenn `PasswordStrengthMeter` gerendert wird, sieht der Nutzer drei gestapelte Elemente:
+
+**1 — Passwort-Eingabe:** Ein Standard-MUI-Textfeld mit einem Passwort-Anzeigen/Verbergen-Toggle-Button rechts. Optional erweiterbar mit einem Passwort-generieren-Button und einem Kopieren-in-Zwischenablage-Button.
+
+**2 — Stärke-Balken:** Ein animierter farbiger Balken unterhalb der Eingabe, der beim Tippen wächst und die Farbe ändert. Bei Score 1 ist er rot und kurz; bei Score 4 ist er grün und vollständig ausgefüllt. Alternativ rendert `showSegmentedBar` 4 separate Segmente, die sich einzeln füllen.
+
+| Score | Status | Farbe | Bedeutung |
+|---|---|---|---|
+| 0 | — | (leer) | Noch kein Passwort eingegeben |
+| 1 | weak | Rot | Zu kurz, oder nur wiederholte Zeichen / bekanntes Muster |
+| 2 | ok | Gelb | Mindestlänge erfüllt, aber nur eine Zeichenklasse |
+| 3 | good | Hellgrün | Mindestlänge + 2–3 Zeichenklassen |
+| 4 | very good | Grün | Langes Passwort mit 3+ Zeichenklassen |
+
+**3 — Anforderungscheckliste:** Eine Liste von Passwortregeln, jede mit einem ✓ (grün) oder ✗ (rot) Icon, das sich in Echtzeit aktualisiert. Standardregeln: Mindestlänge · Großbuchstabe · Kleinbuchstabe · Ziffer · Sonderzeichen. Eigene Regeln können über `customRequirements` hinzugefügt werden.
+
+> **Kernprinzip — Score statt Blockierung:** Die Komponente blockiert den Nutzer nie beim Tippen. Sie meldet die aktuelle Stärke über `onPasswordChange`, damit *deine* Formularlogik entscheiden kann, ob der Senden-Button aktiviert werden soll.
+
 ---
 
 > ### Neu in v3.9.0
@@ -61,14 +81,20 @@ import { PasswordStrengthMeter } from '@thebuoyant-tsdev/mui-ts-library';
 function App() {
   return (
     <PasswordStrengthMeter
-      passwordMinLength={8}
+      passwordMinLength={8}          // legt die „Mindestens 8 Zeichen"-Regel in der Checkliste fest
+                                     // und erzwingt Score 1 („weak") bis die Länge erreicht ist
       onPasswordChange={(password, result) => {
+        // wird bei jedem Tastendruck aufgerufen — mit dem aktuellen Passwort und seiner Analyse
+        // result.score       = 0–4 (damit kann der Senden-Button aktiviert/deaktiviert werden)
+        // result.meterStatus = "weak" | "ok" | "good" | "very good"
         console.log(`Stärke: ${result.meterStatus} (Score ${result.score}/4)`);
       }}
     />
   );
 }
 ```
+
+> **Minimalversion:** Nur `passwordMinLength` + `onPasswordChange` liefern die Eingabe, den animierten Balken und die vollständige Anforderungscheckliste.
 
 ---
 

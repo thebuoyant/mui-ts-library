@@ -24,13 +24,15 @@ const meta: Meta<typeof RichTextEditor> = {
     // Zahlen ("600"), Pixel-Strings ("600px"), Prozent ("50%") — leer = 100%
     width:              { control: "text" },
     // Komplexe Objekte / kontrollierter Modus — dedizierte Stories verwenden
-    toolbarConfig: { control: false },
-    translation:   { control: false },
-    value:         { control: false },
-    onBlur:        { control: false },
-    onChange:      { control: false },
-    onFocus:       { control: false },
-    onMarkdownChange: { control: false },
+    mentionItems:      { control: false },
+    onMentionSearch:   { control: false },
+    toolbarConfig:     { control: false },
+    translation:       { control: false },
+    value:             { control: false },
+    onBlur:            { control: false },
+    onChange:          { control: false },
+    onFocus:           { control: false },
+    onMarkdownChange:  { control: false },
   },
   args: {
     // A–Z
@@ -385,6 +387,78 @@ export const WithMarkdownImportExport: Story = {
     toolbarConfig: { showMarkdownButton: true },
     value: SAMPLE_HTML,
     height: "300",
+  },
+};
+
+const TEAM_MEMBERS = [
+  { id: "alice",   label: "Alice Johnson" },
+  { id: "bob",     label: "Bob Smith" },
+  { id: "carol",   label: "Carol Williams" },
+  { id: "dave",    label: "Dave Brown" },
+  { id: "eve",     label: "Eve Davis" },
+  { id: "frank",   label: "Frank Miller" },
+];
+
+function MentionStory(props: ComponentProps<typeof RichTextEditor>) {
+  const [value, setValue] = useState(
+    "<p>Type <strong>@</strong> to mention a team member.</p>"
+  );
+  return <RichTextEditor {...props} value={value} onChange={setValue} />;
+}
+
+export const WithMention: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "**@-mention autocomplete.** Type `@` anywhere in the editor to open a filterable list " +
+          "of team members. The consumer provides `mentionItems` (and optionally `onMentionSearch` " +
+          "for async/server-side filtering). Mentions are serialised as " +
+          "`<span data-type=\"mention\" data-id=\"…\" data-label=\"…\">@Name</span>` in the HTML output.",
+      },
+    },
+  },
+  render: (args) => <MentionStory {...args} />,
+  args: {
+    mentionItems: TEAM_MEMBERS,
+    height: 280,
+    placeholder: 'Type @ to mention someone…',
+  },
+};
+
+export const WithMentionAsyncSearch: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "**Async / server-side mention search.** `onMentionSearch` replaces the built-in " +
+          "client-side filter — the library calls your function on every keystroke after `@` and " +
+          "renders whatever you return. Simulate a 200 ms backend delay here.",
+      },
+    },
+  },
+  render: (args) => {
+    const [value, setValue] = useState(
+      "<p>Type <strong>@</strong> — results are fetched asynchronously.</p>"
+    );
+    const handleSearch = async (query: string) => {
+      await new Promise((r) => setTimeout(r, 200));
+      return TEAM_MEMBERS.filter((m) =>
+        m.label.toLowerCase().includes(query.toLowerCase())
+      );
+    };
+    return (
+      <RichTextEditor
+        {...args}
+        value={value}
+        onChange={setValue}
+        onMentionSearch={handleSearch}
+      />
+    );
+  },
+  args: {
+    height: 280,
+    placeholder: 'Type @ to trigger async search…',
   },
 };
 

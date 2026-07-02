@@ -8,6 +8,20 @@
 
 Der `ChordChart` visualisiert **Flüsse zwischen benannten Gruppen** als Kreisdiagramm — Gruppen werden als Arc-Segmente um den Kreis dargestellt, die Flüsse zwischen ihnen als verbindende Bänder. Er ist die zweite Komponente der **D3-Charts-Familie**.
 
+### Was macht diese Komponente?
+
+Der Nutzer sieht ein kreisförmiges Diagramm, bei dem jede Gruppe als beschriftetes Bogen-Segment außen am Kreis erscheint. Farbige **Bänder** verbinden die Bögen und zeigen, wie viel von einer Gruppe zu einer anderen fließt. Je breiter ein Band, desto größer der Fluss.
+
+**Hover** auf eine Arc-Gruppe: alle Bänder dieser Gruppe leuchten auf, die übrigen werden abgedunkelt — so sieht man auf einen Blick, womit eine Gruppe verbunden ist. Ein Tooltip zeigt Name, gesamten Ausgangs- und Eingangsfluss.
+
+**Hover** auf ein Band: der Tooltip zeigt Quelle → Ziel und die Flusswerte in beide Richtungen.
+
+**Kernkonzept — `directed` vs. `directed={false}`:**
+- `directed={true}` (Standard): Bänder haben einen Pfeilkopf am Ziel — verwenden wenn der Fluss eine klare Richtung hat (z. B. „Frontend ruft Backend auf").
+- `directed={false}`: symmetrische Bänder ohne Pfeilkopf — verwenden wenn die Beziehung gegenseitig ist (z. B. „Anzahl gemeinsamer Mitarbeiter zwischen Teams").
+
+> **Wie die Daten funktionieren:** Gruppen werden nicht explizit definiert — jeder eindeutige String der als `source` oder `target` vorkommt wird automatisch zur Gruppe. Ein Eintrag `{ source: 'Frontend', target: 'Backend', value: 45 }` bedeutet: „45 Einheiten fließen von Frontend zu Backend."
+
 **Typische Einsatzgebiete:**
 
 - Team- oder Modul-Abhängigkeitskarten
@@ -53,9 +67,11 @@ import type {
 import { ChordChart } from '@thebuoyant-tsdev/mui-ts-library';
 import type { ChordChartData } from '@thebuoyant-tsdev/mui-ts-library';
 
+// Jeder Eintrag ist ein gerichteter Fluss: "source schickt value zu target"
+// Eindeutige Strings in source/target werden automatisch zu Gruppen-Bögen — keine separate Gruppen-Definition nötig.
 const data: ChordChartData[] = [
-  { source: 'Frontend',  target: 'Backend',  value: 45 },
-  { source: 'Backend',   target: 'Frontend', value: 20 },
+  { source: 'Frontend',  target: 'Backend',  value: 45 }, // 45 Einheiten von Frontend → Backend
+  { source: 'Backend',   target: 'Frontend', value: 20 }, // und 20 zurück — ergibt ein beidseitiges Band
   { source: 'Backend',   target: 'DevOps',   value: 35 },
   { source: 'DevOps',    target: 'Backend',  value: 12 },
 ];
@@ -64,7 +80,7 @@ function App() {
   return (
     <ChordChart
       data={data}
-      size={500}
+      size={500}                 // SVG-Breite & -Höhe in px
       onGroupClick={(info) => console.log(info.name, info.valueOut)}
       onChordClick={(info) => console.log(info.source.name, '→', info.target.name)}
     />

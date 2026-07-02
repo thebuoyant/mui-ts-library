@@ -8,6 +8,16 @@
 
 Der `SunburstChart` visualisiert **hierarchische Daten als konzentrische Ringe** — der Wurzelknoten befindet sich im Zentrum, jede Tiefenebene bildet einen Ring darum. Segmentgrößen sind proportional zu ihren Werten. Er ist die erste Komponente der **D3-Charts-Familie** dieser Bibliothek.
 
+### Was macht diese Komponente?
+
+Der Nutzer sieht ein kreisförmiges Diagramm: ein Label im Zentrum (der Wurzelknoten oder der aktuelle Drill-down-Fokus), umgeben von konzentrischen Ringen. Jeder Ring ist eine Hierarchieebene. Segmente innerhalb eines Rings sind proportional zu ihrem `value` — eine Abteilung mit doppeltem Budget bekommt einen doppelt so breiten Bogen.
+
+**Hover** auf ein Segment zeigt einen Tooltip mit Name, Wert, prozentualer Anteil am Gesamtwert und dem vollständigen Breadcrumb-Pfad (z. B. „Unternehmen → Engineering → Frontend").
+
+**Drill-Down** (`Ctrl / Cmd ⌘+Klick`): Klick auf ein Segment mit dem Modifier zoomt hinein — dieses Segment rückt ins Zentrum und nur seine Nachfolger werden angezeigt. Das Center-Label zeigt den aktuellen Fokus. `Ctrl / Cmd ⌘+Klick` auf den Mittelpunkt (oder `Ctrl / Cmd ⌘+Doppelklick` oder `Escape`) zoomt wieder heraus.
+
+> **Wichtig:** Nur **Blattknoten** benötigen einen `value`. Elternknoten summieren die Werte ihrer Kinder automatisch via D3 — Summen müssen nie selbst berechnet werden.
+
 **Typische Einsatzgebiete:**
 
 - Budget- oder Kostenaufschlüsselung nach Abteilung und Kategorie
@@ -64,11 +74,13 @@ import { SunburstChart } from '@thebuoyant-tsdev/mui-ts-library';
 import type { SunburstChartData } from '@thebuoyant-tsdev/mui-ts-library';
 
 const data: SunburstChartData = {
+  // Wurzelknoten — erscheint im Zentrum. Braucht KEINEN value (D3 summiert Kinder).
   id: 'unternehmen', name: 'Unternehmen',
   children: [
     {
-      id: 'engineering', name: 'Engineering',
+      id: 'engineering', name: 'Engineering', // innerer Ring — ebenfalls kein value nötig
       children: [
+        // Blattknoten brauchen einen value → bestimmt Bogengröße (proportional zu Geschwistern)
         { id: 'frontend', name: 'Frontend', value: 480 },
         { id: 'backend',  name: 'Backend',  value: 620 },
         { id: 'devops',   name: 'DevOps',   value: 210 },
@@ -88,8 +100,10 @@ function App() {
   return (
     <SunburstChart
       data={data}
-      size={500}
+      size={500}                 // SVG-Breite & -Höhe in px
       onSegmentClick={(info) => console.log(info.path, info.value)}
+      // Strg/Cmd+Klick zum Hineinzoomen in ein Segment
+      // Strg/Cmd+Klick auf Center-Label zum Herauszoomen — oder Escape drücken
     />
   );
 }

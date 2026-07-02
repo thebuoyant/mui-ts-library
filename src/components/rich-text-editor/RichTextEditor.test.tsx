@@ -1,7 +1,12 @@
+import { createRef } from "react";
 import { render, screen, waitFor, fireEvent, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { RichTextEditor } from "./RichTextEditor";
+import {
+  RichTextEditorMentionList,
+  type MentionListRef,
+} from "./RichTextEditorMentionList";
 
 // ProseMirror-View ruft DOM-APIs auf die in JSDOM nicht oder unvollständig vorhanden sind
 beforeAll(() => {
@@ -384,6 +389,217 @@ describe("RichTextEditor", () => {
     });
     await waitFor(() => {
       expect(screen.getByPlaceholderText("Search emoji…")).toBeInTheDocument();
+    });
+  });
+
+  // ── Mention (@) ────────────────────────────────────────────────────────────
+
+  describe("Mention (@) feature — RichTextEditor integration", () => {
+    const MENTION_ITEMS = [
+      { id: "1", label: "Alice" },
+      { id: "2", label: "Bob" },
+      { id: "3", label: "Charlie" },
+    ];
+
+    it("Should render without errors when mentionItems is provided", () => {
+      render(<RichTextEditor mentionItems={MENTION_ITEMS} />);
+      expect(document.querySelector(".ProseMirror")).toBeInTheDocument();
+    });
+
+    it("Should render without errors when neither mentionItems nor onMentionSearch is provided", () => {
+      render(<RichTextEditor />);
+      expect(document.querySelector(".ProseMirror")).toBeInTheDocument();
+    });
+
+    it("Should render without errors with a custom mentionTriggerChar", () => {
+      render(<RichTextEditor mentionItems={MENTION_ITEMS} mentionTriggerChar="#" />);
+      expect(document.querySelector(".ProseMirror")).toBeInTheDocument();
+    });
+
+    it("Should render without errors when onMentionSearch is provided without mentionItems", () => {
+      const onMentionSearch = vi.fn().mockResolvedValue([]);
+      render(<RichTextEditor onMentionSearch={onMentionSearch} />);
+      expect(document.querySelector(".ProseMirror")).toBeInTheDocument();
+    });
+
+    it("Should use the custom mentionNoResults translation label", () => {
+      const mockRect = () => new DOMRect(0, 0, 100, 20);
+      render(
+        <RichTextEditorMentionList
+          items={[]}
+          noResultsLabel="Niemanden gefunden"
+          clientRect={mockRect}
+          onSelect={vi.fn()}
+        />
+      );
+      expect(screen.getByText("Niemanden gefunden")).toBeInTheDocument();
+    });
+  });
+});
+
+// ── RichTextEditorMentionList unit tests ──────────────────────────────────────
+
+describe("RichTextEditorMentionList", () => {
+  const mockRect = () => new DOMRect(0, 0, 100, 20);
+  const items = [
+    { id: "1", label: "Alice" },
+    { id: "2", label: "Bob" },
+  ];
+
+  it("Should show noResultsLabel when items array is empty", () => {
+    render(
+      <RichTextEditorMentionList
+        items={[]}
+        noResultsLabel="No matches"
+        clientRect={mockRect}
+        onSelect={vi.fn()}
+      />
+    );
+    expect(screen.getByText("No matches")).toBeInTheDocument();
+  });
+
+  it("Should render all items in the list", () => {
+    render(
+      <RichTextEditorMentionList
+        items={items}
+        noResultsLabel="No results"
+        clientRect={mockRect}
+        onSelect={vi.fn()}
+      />
+    );
+    expect(screen.getByText("Alice")).toBeInTheDocument();
+    expect(screen.getByText("Bob")).toBeInTheDocument();
+  });
+
+  it("Should not render the list when clientRect is null (Popper closed)", () => {
+    render(
+      <RichTextEditorMentionList
+        items={items}
+        noResultsLabel="No results"
+        clientRect={null}
+        onSelect={vi.fn()}
+      />
+    );
+    expect(screen.queryByText("Alice")).not.toBeInTheDocument();
+  });
+
+  it("Should call onSelect with the clicked item on mouseDown", async () => {
+    const onSelect = vi.fn();
+    render(
+      <RichTextEditorMentionList
+        items={items}
+        noResultsLabel="No results"
+        clientRect={mockRect}
+        onSelect={onSelect}
+      />
+    );
+    await act(async () => { fireEvent.mouseDown(screen.getByText("Alice")); });
+    expect(onSelect).toHaveBeenCalledWith({ id: "1", label: "Alice" });
+  });
+
+  it("Should navigate to next item on ArrowDown via ref", async () => {
+    const ref = createRef<MentionListRef>();
+    render(
+      <RichTextEditorMentionList
+        ref={ref}
+        items={items}
+        noResultsLabel="No results"
+        clientRect={mockRect}
+        onSelect={vi.fn()}
+      />
+    );
+    await act(async () => {
+      ref.current?.onKeyDown(new KeyboardEvent("keydown", { key: "ArrowDown" }));
+    });
+    await waitFor(() => {
+      expect(screen.getByText("Bob").closest('[role="button"]')).toHaveClass("Mui-selected");
+    });
+  });
+
+  it("Should navigate to previous item on ArrowUp via ref", async () => {
+    const ref = createRef<MentionListRef>();
+    render(
+      <RichTextEditorMentionList
+        ref={ref}
+        items={items}
+        noResultsLabel="No results"
+        clientRect={mockRect}
+        onSelect={vi.fn()}
+      />
+    );
+    await act(async () => {
+      ref.current?.onKeyDown(new KeyboardEvent("keydown", { key: "ArrowUp" }));
+    });
+    // wraps around: from index 0 → index 1 (last item = Bob)
+    await waitFor(() => {
+      expect(screen.getByText("Bob").closest('[role="button"]')).toHaveClass("Mui-selected");
+    });
+  });
+
+  it("Should call onSelect for the currently selected item on Enter via ref", async () => {
+    const onSelect = vi.fn();
+    const ref = createRef<MentionListRef>();
+    render(
+      <RichTextEditorMentionList
+        ref={ref}
+        items={items}
+        noResultsLabel="No results"
+        clientRect={mockRect}
+        onSelect={onSelect}
+      />
+    );
+    await act(async () => {
+      ref.current?.onKeyDown(new KeyboardEvent("keydown", { key: "Enter" }));
+    });
+    expect(onSelect).toHaveBeenCalledWith({ id: "1", label: "Alice" });
+  });
+
+  it("Should return true from onKeyDown for handled keys (Arrow/Enter)", () => {
+    const ref = createRef<MentionListRef>();
+    render(
+      <RichTextEditorMentionList
+        ref={ref}
+        items={items}
+        noResultsLabel="No results"
+        clientRect={mockRect}
+        onSelect={vi.fn()}
+      />
+    );
+    expect(ref.current?.onKeyDown(new KeyboardEvent("keydown", { key: "ArrowDown" }))).toBe(true);
+    expect(ref.current?.onKeyDown(new KeyboardEvent("keydown", { key: "ArrowUp" }))).toBe(true);
+    expect(ref.current?.onKeyDown(new KeyboardEvent("keydown", { key: "Enter" }))).toBe(true);
+    expect(ref.current?.onKeyDown(new KeyboardEvent("keydown", { key: "Escape" }))).toBe(false);
+  });
+
+  it("Should reset selectedIndex to 0 when items change", async () => {
+    const ref = createRef<MentionListRef>();
+    const { rerender } = render(
+      <RichTextEditorMentionList
+        ref={ref}
+        items={items}
+        noResultsLabel="No results"
+        clientRect={mockRect}
+        onSelect={vi.fn()}
+      />
+    );
+    await act(async () => {
+      ref.current?.onKeyDown(new KeyboardEvent("keydown", { key: "ArrowDown" }));
+    });
+    await waitFor(() => {
+      expect(screen.getByText("Bob").closest('[role="button"]')).toHaveClass("Mui-selected");
+    });
+    // Items change (e.g. user typed another char, results filtered) → index resets
+    rerender(
+      <RichTextEditorMentionList
+        ref={ref}
+        items={[{ id: "1", label: "Alice" }]}
+        noResultsLabel="No results"
+        clientRect={mockRect}
+        onSelect={vi.fn()}
+      />
+    );
+    await waitFor(() => {
+      expect(screen.getByText("Alice").closest('[role="button"]')).toHaveClass("Mui-selected");
     });
   });
 });

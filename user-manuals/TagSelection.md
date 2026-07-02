@@ -15,6 +15,20 @@ The `TagSelection` component is a flexible multi-tag selector built on React and
 - Filter selection in search masks and dashboard filters
 - Tag-based labeling in content management systems
 
+### What does this component do?
+
+When you render `TagSelection`, the user sees two areas stacked vertically:
+
+**Upper area — selected chips:** One colored chip per selected tag, each with a **×** button to remove it. A "Selected tags" heading sits above them; when nothing is selected, a "No tags selected." hint appears.
+
+**Lower area — search input:** A standard MUI text field. When the user types, a dropdown appears with matching tags — the typed portion is highlighted **bold** in each result. Clicking an option (or pressing **Enter**) moves it into the chip area.
+
+**Overflow:** When `maxVisibleChips` is set and more tags are selected than the limit, excess chips hide behind a `+N` chip. Clicking `+N` opens a popover where the hidden chips are also deletable.
+
+**Create mode** (`allowCreate={true}`): When the user types something that matches no existing tag, the input switches to create mode — a ✓ (confirm) and ✗ (cancel) button appear, plus a row of 7 semantic theme color chips (and a rainbow chip that opens a full custom color picker). Pressing **Enter** or clicking ✓ confirms the new tag with the chosen color.
+
+> **Key concept — one flat array for everything:** You pass *all* tags — selected, available, and disabled — in one flat `tags` array. `TagSelection` sorts them internally: tags with `selected: true` appear as chips; the rest appear in the dropdown; tags with `disabled: true` are excluded from the dropdown. All changes (select, delete, create) are reported back via callbacks.
+
 ---
 
 ## Prerequisites
@@ -49,12 +63,14 @@ import { TagSelection } from '@thebuoyant-tsdev/mui-ts-library';
 import type { TagSelectionItem } from '@thebuoyant-tsdev/mui-ts-library';
 import { useState } from 'react';
 
+// One flat array contains EVERYTHING: selected tags, available tags, and disabled tags.
+// The component figures out what goes in the chip area and what goes in the dropdown.
 const initialTags: TagSelectionItem[] = [
-  { id: 'react',      label: 'React',      selected: true  },
-  { id: 'typescript', label: 'TypeScript', selected: true  },
-  { id: 'vue',        label: 'Vue'                         },
-  { id: 'angular',    label: 'Angular'                     },
-  { id: 'legacy',     label: 'Legacy',     disabled: true  },
+  { id: 'react',      label: 'React',      selected: true  }, // appears as chip right away
+  { id: 'typescript', label: 'TypeScript', selected: true  }, // appears as chip right away
+  { id: 'vue',        label: 'Vue'                         }, // available in dropdown
+  { id: 'angular',    label: 'Angular'                     }, // available in dropdown
+  { id: 'legacy',     label: 'Legacy',     disabled: true  }, // hidden from dropdown, not selectable
 ];
 
 function App() {
@@ -62,12 +78,17 @@ function App() {
 
   return (
     <TagSelection
-      tags={tags}
+      tags={tags}                          // required: the single source of truth
       onTagsChange={(selectedTags, allTags) => setTags(allTags)}
+      // onTagsChange fires after every select/delete/create action
+      // selectedTags = only the currently selected ones
+      // allTags      = full array with updated selected flags — use this to update state
     />
   );
 }
 ```
+
+> **Minimal version:** `tags` and `onTagsChange` are all you need for a working tag selector with static data.
 
 ---
 

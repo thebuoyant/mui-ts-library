@@ -8,6 +8,20 @@
 
 The `SqlEditor` is a full-featured SQL code editor built on [CodeMirror 6](https://codemirror.net/) with the same MUI Paper layout as the `RichTextEditor`. It provides a rich SQL input interface for query builders, admin tools, BI dashboards, and database frontends — fully integrated with the MUI theme, without any external CSS dependencies.
 
+### What does this component do?
+
+The user sees an MUI Paper card with two zones:
+
+- **Toolbar** (top): action buttons — Format SQL, Copy, Clear, Undo/Redo, and optionally an Execute button (hidden by default).
+- **Editor area**: a CodeMirror text field with SQL-specific features:
+  - **Syntax highlighting**: SQL keywords (`SELECT`, `FROM`, `WHERE`) appear in the primary color, strings in green, identifiers in blue/info color — all from your MUI theme, automatically adapting to dark mode.
+  - **Line numbers** on the left.
+  - **Autocomplete**: typing shows suggestions for SQL keywords; with `schema` provided, table and column names also appear in the dropdown.
+  - **Keyboard shortcut**: `Cmd+Enter` / `Ctrl+Enter` executes the query directly (when `onExecute` is provided).
+- **Footer** (optional): shows cursor position (e.g. "Ln 3, Col 10") and optionally an error count for server-side lint errors.
+
+> **Difference from `RichTextEditor`:** SqlEditor produces plain SQL strings (not HTML). It has no rich-text formatting — it's a code editor, not a document editor.
+
 **Typical use cases:**
 
 - Query builders and SQL playgrounds
@@ -70,17 +84,41 @@ import type {
 ## Quick Start
 
 ```tsx
+import { useState } from 'react';
 import { SqlEditor } from '@thebuoyant-tsdev/mui-ts-library';
+import type { SqlSchema } from '@thebuoyant-tsdev/mui-ts-library';
+
+// Optional: define your database schema for table/column autocomplete while typing
+const schema: SqlSchema = {
+  tables: [
+    {
+      name: 'users',
+      columns: [
+        { name: 'id',    type: 'INT' },
+        { name: 'name',  type: 'VARCHAR' },
+        { name: 'email', type: 'VARCHAR' },
+      ],
+    },
+  ],
+};
 
 function App() {
+  const [sql, setSql] = useState('SELECT * FROM users WHERE active = true;');
+
   return (
     <SqlEditor
-      placeholder="Enter SQL query…"
-      onChange={(sql) => console.log(sql)}
+      value={sql}          // controlled: you own the SQL state
+      onChange={setSql}     // called on every keystroke/change
+      dialect="postgresql" // enables PostgreSQL keywords and formatting
+      schema={schema}      // typing "FROM u" will suggest "users" in autocomplete
+      toolbarConfig={{ showExecute: true }}   // show the Execute button in the toolbar
+      onExecute={(sql) => console.log('Run:', sql)} // also fires on Cmd+Enter / Ctrl+Enter
     />
   );
 }
 ```
+
+> **Minimal version** (uncontrolled, no schema, no execution): `<SqlEditor onChange={(sql) => console.log(sql)} />` — a plain editor with Format/Copy/Clear toolbar, syntax highlighting, and nothing else. Add props as you need them.
 
 ---
 

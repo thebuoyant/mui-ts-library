@@ -8,6 +8,10 @@
 
 Der `RichTextEditor` ist ein vollständiger WYSIWYG-Texteditor auf Basis von [TipTap v3](https://tiptap.dev) und Material UI. Er bietet eine formatreiche Eingabeoberfläche für Inhalte wie CMS-Texte, E-Mail-Templates, Kommentare und Beschreibungsfelder — vollständig in das MUI-Theme integriert, ohne externe CSS-Abhängigkeiten.
 
+| Neu in v3.14.0 | |
+|---|---|
+| **Mention (@)** | `@`-getriggerte Autocomplete-Liste aus einer vom Consumer bereitgestellten Itemliste (`mentionItems`) — mit optionaler asynchroner/serverseitiger Suche (`onMentionSearch`) |
+
 | Neu in v3.8.0 | |
 |---|---|
 | **Einfügen als Klartext** | Toolbar-Toggle, das eingefügten Inhalt von Formatierung befreit (`showPasteAsPlainTextButton`) |
@@ -20,6 +24,20 @@ Der `RichTextEditor` ist ein vollständiger WYSIWYG-Texteditor auf Basis von [Ti
 - E-Mail-Template-Editoren
 - Kommentarfelder mit Formatierungsmöglichkeiten
 - Formularfelder die mehr als `<TextField multiline>` benötigen
+
+### Was macht diese Komponente?
+
+Wenn `RichTextEditor` gerendert wird, sieht der Nutzer ein zweiteiliges Panel innerhalb eines MUI Paper:
+
+**Toolbar (oben):** Eine Reihe von Icon-Buttons — Fett, Kursiv, Unterstrichen, Durchgestrichen, H1/H2/H3, Aufzählungsliste, Nummerierte Liste, Blockquote, Code-Block, Link, Horizontale Linie, Textfarbe, Hervorheben, Rückgängig/Wiederholen, Format löschen. Jeder Button hat einen Tooltip. Opt-in-Buttons (Tabelle, Bild, Emoji, Einfügen-als-Klartext, Markdown, Vollbild) sind standardmäßig ausgeblendet und werden über `toolbarConfig` aktiviert.
+
+**Inhaltsbereich (unterhalb der Toolbar):** Ein weißer (oder im Dark Mode dunkler) editierbarer Textbereich. Der Nutzer tippt hier — was er während des Tippens sieht, entspricht der Ausgabe (WYSIWYG). Formatierungen werden sofort angewendet: Text auswählen und **B** klicken macht ihn fett, **H2** wandelt einen Absatz in eine Überschrift um.
+
+**Fußzeile (optional):** Eine rechtsbündige Zeile mit Zeichenzähler und/oder Wortzähler am unteren Rand, sichtbar wenn `showCharacterCount` oder `showWordCount` aktiv ist.
+
+> **Kernprinzip — Ausgabe ist HTML, kein Klartext:** Anders als `SqlEditor` oder `JsonEditor`, die SQL/JSON-Strings erzeugen, liefert `RichTextEditor` über `onChange` einen **HTML-String**. Diesen String speichert man in der Datenbank und rendert ihn später mit `dangerouslySetInnerHTML` (oder einer Sanitizing-Bibliothek). Das erzeugte HTML verwendet Standard-Tags: `<strong>`, `<em>`, `<h2>`, `<ul>`, `<li>`, `<a>` usw.
+
+> **Unterschied zu `<TextField multiline>`:** `TextField` liefert Klartext. `RichTextEditor` liefert strukturiertes HTML mit Überschriften, Listen, Links, Tabellen, Bildern und mehr — ganz ohne externe CSS-Dateien.
 
 ---
 
@@ -62,16 +80,24 @@ import type {
 
 ```tsx
 import { RichTextEditor } from '@thebuoyant-tsdev/mui-ts-library';
+import { useState } from 'react';
 
 function App() {
+  // RichTextEditor erzeugt HTML — den String im State speichern, dann ans Backend senden
+  const [content, setContent] = useState('');
+
   return (
     <RichTextEditor
-      placeholder="Hier tippen …"
-      onChange={(html) => console.log(html)}
+      placeholder="Hier tippen …"       // wird angezeigt, wenn der Editor leer ist
+      onChange={(html) => setContent(html)}
+      // html = ein Standard-HTML-String wie '<p>Hallo <strong>Welt</strong></p>'
+      // wird bei jedem Tastendruck aufgerufen — damit den State aktuell halten
     />
   );
 }
 ```
+
+> **Minimalversion:** `placeholder` ist optional; `onChange` ist das, was den Editor nützlich macht. Ohne `onChange` funktioniert der Editor, aber man kann nicht lesen, was der Nutzer getippt hat.
 
 ---
 
@@ -94,14 +120,26 @@ function App() {
 | `translation` | `Partial<RichTextEditorTranslation>` | — | Abweichende Texte für Tooltips, Dialog und Zähler-Labels |
 | `value` | `string` | — | Initialer HTML-String; ermöglicht kontrollierten Modus |
 | `width` | `number \| string` | `"100%"` | Breite des Editors. Zahlen → px. Leer oder nicht gesetzt → 100% des Elternelements. |
+| `mentionItems` | `MentionItem[]` | — | Itemliste für `@`-Mention-Autocomplete. Die Mention-Extension wird nur aktiviert wenn diese Prop oder `onMentionSearch` gesetzt ist. Wird für clientseitige Filterung verwendet wenn `onMentionSearch` nicht angegeben ist. |
+| `mentionTriggerChar` | `string` | `"@"` | Zeichen das das Mention-Autocomplete-Popup öffnet |
 | `onBlur` | `() => void` | — | Wird aufgerufen wenn der Editor den Fokus verliert |
 | `onChange` | `(value: string) => void` | — | Wird bei jeder Inhaltsänderung aufgerufen |
 | `onFocus` | `() => void` | — | Wird aufgerufen wenn der Editor den Fokus erhält |
 | `onMarkdownChange` | `(markdown: string) => void` | — | Wird zusätzlich zu `onChange` bei jeder Inhaltsänderung mit dem Inhalt als Markdown aufgerufen |
+| `onMentionSearch` | `(query: string) => MentionItem[] \| Promise<MentionItem[]>` | — | Eigene Such-/Filterfunktion für Mentions. Wenn angegeben wird `mentionItems` nicht gefiltert — die zurückgegebene Teilmenge wird verwendet (unterstützt async für serverseitige Suche) |
 
 ---
 
 ## TypeScript-Typen
+
+### `MentionItem`
+
+```ts
+type MentionItem = {
+  id: string;    // eindeutiger Bezeichner — wird als data-id im HTML-Output gespeichert
+  label: string; // Anzeigename im Dropdown und im Editor
+};
+```
 
 ### `RichTextEditorToolbarConfig`
 
@@ -215,6 +253,8 @@ type RichTextEditorTranslation = {
   markdownDialogCancel?:      string;
   markdownDialogCopy?:        string;
   markdownDialogCopied?:      string;
+  // Mention-Dropdown (mentionItems / onMentionSearch) — optional, siehe Kompatibilitätshinweis unten
+  mentionNoResults?:          string;
 };
 ```
 
@@ -224,7 +264,7 @@ Englische Standardwerte:
 import { DEFAULT_RICH_TEXT_EDITOR_TRANSLATION } from '@thebuoyant-tsdev/mui-ts-library';
 ```
 
-> **⚠️ Kompatibilitätshinweis:** die 8 Keys oben (hinzugefügt in `v3.8.0`) sind auf diesem Typ optional — im Gegensatz zu den anderen Keys, die required sind. Das ist beabsichtigt: dadurch bleibt älterer Code, der ein vollständiges `RichTextEditorTranslation`-Literal deklariert (statt ein partielles Objekt an die `translation`-Prop zu übergeben), auch bei zukünftigen neuen Keys kompilierbar. Intern löst die Komponente fehlende Keys immer gegen `DEFAULT_RICH_TEXT_EDITOR_TRANSLATION` auf — sie müssen also nie angegeben werden.
+> **⚠️ Kompatibilitätshinweis:** die 9 Keys oben (8 hinzugefügt in `v3.8.0`, 1 in `v3.14.0`) sind auf diesem Typ optional — im Gegensatz zu den anderen Keys, die required sind. Das ist beabsichtigt: dadurch bleibt älterer Code, der ein vollständiges `RichTextEditorTranslation`-Literal deklariert (statt ein partielles Objekt an die `translation`-Prop zu übergeben), auch bei zukünftigen neuen Keys kompilierbar. Intern löst die Komponente fehlende Keys immer gegen `DEFAULT_RICH_TEXT_EDITOR_TRANSLATION` auf — sie müssen also nie angegeben werden.
 
 ---
 
@@ -235,6 +275,14 @@ import { DEFAULT_RICH_TEXT_EDITOR_TRANSLATION } from '@thebuoyant-tsdev/mui-ts-l
 ```html
 <h2>Titel</h2><p>Text mit <strong>Fett</strong> und <em>Kursiv</em>.</p>
 ```
+
+Wenn Mentions aktiv sind, wird jede eingefügte Mention als `<span>` mit Data-Attributen serialisiert:
+
+```html
+<p>Hallo <span class="rte-mention" data-type="mention" data-id="alice" data-label="Alice Johnson">@Alice Johnson</span>!</p>
+```
+
+Das Backend kann `data-id` auslesen um die referenzierte Person/Entität aufzulösen.
 
 ---
 
@@ -505,6 +553,109 @@ Für einen Live-Export ohne den Dialog zu öffnen: `onMarkdownChange` verwenden 
 
 ---
 
+## Mention (@)
+
+> **Seit v3.14.0**
+
+### Was macht dieses Feature?
+
+Wenn ein Nutzer `@` im Editor tippt, erscheint ein kleines Dropdown mit einer Namensliste. Er kann weitertippen um die Liste zu filtern und dann einen Namen anklicken oder mit `Enter` bestätigen. Der erwähnte Name erscheint daraufhin hervorgehoben im Text als `@Alice Johnson`. Das Prinzip ist genau das, was man aus Slack, Notion oder Jira kennt.
+
+**Die Namensliste kommt von dir.** Die Bibliothek zeichnet nur das Dropdown und kümmert sich um die Tastaturnavigation — sie ruft selbst keine Datenbank ab und schickt selbst keine API-Anfragen. Das ist bewusst so: Du behältst die volle Kontrolle darüber, wer erwähnt werden kann und wie die Suche funktioniert.
+
+---
+
+### Einstieg — deine erste Mention in 3 Schritten
+
+**Schritt 1 — Personenliste anlegen**
+
+Jede Person braucht eine `id` (eindeutiger Bezeichner, wird intern gespeichert) und ein `label` (der Name, der im Dropdown und im Text angezeigt wird):
+
+```tsx
+// Diese Liste kann von überall kommen: fest im Code, aus einer API, aus einem Redux-Store …
+const TEAM: MentionItem[] = [
+  { id: "alice",   label: "Alice Johnson" },
+  { id: "bob",     label: "Bob Smith" },
+  { id: "carol",   label: "Carol Williams" },
+];
+```
+
+**Schritt 2 — Liste an den Editor übergeben**
+
+```tsx
+<RichTextEditor
+  mentionItems={TEAM}   // <-- aktiviert das @-Feature
+  onChange={setContent} // wird bei jeder Änderung aufgerufen, liefert den Inhalt als HTML-String
+/>
+```
+
+Das war's. Der `@`-Tastendruck öffnet jetzt das Dropdown. Die Bibliothek filtert die Liste automatisch während der Nutzer tippt — `@ali` schränkt die Anzeige auf "Alice Johnson" ein.
+
+**Schritt 3 — Ergebnis verwenden**
+
+`onChange` liefert einen HTML-String. Mentions sind darin als `<span>` mit Data-Attributen gespeichert:
+
+```html
+<!-- Was onChange liefert, wenn "Hallo @Alice Johnson" getippt wurde: -->
+<p>
+  Hallo
+  <span data-type="mention" data-id="alice" data-label="Alice Johnson">
+    @Alice Johnson
+  </span>
+</p>
+```
+
+Das `data-id`-Attribut enthält den Wert aus Schritt 1 (`"alice"`). Im Backend verwendest du diese id um den tatsächlichen Nutzer nachzuschlagen — nicht das Label, denn Labels können sich ändern (ein Nutzer benennt sich um), während die id stabil bleibt.
+
+---
+
+### Asynchrone / serverseitige Suche
+
+Wenn die Personenliste sehr groß ist (tausende Einträge), ist es ineffizient alle auf einmal zu laden. Mit `onMentionSearch` kannst du stattdessen bei jedem Tastendruck das Backend anfragen:
+
+```tsx
+// Die Bibliothek ruft diese Funktion auf, sobald der Nutzer nach @ tippt
+// query = was bisher nach @ getippt wurde, z. B. "ali" bei "@ali"
+const handleMentionSearch = async (query: string): Promise<MentionItem[]> => {
+  const res = await fetch(`/api/users?q=${encodeURIComponent(query)}`);
+  return res.json(); // deine API muss { id: string; label: string }[] zurückgeben
+};
+
+// Hinweis: mentionItems wird hier nicht benötigt — onMentionSearch ersetzt die eingebaute Filterung
+<RichTextEditor
+  onMentionSearch={handleMentionSearch}
+  onChange={setContent}
+/>
+```
+
+> **Wann welche Variante?**
+> - Kleine Liste (wenige hundert Einträge, einmalig geladen): `mentionItems` — einfacher, kein Netzwerk-Request bei jedem Tastendruck.
+> - Große Liste oder Fuzzy-/Ranking-Suche: `onMentionSearch` — du steuerst die Such-Logik vollständig selbst.
+
+---
+
+### Eigenes Trigger-Zeichen
+
+Falls `@` mit einem anderen Feature in deiner App kollidiert, kann das Trigger-Zeichen geändert werden:
+
+```tsx
+<RichTextEditor
+  mentionItems={TEAM}
+  mentionTriggerChar="#"  // jetzt öffnet # das Dropdown statt @
+/>
+```
+
+### "Keine Ergebnisse"-Label übersetzen
+
+```tsx
+<RichTextEditor
+  mentionItems={TEAM}
+  translation={{ mentionNoResults: "Niemanden gefunden" }}
+/>
+```
+
+---
+
 ## Readonly und Disabled
 
 ```tsx
@@ -637,6 +788,7 @@ Der Editor-Rahmen erscheint in `error.main` (MUI-Fehlerfarbe), der `helperText` 
 |---|---|---|---|
 | `onChange` | `(value: string) => void` | Jede nutzerseitige Inhaltsänderung (Tippen, Formatieren, Einfügen, Toolbar) | State-Sync im kontrollierten Modus — `value`-State hier aktualisieren |
 | `onMarkdownChange` | `(markdown: string) => void` | Gleichzeitig mit `onChange`, direkt danach ausgelöst | Inhalt als Markdown benötigt, ohne den Markdown-Dialog zu öffnen |
+| `onMentionSearch` | `(query: string) => MentionItem[] \| Promise<MentionItem[]>` | Bei jedem Tastendruck nach `@` | Async/serverseitige Mention-Suche — ersetzt die eingebaute clientseitige Filterung |
 | `onFocus` | `() => void` | Der Editor-Bereich erhält Tastatur-Fokus | Aktiven Editor hervorheben, Toolbar bedingt anzeigen |
 | `onBlur` | `() => void` | Der Editor-Bereich verliert Tastatur-Fokus | Validierung auslösen, Auto-Save beim Verlassen |
 

@@ -67,7 +67,7 @@ die Timeline hat bereits Scroll + Zoom-Controls.
 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
-| Mention (@) | `@`-getriggerte Autocomplete-Liste über eine vom Consumer bereitgestellte Personen-/Entitätenliste (Tiptap `Mention`-Extension-Pattern) — Bibliothek liefert nur die UI, keine eigene Personensuche. | Hoch | — |
+| ~~Mention (@)~~ | ~~`@`-getriggerte Autocomplete-Liste über eine vom Consumer bereitgestellte Personen-/Entitätenliste (Tiptap `Mention`-Extension-Pattern) — Bibliothek liefert nur die UI, keine eigene Personensuche.~~ | ~~Hoch~~ | ✅ v3.14.0 |
 | Slash Commands (/) | `/`-getriggertes Kontextmenü zum Einfügen von Blöcken (Notion-Pattern), Optionen aus den bereits vorhandenen Toolbar-Features (Tabelle, Bild, Emoji) gespeist — kein neuer Funktionsumfang, nur ein zweiter Zugriffsweg. | Hoch | — |
 | Diff View | Zwei HTML-Versionen readonly nebeneinander, wortweise Differenz hervorgehoben (z.B. via `diff-match-patch`) — Use Case: Edit-Historie in einem CMS-Review-Flow. | Hoch | — |
 | ~~Word Count~~ | ~~Wörter- und Zeichen-Zähler im Footer~~ | ~~Niedrig~~ | ✅ v1.4.0 |

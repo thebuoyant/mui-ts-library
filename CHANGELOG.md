@@ -13,6 +13,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.14.0] — 2026-07-02
+
+### Added
+
+#### RichTextEditor — Mention (@) autocomplete
+
+`@`-triggered autocomplete list for people/entity mentions, following the Tiptap Mention Extension pattern — the library delivers the full UI, the consumer supplies the data.
+
+- **`mentionItems?: MentionItem[]`** — static list for client-side filtering (case-insensitive substring match as the user types). The Mention extension is only activated when this prop or `onMentionSearch` is set.
+- **`onMentionSearch?: (query: string) => MentionItem[] | Promise<MentionItem[]>`** — replaces the built-in filter when provided (async-compatible for server-side search). Items update go through a ref — the extension is not recreated on each items change.
+- **`mentionTriggerChar?: string`** (default `"@"`) — custom trigger character.
+- **`translation.mentionNoResults?: string`** (default `"No results"`) — label shown when the dropdown has no matches.
+- Dropdown UI: MUI `Popper` + `Paper` + `MenuList` anchored to the cursor position. No additional CSS dependency, no Tippy.js.
+- Keyboard navigation: `↑`/`↓` to move through items, `Enter` to insert, `Escape` to dismiss.
+- HTML output: each mention is serialised as `<span class="rte-mention" data-type="mention" data-id="…" data-label="…">@Name</span>` — parse `data-id` on the backend to resolve the referenced entity.
+- New peer dependency: `@tiptap/extension-mention@^3.23.6` (matches the existing Tiptap version pinned in this library).
+- 13 new tests: 4 integration tests on `RichTextEditor` (smoke tests confirming the editor mounts without errors with/without mention props and with custom config), plus 9 unit tests on `RichTextEditorMentionList` covering empty state, item rendering, click selection, Popper open/closed, keyboard navigation (ArrowUp/Down, Enter), key-handling return values, and index reset on items change.
+
+New `MentionItem` type exported from the library root.
+
+---
+
 ## [3.13.0] — 2026-06-29
 
 ### Added

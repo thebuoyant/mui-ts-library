@@ -15,6 +15,26 @@ The `PasswordStrengthMeter` is a password input component built on React and Mat
 - Onboarding flows with security hints
 - Admin areas with strict password policies
 
+### What does this component do?
+
+When you render `PasswordStrengthMeter`, the user sees three stacked elements:
+
+**1 — Password input:** A standard MUI text field with a show/hide password toggle button on the right. Optionally extended with a generate password button and a copy-to-clipboard button.
+
+**2 — Strength bar:** An animated colored bar below the input that grows and changes color as the user types. At score 1 it's red and short; at score 4 it's green and full width. Alternatively, `showSegmentedBar` renders 4 separate segments that fill one by one.
+
+| Score | Status | Color | What it means |
+|---|---|---|---|
+| 0 | — | (empty) | No password entered yet |
+| 1 | weak | Red | Too short, or only repeated characters / known pattern |
+| 2 | ok | Yellow | Minimum length met, but only one character class |
+| 3 | good | Light green | Minimum length + 2–3 character classes |
+| 4 | very good | Green | Long password with 3+ character classes |
+
+**3 — Requirements checklist:** A list of password rules, each with a ✓ (green) or ✗ (red) icon that updates in real time. Default rules: minimum length · uppercase letter · lowercase letter · digit · special character. You can add custom rules via `customRequirements`.
+
+> **Key concept — score vs. blocking:** The component never blocks the user from typing. It reports the current strength via `onPasswordChange` so *your* form logic can decide whether to enable the submit button.
+
 ---
 
 > ### New in v3.9.0
@@ -61,14 +81,20 @@ import { PasswordStrengthMeter } from '@thebuoyant-tsdev/mui-ts-library';
 function App() {
   return (
     <PasswordStrengthMeter
-      passwordMinLength={8}
+      passwordMinLength={8}          // sets the "At least 8 characters" rule in the checklist
+                                     // and forces score 1 ("weak") until the length is reached
       onPasswordChange={(password, result) => {
+        // fires on every keystroke with the current password string and its analysis
+        // result.score     = 0–4 (use this to enable/disable your submit button)
+        // result.meterStatus = "weak" | "ok" | "good" | "very good"
         console.log(`Strength: ${result.meterStatus} (Score ${result.score}/4)`);
       }}
     />
   );
 }
 ```
+
+> **Minimal version:** Just `passwordMinLength` + `onPasswordChange` gives you the input, the animated bar, and the full requirements checklist.
 
 ---
 

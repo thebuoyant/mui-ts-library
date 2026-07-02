@@ -2,17 +2,21 @@
 
 > [Deutsche Version →](ColorPicker.de.md)
 
-**A full saturation/hue/alpha color picker panel — fills a real MUI gap, since MUI ships no color picker at all.** Use `ColorPicker` for theme customizers, brand-color pickers, design-system playgrounds, or anywhere a user needs to pick an arbitrary color rather than choose from a fixed palette.
+**A color picker panel for React and Material UI — fills a real gap, since MUI ships no color picker of its own.** Use it wherever a user needs to pick an arbitrary color: theme customizers, brand-color screens, design-system playgrounds, or any form field that goes beyond a fixed palette.
 
 ## Overview
 
-`ColorPicker` renders a self-contained picker **panel** (a 2D saturation/brightness area, a hue slider, an optional alpha slider, an eyedropper tool, a format-switchable value field, and an optional saved-colors swatch grid) — it does not include its own trigger button or popover. Embedding it in a `Popover`/`Menu` for a "swatch + dropdown" pattern is the consumer's choice, matching how MUI's own desktop/static date pickers separate the "field" from the "calendar."
+### What does this component do?
 
-It's a fully controlled component: you own the `value` (a color string) and update it from `onChange`.
+The user sees a picker panel with a colored gradient area. They drag a small circle (the "thumb") through the gradient to choose a hue and brightness. A slider on the right adjusts the hue, a second slider sets the opacity (alpha). Below that, a text field shows the current color as a hex code, RGB values, or HSL values — the user can also type directly.
+
+Optional extras: an eyedropper tool to sample any color from the screen, and a row of saved-color swatches for quick reuse.
+
+**What the component does not include:** a trigger button or a popup/popover. It renders the picker panel directly — you decide where it appears (inline on the page, inside an MUI `Popover`, inside a `Menu`, etc.). This is the same approach MUI takes with its own date pickers, which also separate the input field from the calendar panel. See [Embedding in a Popover](#embedding-in-a-popover) for the most common pattern.
 
 **Typical use cases:**
 
-- Theme/brand-color customization screens
+- Theme or brand-color customization screens
 - Design-system or component-playground tooling
 - Any form needing a free-form (not just preset-swatch) color input
 
@@ -49,16 +53,19 @@ import { useState } from 'react';
 import { ColorPicker } from '@thebuoyant-tsdev/mui-ts-library';
 
 function App() {
+  // color holds a hex string like "#1976d2"
   const [color, setColor] = useState('#1976d2');
 
   return (
     <ColorPicker
-      value={color}
-      onChange={(hex) => setColor(hex)}
+      value={color}              // the current color — you own this state
+      onChange={(hex) => setColor(hex)} // called on every change; hex is the new color as a string
     />
   );
 }
 ```
+
+`onChange` is called with a hex string on every change — while the user is still dragging, not just when they let go. If you only want a single update when the user finishes a drag, see [`onChangeCommitted`](#onchange-vs-onchangecommitted) below.
 
 ---
 
@@ -78,23 +85,47 @@ function App() {
 | `savedColors` | `string[]` | — | Swatches rendered below the picker — click to select. Purely a display/select list; you own persisting it (e.g. to `localStorage` or a backend). |
 | `disabled` | `boolean` | `false` | Mutes all interactions (drag, typing, swatch clicks, eyedropper) and reduces opacity. |
 | `colorGradientSize` | `'small' \| 'medium'` | `'medium'` | Scales the gradient area height, slider thickness, and swatch size. |
-| `inputSize` | `'small' \| 'medium'` | `'medium'` | Size of the format dropdown and value/alpha fields, independent of `colorGradientSize` — matches the `inputSize` convention used by `TagSelection`/`PasswordStrengthMeter`. |
+| `inputSize` | `'small' \| 'medium'` | `'medium'` | Size of the format dropdown and value/alpha fields, independent of `colorGradientSize`. |
 | `width` | `number` | `280` | Overall panel width in px. |
 | `name` | `string` | — | Form-integration: renders a hidden `<input>` carrying the current hex value, so the picker participates in native/React Hook Form/Formik form submission without extra wiring. |
-| `translation` | `Partial<ColorPickerTranslation>` | English defaults | Override accessible labels (field/slider `aria-label`s and the saved-colors heading). Only the keys you want to change — see [Translations](#translations). |
+| `translation` | `Partial<ColorPickerTranslation>` | English defaults | Override accessible labels and the saved-colors heading. Only the keys you want to change — see [Translations](#translations). |
 
 ---
 
 ## Callbacks / Events
 
+### When does `onChange` fire?
+
 `onChange` fires live, continuously, with every change:
 
 - Continuously while dragging the gradient area, hue slider, or alpha slider (every pointer-move frame, not just on release)
-- On every valid keystroke in the hex/RGB/HSL/alpha fields (invalid in-progress input, like a half-typed hex code, is held locally without firing `onChange`)
+- On every valid keystroke in the hex/RGB/HSL/alpha fields (invalid in-progress input, like a half-typed hex code, is held locally without firing)
 - When a saved-color swatch is clicked
 - When the eyedropper successfully picks a color
 
-Both `onChange` and `onChangeCommitted` pass a normalized hex string as the first argument, plus a clean `ColorPickerColorInfo` object as the second:
+### `onChange` vs. `onChangeCommitted`
+
+Think of it like a volume knob: `onChange` fires for every tiny movement so your UI can preview the color in real time. `onChangeCommitted` fires once when the user lets go — use it for anything expensive like saving to a backend, so you don't hammer it on every drag frame.
+
+```tsx
+<ColorPicker
+  value={color}
+  onChange={(hex) => setColor(hex)}              // live: update your preview as the user drags
+  onChangeCommitted={(hex) => saveToBackend(hex)} // once per gesture: only when the user is done
+/>
+```
+
+This mirrors MUI's own `Slider` component, which has the exact same `onChange`/`onChangeCommitted` split.
+
+`onChangeCommitted` fires:
+
+- Once on pointer-up, after a drag on the gradient area, hue slider, or alpha slider
+- Once on blur, after typing in the hex/RGB/HSL/alpha fields
+- Immediately (same tick as `onChange`) for atomic, single-step actions — a saved-color swatch click or a successful eyedropper pick, since there's no separate drag/typing phase to defer past
+
+### The second argument: `info`
+
+Both callbacks also receive a `ColorPickerColorInfo` object as their second argument:
 
 ```ts
 type ColorPickerColorInfo = {
@@ -104,31 +135,26 @@ type ColorPickerColorInfo = {
 };
 ```
 
-The hex/rgb/hsl values are always kept in sync regardless of which format is currently *displayed* in the value field — `defaultFormat` only controls what the user sees and types, not what `onChange`/`onChangeCommitted` report.
-
-### `onChange` vs. `onChangeCommitted`
-
-`onChange` is intentionally **not** debounced — it stays live so the gradient thumb, swatch preview, etc. track the pointer in real time. If you only need updates once the user is "done" with an interaction (e.g. to avoid hammering a backend on every drag frame), use `onChangeCommitted` instead of debouncing `onChange` yourself. This mirrors MUI's own `Slider` component, which has the exact same `onChange`/`onChangeCommitted` split.
-
-`onChangeCommitted` fires:
-
-- Once on pointer-up, after a drag on the gradient area, hue slider, or alpha slider
-- Once on blur, after typing in the hex/RGB/HSL/alpha fields
-- Immediately (same tick as `onChange`) for atomic, single-step actions — a saved-color swatch click or a successful eyedropper pick, since there's no separate drag/typing phase to defer past
+**Most of the time you only need `hex`** — it's the first argument and covers the majority of use cases. Use `info` when you need to work with the color in a specific format without converting it yourself:
 
 ```tsx
+// Use case: you need the RGB values to pass to a canvas drawing API
 <ColorPicker
   value={color}
-  onChange={(hex) => setColor(hex)}              // live preview
-  onChangeCommitted={(hex) => saveToBackend(hex)} // once per gesture
+  onChange={(hex, info) => {
+    setColor(hex);
+    ctx.fillStyle = `rgba(${info.rgb.r}, ${info.rgb.g}, ${info.rgb.b}, ${info.rgb.a})`;
+  }}
 />
 ```
 
+The hex/rgb/hsl values are always kept in sync — `defaultFormat` only controls what the user *sees and types*, not what the callbacks report.
+
 ---
 
-## No Popover Included — Wrap It Yourself
+## Embedding in a Popover
 
-`ColorPicker` is the panel only. For a compact "swatch button that opens a picker" UI, wrap it in MUI's own `Popover`:
+The most common pattern: a colored swatch button that opens the picker in a floating panel when clicked.
 
 ```tsx
 import { useState } from 'react';
@@ -141,10 +167,18 @@ function SwatchColorPicker() {
 
   return (
     <>
+      {/* The colored square — clicking it opens the picker */}
       <Box
         onClick={(e) => setAnchorEl(e.currentTarget)}
-        sx={{ width: 32, height: 32, borderRadius: 1, backgroundColor: color, cursor: 'pointer', border: '1px solid', borderColor: 'divider' }}
+        sx={{
+          width: 32, height: 32, borderRadius: 1,
+          backgroundColor: color,
+          cursor: 'pointer',
+          border: '1px solid', borderColor: 'divider',
+        }}
       />
+
+      {/* The picker appears below the square */}
       <Popover
         open={!!anchorEl}
         anchorEl={anchorEl}
@@ -160,6 +194,8 @@ function SwatchColorPicker() {
 }
 ```
 
+You can also render the picker panel directly on the page without any popover — for example, in a settings sidebar that's always visible.
+
 ---
 
 ## Saved Colors
@@ -172,7 +208,20 @@ function SwatchColorPicker() {
 />
 ```
 
-Clicking a swatch selects it (fires `onChange` like any other interaction). The component never mutates `savedColors` itself — if you want an "add current color to saved" feature, build it yourself by appending the latest `onChange` hex to your own state.
+Clicking a swatch selects it immediately (fires `onChange` like any other interaction). The component never mutates `savedColors` itself — you own this list. If you want an "add current color" button, maintain your own array in state and append to it:
+
+```tsx
+const [saved, setSaved] = useState<string[]>(['#f44336', '#2196f3']);
+
+<ColorPicker
+  value={color}
+  onChange={(hex) => setColor(hex)}
+  savedColors={saved}
+/>
+<Button onClick={() => setSaved((prev) => [...prev, color])}>
+  Save current color
+</Button>
+```
 
 ---
 
@@ -191,7 +240,7 @@ With `name` set, a hidden `<input type="hidden" name="brandColor" value={...} />
 
 ## Minimal Layouts
 
-`showSliderSection` and `showInputSection` each toggle a whole row independently, for compact use cases:
+`showSliderSection` and `showInputSection` each toggle a whole row independently:
 
 ```tsx
 {/* Gradient area + sliders only — no format dropdown or numeric fields */}
@@ -201,7 +250,7 @@ With `name` set, a hidden `<input type="hidden" name="brandColor" value={...} />
 <ColorPicker value={color} onChange={(hex) => setColor(hex)} showSliderSection={false} />
 ```
 
-The gradient area itself is always shown — there's no prop to hide it, since it's the picker's primary interaction surface.
+The gradient area itself is always shown — it's the picker's primary interaction surface.
 
 ---
 
@@ -217,10 +266,12 @@ All interactions (drag, typing, swatch clicks, eyedropper) are muted. The panel 
 
 ## Translations
 
+All translatable strings are `aria-label`s (for screen readers and assistive technology) — there is no other visible text in the component except the "Saved colors" heading.
+
 ```tsx
 type ColorPickerTranslation = {
-  formatLabel:           string;
-  hexFieldLabel:         string;
+  formatLabel:           string; // aria-label for the format dropdown
+  hexFieldLabel:         string; // aria-label for the hex input field
   redLabel:              string;
   greenLabel:            string;
   blueLabel:             string;
@@ -228,27 +279,25 @@ type ColorPickerTranslation = {
   saturationFieldLabel:  string;
   lightnessFieldLabel:   string;
   alphaFieldLabel:       string;
-  eyeDropperLabel:       string;
-  savedColorsLabel:      string;
-  gradientAreaLabel:     string;
+  eyeDropperLabel:       string; // tooltip + aria-label for the eyedropper button
+  savedColorsLabel:      string; // visible heading above the swatch row
+  gradientAreaLabel:     string; // aria-label for the 2D gradient area
   hueSliderLabel:        string;
 };
 ```
 
-Only `aria-label`s (for the gradient area, hue/alpha sliders, and the RGB/HSL/alpha numeric fields) and the "Saved colors" heading are translatable — there's no other visible chrome (the format dropdown shows fixed `HEX`/`RGB`/`HSL` values, consistent with how color tooling conventionally labels these).
+Only override the keys you need — everything else falls back to the English defaults:
 
 ```tsx
 <ColorPicker
   value={color}
   onChange={(hex) => setColor(hex)}
   translation={{
-    hexFieldLabel: 'Hex-Wert',
+    hexFieldLabel:    'Hex-Wert',
     savedColorsLabel: 'Gespeicherte Farben',
   }}
 />
 ```
-
-Only override the keys you need — everything else falls back to the English defaults.
 
 ---
 
@@ -287,9 +336,9 @@ type ColorPickerProps = {
 
 ## Accessibility
 
-- The gradient area and both sliders expose `role="slider"` with `aria-label`/`aria-valuenow`/`aria-valuemin`/`aria-valuemax` (where applicable) and are keyboard-focusable (`tabIndex={0}`, `-1` when disabled).
+- The gradient area and both sliders expose `role="slider"` with `aria-label`, `aria-valuenow`, `aria-valuemin`, `aria-valuemax` and are keyboard-focusable.
 - Every numeric field (hex, R/G/B, H/S/L, alpha) has an explicit `aria-label`.
-- The eyedropper button has both a `Tooltip` and an explicit `aria-label`.
+- The eyedropper button has both a tooltip and an explicit `aria-label`.
 - Saved-color swatches expose the color string itself as their `aria-label`.
 
 ---
@@ -299,5 +348,5 @@ type ColorPickerProps = {
 | Topic | Note |
 |---|---|
 | **Browser support for the eyedropper** | The [EyeDropper API](https://developer.mozilla.org/en-US/docs/Web/API/EyeDropper) is Chromium-only as of writing (Chrome, Edge, Opera) — not supported in Safari or Firefox. The button is automatically hidden when unsupported, regardless of `showEyeDropper`. |
-| **No built-in popover/trigger** | `ColorPicker` is the panel only — see [No Popover Included](#no-popover-included--wrap-it-yourself) for the recommended wrapping pattern. |
-| **HSV/HSL precision near black/white** | Like virtually all saturation/value color pickers, hue becomes mathematically undefined at pure black or white — dragging through those corners and back out can leave hue at a different value than where you started. This is standard, expected behavior for this style of picker, not a bug. |
+| **No built-in popover/trigger** | `ColorPicker` is the panel only — see [Embedding in a Popover](#embedding-in-a-popover) for the recommended wrapping pattern. |
+| **HSV/HSL precision near black/white** | Like virtually all saturation/value color pickers, hue becomes mathematically undefined at pure black or white — dragging through those corners can leave hue at a different value. This is standard behavior for this style of picker, not a bug. |
