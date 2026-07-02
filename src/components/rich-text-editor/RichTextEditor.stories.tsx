@@ -457,6 +457,38 @@ export const WithMentionAsyncSearch: Story = {
   },
 };
 
+function MentionHashStory(props: ComponentProps<typeof RichTextEditor>) {
+  const [value, setValue] = useState(
+    "<p>Type <strong>#</strong> to tag a topic.</p>"
+  );
+  return <RichTextEditor {...props} value={value} onChange={setValue} />;
+}
+
+export const WithMentionCustomTrigger: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "**Custom trigger character (`mentionTriggerChar`).** " +
+          "By default `@` opens the mention dropdown. Here it is changed to `#` — " +
+          "useful when `@` is already used for another feature, or when tagging topics/labels instead of people.",
+      },
+    },
+  },
+  render: (args) => <MentionHashStory {...args} />,
+  args: {
+    mentionItems: [
+      { id: "react",      label: "React" },
+      { id: "typescript", label: "TypeScript" },
+      { id: "mui",        label: "Material UI" },
+      { id: "tiptap",     label: "TipTap" },
+    ],
+    mentionTriggerChar: "#",
+    height: 280,
+    placeholder: "Type # to tag a topic…",
+  },
+};
+
 export const GermanTranslation: Story = {
   args: {
     placeholder: "Hier tippen …",
