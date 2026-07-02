@@ -1,4 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+// selectedIndex reset on items change uses the "derived state during render" pattern
+// (setState in render is safe when guarded by a changed-value check).
 import { Paper, List, ListItemButton, Typography, Popper } from "@mui/material";
 import type { MentionItem } from "./RichTextEditor.types";
 
@@ -16,9 +18,13 @@ export type MentionListRef = {
 export const RichTextEditorMentionList = forwardRef<MentionListRef, MentionListProps>(
   function RichTextEditorMentionList({ items, noResultsLabel, clientRect, onSelect }, ref) {
     const [selectedIndex, setSelectedIndex] = useState(0);
+    const [prevItems, setPrevItems] = useState(items);
     const listRef = useRef<HTMLUListElement>(null);
 
-    useEffect(() => { setSelectedIndex(0); }, [items]);
+    if (items !== prevItems) {
+      setPrevItems(items);
+      setSelectedIndex(0);
+    }
 
     useEffect(() => {
       const el = listRef.current?.children[selectedIndex] as HTMLElement | undefined;

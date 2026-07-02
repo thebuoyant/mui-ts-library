@@ -426,6 +426,19 @@ export const WithMention: Story = {
   },
 };
 
+function MentionAsyncStory(props: ComponentProps<typeof RichTextEditor>) {
+  const [value, setValue] = useState(
+    "<p>Type <strong>@</strong> — results are fetched asynchronously.</p>"
+  );
+  const handleSearch = async (query: string) => {
+    await new Promise((r) => setTimeout(r, 200));
+    return TEAM_MEMBERS.filter((m) =>
+      m.label.toLowerCase().includes(query.toLowerCase())
+    );
+  };
+  return <RichTextEditor {...props} value={value} onChange={setValue} onMentionSearch={handleSearch} />;
+}
+
 export const WithMentionAsyncSearch: Story = {
   parameters: {
     docs: {
@@ -437,25 +450,7 @@ export const WithMentionAsyncSearch: Story = {
       },
     },
   },
-  render: (args) => {
-    const [value, setValue] = useState(
-      "<p>Type <strong>@</strong> — results are fetched asynchronously.</p>"
-    );
-    const handleSearch = async (query: string) => {
-      await new Promise((r) => setTimeout(r, 200));
-      return TEAM_MEMBERS.filter((m) =>
-        m.label.toLowerCase().includes(query.toLowerCase())
-      );
-    };
-    return (
-      <RichTextEditor
-        {...args}
-        value={value}
-        onChange={setValue}
-        onMentionSearch={handleSearch}
-      />
-    );
-  },
+  render: (args) => <MentionAsyncStory {...args} />,
   args: {
     height: 280,
     placeholder: 'Type @ to trigger async search…',
