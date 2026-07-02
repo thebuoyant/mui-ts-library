@@ -434,6 +434,13 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/). In der Praxis b
 
 ## Changelog
 
+### [3.14.1] — 2026-07-02
+
+**Behoben**
+- README: fehlender Changelog-Eintrag für 3.14.0 — keine Code-Änderungen.
+
+---
+
 ### [3.14.0] — 2026-07-02
 
 **Hinzugefügt**
