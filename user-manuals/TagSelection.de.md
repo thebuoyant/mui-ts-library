@@ -15,6 +15,20 @@ Die `TagSelection`-Komponente ist ein flexibles Multi-Tag-Auswahlfeld auf Basis 
 - Filterauswahl in Suchmasken und Dashboard-Filtern
 - Tag-basiertes Labeling in Content-Management-Systemen
 
+### Was macht diese Komponente?
+
+Wenn `TagSelection` gerendert wird, sieht der Nutzer zwei vertikal gestapelte Bereiche:
+
+**Oberer Bereich — ausgewählte Chips:** Ein farbiger Chip pro ausgewähltem Tag, jeweils mit einem **×**-Button zum Entfernen. Darüber befindet sich die Überschrift „Ausgewählte Tags"; wenn nichts ausgewählt ist, erscheint der Hinweis „Keine Tags ausgewählt."
+
+**Unterer Bereich — Sucheingabe:** Ein Standard-MUI-Textfeld. Beim Tippen erscheint ein Dropdown mit passenden Tags — der eingetippte Teil ist in jedem Ergebnis **fett** hervorgehoben. Klicken auf eine Option (oder **Enter**) verschiebt sie in den Chip-Bereich.
+
+**Überlauf:** Wenn `maxVisibleChips` gesetzt ist und mehr Tags ausgewählt sind als das Limit, werden überschüssige Chips hinter einem `+N`-Chip versteckt. Klicken auf `+N` öffnet ein Popover, in dem die versteckten Chips auch gelöscht werden können.
+
+**Erstellungsmodus** (`allowCreate={true}`): Wenn der Nutzer etwas eintippt, das keinem vorhandenen Tag entspricht, wechselt die Eingabe in den Erstellungsmodus — ein ✓ (Bestätigen)- und ✗ (Abbrechen)-Button erscheinen, sowie eine Reihe von 7 semantischen Themefarb-Chips (und ein Regenbogen-Chip, der einen vollständigen Custom-Color-Picker öffnet). **Enter** oder Klick auf ✓ bestätigt den neuen Tag mit der gewählten Farbe.
+
+> **Kernprinzip — ein flaches Array für alles:** Du übergibst *alle* Tags — ausgewählte, verfügbare und deaktivierte — in einem einzigen flachen `tags`-Array. `TagSelection` sortiert sie intern: Tags mit `selected: true` erscheinen als Chips; der Rest erscheint im Dropdown; Tags mit `disabled: true` sind aus dem Dropdown ausgeschlossen. Alle Änderungen (Auswählen, Löschen, Erstellen) werden über Callbacks zurückgemeldet.
+
 ---
 
 ## Technische Voraussetzungen
@@ -49,12 +63,14 @@ import { TagSelection } from '@thebuoyant-tsdev/mui-ts-library';
 import type { TagSelectionItem } from '@thebuoyant-tsdev/mui-ts-library';
 import { useState } from 'react';
 
+// Ein flaches Array enthält ALLES: ausgewählte, verfügbare und deaktivierte Tags.
+// Die Komponente entscheidet selbst, was als Chip und was im Dropdown erscheint.
 const initialTags: TagSelectionItem[] = [
-  { id: 'react',      label: 'React',      selected: true  },
-  { id: 'typescript', label: 'TypeScript', selected: true  },
-  { id: 'vue',        label: 'Vue'                         },
-  { id: 'angular',    label: 'Angular'                     },
-  { id: 'legacy',     label: 'Legacy',     disabled: true  },
+  { id: 'react',      label: 'React',      selected: true  }, // erscheint sofort als Chip
+  { id: 'typescript', label: 'TypeScript', selected: true  }, // erscheint sofort als Chip
+  { id: 'vue',        label: 'Vue'                         }, // verfügbar im Dropdown
+  { id: 'angular',    label: 'Angular'                     }, // verfügbar im Dropdown
+  { id: 'legacy',     label: 'Legacy',     disabled: true  }, // im Dropdown ausgeblendet, nicht wählbar
 ];
 
 function App() {
@@ -62,12 +78,17 @@ function App() {
 
   return (
     <TagSelection
-      tags={tags}
+      tags={tags}                          // Pflicht: die einzige Datenquelle
       onTagsChange={(selectedTags, allTags) => setTags(allTags)}
+      // onTagsChange wird nach jeder Auswahl/Löschung/Erstellung aufgerufen
+      // selectedTags = nur die aktuell ausgewählten Tags
+      // allTags      = vollständiges Array mit aktualisierten selected-Flags — damit State aktualisieren
     />
   );
 }
 ```
+
+> **Minimalversion:** `tags` und `onTagsChange` reichen für ein funktionierendes Tag-Auswahlfeld mit statischen Daten.
 
 ---
 

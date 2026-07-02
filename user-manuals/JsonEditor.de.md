@@ -8,6 +8,20 @@
 
 Der `JsonEditor` ist ein vollständiger JSON-Code-Editor auf Basis von [CodeMirror 6](https://codemirror.net/) und Material UI. Er bietet Echtzeit-JSON-Validierung mit Inline-Fehlermarkern, Format- (Pretty-Print) und Komprimieren-Schaltflächen sowie einen Validierungsstatus-Anzeiger im Footer — alles im selben MUI-Paper-Layout wie der `SqlEditor`.
 
+### Was macht diese Komponente?
+
+Der Nutzer sieht eine MUI-Paper-Karte mit zwei Bereichen:
+
+- **Toolbar** (oben): JSON formatieren (Pretty-Print), Komprimieren (Minify), Kopieren, Leeren, Rückgängig/Wiederholen.
+- **Editor-Bereich**: ein CodeMirror-JSON-Editor mit:
+  - **Syntax-Highlighting**: Property-Namen in der Primärfarbe (fett), Strings in Grün, Zahlen in Gelb, Booleans in Blau, `null` in Grau — alles aus dem MUI-Theme.
+  - **Zeilennummern** und optionale **Falten-Arrows** (▾/▸) neben `{` und `[` zum Ein-/Ausklappen von Objects und Arrays.
+  - **Wellige Unterstreichungen** für Syntaxfehler (fehlende Kommas, nicht geschlossene Klammern) — Hover für die Fehlermeldung.
+  - **`Ctrl / Cmd ⌘+Click`** auf einen Wert oder Property-Key kopiert seinen vollständigen JSON-Pfad in die Zwischenablage (z. B. `$.users[0].address.city`).
+- **Footer** (optional): Cursor-Position + „Gültiges JSON" / „Ungültiges JSON"-Anzeige.
+
+> **Im Vergleich zum `SqlEditor`:** JsonEditor validiert die Struktur kontinuierlich — sofortiges visuelles Feedback bei ungültigem JSON, ohne eigenen Lint-Code.
+
 **Typische Einsatzgebiete:**
 
 - API-Konfigurationspanels in Admin-Dashboards
@@ -60,18 +74,26 @@ import type {
 ## Schnellstart
 
 ```tsx
+import { useState } from 'react';
 import { JsonEditor } from '@thebuoyant-tsdev/mui-ts-library';
 
 function App() {
+  const [json, setJson] = useState('{\n  "name": "Alice",\n  "age": 30\n}');
+
   return (
     <JsonEditor
-      placeholder="JSON eingeben …"
-      showValidation
-      onChange={(json) => console.log(json)}
+      value={json}              // kontrolliert: du besitzt den JSON-String
+      onChange={setJson}         // wird bei jeder Änderung aufgerufen
+      showValidation             // zeigt „Gültiges JSON" / „Ungültiges JSON" im Footer
+      onValidChange={(isValid) => console.log('Gültig:', isValid)} // feuert bei Wechsel der Validität
+      // Toolbar: Formatieren, Komprimieren, Kopieren, Leeren, Rückgängig/Wiederholen — alle an
+      // Strg/Cmd+Click auf Wert → JSON-Path in Zwischenablage kopieren
     />
   );
 }
 ```
+
+> **Minimalvariante** (kein kontrollierter State, keine Validierung): `<JsonEditor onChange={(json) => console.log(json)} />` — einfacher Editor mit Toolbar und Syntax-Highlighting. `showValidation`, `schema`, `onValidChange` nach Bedarf ergänzen.
 
 ---
 

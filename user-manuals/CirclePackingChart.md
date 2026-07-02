@@ -8,6 +8,16 @@
 
 The `CirclePackingChart` renders hierarchical data using [D3 v7](https://d3js.org)'s circle packing layout. Circles are nested and sized proportionally to their values. Double-clicking zooms in with a smooth D3 interpolation animation — not a simple viewBox scale, but a genuine wipe transition that repositions and resizes all circles. It is the fourth component in the **D3 Charts family**.
 
+### What does this component do?
+
+The user sees a large outer circle (the root) that contains smaller circles (its children), which in turn contain even smaller circles (grandchildren). **Circle area is proportional to `value`** — a node with value 620 is visibly larger than one with value 210. Labels appear inside each circle.
+
+**Double-click** any circle: a smooth animated "wipe" zooms in — that circle expands to fill the entire canvas and its children grow to fill it. The labels of the newly focused direct children fade in. Double-click the background to zoom back out one level.
+
+> **Key concept:** only **leaf nodes** need a `value`. Parent nodes aggregate their children's values automatically — just like `SunburstChart`. The outer circle always shows the total sum.
+
+> **Alt + Double-click** runs the same zoom at 10× slower speed — useful for demos and presentations.
+
 | New in v2.5.0 | |
 |---|---|
 | **CirclePackingChart** | D3 circle packing, animated zoom, depth gradient or palette, MUI theme |
@@ -45,14 +55,19 @@ import { CirclePackingChart } from '@thebuoyant-tsdev/mui-ts-library';
 import type { CirclePackingData } from '@thebuoyant-tsdev/mui-ts-library';
 
 const data: CirclePackingData = {
+  // Root node — the outermost circle. No value needed (D3 sums children automatically).
   name: 'Company',
   children: [
-    { name: 'Engineering', children: [
-      { name: 'Frontend',  value: 480 },
-      { name: 'Backend',   value: 620 },
-      { name: 'DevOps',    value: 210 },
-    ]},
-    { name: 'Sales',   value: 890 },
+    {
+      name: 'Engineering', // inner group circle — also no value needed
+      children: [
+        // Leaf nodes need a value → determines circle size relative to siblings
+        { name: 'Frontend',  value: 480 },
+        { name: 'Backend',   value: 620 }, // larger circle than Frontend (620 > 480)
+        { name: 'DevOps',    value: 210 },
+      ]
+    },
+    { name: 'Sales',   value: 890 }, // leaf at top level — directly inside the root
     { name: 'Product', value: 640 },
   ],
 };
@@ -61,9 +76,11 @@ function App() {
   return (
     <CirclePackingChart
       data={data}
-      size={600}
+      size={600}                 // SVG width & height in px (always square)
       onCircleClick={(info) => console.log(info.name, info.value)}
       onZoomChange={(zoom) => console.log('Zoomed to:', zoom.currentName)}
+      // Double-click a circle to zoom in with smooth D3 animation
+      // Double-click the background to zoom back out
     />
   );
 }

@@ -8,6 +8,16 @@
 
 Der `CirclePackingChart` stellt hierarchische Daten mit dem Circle-Packing-Layout von [D3 v7](https://d3js.org) dar. Kreise sind verschachtelt und proportional zu ihren Werten dimensioniert. Ein Doppelklick zoomt mit einer D3-Interpolations-Animation ein — kein einfaches ViewBox-Scaling, sondern eine echte Wipe-Transition. Er ist die vierte Komponente der **D3-Charts-Familie**.
 
+### Was macht diese Komponente?
+
+Der Nutzer sieht einen großen äußeren Kreis (die Wurzel), der kleinere Kreise enthält (Kinder), die wiederum noch kleinere Kreise enthalten (Enkelkinder). **Die Kreisfläche ist proportional zum `value`** — ein Knoten mit value 620 ist sichtbar größer als einer mit value 210. Labels erscheinen im Innern der Kreise.
+
+**Doppelklick** auf einen Kreis: ein glatter animierter „Wipe" zoomt hinein — dieser Kreis vergrößert sich auf die gesamte Fläche, seine Kinder füllen sie aus. Labels der direkt untergeordneten Kreise blenden ein. Doppelklick auf den Hintergrund zoomt eine Ebene zurück.
+
+> **Wichtig:** Nur **Blattknoten** brauchen einen `value`. Elternknoten summieren die Werte ihrer Kinder automatisch — genau wie beim `SunburstChart`. Der äußerste Kreis zeigt immer den Gesamtwert.
+
+> **Alt + Doppelklick** führt denselben Zoom 10× langsamer aus — nützlich für Präsentationen und Demos.
+
 | Neu in v2.5.0 | |
 |---|---|
 | **CirclePackingChart** | D3 Circle Packing, animierter Zoom, Tiefen-Gradient oder Palette, MUI-Theme |
@@ -45,14 +55,19 @@ import { CirclePackingChart } from '@thebuoyant-tsdev/mui-ts-library';
 import type { CirclePackingData } from '@thebuoyant-tsdev/mui-ts-library';
 
 const data: CirclePackingData = {
+  // Wurzelknoten — der äußerste Kreis. Kein value nötig (D3 summiert Kinder automatisch).
   name: 'Unternehmen',
   children: [
-    { name: 'Engineering', children: [
-      { name: 'Frontend',  value: 480 },
-      { name: 'Backend',   value: 620 },
-      { name: 'DevOps',    value: 210 },
-    ]},
-    { name: 'Vertrieb',  value: 890 },
+    {
+      name: 'Engineering', // Gruppenkreis — ebenfalls kein value nötig
+      children: [
+        // Blattknoten brauchen einen value → bestimmt Kreisgröße relativ zu Geschwistern
+        { name: 'Frontend',  value: 480 },
+        { name: 'Backend',   value: 620 }, // größerer Kreis als Frontend (620 > 480)
+        { name: 'DevOps',    value: 210 },
+      ]
+    },
+    { name: 'Vertrieb',  value: 890 }, // Blatt auf Top-Level — direkt im Wurzelkreis
     { name: 'Produkt',   value: 640 },
   ],
 };
@@ -61,9 +76,11 @@ function App() {
   return (
     <CirclePackingChart
       data={data}
-      size={600}
+      size={600}                 // SVG-Breite & -Höhe in px (immer quadratisch)
       onCircleClick={(info) => console.log(info.name, info.value)}
       onZoomChange={(zoom) => console.log('Gezoomt zu:', zoom.currentName)}
+      // Doppelklick auf Kreis: Zoom-in mit sanfter D3-Animation
+      // Doppelklick auf Hintergrund: eine Ebene zurück
     />
   );
 }

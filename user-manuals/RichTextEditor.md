@@ -8,6 +8,10 @@
 
 The `RichTextEditor` is a full-featured WYSIWYG text editor built on [TipTap v3](https://tiptap.dev) and Material UI. It provides a rich input interface for content such as CMS texts, email templates, comments, and description fields — fully integrated with the MUI theme, without any external CSS dependencies.
 
+| New in v3.14.0 | |
+|---|---|
+| **Mention (@)** | `@`-triggered autocomplete list populated from a consumer-provided item list (`mentionItems`) — with optional async/server-side search (`onMentionSearch`) |
+
 | New in v3.8.0 | |
 |---|---|
 | **Paste as plain text** | Toolbar toggle that strips formatting from pasted content (`showPasteAsPlainTextButton`) |
@@ -20,6 +24,20 @@ The `RichTextEditor` is a full-featured WYSIWYG text editor built on [TipTap v3]
 - Email template editors
 - Comment fields with formatting options
 - Form fields that need more than `<TextField multiline>`
+
+### What does this component do?
+
+When you render `RichTextEditor`, the user sees a two-part panel inside a MUI Paper:
+
+**Toolbar (top):** A row of icon buttons — Bold, Italic, Underline, Strike, H1/H2/H3, Bullet list, Numbered list, Blockquote, Code block, Link, Horizontal rule, Text color, Highlight, Undo/Redo, Clear format. Each button has a tooltip. Opt-in buttons (Table, Image, Emoji, Paste-as-plain-text, Markdown, Fullscreen) are hidden by default and enabled via `toolbarConfig`.
+
+**Content area (below the toolbar):** A white (or dark-mode) editable text area. The user types here — what they see while typing is what the output looks like (WYSIWYG). Formatting is applied immediately: selecting text and clicking **B** makes it bold, clicking **H2** turns a paragraph into a heading.
+
+**Footer (optional):** A right-aligned character counter and/or word counter line at the bottom, shown when `showCharacterCount` or `showWordCount` is active.
+
+> **Key concept — output is HTML, not plain text:** Unlike `SqlEditor` or `JsonEditor` which produce SQL/JSON strings, `RichTextEditor` produces an **HTML string** via `onChange`. Store this string in your database and render it later with `dangerouslySetInnerHTML` (or a sanitized rendering library). The produced HTML uses standard tags: `<strong>`, `<em>`, `<h2>`, `<ul>`, `<li>`, `<a>`, etc.
+
+> **Difference from `<TextField multiline>`:** `TextField` gives you plain text. `RichTextEditor` gives you structured HTML with headings, lists, links, tables, images, and more — all without any external CSS files.
 
 ---
 
@@ -62,16 +80,24 @@ import type {
 
 ```tsx
 import { RichTextEditor } from '@thebuoyant-tsdev/mui-ts-library';
+import { useState } from 'react';
 
 function App() {
+  // RichTextEditor produces HTML — store the string in state, then save it to your backend
+  const [content, setContent] = useState('');
+
   return (
     <RichTextEditor
-      placeholder="Start typing here…"
-      onChange={(html) => console.log(html)}
+      placeholder="Start typing here…"  // shown when the editor is empty
+      onChange={(html) => setContent(html)}
+      // html = a standard HTML string like '<p>Hello <strong>World</strong></p>'
+      // called on every keystroke — use this to keep your state in sync
     />
   );
 }
 ```
+
+> **Minimal version:** `placeholder` is optional; `onChange` is what makes it useful. Without `onChange` the editor works but you can't read what the user typed.
 
 ---
 
@@ -94,14 +120,26 @@ function App() {
 | `translation` | `Partial<RichTextEditorTranslation>` | — | Override texts for tooltips, dialog, and counter labels |
 | `value` | `string` | — | Initial HTML string; enables controlled mode |
 | `width` | `number \| string` | `"100%"` | Width of the editor. Numbers → px. Empty or unset → 100% of the parent. |
+| `mentionItems` | `MentionItem[]` | — | Item list for `@`-mention autocomplete. The Mention extension is only active when this prop or `onMentionSearch` is set. Used for client-side filtering when `onMentionSearch` is not provided. |
+| `mentionTriggerChar` | `string` | `"@"` | Character that opens the mention autocomplete popup |
 | `onBlur` | `() => void` | — | Called when the editor loses focus |
 | `onChange` | `(value: string) => void` | — | Called on every content change |
 | `onFocus` | `() => void` | — | Called when the editor gains focus |
 | `onMarkdownChange` | `(markdown: string) => void` | — | Called alongside `onChange` on every content change, with the content as Markdown |
+| `onMentionSearch` | `(query: string) => MentionItem[] \| Promise<MentionItem[]>` | — | Custom search/filter function for mentions. When provided, `mentionItems` is ignored for filtering — return the matching subset (supports async for server-side search) |
 
 ---
 
 ## TypeScript Types
+
+### `MentionItem`
+
+```ts
+type MentionItem = {
+  id: string;    // unique identifier stored as data-id in the HTML output
+  label: string; // display name shown in the dropdown and in the editor
+};
+```
 
 ### `RichTextEditorToolbarConfig`
 
@@ -215,6 +253,8 @@ type RichTextEditorTranslation = {
   markdownDialogCancel?:      string;
   markdownDialogCopy?:        string;
   markdownDialogCopied?:      string;
+  // Mention dropdown (mentionItems / onMentionSearch) — optional, see compatibility note below
+  mentionNoResults?:          string;
 };
 ```
 
@@ -224,7 +264,7 @@ English defaults:
 import { DEFAULT_RICH_TEXT_EDITOR_TRANSLATION } from '@thebuoyant-tsdev/mui-ts-library';
 ```
 
-> **⚠️ Compatibility note:** the 8 keys above (added in `v3.8.0`) are optional on this type — unlike the other keys, which are required. This is intentional: it lets older code that declares a full `RichTextEditorTranslation` literal (instead of passing a partial object to the `translation` prop) keep compiling without changes when we add new keys in the future. Internally, the component always resolves missing keys against `DEFAULT_RICH_TEXT_EDITOR_TRANSLATION`, so you never need to provide them.
+> **⚠️ Compatibility note:** the 9 keys above (8 added in `v3.8.0`, 1 in `v3.14.0`) are optional on this type — unlike the other keys, which are required. This is intentional: it lets older code that declares a full `RichTextEditorTranslation` literal (instead of passing a partial object to the `translation` prop) keep compiling without changes when we add new keys in the future. Internally, the component always resolves missing keys against `DEFAULT_RICH_TEXT_EDITOR_TRANSLATION`, so you never need to provide them.
 
 ---
 
@@ -235,6 +275,14 @@ import { DEFAULT_RICH_TEXT_EDITOR_TRANSLATION } from '@thebuoyant-tsdev/mui-ts-l
 ```html
 <h2>Title</h2><p>Text with <strong>bold</strong> and <em>italic</em>.</p>
 ```
+
+When mentions are active, each inserted mention is serialised as a `<span>` with data attributes:
+
+```html
+<p>Hello <span class="rte-mention" data-type="mention" data-id="alice" data-label="Alice Johnson">@Alice Johnson</span>!</p>
+```
+
+Your backend can parse `data-id` to resolve the referenced user/entity.
 
 ---
 
@@ -505,6 +553,109 @@ For a live export without opening the dialog, use `onMarkdownChange` — it fire
 
 ---
 
+## Mention (@)
+
+> **Since v3.14.0**
+
+### What does this feature do?
+
+When a user types `@` in the editor, a small dropdown appears with a list of names. The user can keep typing to filter the list, then click a name or press `Enter` to insert it. The mention appears highlighted in the text as `@Alice Johnson`. The feature works exactly like you know it from Slack, Notion, or Jira.
+
+**You are responsible for the list of names.** The library only draws the dropdown and handles the keyboard navigation — it does not search a database or call any API on its own. That is intentional: you keep full control over who can be mentioned and how the search works.
+
+---
+
+### Getting started — your first mention in 3 steps
+
+**Step 1 — Define your list of people**
+
+Each person needs an `id` (unique identifier, used internally) and a `label` (the name shown in the dropdown and in the text):
+
+```tsx
+// This list can come from anywhere: hardcoded, loaded from an API, from a Redux store…
+const TEAM: MentionItem[] = [
+  { id: "alice",   label: "Alice Johnson" },
+  { id: "bob",     label: "Bob Smith" },
+  { id: "carol",   label: "Carol Williams" },
+];
+```
+
+**Step 2 — Pass the list to the editor**
+
+```tsx
+<RichTextEditor
+  mentionItems={TEAM}   // <-- activates the @ feature
+  onChange={setContent} // called on every change, delivers the full HTML as a string
+/>
+```
+
+That's it. The `@` key now opens the dropdown. The library filters the list automatically as the user types — `@ali` narrows it down to "Alice Johnson".
+
+**Step 3 — Read the result**
+
+`onChange` gives you an HTML string. Mentions are saved inside it as a `<span>` with data attributes:
+
+```html
+<!-- What onChange delivers when "Hello @Alice Johnson" was typed: -->
+<p>
+  Hello
+  <span data-type="mention" data-id="alice" data-label="Alice Johnson">
+    @Alice Johnson
+  </span>
+</p>
+```
+
+The `data-id` attribute holds the value you set in Step 1 (`"alice"`). On your backend you use this id to look up the actual user — not the label, because labels can change (a user might rename themselves) while the id stays stable.
+
+---
+
+### Async / server-side search
+
+If your user list is large (thousands of entries), loading all of them upfront is inefficient. With `onMentionSearch` you can query your backend on every keystroke instead:
+
+```tsx
+// The library calls this function every time the user types after @
+// query = whatever was typed after @, e.g. "ali" when the user typed "@ali"
+const handleMentionSearch = async (query: string): Promise<MentionItem[]> => {
+  const res = await fetch(`/api/users?q=${encodeURIComponent(query)}`);
+  return res.json(); // your API must return { id: string; label: string }[]
+};
+
+// Note: mentionItems is not needed here — onMentionSearch replaces the built-in filter
+<RichTextEditor
+  onMentionSearch={handleMentionSearch}
+  onChange={setContent}
+/>
+```
+
+> **When to use which approach?**
+> - Small list (< a few hundred entries, loaded once): use `mentionItems` — simpler, no network call on every keystroke.
+> - Large list or fuzzy/ranked search: use `onMentionSearch` — you control the search logic entirely.
+
+---
+
+### Custom trigger character
+
+If `@` conflicts with another feature in your app, you can change the trigger character:
+
+```tsx
+<RichTextEditor
+  mentionItems={TEAM}
+  mentionTriggerChar="#"  // now # opens the dropdown instead of @
+/>
+```
+
+### Translating the "no results" label
+
+```tsx
+<RichTextEditor
+  mentionItems={TEAM}
+  translation={{ mentionNoResults: "No one found" }}
+/>
+```
+
+---
+
 ## Readonly and Disabled
 
 ```tsx
@@ -637,6 +788,7 @@ The editor border appears in `error.main` (MUI error color), and the `helperText
 |---|---|---|---|
 | `onChange` | `(value: string) => void` | Every user-driven content change (typing, formatting, paste, toolbar buttons) | Controlled mode state sync — update your `value` state here |
 | `onMarkdownChange` | `(markdown: string) => void` | Same as `onChange`, fired immediately after it | You need the content as Markdown without opening the Markdown dialog |
+| `onMentionSearch` | `(query: string) => MentionItem[] \| Promise<MentionItem[]>` | Every keystroke after `@` | Async/server-side mention search — replaces built-in client-side filter |
 | `onFocus` | `() => void` | The editor area gains keyboard focus | Highlighting an active editor, showing toolbars conditionally |
 | `onBlur` | `() => void` | The editor area loses keyboard focus | Triggering validation, auto-saving on leave |
 

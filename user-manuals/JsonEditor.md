@@ -8,6 +8,20 @@
 
 `JsonEditor` is a full-featured JSON code editor built on [CodeMirror 6](https://codemirror.net/) and Material UI. It provides real-time JSON validation with inline error markers, Format (pretty-print) and Compact (minify) buttons, and a validation status indicator in the footer — all wrapped in the same MUI Paper layout as `SqlEditor`.
 
+### What does this component do?
+
+The user sees an MUI Paper card with two zones:
+
+- **Toolbar** (top): Format JSON (pretty-print), Compact (minify), Copy, Clear, Undo/Redo.
+- **Editor area**: a CodeMirror JSON editor with:
+  - **Syntax highlighting**: property names in the primary color (bold), strings in green, numbers in yellow, booleans in info-blue, `null` in gray — all from your MUI theme.
+  - **Line numbers** and optional **fold arrows** (▾/▸) next to `{` and `[` to collapse/expand objects and arrays.
+  - **Wavy underlines** for syntax errors (e.g. missing comma, trailing comma, unclosed brace) — red underline, hover for the error message.
+  - **`Ctrl / Cmd ⌘+Click`** on any value or property key copies its full JSON path to the clipboard (e.g. `$.users[0].address.city`).
+- **Footer** (optional): cursor position + "Valid JSON" / "Invalid JSON" indicator.
+
+> **Compared to `SqlEditor`:** JsonEditor validates structure continuously — you get immediate visual feedback on invalid JSON without writing any linting code.
+
 **Typical use cases:**
 
 - API configuration panels in admin dashboards
@@ -60,18 +74,26 @@ import type {
 ## Quick Start
 
 ```tsx
+import { useState } from 'react';
 import { JsonEditor } from '@thebuoyant-tsdev/mui-ts-library';
 
 function App() {
+  const [json, setJson] = useState('{\n  "name": "Alice",\n  "age": 30\n}');
+
   return (
     <JsonEditor
-      placeholder="Enter JSON…"
-      showValidation
-      onChange={(json) => console.log(json)}
+      value={json}              // controlled: you own the JSON string
+      onChange={setJson}         // called on every change
+      showValidation             // shows "Valid JSON" / "Invalid JSON" in the footer
+      onValidChange={(isValid) => console.log('Valid:', isValid)} // fires when validity changes
+      // Toolbar: Format, Compact, Copy, Clear, Undo/Redo — all on by default
+      // Ctrl/Cmd+Click any value → copies its JSON path to clipboard
     />
   );
 }
 ```
+
+> **Minimal version** (no controlled state, no validation): `<JsonEditor onChange={(json) => console.log(json)} />` — a plain editor with toolbar and syntax highlighting. Add `showValidation`, `schema`, `onValidChange` as you need them.
 
 ---
 

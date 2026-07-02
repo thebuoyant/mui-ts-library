@@ -8,6 +8,28 @@
 
 Der `GanttChart` ist eine vollständig interaktive Projektplanungs-Komponente auf Basis von React und Material UI. Er visualisiert Aufgaben (Tasks) als Balken auf einer Zeitleiste und unterstützt hierarchische Strukturen, Abhängigkeiten zwischen Tasks, Drag & Drop, Inline-Bearbeitung sowie einen kritischen-Pfad-Modus.
 
+### Was macht diese Komponente?
+
+Der Nutzer sieht **zwei Bereiche nebeneinander**:
+
+- **Linkes Panel — Aufgabenliste:** Task-Namen in einer hierarchischen Liste. Unteraufgaben werden eingerückt unter dem Elterntask angezeigt. Jede Zeile zeigt einen Status-Chip (Planned / In Progress / Done / Blocked) sowie Aktions-Icons (Unteraufgabe hinzufügen, Bearbeiten, Löschen). Die Trennlinie zwischen Panel und Zeitleiste ist per Drag verschiebbar.
+- **Rechts — die Zeitleiste:** Horizontale Balken ("Gantt-Balken"), die sich über ein Datumsgitter erstrecken. Die linke Balkenkante entspricht dem Startdatum, die rechte dem Enddatum. Die Farbe spiegelt den Task-Status wider (oder eine eigene Farbe, wenn `color` gesetzt ist). Eine gestrichelte vertikale Linie markiert den heutigen Tag.
+- **Toolbar** (oben): Zeitskalenbuttons (Tage / Wochen / Monate / Quartale), Datumseingaben zum Verschieben des sichtbaren Bereichs, Alle auf-/zuklappen und ein „Zum heutigen Tag"-Button.
+
+**Optionale Funktionen, die aktiviert werden können:**
+
+| Funktion | Was der Nutzer sieht |
+|---|---|
+| `draggable` | Balken nach links/rechts ziehen — verschiebt Start- und Enddatum gemeinsam |
+| `resizable` | Rechten Balkenrand ziehen — verlängert das Enddatum |
+| `progressDraggable` | Kleiner Handle am Balken — Fertigstellungsgrad (0–100 %) per Drag setzen |
+| `inlineEdit` | Doppelklick auf einen Task-Namen im Panel — direkt umbenennen |
+| `showCriticalPath` | Die längste Abhängigkeitskette wird farblich hervorgehoben — sie bestimmt, wann das Projekt fertig wird |
+| `cascadeDependencies` | Verschiebt einen Task → alle Nachfolger verschieben sich automatisch um denselben Zeitraum |
+| `zoomable` | `Strg / Cmd ⌘+Scroll` wechselt die Zeitskala |
+
+Rechtsklick auf einen Balken öffnet ein **Kontextmenü** zum direkten Ändern des Status — ohne Dialog.
+
 **Typische Einsatzgebiete:**
 
 - Projektmanagement-Anwendungen (Sprint-Planung, Release-Roadmaps)
@@ -60,17 +82,19 @@ import type {
 import { GanttChart } from '@thebuoyant-tsdev/mui-ts-library';
 import type { GanttTask } from '@thebuoyant-tsdev/mui-ts-library';
 
+// Ein flaches Array — die Hierarchie wird intern aus den parentId-Referenzen aufgebaut.
 const tasks: GanttTask[] = [
   {
-    id: 'projekt',
+    id: 'projekt',              // eindeutige ID — als React-Key und für Abhängigkeiten
     name: 'Webseite Relaunch',
-    status: 'in-progress',
+    status: 'in-progress',      // steuert Balkenfarbe und Status-Chip
     startDate: new Date('2025-01-01'),
     endDate: new Date('2025-06-30'),
+    // kein parentId → Root-Task (oberste Ebene)
   },
   {
     id: 'design',
-    parentId: 'projekt',
+    parentId: 'projekt',        // Kind von 'projekt' oben → eingerückt im Task-Panel
     name: 'Design-Phase',
     status: 'done',
     startDate: new Date('2025-01-01'),
@@ -83,7 +107,8 @@ const tasks: GanttTask[] = [
     status: 'in-progress',
     startDate: new Date('2025-03-01'),
     endDate: new Date('2025-05-31'),
-    dependencies: ['design'],
+    dependencies: ['design'],   // 'design' muss fertig sein, bevor 'entwicklung' starten kann
+                                // → Abhängigkeitspfeil in der Zeitleiste; verhindert Zyklen im Dialog
   },
 ];
 
@@ -91,12 +116,15 @@ function App() {
   return (
     <GanttChart
       tasks={tasks}
-      timeScale="months"
+      timeScale="months" // initialer Zoom — Nutzer kann über Toolbar wechseln
       height={400}
     />
   );
 }
 ```
+
+> **Erster Schritt fertig.** Dies rendert einen schreibgeschützten Chart mit eingebauten Dialogen für Hinzufügen/Bearbeiten/Löschen. `draggable resizable onTasksChange={setTasks}` hinzufügen für einen vollständig interaktiven Chart — siehe [Anwendungsbeispiele](#anwendungsbeispiele).
+
 
 ---
 
@@ -104,7 +132,9 @@ function App() {
 
 ### Datenstruktur: `GanttTask`
 
-Jede Aufgabe wird als `GanttTask`-Objekt übergeben. Die `tasks`-Prop erwartet ein flaches Array — die Hierarchie wird intern aus `parentId`-Referenzen aufgebaut.
+Jede Aufgabe wird als `GanttTask`-Objekt übergeben. Die `tasks`-Prop erwartet ein **flaches Array** — Kinder werden nicht in Eltern verschachtelt. Stattdessen bekommt jedes Kind eine `parentId`, die auf die `id` des Elterntasks zeigt. Die Komponente baut den Baum intern aus diesen Referenzen auf.
+
+> **Mentales Modell:** Stell dir eine Tabelle vor, in der jede Zeile eine "Elternzeile"-Spalte hat. Die Zeilen bleiben flach, aber die Komponente rendert sie als Baum.
 
 | Feld | Typ | Pflicht | Beschreibung |
 |---|---|---|---|
@@ -119,6 +149,8 @@ Jede Aufgabe wird als `GanttTask`-Objekt übergeben. Die `tasks`-Prop erwartet e
 | `progress` | `number` | Nein | Fortschritt in Prozent (0–100). Wird als halbopaker Overlay-Balken über den Task-Balken gerendert. Interaktiv wenn `progressDraggable={true}`. |
 | `color` | `string` | Nein | Überschreibt die statusbasierte Balkenfarbe für diesen einzelnen Task (höchste Priorität). Beliebiger CSS-Farbwert (z. B. `"#e91e63"` oder `"rgb(0,150,136)"`). |
 | `assignee` | `string` | Nein | Person oder Team, das für den Task verantwortlich ist — wird in der Assignee-Spalte angezeigt, wenn `showAssigneeColumn={true}`. |
+
+> **Wie Abhängigkeiten in der Praxis funktionieren:** Angenommen "Entwicklung" hat `dependencies: ['design']`. In der Zeitleiste verbindet ein Pfeil die rechte Kante des "Design"-Balkens mit der linken Kante des "Entwicklung"-Balkens — sichtbar: "das kann erst starten, wenn jenes fertig ist." Mit `cascadeDependencies={true}` verschiebt sich "Entwicklung" automatisch um denselben Zeitraum, wenn "Design" per Drag zwei Wochen später gelegt wird — und alle Tasks, die von "Entwicklung" abhängen, ebenfalls (transitiv).
 
 **TypeScript-Typen:**
 
@@ -310,6 +342,18 @@ const ganttTheme: GanttTheme = {
 | `onExportCSV` | `(csv: string, tasks: GanttTask[]) => void` | CSV-Export-Button geklickt — ohne Callback: automatischer Browser-Download `gantt-tasks.csv` | Eigener Export (Server-Upload, eigener Dateiname) |
 
 > **Tipp — `onTasksChange` vs. spezifische Callbacks:** Für einfache Datenspeicherung reicht `onTasksChange` allein aus. Die spezifischen Callbacks (`onTaskCreated`, `onTaskUpdated` etc.) sind für Anwendungen gedacht, die auf bestimmte Aktionen unterschiedlich reagieren müssen (z. B. separate API-Calls für Create/Update/Delete).
+
+---
+
+### Eingebaute Dialoge vs. eigene (`enableBuiltinDialogs`)
+
+| | `enableBuiltinDialogs={true}` (Standard) | `enableBuiltinDialogs={false}` |
+|---|---|---|
+| **Was öffnet** | MUI-Dialoge für Hinzufügen / Bearbeiten / Löschen (eingebaut) | Nichts — du übernimmst die Steuerung |
+| **Callbacks** | `onTaskCreated`, `onTaskUpdated`, `onTaskDeleted`, `onTasksChange` | `onAddTask`, `onEditTask`, `onDeleteTask` |
+| **Verwenden wenn** | Du eine funktionierende UI ohne eigene Formulare willst | Du eigenes Design, Drawer oder spezielle Validierung brauchst |
+
+**Faustregel:** Mit `enableBuiltinDialogs={true}` starten. Auf `false` nur wechseln, wenn du eigene Formularfelder, ein eigenes Design oder eine spezielle Validierung benötigst, die der eingebaute Dialog nicht abdecken kann.
 
 ---
 
@@ -592,6 +636,25 @@ Bei `zoomable={true}` kann der Nutzer direkt in der Timeline durch die Zoom-Stuf
 ```
 
 `zoomable` ist standardmäßig `false`, um unbeabsichtigtes Zoomen beim Scrollen der Seite zu vermeiden.
+
+---
+
+## Kritischer Pfad verstehen
+
+> **Neu im Projektmanagement?** Der kritische Pfad ist die längste ununterbrochene Kette abhängiger Tasks vom Projektstart bis zum Projektende. Jede Verzögerung auf dem kritischen Pfad verzögert das gesamte Projekt — Tasks außerhalb des kritischen Pfads haben „Puffer" und können sich leicht verschieben, ohne das Enddatum zu beeinflussen.
+
+```tsx
+// Kritischen Pfad visuell hervorheben
+<GanttChart
+  tasks={tasks}
+  showCriticalPath
+  ganttTheme={{ criticalPathColor: '#e53935' }} // Standard: MUI error.main
+/>
+```
+
+**Wie er berechnet wird:** Die Komponente findet die Task-Kette, bei der die Summe der Laufzeiten (von der ersten bis zur letzten Abhängigkeit) am längsten ist. Tasks auf dieser Kette werden hervorgehoben — alle anderen nicht.
+
+**Praktischer Tipp:** Wenn ein Task auf dem kritischen Pfad in Verzug gerät, braucht er sofortige Aufmerksamkeit — er schiebt das Projekt-Enddatum direkt nach hinten. Tasks außerhalb des kritischen Pfads haben Spielraum und können vorübergehend niedriger priorisiert werden.
 
 ---
 

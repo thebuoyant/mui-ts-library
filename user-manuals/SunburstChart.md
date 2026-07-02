@@ -8,6 +8,16 @@
 
 The `SunburstChart` visualizes **hierarchical data as concentric rings** — the root node sits at the center, and each depth level forms one ring around it. Segment sizes are proportional to their values. It is the first component in the **D3 Charts family** of this library.
 
+### What does this component do?
+
+The user sees a circular diagram: a label at the center (the root, or the current drill-down focus), surrounded by a series of concentric rings. Each ring is one level of the hierarchy. Segments within a ring are sized proportionally to their `value` — a department with twice the budget gets an arc twice as wide.
+
+**Hovering** a segment shows a tooltip with name, value, percentage share of the total, and the full breadcrumb path (e.g. "Company → Engineering → Frontend").
+
+**Drill-down** (`Ctrl / Cmd ⌘+Click`): clicking a segment with the modifier key zooms in — that segment slides to the center and only its descendants are shown. The center label updates to reflect the current focus. `Ctrl / Cmd ⌘+Click` on the center (or `Ctrl / Cmd ⌘+Double-click`, or `Escape`) zooms back out.
+
+> **Key insight:** only **leaf nodes** need a `value`. Parent nodes aggregate their children's values automatically via D3 — you never need to compute sums yourself.
+
 **Typical use cases:**
 
 - Budget or cost breakdowns by department and category
@@ -64,11 +74,13 @@ import { SunburstChart } from '@thebuoyant-tsdev/mui-ts-library';
 import type { SunburstChartData } from '@thebuoyant-tsdev/mui-ts-library';
 
 const data: SunburstChartData = {
+  // The root node — shown in the center. Does NOT need a value (D3 sums children).
   id: 'company', name: 'Company',
   children: [
     {
-      id: 'engineering', name: 'Engineering',
+      id: 'engineering', name: 'Engineering', // inner ring segment — also no value needed
       children: [
+        // Leaf nodes need a value → controls arc width (proportional to siblings)
         { id: 'frontend', name: 'Frontend', value: 480 },
         { id: 'backend',  name: 'Backend',  value: 620 },
         { id: 'devops',   name: 'DevOps',   value: 210 },
@@ -88,8 +100,10 @@ function App() {
   return (
     <SunburstChart
       data={data}
-      size={500}
+      size={500}                 // SVG width & height in px
       onSegmentClick={(info) => console.log(info.path, info.value)}
+      // Ctrl/Cmd+Click to drill into a segment (zoom in)
+      // Ctrl/Cmd+Click center label to zoom back out — or press Escape
     />
   );
 }

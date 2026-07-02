@@ -13,6 +13,28 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [3.14.0] — 2026-07-02
+
+### Hinzugefügt
+
+#### RichTextEditor — Mention (@) Autocomplete
+
+`@`-getriggerte Autocomplete-Liste für Personen-/Entitäts-Mentions nach dem Tiptap-Mention-Extension-Pattern — die Bibliothek liefert die vollständige UI, der Consumer stellt die Daten bereit.
+
+- **`mentionItems?: MentionItem[]`** — statische Liste für clientseitige Filterung (Substring-Match ohne Groß-/Kleinschreibung während der Eingabe). Die Mention-Extension wird nur aktiviert wenn diese Prop oder `onMentionSearch` gesetzt ist.
+- **`onMentionSearch?: (query: string) => MentionItem[] | Promise<MentionItem[]>`** — ersetzt die eingebaute Filterung wenn angegeben (async-kompatibel für serverseitige Suche). Item-Updates werden über eine Ref geleitet — die Extension wird bei Item-Änderungen nicht neu erzeugt.
+- **`mentionTriggerChar?: string`** (Standard: `"@"`) — eigenes Trigger-Zeichen.
+- **`translation.mentionNoResults?: string`** (Standard: `"No results"`) — Label im Dropdown wenn keine Treffer vorhanden.
+- Dropdown-UI: MUI `Popper` + `Paper` + `MenuList`, an der Cursor-Position verankert. Kein zusätzliches CSS-Dependency, kein Tippy.js.
+- Tastaturnavigation: `↑`/`↓` zum Navigieren, `Enter` zum Einfügen, `Escape` zum Schließen.
+- HTML-Ausgabe: jede Mention wird als `<span class="rte-mention" data-type="mention" data-id="…" data-label="…">@Name</span>` serialisiert — `data-id` im Backend auslesen um die referenzierte Entität aufzulösen.
+- Neue Peer-Dependency: `@tiptap/extension-mention@^3.23.6` (passend zur bereits in dieser Bibliothek gepinnten Tiptap-Version).
+- 13 neue Tests: 4 Integrationstests auf `RichTextEditor` (Smoke-Tests: Editor mountet fehlerfrei mit/ohne Mention-Props und mit Custom-Config), plus 9 Unit-Tests auf `RichTextEditorMentionList` für leeren Zustand, Item-Rendering, Klick-Auswahl, Popper offen/geschlossen, Tastaturnavigation (ArrowUp/Down, Enter), Rückgabewerte der Key-Handler und Index-Reset bei Item-Änderungen.
+
+Neuer `MentionItem`-Typ wird aus dem Bibliotheks-Root exportiert.
+
+---
+
 ## [3.13.0] — 2026-06-29
 
 ### Hinzugefügt

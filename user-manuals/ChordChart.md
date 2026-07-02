@@ -8,6 +8,20 @@
 
 The `ChordChart` visualizes **flows between named groups** as a circular diagram — groups are represented as arc segments around the circle, and the flows between them as ribbons connecting the arcs. It is the second component in the **D3 Charts family**.
 
+### What does this component do?
+
+The user sees a circular diagram where each group appears as a labeled arc segment around the outside of the circle. Colored **ribbons** (bands) connect the arcs, showing how much flows from one group to another. The wider a ribbon, the larger the flow.
+
+**Hover** over an arc group: all ribbons belonging to that group light up, while unrelated ribbons dim — making it easy to see what a single group connects to. A tooltip shows the group name plus its total outgoing and incoming values.
+
+**Hover** over a ribbon: the tooltip shows source → target and the flow values in both directions.
+
+**Key concept — `directed` vs. `directed={false}`:**
+- `directed={true}` (default): ribbons have an arrowhead at the target end — use when the flow has a clear direction (e.g. "Frontend calls Backend").
+- `directed={false}`: symmetric ribbons with no arrowhead — use when the relationship is mutual (e.g. "number of shared employees between teams").
+
+> **How the data works:** you don't define groups explicitly — each unique string that appears as `source` or `target` automatically becomes a group. A pair like `{ source: 'Frontend', target: 'Backend', value: 45 }` means "45 units flow from Frontend to Backend."
+
 **Typical use cases:**
 
 - Team or module dependency maps
@@ -53,9 +67,11 @@ import type {
 import { ChordChart } from '@thebuoyant-tsdev/mui-ts-library';
 import type { ChordChartData } from '@thebuoyant-tsdev/mui-ts-library';
 
+// Each entry is one directed flow: "source sends value to target"
+// Unique strings in source/target become group arcs automatically — no separate group definition needed.
 const data: ChordChartData[] = [
-  { source: 'Frontend',  target: 'Backend',  value: 45 },
-  { source: 'Backend',   target: 'Frontend', value: 20 },
+  { source: 'Frontend',  target: 'Backend',  value: 45 }, // 45 units flow from Frontend → Backend
+  { source: 'Backend',   target: 'Frontend', value: 20 }, // and 20 units back — creates a two-way ribbon
   { source: 'Backend',   target: 'DevOps',   value: 35 },
   { source: 'DevOps',    target: 'Backend',  value: 12 },
 ];
@@ -64,7 +80,7 @@ function App() {
   return (
     <ChordChart
       data={data}
-      size={500}
+      size={500}                 // SVG width & height in px
       onGroupClick={(info) => console.log(info.name, info.valueOut)}
       onChordClick={(info) => console.log(info.source.name, '→', info.target.name)}
     />

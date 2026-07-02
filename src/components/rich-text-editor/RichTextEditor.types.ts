@@ -1,3 +1,8 @@
+export type MentionItem = {
+  id: string;
+  label: string;
+};
+
 export type RichTextEditorToolbarConfig = {
   showBold?:             boolean;
   showItalic?:           boolean;
@@ -128,6 +133,8 @@ export type RichTextEditorTranslation = {
   markdownDialogCopy?:        string;
   /** @since 3.8.0 */
   markdownDialogCopied?:      string;
+  /** Text shown in mention dropdown when no items match the query @since 3.14.0 */
+  mentionNoResults?:          string;
 };
 
 export const DEFAULT_RICH_TEXT_EDITOR_TRANSLATION: Required<RichTextEditorTranslation> = {
@@ -187,6 +194,7 @@ export const DEFAULT_RICH_TEXT_EDITOR_TRANSLATION: Required<RichTextEditorTransl
   markdownDialogCancel:      "Cancel",
   markdownDialogCopy:        "Copy",
   markdownDialogCopied:      "Copied!",
+  mentionNoResults:          "No results",
 };
 
 export type RichTextEditorProps = {
@@ -209,6 +217,24 @@ export type RichTextEditorProps = {
   value?:              string;
   /** Breite des Editors. Zahlen → px. "auto" oder leer → 100% des Elternelements. */
   width?:              number | string;
+  /**
+   * List of items for @-mention autocomplete. The Mention extension is only active when this prop is provided.
+   * Used for client-side filtering when `onMentionSearch` is not provided.
+   * @since 3.14.0
+   */
+  mentionItems?: MentionItem[];
+  /**
+   * Custom search/filter function called on each keystroke after @.
+   * When provided, `mentionItems` is ignored for filtering — return the relevant subset.
+   * Supports async for server-side search.
+   * @since 3.14.0
+   */
+  onMentionSearch?: (query: string) => MentionItem[] | Promise<MentionItem[]>;
+  /**
+   * Character that triggers the mention autocomplete popup. Default: "@"
+   * @since 3.14.0
+   */
+  mentionTriggerChar?: string;
   // Callbacks
   onBlur?:   () => void;
   onChange?:  (value: string) => void;

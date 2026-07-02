@@ -8,6 +8,28 @@
 
 The `GanttChart` is a fully interactive project planning component built on React and Material UI. It visualizes tasks as bars on a timeline and supports hierarchical structures, task dependencies, drag & drop, inline editing, and a critical path mode.
 
+### What does this component do?
+
+The user sees **two panes side by side**:
+
+- **Left panel — task list:** Task names in a hierarchical list. Child tasks are indented below their parent. Each row shows a status chip (Planned / In Progress / Done / Blocked) and action icons (Add subtask, Edit, Delete). The user can drag the divider to resize the panel.
+- **Right side — the timeline:** Horizontal bars ("Gantt bars") stretching across a date grid. The bar's left edge is the start date; the right edge is the end date. Bar color reflects the task status (or a custom color per task). A dashed vertical line marks today.
+- **Toolbar** (at the top): time-scale buttons (Days / Weeks / Months / Quarters), date inputs to pan the visible range, Expand all / Collapse all, and a "Scroll to today" button.
+
+**Optional features you can enable:**
+
+| Feature | What the user sees |
+|---|---|
+| `draggable` | Drag a bar left/right to shift both dates at once |
+| `resizable` | Drag the right edge of a bar to extend the end date |
+| `progressDraggable` | A small handle on the bar to set completion % by dragging |
+| `inlineEdit` | Double-click a task name in the panel to rename it in place |
+| `showCriticalPath` | The longest dependency chain is highlighted — it controls when the whole project finishes |
+| `cascadeDependencies` | Moving a task automatically shifts all its dependents by the same amount |
+| `zoomable` | `Ctrl / Cmd ⌘+Scroll` cycles through time scales |
+
+Right-clicking a task bar opens a **context menu** to change its status without opening a dialog.
+
 **Typical use cases:**
 
 - Project management applications (sprint planning, release roadmaps)
@@ -60,17 +82,19 @@ import type {
 import { GanttChart } from '@thebuoyant-tsdev/mui-ts-library';
 import type { GanttTask } from '@thebuoyant-tsdev/mui-ts-library';
 
+// You pass a flat array — the component builds the visual tree from parentId references.
 const tasks: GanttTask[] = [
   {
-    id: 'project',
+    id: 'project',           // unique id — used as React key and for dependency references
     name: 'Website Relaunch',
-    status: 'in-progress',
+    status: 'in-progress',   // controls bar color and status chip
     startDate: new Date('2025-01-01'),
     endDate: new Date('2025-06-30'),
+    // no parentId → this is a root (top-level) task
   },
   {
     id: 'design',
-    parentId: 'project',
+    parentId: 'project',     // child of 'project' above → shown indented in the task panel
     name: 'Design Phase',
     status: 'done',
     startDate: new Date('2025-01-01'),
@@ -83,7 +107,8 @@ const tasks: GanttTask[] = [
     status: 'in-progress',
     startDate: new Date('2025-03-01'),
     endDate: new Date('2025-05-31'),
-    dependencies: ['design'],
+    dependencies: ['design'], // 'design' must finish before 'development' can start
+                              // shown as an arrow in the timeline; prevents cycle creation in dialogs
   },
 ];
 
@@ -91,12 +116,15 @@ function App() {
   return (
     <GanttChart
       tasks={tasks}
-      timeScale="months"
+      timeScale="months" // initial zoom level — user can switch via toolbar
       height={400}
     />
   );
 }
 ```
+
+> **Step 1 done.** This renders a read-only chart with built-in dialogs for adding/editing/deleting tasks. Add `draggable resizable onTasksChange={setTasks}` to make it fully interactive — see [Usage Examples](#usage-examples).
+
 
 ---
 
@@ -104,7 +132,9 @@ function App() {
 
 ### Data structure: `GanttTask`
 
-Each task is passed as a `GanttTask` object. The `tasks` prop expects a flat array — the hierarchy is built internally from `parentId` references.
+Each task is passed as a `GanttTask` object. The `tasks` prop expects a **flat array** — you don't nest children inside parents. Instead, you give each child a `parentId` that points to its parent's `id`. The component builds the visual tree from these references internally.
+
+> **Example mental model:** think of it like a spreadsheet where each row has a "parent row" column. The rows stay flat, but the component draws them as a tree.
 
 | Field | Type | Required | Description |
 |---|---|---|---|
@@ -119,6 +149,8 @@ Each task is passed as a `GanttTask` object. The `tasks` prop expects a flat arr
 | `progress` | `number` | No | Progress in percent (0–100). Rendered as a semi-transparent overlay bar on top of the task bar. Interactive when `progressDraggable={true}`. |
 | `color` | `string` | No | Overrides the status-based bar color for this individual task (highest priority). Any CSS color value (e.g. `"#e91e63"` or `"rgb(0,150,136)"`). |
 | `assignee` | `string` | No | Person or team responsible for the task — shown in the Assignee column when `showAssigneeColumn={true}`. |
+
+> **How dependencies work in practice:** Say "Development" has `dependencies: ['design']`. In the timeline, an arrow connects the right edge of the "Design" bar to the left edge of the "Development" bar — visually showing "this can't start before that ends." With `cascadeDependencies={true}`, if you drag "Design" two weeks later, "Development" automatically moves two weeks later too (and any task that depends on "Development" moves as well, transitively).
 
 **TypeScript types:**
 
@@ -310,6 +342,18 @@ const ganttTheme: GanttTheme = {
 | `onExportCSV` | `(csv: string, tasks: GanttTask[]) => void` | CSV export button clicked — when not provided, the chart triggers a browser download of `gantt-tasks.csv` automatically | Custom export handling (upload to server, custom filename) |
 
 > **Tip — `onTasksChange` vs. specific callbacks:** For simple data persistence, `onTasksChange` alone is sufficient. The specific callbacks (`onTaskCreated`, `onTaskUpdated`, etc.) are intended for applications that need to react differently to specific actions (e.g. separate API calls for Create/Update/Delete).
+
+---
+
+### Built-in dialogs vs. your own (`enableBuiltinDialogs`)
+
+| | `enableBuiltinDialogs={true}` (default) | `enableBuiltinDialogs={false}` |
+|---|---|---|
+| **What opens** | MUI dialogs for Add / Edit / Delete (built-in) | Nothing — you handle it yourself |
+| **Callbacks** | `onTaskCreated`, `onTaskUpdated`, `onTaskDeleted`, `onTasksChange` | `onAddTask`, `onEditTask`, `onDeleteTask` |
+| **Use when** | You want a working UI without building your own forms | You have a custom design, side-drawer, or validation logic |
+
+**Rule of thumb:** start with `enableBuiltinDialogs={true}`. Switch to `false` only when you need custom form fields, your own design, or specific validation that the built-in dialog can't cover.
 
 ---
 
@@ -592,6 +636,25 @@ When `zoomable={true}`, the user can cycle through zoom levels directly in the t
 ```
 
 `zoomable` is `false` by default to avoid accidental zoom while scrolling the page.
+
+---
+
+## Understanding Critical Path
+
+> **New to project planning?** The critical path is the longest unbroken chain of dependent tasks from project start to project end. Any delay on the critical path delays the whole project — tasks off the critical path have "slack" and can slip without affecting the final deadline.
+
+```tsx
+// Enable visual critical path highlighting
+<GanttChart
+  tasks={tasks}
+  showCriticalPath
+  ganttTheme={{ criticalPathColor: '#e53935' }} // default: MUI error.main
+/>
+```
+
+**How it's calculated:** the component finds the task chain where the sum of durations (from the first dependency to the last) is the longest. Tasks on this chain are highlighted; all others are not.
+
+**Practical tip:** if you see a task on the critical path that's falling behind, it needs immediate attention — it will push back the project end date. Tasks not on the critical path have buffer room and can be de-prioritized temporarily.
 
 ---
 

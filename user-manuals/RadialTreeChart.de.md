@@ -8,6 +8,18 @@
 
 Der `RadialTreeChart` stellt hierarchische Daten als kreisförmigen radialen Baum auf Basis von [D3 v7](https://d3js.org) dar. Die Wurzel sitzt im Zentrum, Kindknoten strahlen nach außen in Ringen. Jeder Knoten kann ein Icon haben, und ein Klick kann ein eingebautes MUI-Popover mit Knotendetails öffnen. Er ist die dritte Komponente der **D3-Charts-Familie**.
 
+### Was macht diese Komponente?
+
+Der Nutzer sieht ein kreisförmiges Baumdiagramm: Der Wurzelknoten sitzt als farbiger Kreis im Zentrum, Kindknoten strahlen nach außen wie Speichen eines Rades. Jeder Ring nach außen ist eine Hierarchieebene tiefer. Knoten sind durch geschwungene Linien verbunden. Jeder Kreis enthält ein kleines Icon — ein Ordner-Icon für Ast-Knoten (mit Kindern), ein Personen-Icon für Blattknoten.
+
+**Hover** auf einen Knoten: ein MUI-Tooltip erscheint mit Name, Subname und optionalen Datenwerten.
+
+**Klick** auf einen Knoten: löst `onNodeClick` aus. Mit `showNodePopover` öffnet sich zusätzlich eine eingebaute Karte mit Knotendetails (Avatar, Name, Subname, Sonderwerte).
+
+**Drill-Down** (`Ctrl / Cmd ⌘+Klick`): dieser Knoten wird zum neuen Zentrum — nur sein Teilbaum wird angezeigt. Nützlich bei großen, tiefen Bäumen. `Ctrl / Cmd ⌘+Doppelklick` oder `Escape` zoomt wieder heraus.
+
+> **Unterschied zum `HorizontalTreeChart`:** RadialTree wächst in alle Richtungen (360°) vom Zentrum aus — ideal wenn keine einzelne Richtung bevorzugt wird und ein radiales/Spinnen-Layout die Hierarchie natürlich vermittelt. HorizontalTreeChart wächst linear in eine Richtung.
+
 **Typische Einsatzgebiete:**
 
 - Organigramme und Berichts-Hierarchien
@@ -60,16 +72,19 @@ import { RadialTreeChart } from '@thebuoyant-tsdev/mui-ts-library';
 import type { RadialTreeChartData } from '@thebuoyant-tsdev/mui-ts-library';
 
 const data: RadialTreeChartData = {
-  id: 'ceo', name: 'CEO', subname: 'Führung',
+  // Wurzelknoten — der Mittelkreis. id ist Pflicht (intern für Drill-Down-Tracking).
+  id: 'ceo', name: 'CEO',
+  subname: 'Führung',         // subname erscheint unter dem Namen im Tooltip und Popover
   children: [
     {
       id: 'cto', name: 'CTO', subname: 'Technologie',
       children: [
+        // specialValueA und specialValueB sind eigene Datenfelder — erscheinen in Tooltip & Popover
         { id: 'fe', name: 'Frontend Lead', specialValueA: 'L2', specialValueB: '8 Berichte' },
         { id: 'be', name: 'Backend Lead',  specialValueA: 'L2', specialValueB: '6 Berichte' },
       ],
     },
-    { id: 'cpo', name: 'CPO', subname: 'Produkt' },
+    { id: 'cpo', name: 'CPO', subname: 'Produkt' }, // Blattknoten (keine Kinder) — Personen-Icon
   ],
 };
 
@@ -77,8 +92,8 @@ function App() {
   return (
     <RadialTreeChart
       data={data}
-      size={600}
-      showNodePopover
+      size={600}                 // SVG-Breite & -Höhe in px
+      showNodePopover            // eingebaute Karte mit Knotendetails bei Klick öffnen
       onNodeClick={(info) => console.log(info.name, info.depth)}
     />
   );
