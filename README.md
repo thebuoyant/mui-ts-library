@@ -40,6 +40,7 @@ A type-safe React component library built on **TypeScript** and **MUI (Material 
 | [`RadialTreeChart`](#radialtreechart) | Org charts and taxonomies as a radial tree, with drill-down | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-radialtreechart--default) · [Docs](user-manuals/RadialTreeChart.md) |
 | [`CirclePackingChart`](#circlepackingchart) | Nested circles with animated zoom — storage and hierarchy at a glance | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-circlepackingchart--default) · [Docs](user-manuals/CirclePackingChart.md) |
 | [`HorizontalTreeChart`](#horizontaltreechart) | Decision trees and hierarchies in 4 orientations (LR/RL/TB/BT) | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-horizontaltreechart--default) · [Docs](user-manuals/HorizontalTreeChart.md) |
+| [`RadialStackedBarChart`](#radialstackedbarchart) | Multi-series stacked bars in a radial layout — compare categories across segments | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-radialstackedbarchart--default) · [Docs](user-manuals/RadialStackedBarChart.md) |
 
 All charts share Ctrl / Cmd ⌘+Scroll zoom and full MUI theme integration (dark mode included).
 
@@ -375,6 +376,43 @@ const data: HorizontalTreeData = {
 
 ---
 
+### RadialStackedBarChart
+
+Multi-series stacked bar chart in a polar (radial) layout. Each bar segment represents one data point, each arc layer represents one series — ideal for comparing quarterly figures, budget breakdowns, or any multi-category totals across a set of items. Concentric grid rings give a visual scale; an auto-centered legend is built in. `Ctrl / Cmd ⌘+Scroll` zooms the chart.
+
+```tsx
+import { RadialStackedBarChart } from '@thebuoyant-tsdev/mui-ts-library';
+import type {
+  RadialStackedBarData,
+  RadialStackedBarSeries,
+} from '@thebuoyant-tsdev/mui-ts-library';
+
+const keys: RadialStackedBarSeries[] = [
+  { key: 'q1', label: 'Q1' },
+  { key: 'q2', label: 'Q2' },
+  { key: 'q3', label: 'Q3' },
+  { key: 'q4', label: 'Q4' },
+];
+
+const data: RadialStackedBarData[] = [
+  { id: 'berlin',  label: 'Berlin',  values: { q1: 120, q2: 145, q3: 98,  q4: 175 } },
+  { id: 'hamburg', label: 'Hamburg', values: { q1: 95,  q2: 110, q3: 130, q4: 88  } },
+  { id: 'munich',  label: 'Munich',  values: { q1: 200, q2: 185, q3: 210, q4: 230 } },
+];
+
+<RadialStackedBarChart
+  data={data}
+  keys={keys}
+  size={480}
+  sortBy="value"
+  onBarClick={(info) => console.log(info.label, info.seriesKey, info.value)}
+/>
+```
+
+→ [Full documentation](user-manuals/RadialStackedBarChart.md)
+
+---
+
 ## TypeScript
 
 All types and defaults are exported directly — no separate `@types/...` package needed.
@@ -413,6 +451,9 @@ import type {
 
   // HorizontalTreeChart
   HorizontalTreeData, HorizontalTreeNodeInfo, HorizontalTreeOrientation,
+
+  // RadialStackedBarChart
+  RadialStackedBarData, RadialStackedBarSeries, RadialStackedBarClickInfo,
 } from '@thebuoyant-tsdev/mui-ts-library';
 ```
 

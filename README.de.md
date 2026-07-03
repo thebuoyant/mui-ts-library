@@ -40,6 +40,7 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 | [`RadialTreeChart`](#radialtreechart) | Org-Charts und Taxonomien als radialer Baum, mit Drill-Down | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-radialtreechart--default) · [Docs](user-manuals/RadialTreeChart.de.md) |
 | [`CirclePackingChart`](#circlepackingchart) | Verschachtelte Kreise mit animiertem Zoom — Speicher und Hierarchie auf einen Blick | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-circlepackingchart--default) · [Docs](user-manuals/CirclePackingChart.de.md) |
 | [`HorizontalTreeChart`](#horizontaltreechart) | Entscheidungsbäume und Hierarchien in 4 Orientierungen (LR/RL/TB/BT) | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-horizontaltreechart--default) · [Docs](user-manuals/HorizontalTreeChart.de.md) |
+| [`RadialStackedBarChart`](#radialstackedbarchart) | Mehrreihige gestapelte Balken in polarem Layout — Kategorien über Segmente vergleichen | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-radialstackedbarchart--default) · [Docs](user-manuals/RadialStackedBarChart.de.md) |
 
 Alle Charts teilen sich Ctrl / Cmd ⌘+Scroll-Zoom und vollständige MUI-Theme-Integration (Dark Mode inklusive).
 
@@ -375,6 +376,43 @@ const data: HorizontalTreeData = {
 
 ---
 
+### RadialStackedBarChart
+
+Mehrreihiges gestapeltes Balkendiagramm in polarem Layout. Jedes Balkensegment repräsentiert einen Datenpunkt, jede Bogen-Ebene eine Datenreihe — ideal für Quartalsvergleiche, Budgetaufschlüsselungen oder mehrere Kategorien über eine Menge von Einträgen. Konzentrische Gitterringe geben visuelle Skala; eine automatisch zentrierte Legende ist integriert. `Ctrl / Cmd ⌘+Scroll` zoomt den Chart.
+
+```tsx
+import { RadialStackedBarChart } from '@thebuoyant-tsdev/mui-ts-library';
+import type {
+  RadialStackedBarData,
+  RadialStackedBarSeries,
+} from '@thebuoyant-tsdev/mui-ts-library';
+
+const keys: RadialStackedBarSeries[] = [
+  { key: 'q1', label: 'Q1' },
+  { key: 'q2', label: 'Q2' },
+  { key: 'q3', label: 'Q3' },
+  { key: 'q4', label: 'Q4' },
+];
+
+const data: RadialStackedBarData[] = [
+  { id: 'berlin',  label: 'Berlin',  values: { q1: 120, q2: 145, q3: 98,  q4: 175 } },
+  { id: 'hamburg', label: 'Hamburg', values: { q1: 95,  q2: 110, q3: 130, q4: 88  } },
+  { id: 'munich',  label: 'Munich',  values: { q1: 200, q2: 185, q3: 210, q4: 230 } },
+];
+
+<RadialStackedBarChart
+  data={data}
+  keys={keys}
+  size={480}
+  sortBy="value"
+  onBarClick={(info) => console.log(info.label, info.seriesKey, info.value)}
+/>
+```
+
+→ [Vollständige Dokumentation](user-manuals/RadialStackedBarChart.de.md)
+
+---
+
 ## TypeScript
 
 Alle Typen und Defaults werden direkt exportiert — kein separates `@types/...`-Paket nötig.
@@ -413,6 +451,9 @@ import type {
 
   // HorizontalTreeChart
   HorizontalTreeData, HorizontalTreeNodeInfo, HorizontalTreeOrientation,
+
+  // RadialStackedBarChart
+  RadialStackedBarData, RadialStackedBarSeries, RadialStackedBarClickInfo,
 } from '@thebuoyant-tsdev/mui-ts-library';
 ```
 
