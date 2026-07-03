@@ -39,6 +39,12 @@ Right-clicking a task bar opens a **context menu** to change its status without 
 
 ---
 
+> ### New in v3.16.0
+>
+> | Feature | Description | Jump to |
+> |---|---|---|
+> | **Progress slider in dialog** | `GanttTask.progress` is now editable via a MUI Slider in the Add/Edit dialog — no mouse required. Pre-fills from existing task data in edit mode; resets to 0 when milestone is toggled. New optional translation key `dialogFieldProgress`. | [→ GanttTask fields](#ganttask-fields) · [→ Translations](#translations) |
+
 > ### New in v2.7.0
 >
 > | Feature | Description | Jump to |
@@ -146,7 +152,7 @@ Each task is passed as a `GanttTask` object. The `tasks` prop expects a **flat a
 | `parentId` | `string` | No | ID of the parent task. Omit for root tasks (top level). When set, creates an indented row in the panel and builds the tree. |
 | `dependencies` | `string[]` | No | IDs of predecessor tasks. Shown as a multi-select in the edit dialog — any task that already (directly or transitively) depends on the task being edited is excluded from the options, so the built-in dialog cannot create a dependency cycle. When used with `cascadeDependencies`, successors are automatically shifted when a predecessor moves. |
 | `isMilestone` | `boolean` | No | When `true`, the task is rendered as a diamond (♦) instead of a bar. Milestones should have `startDate ≈ endDate`. |
-| `progress` | `number` | No | Progress in percent (0–100). Rendered as a semi-transparent overlay bar on top of the task bar. Interactive when `progressDraggable={true}`. |
+| `progress` | `number` | No | Progress in percent (0–100). Rendered as a semi-transparent overlay bar on top of the task bar. Editable via the **built-in dialog** (slider, since v3.16.0) or by dragging when `progressDraggable={true}`. |
 | `color` | `string` | No | Overrides the status-based bar color for this individual task (highest priority). Any CSS color value (e.g. `"#e91e63"` or `"rgb(0,150,136)"`). |
 | `assignee` | `string` | No | Person or team responsible for the task — shown in the Assignee column when `showAssigneeColumn={true}`. |
 
@@ -413,6 +419,7 @@ type GanttTranslations = {
   dialogDeleteConfirm: string;  // {name} is replaced with the task name at runtime
   dialogFieldDependencies: string;
   dialogFieldDependenciesNone: string;
+  dialogFieldProgress?: string;  // @since 3.16.0, optional — existing literals compile without changes
 };
 ```
 
@@ -461,6 +468,7 @@ type GanttTranslations = {
 | `dialogFieldParentNone` | `"— Keine —"` | Option for "no parent task" |
 | `dialogFieldDependencies` | `"Vorgänger"` | Form field label for dependencies |
 | `dialogFieldDependenciesNone` | `"— Keine —"` | Option for "no dependencies" |
+| `dialogFieldProgress` | `"Fortschritt (%)"` | Slider label in the Add/Edit dialog — **optional**, added in v3.16.0 |
 | `dialogDeleteConfirm` | `"Soll die Aufgabe \"{name}\" wirklich gelöscht werden?"` | Confirmation text. `{name}` is replaced with the task name. |
 
 **Full English translation:**
@@ -508,6 +516,7 @@ type GanttTranslations = {
     dialogFieldParentNone: '— None —',
     dialogFieldDependencies: 'Predecessors',
     dialogFieldDependenciesNone: '— None —',
+    dialogFieldProgress: 'Progress (%)',   // optional — added in v3.16.0
     dialogDeleteConfirm: 'Delete task "{name}"?',
   }}
 />

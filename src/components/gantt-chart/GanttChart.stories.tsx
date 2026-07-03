@@ -537,6 +537,33 @@ export const WithBuiltinDialogs: Story = {
   ),
 };
 
+export const WithProgressDialogField: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The built-in edit dialog exposes a **Progress slider (0–100 %)** since v3.16.0. " +
+          "Click the edit icon on any row to open the dialog — the slider is pre-filled with " +
+          "the task's current `progress` value. The slider is automatically disabled for " +
+          "milestone tasks (which have no progress bar). " +
+          "Non-mouse users can Tab to the slider and adjust it with arrow keys.",
+      },
+    },
+  },
+  args: {
+    tasks: progressTasks,
+    timeScale: "months",
+    initialExpandAll: true,
+    enableBuiltinDialogs: true,
+    height: 400,
+  },
+  render: (args) => (
+    <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
+      <GanttChart {...args} />
+    </Box>
+  ),
+};
+
 export const ZoomAndToday: Story = {
   parameters: {
     docs: {

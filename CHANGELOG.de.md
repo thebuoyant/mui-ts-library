@@ -13,6 +13,35 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [3.16.0] — 2026-07-03
+
+### Hinzugefügt
+
+#### `GanttChart` — Fortschrittsfeld im eingebauten Aufgaben-Dialog
+
+`GanttTask.progress` (0–100 %) war bisher nur über den `progressDraggable`-Drag-Handle setzbar — ein Zeigegerät war Pflicht, Tastatur-Nutzer und Hilfstechnologien waren ausgeschlossen.
+
+Der eingebaute **Hinzufügen- / Bearbeiten-Dialog** enthält jetzt einen **MUI-Slider** für den Fortschritt:
+
+- **Hinzufügen-Dialog** — Slider startet bei `0 %`
+- **Bearbeiten-Dialog** — Slider wird aus `initialTask.progress` vorbelegt (Fallback: `0`)
+- **Meilenstein-Toggle** — setzt Fortschritt automatisch auf `0` zurück (Meilensteine haben keinen Fortschrittsbalken)
+- **Speicher-Payload** — `progress` wird weggelassen wenn `0`, konsistent mit dem bestehenden `undefined`-Verhalten
+
+**Neuer optionaler Übersetzungsschlüssel:**
+
+| Schlüssel | Standard | Beschreibung |
+|---|---|---|
+| `dialogFieldProgress` | `"Fortschritt (%)"` | Slider-Label im Hinzufügen-/Bearbeiten-Dialog |
+
+`dialogFieldProgress` ist in `GanttTranslations` als `optional` (`?`) deklariert — alle bestehenden vollständigen Übersetzungs-Literale kompilieren ohne Änderungen weiter.
+
+**Tests:** 4 neue Tests ergänzt (Render, Vorbelegen, Meilenstein-Reset, Speicher-Payload) — **122 Tests gesamt**, alle grün.
+
+**Neue Storybook-Story:** `WithProgressDialogField` — zeigt den vorbelegten Slider mit bestehenden Fortschritts-Tasks und das Slider-Deaktivieren bei Meilenstein-Toggle.
+
+---
+
 ## [3.15.0] — 2026-07-03
 
 ### Hinzugefügt

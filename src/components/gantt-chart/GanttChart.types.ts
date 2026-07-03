@@ -76,6 +76,8 @@ export type GanttTranslations = {
   // Dialoge — Vorgänger-Multiselect
   dialogFieldDependencies: string;
   dialogFieldDependenciesNone: string;
+  /** Label for the progress slider in the task dialog (0–100 %) @since 3.16.0 */
+  dialogFieldProgress?: string;
   // Task-Panel — Aktions-Spalten-Header
   columnActions: string;
   /** Header label for the Assignee column — shown when showAssigneeColumn=true @since 2.7.0 */
@@ -127,6 +129,7 @@ export const DEFAULT_GANTT_TRANSLATIONS: Required<GanttTranslations> = {
   dialogDeleteConfirm: "Soll die Aufgabe \"{name}\" wirklich gelöscht werden?",
   dialogFieldDependencies: "Vorgänger",
   dialogFieldDependenciesNone: "— Keine —",
+  dialogFieldProgress: "Fortschritt (%)",
   scrollToTodayTooltip: "Zum heutigen Tag",
   expandAllTooltip: "Alle aufklappen",
   collapseAllTooltip: "Alle zuklappen",

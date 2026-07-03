@@ -13,6 +13,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.16.0] — 2026-07-03
+
+### Added
+
+#### `GanttChart` — Progress field in the built-in task dialog
+
+`GanttTask.progress` (0–100 %) was previously only settable via the `progressDraggable` drag handle — requiring a pointing device and excluding keyboard users and assistive technology.
+
+The built-in **Add / Edit task dialog** now contains a **MUI Slider** for progress:
+
+- **Add dialog** — slider initializes at `0 %`
+- **Edit dialog** — slider pre-fills from `initialTask.progress` (falls back to `0`)
+- **Milestone toggle** — automatically resets progress to `0` (milestones have no progress bar)
+- **Save payload** — `progress` is omitted when `0`, consistent with the existing `undefined` behavior
+
+**New optional translation key:**
+
+| Key | Default | Description |
+|---|---|---|
+| `dialogFieldProgress` | `"Fortschritt (%)"` | Slider label in the Add/Edit dialog |
+
+`dialogFieldProgress` is declared as `optional` (`?`) in `GanttTranslations` — all existing full translation literals continue to compile without changes.
+
+**Tests:** 4 new tests added (render, pre-fill, milestone reset, save payload) — **122 tests total**, all passing.
+
+**New Storybook story:** `WithProgressDialogField` — demonstrates the pre-filled slider with existing progress tasks and the milestone-disables-slider behavior.
+
+---
+
 ## [3.15.0] — 2026-07-03
 
 ### Added

@@ -42,13 +42,13 @@ auf eine Wand laufen — entweder gibt's nichts, oder nur in MUI X Pro/Premium g
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
 | ⭐ Keyboard Navigation | `↑`/`↓` wählt die nächste/vorherige Task-Zeile, `Enter` öffnet den Bearbeiten-Dialog für die ausgewählte Zeile, `Escape` schließt ihn. Aktuell nur mausbedienbar — fehlende Accessibility-Grundlage. | Mittel | — |
-| ⭐ Progress-Feld im eingebauten Dialog | `GanttTask.progress` (0–100 %) existiert und wird als Overlay-Balken gerendert, ist aber nicht im eingebauten Bearbeiten-Dialog exponiert — der einzige Weg ist `progressDraggable`. Nicht-Maus-Nutzer und Accessibility-Szenarien sind damit ausgeschlossen. Ein einfaches Slider- oder Number-Feld im Dialog. | Niedrig | — |
 | ⭐ Panel-Splitter per Drag | `minPanelWidth` / `maxPanelWidth` sind nur statische Props. Ein Drag-Handle zwischen Task-Panel und Timeline würde erlauben, die Breite zur Laufzeit anzupassen — Standard-Pattern aus Excel/MS Project/Jira. | Mittel | — |
 | Assignee-Filter in Toolbar | Dropdown-Filter in der Toolbar zum Einschränken auf einen Assignee — baut auf `showAssigneeColumn` + `GanttTask.assignee` auf, kein neues Datenmodell. | Mittel | — |
 | `onDragStart` Callback | Feuert wenn der User beginnt, einen Balken zu verschieben oder zu resizen — für optimistic UI / Shadow-Balken während des Dragens. Aktuell gibt es nur das Endergebnis via `onTaskMoved` / `onTaskResized`. | Niedrig | — |
 | Export PNG/PDF | Sichtbarer Ausschnitt der Timeline als Bild — andere Rendering-Basis als die D3-Charts (Mix aus HTML-Panel + SVG-Timeline statt reines SVG), daher eigene Lösung nötig, nicht über die D3-Charts-Export-Utility wiederverwendbar. | Hoch | — |
 | Touch / Mobile Drag | Drag & Drop für Task-Balken auf Touch-Geräten über die Pointer Events API — aktuell nur Maus. | Hoch | — |
 | Baseline-Vergleich | Ursprungsplanung als zweiter, schmalerer Balken hinter dem Ist-Balken — Standardmuster aus MS Project/Jira-Gantt-Plugins, kein Custom-Konzept. | Hoch | — |
+| ~~⭐ Progress-Feld im eingebauten Dialog~~ | ~~`GanttTask.progress` (0–100 %) war nur via `progressDraggable` setzbar — Nicht-Maus-Nutzer und Accessibility-Szenarien ausgeschlossen.~~ MUI-Slider im eingebauten Add/Edit-Dialog, pre-filled aus `initialTask.progress`, Rücksetzen auf 0 bei Milestone-Toggle, `aria-valuenow` testbar. | ~~Niedrig~~ | ✅ v3.16.0 |
 | ~~Dependency-Zyklus-Schutz~~ | ~~Bearbeiten der Task-Daten/Abhängigkeiten über den Task-Dialog konnte ohne Warnung einen Abhängigkeitszyklus erzeugen.~~ Tasks, die bereits (direkt oder transitiv) vom bearbeiteten Task abhängen, werden jetzt aus den Dependency-Optionen ausgeschlossen. | ~~Mittel~~ | ✅ v3.11.3 |
 | ~~Spalte: Assignee~~ | ~~Zusätzliche Spalte im Task-Panel für Verantwortliche~~ | ~~Mittel~~ | ✅ v2.7.0 |
 | ~~CSV / Excel Export~~ | ~~Tasks als Tabelle exportieren~~ | ~~Mittel~~ | ✅ v2.7.0 |
@@ -249,7 +249,7 @@ Cross-Cutting-Ideen, die für alle D3-Charts gleich umgesetzt werden würden —
 
 ## RadialStackedBarChart
 
-Neue Komponente (v3.15.0 voraussichtlich) — Sektion wächst mit den ersten Erfahrungen aus dem Einsatz.
+Neue Komponente seit v3.15.0 — Sektion wächst mit den ersten Erfahrungen aus dem Einsatz.
 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
