@@ -434,6 +434,13 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/). In der Praxis b
 
 ## Changelog
 
+### [3.15.0] — 2026-07-03
+
+**Hinzugefügt**
+- Neue Komponente: `RadialStackedBarChart` — Mehrreihige Stapelbalken im radialen Layout (6. D3-Chart). Features: 20+ Props, konzentrische Gitterringe mit eigenem Formatter, automatisch zentrierte Legende mit Overflow-Schutz, `sortBy`, `colorConfig`, `onBarClick`, `zoomable` und volle Dark-Mode-Unterstützung. Siehe [Vollständiger Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) für Details.
+
+---
+
 ### [3.14.1] — 2026-07-02
 
 **Behoben**

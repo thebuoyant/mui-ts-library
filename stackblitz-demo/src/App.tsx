@@ -21,6 +21,7 @@ import {
   CirclePackingChart,
   HorizontalTreeChart,
   ColorPicker,
+  RadialStackedBarChart,
 } from "@thebuoyant-tsdev/mui-ts-library";
 import type {
   TagSelectionItem,
@@ -30,6 +31,8 @@ import type {
   RadialTreeChartData,
   CirclePackingData,
   HorizontalTreeData,
+  RadialStackedBarData,
+  RadialStackedBarSeries,
 } from "@thebuoyant-tsdev/mui-ts-library";
 
 // ── TagSelection ─────────────────────────────────────────────────────────────
@@ -186,6 +189,26 @@ const HORIZONTAL_TREE_DATA: HorizontalTreeData = {
   ],
 };
 
+// ── RadialStackedBarChart ─────────────────────────────────────────────────────
+
+const RADIAL_KEYS: RadialStackedBarSeries[] = [
+  { key: "q1", label: "Q1" },
+  { key: "q2", label: "Q2" },
+  { key: "q3", label: "Q3" },
+  { key: "q4", label: "Q4" },
+];
+
+const RADIAL_DATA: RadialStackedBarData[] = [
+  { id: "berlin",     label: "Berlin",     values: { q1: 120, q2: 145, q3: 98,  q4: 175 } },
+  { id: "munich",     label: "Munich",     values: { q1: 210, q2: 185, q3: 220, q4: 195 } },
+  { id: "hamburg",    label: "Hamburg",    values: { q1: 95,  q2: 110, q3: 88,  q4: 130 } },
+  { id: "cologne",    label: "Cologne",    values: { q1: 80,  q2: 95,  q3: 105, q4: 90  } },
+  { id: "frankfurt",  label: "Frankfurt",  values: { q1: 165, q2: 150, q3: 180, q4: 200 } },
+  { id: "stuttgart",  label: "Stuttgart",  values: { q1: 75,  q2: 85,  q3: 70,  q4: 95  } },
+  { id: "dusseldorf", label: "Düsseldorf", values: { q1: 60,  q2: 70,  q3: 65,  q4: 80  } },
+  { id: "leipzig",    label: "Leipzig",    values: { q1: 45,  q2: 55,  q3: 60,  q4: 65  } },
+];
+
 // ── DemoCard ──────────────────────────────────────────────────────────────────
 
 function DemoCard({
@@ -293,14 +316,14 @@ export default function App() {
         </Typography>
         <Typography variant="h6" sx={{ opacity: 0.85, fontWeight: 400, mb: 1.5, maxWidth: 720, mx: "auto" }}>
           Project planning, content editing, SQL &amp; JSON tooling, D3 data visualization, and theme tooling —
-          12 fully-typed React 19 + MUI v9 components, each built for a real use case below.
+          13 fully-typed React 19 + MUI v9 components, each built for a real use case below.
         </Typography>
         <Typography variant="body2" sx={{ opacity: 0.7, mb: 3 }}>
           Edit any file on the left — changes hot-reload instantly. No setup, no install.
         </Typography>
         <Box sx={{ display: "flex", flexDirection: "row", gap: 1, justifyContent: "center", flexWrap: "wrap" }}>
           {["ChordChart", "CirclePackingChart", "ColorPicker", "GanttChart", "HorizontalTreeChart", "JsonEditor",
-            "PasswordStrengthMeter", "RadialTreeChart", "RichTextEditor", "SqlEditor", "SunburstChart", "TagSelection"]
+            "PasswordStrengthMeter", "RadialStackedBarChart", "RadialTreeChart", "RichTextEditor", "SqlEditor", "SunburstChart", "TagSelection"]
             .map(name => (
               <Chip
                 key={name}
@@ -433,6 +456,25 @@ export default function App() {
           >
             <Box sx={{ display: "flex", justifyContent: "center" }}>
               <RadialTreeChart data={RADIAL_TREE_DATA} size={460} drillable zoomable showNodePopover />
+            </Box>
+          </DemoCard>
+
+          {/* RadialStackedBarChart */}
+          <DemoCard
+            title="RadialStackedBarChart"
+            useCase="Multi-Series Data Visualization"
+            subtitle="Quarterly sales by city as radial stacked bars. Each bar is one city; each color layer is a quarter. Hover for details, click a segment to inspect the full city breakdown."
+          >
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
+              <RadialStackedBarChart
+                data={RADIAL_DATA}
+                keys={RADIAL_KEYS}
+                size={420}
+                sortBy="value"
+                onBarClick={(info) =>
+                  alert(`${info.label} — ${info.seriesKey}: ${info.value}\nTotal: ${info.total}`)
+                }
+              />
             </Box>
           </DemoCard>
 

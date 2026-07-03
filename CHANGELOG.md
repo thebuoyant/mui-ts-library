@@ -13,6 +13,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.15.0] — 2026-07-03
+
+### Added
+
+#### New component: `RadialStackedBarChart`
+
+A new D3 chart — the 6th in the library's D3 family — for visualizing multi-series data in a radial stacked bar layout. Bars radiate outward from a center hole and are subdivided into stacked color-coded segments.
+
+**Props and capabilities:**
+
+- **`data: RadialStackedBarData[]`** — one item per bar (id, label, values map). Missing series keys are treated as 0 — no need to fill every slot.
+- **`keys: RadialStackedBarSeries[] | string[]`** — series definitions in stack order (innermost segment first). Pass `string[]` for quick setup; use `RadialStackedBarSeries[]` to set legend labels independently from the data key names.
+- **`size?: number`** (default `500`) — SVG width and height in pixels (always square).
+- **`innerRadius?: number`** (default `size × 0.18`) — radius of the center hole; increase for a wider legend area.
+- **`barPadding?: number`** (default `0.12`) — fractional angular gap between bars (0 = no gap, 1 = all gap).
+- **`showGridLines?: boolean`** (default `true`), **`gridLineCount?: number`** (default `3`), **`showGridValues?: boolean`** (default `true`) — concentric dashed grid rings with value labels at the top.
+- **`gridValueFormatter?: (v: number) => string`** — custom label formatter for grid ring values (default: compact notation, e.g. `30000 → "30k"`, `3000000 → "3M"`).
+- **`showLabels?: boolean`** (default `true`) — outer-edge bar labels, auto-rotated for readability regardless of angular position.
+- **`showLegend?: boolean`** (default `true`) — center hole legend mapping series colors to names. Automatically centered and truncated to never overflow into chart segments.
+- **`sortBy?: 'value' | 'label' | 'none'`** (default `'none'`) — sort bars by total descending, label ascending, or keep original array order.
+- **`chartColors?: string[]`** — custom color palette; falls back to MUI theme tokens when omitted. Dark mode supported automatically.
+- **`colorConfig?: RadialStackedBarColorConfigs`** — per-series `fill` overrides keyed by series key; takes priority over `chartColors`.
+- **`valueDecimalCount?`** / **`valueDecimalSeparator?`** / **`valueThousandsSeparator?`** — tooltip number formatting, consistent with all other D3 charts.
+- **`onBarClick?: (info: RadialStackedBarBarInfo, event) => void`** — click callback with full context: `id`, `label`, `seriesKey`, `value` (segment), `total` (bar), `values` (all series for this bar).
+- **`zoomable?: boolean`** (default `false`) — `Ctrl / Cmd ⌘ + Scroll` visual zoom; `Escape` resets.
+- **`disabled?: boolean`** (default `false`) — mutes all interactions and reduces opacity to `0.5`.
+- **`translation?: Partial<RadialStackedBarChartTranslation>`** — override `noData` (default `'No data'`).
+
+**New exports:** `RadialStackedBarChart`, `RadialStackedBarData`, `RadialStackedBarSeries`, `RadialStackedBarBarInfo`, `RadialStackedBarColorConfigs`, `RadialStackedBarChartTranslation`, `DEFAULT_RADIAL_STACKED_BAR_CHART_TRANSLATION`.
+
+**Tests:** 20 tests covering smoke rendering, empty state, string-key shorthand, path count, size prop, disabled opacity, `onBarClick` payload, click guard when disabled, outer labels, legend, `colorConfig`, `sortBy` variants, grid circles, and `gridValueFormatter`.
+
+**Stories:** 12 Storybook stories — Default (US states population, 20 bars × 7 age groups), SortedByValue, SalesQuarterly, CustomColors, NoLabels, NoLegend, NoGridLines, LargeInnerRadius, StringKeys, Disabled, ZoomableWithCtrlScroll, CustomGridValueFormatter, LegendOverflowProtection (stress-test story showing truncation with very long labels).
+
+**Documentation:** [`user-manuals/RadialStackedBarChart.md`](user-manuals/RadialStackedBarChart.md) and [`user-manuals/RadialStackedBarChart.de.md`](user-manuals/RadialStackedBarChart.de.md).
+
+---
+
 ## [3.14.0] — 2026-07-02
 
 ### Added

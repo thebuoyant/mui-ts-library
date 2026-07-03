@@ -298,5 +298,6 @@ All 5 D3 charts have shipped:
 | `RadialTreeChart` | ✅ v2.4.0 |
 | `CirclePackingChart` | ✅ v2.5.0 |
 | `HorizontalTreeChart` | ✅ v2.6.0 |
+| `RadialStackedBarChart` | ✅ v3.15.0 |
 
 Open feature ideas per chart: [`component-features-nice-to-have.md`](../component-features-nice-to-have.md).

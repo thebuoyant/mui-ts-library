@@ -13,6 +13,44 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [3.15.0] — 2026-07-03
+
+### Hinzugefügt
+
+#### Neue Komponente: `RadialStackedBarChart`
+
+Ein neues D3-Chart — das 6. in der D3-Familie dieser Bibliothek — zur Visualisierung von Mehrreihendaten im radialen Stapelbalken-Layout. Balken strahlen von einer Mittelöffnung nach außen und sind in gestapelte farbcodierte Segmente unterteilt.
+
+**Props und Funktionen:**
+
+- **`data: RadialStackedBarData[]`** — ein Element pro Balken (id, Label, Values-Map). Fehlende Reihenschlüssel werden als 0 behandelt — kein Auffüllen aller Slots nötig.
+- **`keys: RadialStackedBarSeries[] | string[]`** — Reihendefinitionen in Stapelreihenfolge (innerstes Segment zuerst). `string[]` für schnellen Einstieg; `RadialStackedBarSeries[]` wenn Legendenbeschriftungen unabhängig von den Datenschlüsseln gesetzt werden sollen.
+- **`size?: number`** (Standard `500`) — SVG-Breite und -Höhe in Pixeln (immer quadratisch).
+- **`innerRadius?: number`** (Standard `size × 0,18`) — Radius der Mittelöffnung; vergrößern für mehr Platz in der Zentrums-Legende.
+- **`barPadding?: number`** (Standard `0,12`) — Anteilsmäßiger Winkelabstand zwischen Balken (0 = kein Abstand, 1 = nur Abstand).
+- **`showGridLines?: boolean`** (Standard `true`), **`gridLineCount?: number`** (Standard `3`), **`showGridValues?: boolean`** (Standard `true`) — konzentrische gestrichelte Gitterringe mit Wertbeschriftungen oben.
+- **`gridValueFormatter?: (v: number) => string`** — eigene Formatierungsfunktion für Gitterring-Werte (Standard: Kompaktnotation, z. B. `30000 → "30k"`, `3000000 → "3M"`).
+- **`showLabels?: boolean`** (Standard `true`) — Außenrand-Balkenbeschriftungen, automatisch rotiert für gute Lesbarkeit unabhängig von der Winkelposition.
+- **`showLegend?: boolean`** (Standard `true`) — Zentrums-Legende, die Reihenfarben auf Namen abbildet. Wird automatisch zentriert und bei Bedarf gekürzt, damit Text nie in die Chart-Segmente überläuft.
+- **`sortBy?: 'value' | 'label' | 'none'`** (Standard `'none'`) — Balken nach Gesamtwert absteigend, Label aufsteigend oder in ursprünglicher Reihenfolge sortieren.
+- **`chartColors?: string[]`** — eigene Farbpalette; fällt auf MUI-Theme-Tokens zurück wenn nicht gesetzt. Dark Mode automatisch unterstützt.
+- **`colorConfig?: RadialStackedBarColorConfigs`** — reihenweise `fill`-Überschreibungen nach Reihenschlüssel; hat Vorrang vor `chartColors`.
+- **`valueDecimalCount?`** / **`valueDecimalSeparator?`** / **`valueThousandsSeparator?`** — Zahlformatierung in Tooltips, konsistent mit allen anderen D3-Charts.
+- **`onBarClick?: (info: RadialStackedBarBarInfo, event) => void`** — Klick-Callback mit vollständigem Kontext: `id`, `label`, `seriesKey`, `value` (Segment), `total` (Balken), `values` (alle Reihen dieses Balkens).
+- **`zoomable?: boolean`** (Standard `false`) — `Ctrl / Cmd ⌘ + Scroll` visueller Zoom; `Escape` setzt zurück.
+- **`disabled?: boolean`** (Standard `false`) — deaktiviert alle Interaktionen und reduziert die Deckkraft auf `0,5`.
+- **`translation?: Partial<RadialStackedBarChartTranslation>`** — `noData` überschreiben (Standard `'No data'`).
+
+**Neue Exporte:** `RadialStackedBarChart`, `RadialStackedBarData`, `RadialStackedBarSeries`, `RadialStackedBarBarInfo`, `RadialStackedBarColorConfigs`, `RadialStackedBarChartTranslation`, `DEFAULT_RADIAL_STACKED_BAR_CHART_TRANSLATION`.
+
+**Tests:** 20 Tests — Smoke-Rendering, Leer-Zustand, String-Key-Kurzform, Pfad-Anzahl, Size-Prop, Disabled-Deckkraft, `onBarClick`-Payload, Klick-Guard bei Disabled, Außenbeschriftungen, Legende, `colorConfig`, `sortBy`-Varianten, Gitterkreise und `gridValueFormatter`.
+
+**Stories:** 12 Storybook-Stories — Default (US-Bundesstaaten-Bevölkerung, 20 Balken × 7 Altersgruppen), SortedByValue, SalesQuarterly, CustomColors, NoLabels, NoLegend, NoGridLines, LargeInnerRadius, StringKeys, Disabled, ZoomableWithCtrlScroll, CustomGridValueFormatter, LegendOverflowProtection (Stress-Test-Story zum Nachweis der Texttrunkierung bei sehr langen Labels).
+
+**Dokumentation:** [`user-manuals/RadialStackedBarChart.md`](user-manuals/RadialStackedBarChart.md) und [`user-manuals/RadialStackedBarChart.de.md`](user-manuals/RadialStackedBarChart.de.md).
+
+---
+
 ## [3.14.0] — 2026-07-02
 
 ### Hinzugefügt

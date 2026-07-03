@@ -22,3 +22,5 @@ export * from "./components/horizontal-tree-chart/HorizontalTreeChart";
 export * from "./components/horizontal-tree-chart/HorizontalTreeChart.types";
 export * from "./components/color-picker/ColorPicker";
 export * from "./components/color-picker/ColorPicker.types";
+export * from "./components/radial-stacked-bar-chart/RadialStackedBarChart";
+export * from "./components/radial-stacked-bar-chart/RadialStackedBarChart.types";
