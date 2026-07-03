@@ -475,6 +475,13 @@ This project follows [Semantic Versioning](https://semver.org/). In practice:
 
 ## Changelog
 
+### [3.16.0] — 2026-07-03
+
+**Added**
+- `GanttChart`: progress slider in the built-in Add/Edit task dialog — `GanttTask.progress` (0–100 %) is now editable without a mouse, closing an accessibility gap for keyboard users. Slider pre-fills from existing task data in edit mode; resets to 0 when milestone is toggled on. New optional translation key `dialogFieldProgress`. See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.
+
+---
+
 ### [3.15.0] — 2026-07-03
 
 **Added**

@@ -39,6 +39,12 @@ Rechtsklick auf einen Balken öffnet ein **Kontextmenü** zum direkten Ändern d
 
 ---
 
+> ### Neu in v3.16.0
+>
+> | Feature | Beschreibung | Springe zu |
+> |---|---|---|
+> | **Fortschritts-Slider im Dialog** | `GanttTask.progress` ist jetzt via MUI-Slider im Hinzufügen-/Bearbeiten-Dialog bearbeitbar — ohne Maus. Wird im Bearbeiten-Modus aus bestehenden Task-Daten vorbelegt; setzt auf 0 zurück wenn Meilenstein aktiviert wird. Neuer optionaler Übersetzungsschlüssel `dialogFieldProgress`. | [→ GanttTask-Felder](#ganttask-felder) · [→ Übersetzungen](#übersetzungen) |
+
 > ### Neu in v2.7.0
 >
 > | Feature | Beschreibung | Springe zu |
@@ -146,7 +152,7 @@ Jede Aufgabe wird als `GanttTask`-Objekt übergeben. Die `tasks`-Prop erwartet e
 | `parentId` | `string` | Nein | ID des übergeordneten Tasks. Wird weggelassen für Root-Tasks (oberste Ebene). Erzeugt bei Angabe eine Einrückung im Panel und baut den Baum auf. |
 | `dependencies` | `string[]` | Nein | IDs von Vorgänger-Tasks. Wird im Bearbeiten-Dialog als Multiselect angezeigt — Tasks, die bereits (direkt oder transitiv) vom bearbeiteten Task abhängen, werden aus den Optionen ausgeschlossen, sodass der eingebaute Dialog keinen Abhängigkeitszyklus erzeugen kann. In Kombination mit `cascadeDependencies` werden Nachfolger automatisch verschoben. |
 | `isMilestone` | `boolean` | Nein | Wenn `true`, wird der Task als Raute (♦) statt als Balken dargestellt. Meilensteine sollten `startDate ≈ endDate` haben. |
-| `progress` | `number` | Nein | Fortschritt in Prozent (0–100). Wird als halbopaker Overlay-Balken über den Task-Balken gerendert. Interaktiv wenn `progressDraggable={true}`. |
+| `progress` | `number` | Nein | Fortschritt in Prozent (0–100). Wird als halbopaker Overlay-Balken über den Task-Balken gerendert. Bearbeitbar via **eingebautem Dialog** (Slider, seit v3.16.0) oder per Drag wenn `progressDraggable={true}`. |
 | `color` | `string` | Nein | Überschreibt die statusbasierte Balkenfarbe für diesen einzelnen Task (höchste Priorität). Beliebiger CSS-Farbwert (z. B. `"#e91e63"` oder `"rgb(0,150,136)"`). |
 | `assignee` | `string` | Nein | Person oder Team, das für den Task verantwortlich ist — wird in der Assignee-Spalte angezeigt, wenn `showAssigneeColumn={true}`. |
 
@@ -461,6 +467,7 @@ type GanttTranslations = {
 | `dialogFieldParentNone` | `"— Keine —"` | Option für „kein übergeordneter Task" |
 | `dialogFieldDependencies` | `"Vorgänger"` | Formularfeld-Label für Abhängigkeiten |
 | `dialogFieldDependenciesNone` | `"— Keine —"` | Option für „keine Abhängigkeiten" |
+| `dialogFieldProgress` | `"Fortschritt (%)"` | Slider-Label im Hinzufügen-/Bearbeiten-Dialog — **optional**, hinzugefügt in v3.16.0 |
 | `dialogDeleteConfirm` | `"Soll die Aufgabe \"{name}\" wirklich gelöscht werden?"` | Bestätigungstext. `{name}` wird durch den Task-Namen ersetzt. |
 
 **Vollständige englische Übersetzung:**
@@ -508,6 +515,7 @@ type GanttTranslations = {
     dialogFieldParentNone: '— None —',
     dialogFieldDependencies: 'Predecessors',
     dialogFieldDependenciesNone: '— None —',
+    dialogFieldProgress: 'Progress (%)',   // optional — hinzugefügt in v3.16.0
     dialogDeleteConfirm: 'Delete task "{name}"?',
   }}
 />

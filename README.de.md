@@ -475,6 +475,13 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/). In der Praxis b
 
 ## Changelog
 
+### [3.16.0] — 2026-07-03
+
+**Hinzugefügt**
+- `GanttChart`: Fortschritts-Slider im eingebauten Hinzufügen-/Bearbeiten-Dialog — `GanttTask.progress` (0–100 %) ist jetzt ohne Maus bearbeitbar, schließt eine Accessibility-Lücke für Tastatur-Nutzer. Slider wird im Bearbeiten-Modus aus bestehenden Task-Daten vorbelegt; setzt auf 0 zurück wenn Meilenstein aktiviert wird. Neuer optionaler Übersetzungsschlüssel `dialogFieldProgress`. Siehe [Vollständiger Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) für Details.
+
+---
+
 ### [3.15.0] — 2026-07-03
 
 **Hinzugefügt**
