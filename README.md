@@ -434,6 +434,13 @@ This project follows [Semantic Versioning](https://semver.org/). In practice:
 
 ## Changelog
 
+### [3.15.0] — 2026-07-03
+
+**Added**
+- New component: `RadialStackedBarChart` — multi-series stacked bars in a radial layout (6th D3 chart). Features: 20+ props, concentric grid rings with custom formatter, auto-centered legend with overflow protection, `sortBy`, `colorConfig`, `onBarClick`, `zoomable`, and full dark-mode support. See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.
+
+---
+
 ### [3.14.1] — 2026-07-02
 
 **Fixed**

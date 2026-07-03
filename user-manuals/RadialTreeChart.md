@@ -378,5 +378,6 @@ All 5 D3 charts have shipped:
 | `RadialTreeChart` | Radial tree with node icons and popover | ✅ v2.4.0 |
 | `CirclePackingChart` | Nested circles with animated zoom | ✅ v2.5.0 |
 | `HorizontalTreeChart` | Decision trees in 4 orientations | ✅ v2.6.0 |
+| `RadialStackedBarChart` | Multi-series stacked bars in a radial layout | ✅ v3.15.0 |
 
 Open feature ideas per chart: [`component-features-nice-to-have.md`](../component-features-nice-to-have.md).

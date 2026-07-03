@@ -320,5 +320,6 @@ Alle 5 D3-Charts sind erschienen:
 | `RadialTreeChart` | Radialer Baum mit eigenen Knoten-Icons | ✅ v2.4.0 |
 | `CirclePackingChart` | Verschachtelte Kreise mit animiertem Zoom | ✅ v2.5.0 |
 | `HorizontalTreeChart` | Entscheidungsbäume in 4 Ausrichtungen | ✅ v2.6.0 |
+| `RadialStackedBarChart` | Mehrreihige Stapelbalken im radialen Layout | ✅ v3.15.0 |
 
 Offene Feature-Ideen pro Chart: [`component-features-nice-to-have.md`](../component-features-nice-to-have.md).

@@ -377,5 +377,6 @@ Currently the only translation key is `noData` (shown when the data has no value
 | `RadialTreeChart` | Radial tree with custom node icons | ✅ v2.4.0 |
 | `CirclePackingChart` | Nested circles with animated zoom | ✅ v2.5.0 |
 | `HorizontalTreeChart` | Decision trees in 4 orientations | ✅ v2.6.0 |
+| `RadialStackedBarChart` | Multi-series stacked bars in a radial layout | ✅ v3.15.0 |
 
 All D3 charts follow the same conventions: `chartColors`, `translation`, `disabled`, `onXxxClick`, MUI theme integration, and dark mode support. See [`component-features-nice-to-have.md`](../component-features-nice-to-have.md) for open feature ideas per chart.
