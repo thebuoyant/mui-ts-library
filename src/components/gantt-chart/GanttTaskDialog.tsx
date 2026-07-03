@@ -12,6 +12,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Slider,
   TextField,
   Tooltip,
   Typography,
@@ -26,6 +27,7 @@ type TaskFormState = {
   endDate: string;
   status: GanttTaskStatus;
   isMilestone: boolean;
+  progress: number;
   parentId: string;
   dependencies: string[];
   assignee: string;
@@ -122,6 +124,7 @@ export function GanttTaskDialog({
     endDate: defaultDate,
     status: "planned",
     isMilestone: false,
+    progress: 0,
     parentId: "",
     dependencies: [],
     assignee: "",
@@ -138,6 +141,7 @@ export function GanttTaskDialog({
         endDate: toDateString(initialTask.endDate),
         status: initialTask.status,
         isMilestone: initialTask.isMilestone ?? false,
+        progress: initialTask.progress ?? 0,
         parentId: initialTask.parentId ?? "",
         dependencies: initialTask.dependencies ?? [],
         assignee: initialTask.assignee ?? "",
@@ -149,6 +153,7 @@ export function GanttTaskDialog({
         endDate: clamped,
         status: "planned",
         isMilestone: false,
+        progress: 0,
         parentId: defaultParentId ?? "",
         dependencies: [],
         assignee: "",
@@ -178,6 +183,8 @@ export function GanttTaskDialog({
       ...prev,
       isMilestone: checked,
       endDate: checked ? prev.startDate : prev.endDate,
+      // Milestones haben keinen Fortschrittsbalken — bei Aktivierung auf 0 zurücksetzen.
+      progress: checked ? 0 : prev.progress,
     }));
   };
 
@@ -195,6 +202,7 @@ export function GanttTaskDialog({
       endDate: new Date(form.endDate),
       status: form.status,
       isMilestone: form.isMilestone || undefined,
+      progress: form.progress > 0 ? form.progress : undefined,
       parentId: form.parentId || undefined,
       dependencies: form.dependencies.length > 0 ? form.dependencies : undefined,
       assignee: form.assignee.trim() || undefined,
@@ -276,6 +284,43 @@ export function GanttTaskDialog({
             ))}
           </Select>
         </FormControl>
+        <Box data-testid="gantt-dialog-field-progress-wrapper">
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", mb: 0.25 }}>
+            <Typography
+              variant="caption"
+              color={form.isMilestone ? "text.disabled" : "text.secondary"}
+            >
+              {t.dialogFieldProgress ?? "Fortschritt (%)"}
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={{ fontWeight: 600 }}
+              color={form.isMilestone ? "text.disabled" : "text.primary"}
+            >
+              {form.progress} %
+            </Typography>
+          </Box>
+          <Slider
+            value={form.progress}
+            onChange={(_, value) =>
+              setForm((prev) => ({ ...prev, progress: value as number }))
+            }
+            min={0}
+            max={100}
+            step={1}
+            disabled={form.isMilestone}
+            size="small"
+            marks={[
+              { value: 0 },
+              { value: 25 },
+              { value: 50 },
+              { value: 75 },
+              { value: 100 },
+            ]}
+            aria-label={t.dialogFieldProgress ?? "Fortschritt (%)"}
+            data-testid="gantt-dialog-field-progress"
+          />
+        </Box>
         <FormControlLabel
           control={
             <Checkbox

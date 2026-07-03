@@ -1527,3 +1527,59 @@ describe("GanttChart — GanttTask.color", () => {
     expect(screen.getByTestId("gantt-task-row-child")).toBeInTheDocument();
   });
 });
+
+// ---------------------------------------------------------------------------
+// Phase 21 — Dialog progress field (⭐ since v3.16.0)
+// ---------------------------------------------------------------------------
+
+describe("GanttChart — dialog progress field", () => {
+  const taskWithProgress: GanttTask = {
+    id: "prog",
+    name: "Progress Task",
+    startDate: new Date("2025-03-01"),
+    endDate: new Date("2025-03-15"),
+    status: "in-progress",
+    progress: 60,
+  };
+
+  it("Should render the progress slider in the add dialog", () => {
+    render(<GanttChart tasks={tasks} enableBuiltinDialogs />);
+    fireEvent.click(screen.getByTestId("gantt-add-task-root"));
+    expect(screen.getByTestId("gantt-dialog-field-progress-wrapper")).toBeInTheDocument();
+  });
+
+  it("Should pre-fill the progress slider with the task's current progress in the edit dialog", () => {
+    render(<GanttChart tasks={[taskWithProgress]} enableBuiltinDialogs />);
+    fireEvent.click(screen.getByTestId("gantt-edit-task-prog"));
+    const slider = screen.getByRole("slider");
+    expect(slider).toHaveAttribute("aria-valuenow", "60");
+  });
+
+  it("Should reset progress to 0 when the milestone checkbox is toggled on", () => {
+    // When a task has progress and is then marked as a milestone, progress must reset to 0
+    // because milestones are point-in-time events with no progress bar.
+    render(<GanttChart tasks={[taskWithProgress]} enableBuiltinDialogs />);
+    fireEvent.click(screen.getByTestId("gantt-edit-task-prog"));
+    // Pre-filled at 60 — verify before toggling
+    expect(screen.getByRole("slider")).toHaveAttribute("aria-valuenow", "60");
+    fireEvent.click(screen.getByTestId("gantt-dialog-field-milestone"));
+    expect(screen.getByRole("slider")).toHaveAttribute("aria-valuenow", "0");
+  });
+
+  it("Should include the pre-filled progress value when saving the edit dialog without changes", () => {
+    const onTaskUpdated = vi.fn();
+    render(
+      <GanttChart
+        tasks={[taskWithProgress]}
+        enableBuiltinDialogs
+        onTaskUpdated={onTaskUpdated}
+      />,
+    );
+    fireEvent.click(screen.getByTestId("gantt-edit-task-prog"));
+    fireEvent.click(screen.getByTestId("gantt-dialog-save"));
+    expect(onTaskUpdated).toHaveBeenCalledOnce();
+    expect(onTaskUpdated).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "prog", progress: 60 }),
+    );
+  });
+});
