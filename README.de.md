@@ -475,6 +475,13 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/). In der Praxis b
 
 ## Changelog
 
+### [3.17.1] — 2026-07-05
+
+**Behoben**
+- `GanttChart`: Reset-View-Button (`showResetView`) aktiviert sich jetzt wenn ein Assignee-Filter gesetzt ist — bisher blieb der Button inaktiv obwohl ein Klick den Filter korrekt zurückgesetzt hätte. `isViewChanged` berücksichtigt nun korrekt den Assignee-Filter-Zustand.
+
+---
+
 ### [3.17.0] — 2026-07-05
 
 **Hinzugefügt**

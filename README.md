@@ -475,6 +475,13 @@ This project follows [Semantic Versioning](https://semver.org/). In practice:
 
 ## Changelog
 
+### [3.17.1] — 2026-07-05
+
+**Fixed**
+- `GanttChart`: Reset View button (`showResetView`) now activates when an assignee filter is set — previously the button stayed disabled even though clicking it would have cleared the filter. `isViewChanged` now correctly includes the assignee filter state.
+
+---
+
 ### [3.17.0] — 2026-07-05
 
 **Added**

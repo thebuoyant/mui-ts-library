@@ -13,6 +13,24 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [3.17.1] — 2026-07-05
+
+### Behoben
+
+#### `GanttChart` — Reset-View-Button bleibt inaktiv wenn Assignee-Filter gesetzt ist
+
+Der **Reset-View-Button** (`showResetView`) wurde nicht aktiviert, wenn ein Assignee-Filter über `toolbarConfig={{ showAssigneeFilter: true }}` gesetzt war. Das interne `isViewChanged`-Flag berücksichtigte den Assignee-Filter-Zustand nicht, sodass der Button deaktiviert blieb — obwohl ein Klick den Filter korrekt zurückgesetzt hätte.
+
+**Auswirkung:** War der Assignee-Filter die einzige aktive Ansichtsänderung, gab es keine Möglichkeit, ihn über den Reset-View-Button in der Toolbar zu löschen. Als Workaround musste manuell „Alle" im Filter-Dropdown gewählt werden.
+
+**Fix:** `isViewChanged` berücksichtigt jetzt `assigneeFilter !== ""`. Der Reset-View-Button aktiviert sich sobald irgendein Ansichtszustand vom Standard abweicht — inklusive des Assignee-Filters.
+
+**Dokumentiert:** Die Beschreibungen von `showResetView` und `onExportCSV` in `GanttToolbarConfig` und der Callback-Tabelle wurden präzisiert:
+- Reset View setzt **alle** Ansichtszustände zurück: Skala, Datumsbereich, Expand/Collapse und den Assignee-Filter.
+- CSV-Export exportiert immer **alle** Tasks, unabhängig von einem aktiven Assignee-Filter.
+
+---
+
 ## [3.17.0] — 2026-07-05
 
 ### Hinzugefügt
