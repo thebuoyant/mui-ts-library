@@ -595,6 +595,42 @@ The value is submitted via a hidden `<input type="hidden" name="query">` in the 
 | `onFocus` | `() => void` | Editor gains keyboard focus | Visual feedback, conditional UI |
 | `onBlur` | `() => void` | Editor loses keyboard focus | Triggering validation, auto-save |
 
+### Persisting to a backend — debouncing `onChange`
+
+`onChange` fires on **every content change** (keystroke, paste, format). For local state this is the desired behavior. When persisting to a backend (e.g. auto-saving a query), debounce the backend call:
+
+```tsx
+import { useCallback, useRef } from "react";
+
+function useDebounce<T extends (...args: Parameters<T>) => void>(fn: T, ms: number): T {
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  return useCallback((...args: Parameters<T>) => {
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => fn(...args), ms);
+  }, [fn, ms]) as T;
+}
+
+function MySqlEditor() {
+  const [sql, setSql] = useState("SELECT * FROM users;");
+
+  const saveToBackend = useDebounce((value: string) => {
+    api.saveDraft(value);
+  }, 500);
+
+  return (
+    <SqlEditor
+      value={sql}
+      onChange={(value) => {
+        setSql(value);           // instant — for controlled state
+        saveToBackend(value);    // debounced — for backend
+      }}
+    />
+  );
+}
+```
+
+> **Note:** `onExecute` fires once per button click or keyboard shortcut — it does not need debouncing. `onLint` is already internally debounced (600 ms) for performance.
+
 ---
 
 ## i18n — Translations

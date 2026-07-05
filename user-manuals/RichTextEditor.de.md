@@ -794,6 +794,44 @@ Der Editor-Rahmen erscheint in `error.main` (MUI-Fehlerfarbe), der `helperText` 
 
 **Wichtig:** `onChange` feuert NICHT wenn `value` von außen über die Prop gesetzt wird (externer Sync via `setContent`). Dies verhindert Endlosschleifen im kontrollierten Modus.
 
+### Ins Backend persistieren — `onChange` debouncen
+
+`onChange` feuert bei **jeder nutzergesteuerten Inhaltsänderung** (Tastendruck, Einfügen, Formatierung). Für lokalen State ist das genau richtig. Wenn du parallel ins Backend schreibst, debounce den Backend-Call:
+
+```tsx
+import { useCallback, useRef } from "react";
+
+function useDebounce<T extends (...args: Parameters<T>) => void>(fn: T, ms: number): T {
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  return useCallback((...args: Parameters<T>) => {
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => fn(...args), ms);
+  }, [fn, ms]) as T;
+}
+
+function MeinEditor() {
+  const [content, setContent] = useState("<p>Hallo</p>");
+
+  // Lokaler State-Update ist sofort — kein Debounce nötig.
+  // Backend-Persistierung wird gedebounced, um die API nicht zu überfluten.
+  const saveToBackend = useDebounce((html: string) => {
+    api.saveContent(html);
+  }, 500);
+
+  return (
+    <RichTextEditor
+      value={content}
+      onChange={(html) => {
+        setContent(html);        // sofort — für den kontrollierten Wert
+        saveToBackend(html);     // gedebounced — für den Backend-Call
+      }}
+    />
+  );
+}
+```
+
+**Warum die Library intern nicht debounced:** Die richtige Verzögerung (300–1000 ms für REST-API, 0 für lokalen State, individuell für Echtzeit-Zusammenarbeit) hängt von der Anwendung ab. Ein internes Debounce würde alle Apps zwingen, dagegen anzukämpfen.
+
 ---
 
 ## Architektur-Entscheidungen

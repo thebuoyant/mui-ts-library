@@ -48,9 +48,42 @@ Ein neues **Assignee-Filter-Dropdown** in der Toolbar ermöglicht es, die Chart-
 
 Beide Schlüssel sind in `GanttTranslations` als `optional` (`?`) deklariert — alle bestehenden vollständigen Übersetzungs-Literale kompilieren ohne Änderungen weiter.
 
-**Tests:** 4 neue Tests ergänzt (Render, Standard verborgen, vorfahren-inklusiver Filter, Zurücksetzen auf Alle) — **130 Tests gesamt**, alle grün.
+**Tests:** 4 neue Tests ergänzt (Render, Standard verborgen, vorfahren-inklusiver Filter, Zurücksetzen auf Alle) — **700 Tests gesamt**, alle grün.
 
 **Neue Storybook-Story:** `WithAssigneeFilter` — zeigt das Dropdown mit einem Mehrpersonen-Projekt und das vorfahren-inklusive Filterverhalten.
+
+---
+
+### Hinzugefügt — `onDragStart`-Callback
+
+```tsx
+onDragStart?: (task: GanttTask, type: "move" | "resize") => void
+```
+
+Ein neuer Callback, der **einmalig** bei mousedown feuert — sofort wenn der User die Maustaste auf einem zieh- oder skalierbaren Balken drückt, noch bevor ein Bewegungs-Schwellwert erreicht ist.
+
+- `type: "move"` — feuert bei einem Balken-Drag-Gesture (`draggable={true}`)
+- `type: "resize"` — feuert bei einer Resize-Gesture (`resizable={true}`)
+- Feuert NICHT beim Progress-Drag (`progressDraggable={true}`)
+- Vollständig abwärtskompatibel — neue optionale Prop, kein Verhaltensunterschied bei Weglassen
+
+**Anwendungsfälle:**
+
+- **Optimistisches UI**: Backend-State bereits beim Drag-Start updaten, damit der Schreibvorgang bei mouseup quasi sofort abgeschlossen ist
+- **Analytics**: Welcher Task wurde angefasst und wie
+- **Shadow-Element**: Ghost-Zeile / Indikator während des Dragens rendern
+
+**Verhältnis zu anderen Drag-Callbacks:**
+
+| Callback | Feuert wann | Anmerkung |
+|---|---|---|
+| `onDragStart` | mousedown — Geste beginnt (vor ≥ 5 px-Schwellwert) | Neu in v3.17.0 |
+| `onTaskMoved` | mouseup — Geste endet, nur wenn ≥ 5 px bewegt | Bestehend |
+| `onTaskResized` | mouseup — Geste endet, nur wenn ≥ 5 px bewegt | Bestehend |
+
+Keiner dieser Callbacks muss gedebounced werden — jeder feuert höchstens einmal pro Geste. Siehe [GanttChart User Manual — Backend-Integration](user-manuals/GanttChart.de.md) für eine ausführliche Erklärung.
+
+**Tests:** 2 neue Tests ergänzt (onDragStart für Move, onDragStart für Resize).
 
 ---
 

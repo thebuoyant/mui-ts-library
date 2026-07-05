@@ -478,7 +478,8 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/). In der Praxis b
 ### [3.17.0] — 2026-07-05
 
 **Hinzugefügt**
-- `GanttChart`: Assignee-Filter-Dropdown in der Toolbar — `toolbarConfig={{ showAssigneeFilter: true }}` fügt ein Select hinzu, das sichtbare Tasks nach Assignee filtert. Der Filter ist vorfahren-inklusiv (Parent-Tasks bleiben sichtbar wenn Nachkommen passen). Zwei neue optionale Übersetzungsschlüssel: `filterAssigneeAll`, `filterAssigneeLabel`. Siehe [Vollständiger Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) für Details.
+- `GanttChart`: Assignee-Filter-Dropdown in der Toolbar — `toolbarConfig={{ showAssigneeFilter: true }}` fügt ein Select hinzu, das sichtbare Tasks nach Assignee filtert. Der Filter ist vorfahren-inklusiv (Parent-Tasks bleiben sichtbar wenn Nachkommen passen). Zwei neue optionale Übersetzungsschlüssel: `filterAssigneeAll`, `filterAssigneeLabel`.
+- `GanttChart`: `onDragStart(task, type)`-Callback — feuert sofort bei mousedown auf einem zieh-/skalierbaren Balken (vor dem ≥ 5 px-Schwellwert). `type` ist `"move"` oder `"resize"`. Gedacht für optimistisches UI, Analytics und Shadow-Elemente. Kein Debounce nötig — feuert höchstens einmal pro Geste. Siehe [Vollständiger Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) für Details.
 
 ---
 

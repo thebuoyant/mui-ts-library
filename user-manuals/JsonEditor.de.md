@@ -498,6 +498,42 @@ const colors: JsonEditorHighlightColors = {
 | `onFocus` | `() => void` | Editor erhält Tastatur-Fokus | Visuelle Rückmeldung, bedingte UI |
 | `onBlur` | `() => void` | Editor verliert Tastatur-Fokus | Validierung auslösen, Auto-Save |
 
+### Ins Backend persistieren — `onChange` debouncen
+
+`onChange` feuert bei **jeder Inhaltsänderung** (Tastendruck, Einfügen, Formatierung). Für lokalen State ist das richtig. Wenn du ins Backend persistierst (z. B. Konfigurations-JSON automatisch speichern), debounce den Backend-Call:
+
+```tsx
+import { useCallback, useRef } from "react";
+
+function useDebounce<T extends (...args: Parameters<T>) => void>(fn: T, ms: number): T {
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  return useCallback((...args: Parameters<T>) => {
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => fn(...args), ms);
+  }, [fn, ms]) as T;
+}
+
+function MeinJsonEditor() {
+  const [json, setJson] = useState('{"key": "value"}');
+
+  const saveToBackend = useDebounce((value: string) => {
+    api.saveConfig(value);
+  }, 500);
+
+  return (
+    <JsonEditor
+      value={json}
+      onChange={(value) => {
+        setJson(value);          // sofort — für den kontrollierten State
+        saveToBackend(value);    // gedebounced — für das Backend
+      }}
+    />
+  );
+}
+```
+
+> **Hinweis:** `onValidChange` feuert nur bei Gültigkeitswechseln (nicht bei jedem Tastendruck) — kein Debounce nötig.
+
 ---
 
 ## Storybook-Stories

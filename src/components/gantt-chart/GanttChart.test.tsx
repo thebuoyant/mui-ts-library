@@ -988,6 +988,52 @@ describe("GanttChart — drag (draggable prop)", () => {
   });
 });
 
+describe("GanttChart — onDragStart callback", () => {
+  it("Should call onDragStart immediately on mousedown when dragging a bar", () => {
+    const onDragStart = vi.fn();
+    render(
+      <GanttChart
+        tasks={tasks}
+        draggable
+        timeScale="days"
+        defaultRangeStart={new Date("2025-01-01")}
+        defaultRangeEnd={new Date("2025-12-31")}
+        onDragStart={onDragStart}
+      />,
+    );
+    const bar = screen.getByTestId("gantt-bar-root");
+    fireEvent.mouseDown(bar, { clientX: 100 });
+    expect(onDragStart).toHaveBeenCalledOnce();
+    expect(onDragStart).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "root" }),
+      "move",
+    );
+    fireEvent.mouseUp(document);
+  });
+
+  it("Should call onDragStart with type 'resize' when resizing a bar", () => {
+    const onDragStart = vi.fn();
+    render(
+      <GanttChart
+        tasks={tasks}
+        resizable
+        timeScale="days"
+        defaultRangeStart={new Date("2025-01-01")}
+        defaultRangeEnd={new Date("2025-12-31")}
+        onDragStart={onDragStart}
+      />,
+    );
+    const handle = screen.getByTestId("gantt-resize-handle-root");
+    fireEvent.mouseDown(handle, { clientX: 100 });
+    expect(onDragStart).toHaveBeenCalledOnce();
+    expect(onDragStart).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "root" }),
+      "resize",
+    );
+    fireEvent.mouseUp(document);
+  });
+});
+
 describe("GanttChart — resize (resizable prop)", () => {
   it("Should render resize handles when resizable=true", () => {
     render(<GanttChart tasks={tasks} resizable />);

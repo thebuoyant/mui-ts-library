@@ -242,6 +242,13 @@ export type GanttChartProps = {
   // Dialog-Callbacks — werden nur ausgelöst wenn enableBuiltinDialogs=true
   onTaskCreated?: (task: GanttTask) => void;
   onTaskDeleted?: (taskId: string) => void;
+  /**
+   * Fired once when the user presses the mouse button on a draggable bar (before any movement).
+   * Use this for optimistic UI, analytics, or showing a shadow element during drag.
+   * `type` distinguishes between a move gesture and a resize gesture.
+   * @since 3.17.0
+   */
+  onDragStart?: (task: GanttTask, type: "move" | "resize") => void;
   onTaskMoved?: (task: GanttTask, newStart: Date, newEnd: Date) => void;
   onTaskResized?: (task: GanttTask, newEnd: Date) => void;
   // Wird nach jeder CRUD-Aktion mit der vollständigen aktuellen Task-Liste aufgerufen.

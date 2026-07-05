@@ -120,6 +120,7 @@ type GanttTimelineProps = {
   progressDraggable?: boolean;
   showCriticalPath?: boolean;
   virtualizeRows?: boolean;
+  onDragStart?: (task: GanttTask, type: "move" | "resize") => void;
   onTaskMoved?: (task: GanttTask, newStart: Date, newEnd: Date) => void;
   onTaskResized?: (task: GanttTask, newEnd: Date) => void;
   onTasksChange?: (tasks: GanttTask[]) => void;
@@ -136,6 +137,7 @@ export function GanttTimeline({
   progressDraggable = false,
   showCriticalPath = false,
   virtualizeRows = false,
+  onDragStart,
   onTaskMoved,
   onTaskResized,
   onTasksChange,
@@ -305,6 +307,7 @@ export function GanttTimeline({
   const { activeDrag, suppressClickRef, handleBarMouseDown, handleProgressMouseDown, formatDragDate } = useGanttDrag({
     totalWidth,
     displayRange,
+    onDragStart,
     onTaskMoved,
     onTaskResized,
     onTasksChange,
