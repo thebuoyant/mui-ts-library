@@ -13,6 +13,80 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.17.0] — 2026-07-05
+
+### Added
+
+#### `GanttChart` — Assignee filter in the toolbar
+
+A new **assignee filter dropdown** in the toolbar lets users narrow the chart view to tasks assigned to a specific person or team — without touching the data.
+
+**How to enable:**
+
+```tsx
+<GanttChart
+  tasks={tasks}
+  showAssigneeColumn={true}            // optional — makes assignees visible in the panel
+  toolbarConfig={{ showAssigneeFilter: true }}
+/>
+```
+
+**Behavior:**
+
+- Disabled by default (`showAssigneeFilter: false`) — fully backwards-compatible.
+- The dropdown is populated automatically from the unique, non-empty `GanttTask.assignee` values in the current task list — sorted alphabetically. Hidden when no tasks have an assignee.
+- **Ancestor-inclusive filter**: selecting an assignee also reveals parent tasks whose descendants match — the tree hierarchy stays readable.
+- Selecting "Alle" (or the translated equivalent) resets the filter and shows all tasks.
+- The "Reset view" button also clears the assignee filter.
+
+**New optional translation keys:**
+
+| Key | Default | Description |
+|---|---|---|
+| `filterAssigneeAll` | `"Alle"` | "All" option label in the dropdown |
+| `filterAssigneeLabel` | `"Assignee"` | Select label shown above the dropdown |
+
+Both keys are declared as `optional` (`?`) in `GanttTranslations` — all existing full translation literals continue to compile without changes.
+
+**Tests:** 4 new tests added (render, default hidden, ancestor-inclusive filter, reset to all) — **700 tests total**, all passing.
+
+**New Storybook story:** `WithAssigneeFilter` — demonstrates the dropdown with a multi-assignee project and the ancestor-inclusive filter behavior.
+
+---
+
+### Added — `onDragStart` callback
+
+```tsx
+onDragStart?: (task: GanttTask, type: "move" | "resize") => void
+```
+
+A new callback that fires **once** on mousedown — immediately when the user presses the mouse button on a draggable or resizable bar, before any movement threshold is reached.
+
+- `type: "move"` — fired from a bar move gesture (`draggable={true}`)
+- `type: "resize"` — fired from a resize gesture (`resizable={true}`)
+- Does NOT fire for progress-drag (`progressDraggable={true}`)
+- Fully backwards-compatible — new optional prop, no behavior change when omitted
+
+**Use cases:**
+
+- **Optimistic UI**: start updating your backend state before the drag ends, so the write is nearly instant on mouseup
+- **Analytics**: log which task was grabbed and how
+- **Shadow element**: render a ghost row/indicator while the user is dragging
+
+**Relationship to other drag callbacks:**
+
+| Callback | Fires at | Notes |
+|---|---|---|
+| `onDragStart` | mousedown — gesture begins (before ≥ 5 px threshold) | New in v3.17.0 |
+| `onTaskMoved` | mouseup — gesture ends, only if moved ≥ 5 px | Existing |
+| `onTaskResized` | mouseup — gesture ends, only if moved ≥ 5 px | Existing |
+
+No debouncing is needed for any of these — each fires at most once per gesture. See [GanttChart user manual — Backend integration](user-manuals/GanttChart.md) for a full explanation.
+
+**Tests:** 2 new tests added (onDragStart for move, onDragStart for resize).
+
+---
+
 ## [3.16.0] — 2026-07-03
 
 ### Added

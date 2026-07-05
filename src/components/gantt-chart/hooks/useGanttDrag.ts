@@ -56,6 +56,7 @@ type DragInit = {
 type UseGanttDragOptions = {
   totalWidth: number;
   displayRange: TimelineRange;
+  onDragStart?: (task: GanttTask, type: "move" | "resize") => void;
   onTaskMoved?: (task: GanttTask, newStart: Date, newEnd: Date) => void;
   onTaskResized?: (task: GanttTask, newEnd: Date) => void;
   onTasksChange?: (tasks: GanttTask[]) => void;
@@ -76,6 +77,7 @@ type UseGanttDragReturn = {
 export function useGanttDrag({
   totalWidth,
   displayRange,
+  onDragStart,
   onTaskMoved,
   onTaskResized,
   onTasksChange,
@@ -88,6 +90,7 @@ export function useGanttDrag({
   const dayWidthPxRef = useRef(1);
 
   // Stabile Callback-Refs (Muster 1) — kein useCallback-Rebuild bei Prop-Änderungen nötig.
+  const onDragStartRef   = useRef(onDragStart);
   const onTaskMovedRef   = useRef(onTaskMoved);
   const onTaskResizedRef = useRef(onTaskResized);
   const onTasksChangeRef = useRef(onTasksChange);
@@ -97,6 +100,7 @@ export function useGanttDrag({
       totalWidth > 0
         ? totalWidth / ((displayRange.end.getTime() - displayRange.start.getTime()) / MS_PER_DAY)
         : 1;
+    onDragStartRef.current   = onDragStart;
     onTaskMovedRef.current   = onTaskMoved;
     onTaskResizedRef.current = onTaskResized;
     onTasksChangeRef.current = onTasksChange;
@@ -136,6 +140,11 @@ export function useGanttDrag({
       originalStart: task.startDate,
       originalEnd:   task.endDate,
     };
+
+    // Fire onDragStart immediately — before any movement threshold is reached.
+    if (type !== "progress") {
+      onDragStartRef.current?.(task, type as "move" | "resize");
+    }
 
     document.body.style.cursor = type === "resize" ? "ew-resize" : "grabbing";
 

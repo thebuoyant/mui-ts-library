@@ -10,6 +10,7 @@ import { useGanttDrag } from "./hooks/useGanttDrag";
 import {
   calculateTaskPosition,
   computeCriticalPath,
+  filterByAssignee,
   getDaysInRange,
   getDisplayRange,
   getISOWeekNumber,
@@ -119,6 +120,7 @@ type GanttTimelineProps = {
   progressDraggable?: boolean;
   showCriticalPath?: boolean;
   virtualizeRows?: boolean;
+  onDragStart?: (task: GanttTask, type: "move" | "resize") => void;
   onTaskMoved?: (task: GanttTask, newStart: Date, newEnd: Date) => void;
   onTaskResized?: (task: GanttTask, newEnd: Date) => void;
   onTasksChange?: (tasks: GanttTask[]) => void;
@@ -135,6 +137,7 @@ export function GanttTimeline({
   progressDraggable = false,
   showCriticalPath = false,
   virtualizeRows = false,
+  onDragStart,
   onTaskMoved,
   onTaskResized,
   onTasksChange,
@@ -155,10 +158,15 @@ export function GanttTimeline({
   const instanceId = useId().replace(/:/g, "");
   const arrowMarkerId = `gantt-arrow-${instanceId}`;
 
+  const assigneeFilter = useGanttChartStore((s) => s.assigneeFilter);
+
   // Selector würde bei jedem Aufruf eine neue Array-Referenz liefern → Endlosschleife.
   const visibleTasks = useMemo(
-    () => getVisibleTasks(taskTree, expandedIds),
-    [taskTree, expandedIds],
+    () => {
+      const flat = getVisibleTasks(taskTree, expandedIds);
+      return assigneeFilter ? filterByAssignee(flat, assigneeFilter) : flat;
+    },
+    [taskTree, expandedIds, assigneeFilter],
   );
 
   // Anzeigebereich auf Spalten-Grenzen ausweiten damit Balken-Prozente korrekt ausgerichtet sind.
@@ -299,6 +307,7 @@ export function GanttTimeline({
   const { activeDrag, suppressClickRef, handleBarMouseDown, handleProgressMouseDown, formatDragDate } = useGanttDrag({
     totalWidth,
     displayRange,
+    onDragStart,
     onTaskMoved,
     onTaskResized,
     onTasksChange,

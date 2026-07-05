@@ -39,6 +39,13 @@ Rechtsklick auf einen Balken öffnet ein **Kontextmenü** zum direkten Ändern d
 
 ---
 
+> ### Neu in v3.17.0
+>
+> | Feature | Beschreibung | Springe zu |
+> |---|---|---|
+> | **Assignee-Filter in der Toolbar** | `toolbarConfig={{ showAssigneeFilter: true }}` fügt ein Select-Dropdown hinzu, das sichtbare Tasks nach Assignee filtert. Der Filter ist **vorfahren-inklusiv**: ein ausgewählter Assignee zeigt auch Parent-Tasks, deren Nachkommen passen. Zurücksetzen (Option „Alle" / übersetzte Bezeichnung) zeigt wieder alle Tasks. Zwei neue optionale Übersetzungsschlüssel: `filterAssigneeAll`, `filterAssigneeLabel`. | [→ Toolbar-Konfiguration](#ganttoolbarconfig) · [→ Übersetzungen](#übersetzungen) |
+> | **`onDragStart`-Callback** | Feuert sofort wenn der User die Maustaste auf einem zieh- oder skalierbaren Balken drückt — noch bevor ein Bewegungs-Schwellwert erreicht ist. Geeignet für optimistisches UI, Analytics oder das Anzeigen eines Shadow-Elements während des Dragens. Erhält den Task und den Gesten-Typ (`"move"` oder `"resize"`). | [→ Props](#props-referenz) · [→ Backend-Integration](#backend-integration--debouncing) |
+
 > ### Neu in v3.16.0
 >
 > | Feature | Beschreibung | Springe zu |
@@ -226,6 +233,7 @@ Erlaubt die selektive Ausblendung einzelner Toolbar-Elemente. Alle Felder sind o
 | `showExpandCollapseAll` | `boolean` | `true` | Alle aufklappen / Alle zuklappen |
 | `showScrollToToday` | `boolean` | `true` | „Zum heutigen Tag"-Button |
 | `showDateRange` | `boolean` | `true` | Von/Bis-Datumseingaben |
+| `showAssigneeFilter` | `boolean` | `false` | Assignee-Filter-Dropdown in der Toolbar (vorfahren-inklusiv, **@since 3.17.0**) |
 | `showExportCSV` | `boolean` | `false` | CSV-Download-Button — löst `onExportCSV` aus oder Browser-Download |
 | `showRangeReset` | `boolean` | `true` | Zurücksetzen-Button (erscheint nur wenn Bereich manuell angepasst wurde) |
 | `showResetView` | `boolean` | `true` | Ansicht zurücksetzen (Skala + Bereich auf Standardwerte) |
@@ -325,6 +333,7 @@ const ganttTheme: GanttTheme = {
 > | Hinzufügen-Icon geklickt (`enableBuiltinDialogs={false}`) | `onAddTask` |
 > | Bearbeiten-Icon geklickt (`enableBuiltinDialogs={false}`) | `onEditTask` |
 > | Löschen-Icon geklickt (`enableBuiltinDialogs={false}`) | `onDeleteTask` |
+> | Maustaste auf ziehbarem Balken gedrückt (vor Bewegung) | `onDragStart` |
 > | Task-Balken per Drag verschoben (`draggable={true}`) | `onTaskMoved` · `onTasksChange` |
 > | Rechter Balkenrand per Drag geändert (`resizable={true}`) | `onTaskResized` · `onTasksChange` |
 > | CSV-Export-Button geklickt | `onExportCSV` (oder Browser-Download wenn nicht angegeben) |
@@ -343,11 +352,66 @@ const ganttTheme: GanttTheme = {
 | `onAddTask` | `(parentTask?: GanttTask) => void` | Hinzufügen-Icon geklickt — **nur** wenn `enableBuiltinDialogs={false}` | Eigener Hinzufügen-Dialog / Drawer |
 | `onEditTask` | `(task: GanttTask) => void` | Bearbeiten-Icon geklickt — **nur** wenn `enableBuiltinDialogs={false}` | Eigener Bearbeiten-Dialog / Drawer |
 | `onDeleteTask` | `(task: GanttTask) => void` | Löschen-Icon geklickt — **nur** wenn `enableBuiltinDialogs={false}` | Eigene Löschbestätigung |
+| `onDragStart` | `(task: GanttTask, type: "move" \| "resize") => void` | Maustaste auf zieh-/skalierbarem Balken gedrückt — feuert **vor** jedem Bewegungs-Schwellwert, einmal pro Geste. `type` ist `"move"` für Balken-Drag, `"resize"` für Rechtsrand-Resize. **@since 3.17.0** | Optimistisches UI, Analytics, Shadow-Element anzeigen |
 | `onTaskMoved` | `(task: GanttTask, newStart: Date, newEnd: Date) => void` | Task-Balken per Drag horizontal verschoben (`draggable={true}`). `task` enthält die ursprünglichen Metadaten; neue Daten in `newStart`/`newEnd` | Drag-Ergebnisse ins Backend persistieren |
 | `onTaskResized` | `(task: GanttTask, newEnd: Date) => void` | Rechter Balkenrand per Drag verändert (`resizable={true}`) | Resize-Ergebnisse persistieren |
 | `onExportCSV` | `(csv: string, tasks: GanttTask[]) => void` | CSV-Export-Button geklickt — ohne Callback: automatischer Browser-Download `gantt-tasks.csv` | Eigener Export (Server-Upload, eigener Dateiname) |
 
 > **Tipp — `onTasksChange` vs. spezifische Callbacks:** Für einfache Datenspeicherung reicht `onTasksChange` allein aus. Die spezifischen Callbacks (`onTaskCreated`, `onTaskUpdated` etc.) sind für Anwendungen gedacht, die auf bestimmte Aktionen unterschiedlich reagieren müssen (z. B. separate API-Calls für Create/Update/Delete).
+
+---
+
+### Backend-Integration & Debouncing
+
+#### Muss ich GanttChart-Callbacks debouncen?
+
+**Nein.** Jeder GanttChart-Callback feuert genau einmal an einer klaren Interaktionsgrenze — es gibt nichts zu debouncen:
+
+| Callback | Feuert | Bereits Grenz-gefeuert? |
+|---|---|---|
+| `onDragStart` | Einmal bei mousedown (Geste beginnt) | ✅ Ja |
+| `onTaskMoved` | Einmal bei mouseup — nur wenn Bewegung ≥ 5 px | ✅ Ja |
+| `onTaskResized` | Einmal bei mouseup — nur wenn Bewegung ≥ 5 px | ✅ Ja |
+| `onTaskCreated/Updated/Deleted` | Einmal bei Dialog-Speichern/Löschen-Bestätigung | ✅ Ja |
+| `onTasksChange` | Einmal nach jeder CRUD-Aktion, mit der vollen Liste | ✅ Ja |
+| `onTaskClick`, `onMilestoneClick`, `onStatusChange` | Einmal pro diskretem Nutzerklick | ✅ Ja |
+| `onExportCSV` | Einmal pro Button-Klick | ✅ Ja |
+
+Du kannst dein Backend direkt in diesen Callbacks aufrufen, ohne Gefahr, es zu überfluten.
+
+#### Typisches Drag-zu-Backend-Muster
+
+```tsx
+<GanttChart
+  tasks={tasks}
+  draggable
+  resizable
+  onDragStart={(task, type) => {
+    // Sofort bei mousedown — für optimistisches UI
+    setDragging({ taskId: task.id, type });
+  }}
+  onTaskMoved={(task, newStart, newEnd) => {
+    // Einmal bei mouseup nach bestätigtem Verschieben
+    setDragging(null);
+    api.updateTask({ ...task, startDate: newStart, endDate: newEnd });
+  }}
+  onTaskResized={(task, newEnd) => {
+    setDragging(null);
+    api.updateTask({ ...task, endDate: newEnd });
+  }}
+/>
+```
+
+#### Warum die Bibliothek intern nicht debounced
+
+Die Debounce-Verzögerung ist anwendungsspezifisch:
+- 300 ms ist üblich für eine REST-API
+- 0 ms ist korrekt für lokalen State oder `useState`
+- Echtzeit-Zusammenarbeit (WebSockets, CRDTs) benötigt ggf. eigenes Throttling
+
+Ein eingebautes Debounce würde alle Apps zwingen, dagegen anzukämpfen. Ungethrottelte Callbacks lassen jede App genau die Strategie anwenden, die sie benötigt — einschließlich gar keiner.
+
+> **Hinweis für Editor-Komponenten:** Die Callbacks von `RichTextEditor`, `SqlEditor` und `JsonEditor` feuern bei jedem Tastendruck. Wenn du diese in ein Backend persistierst, lies die Debounce-Hinweise in den jeweiligen User-Manuals.
 
 ---
 
@@ -419,6 +483,9 @@ type GanttTranslations = {
   dialogDeleteConfirm: string;  // {name} wird durch den Task-Namen ersetzt
   dialogFieldDependencies: string;
   dialogFieldDependenciesNone: string;
+  dialogFieldProgress?: string;  // @since 3.16.0, optional — bestehende Literals kompilieren ohne Änderungen
+  filterAssigneeAll?: string;    // @since 3.17.0, optional
+  filterAssigneeLabel?: string;  // @since 3.17.0, optional
 };
 ```
 
@@ -468,6 +535,8 @@ type GanttTranslations = {
 | `dialogFieldDependencies` | `"Vorgänger"` | Formularfeld-Label für Abhängigkeiten |
 | `dialogFieldDependenciesNone` | `"— Keine —"` | Option für „keine Abhängigkeiten" |
 | `dialogFieldProgress` | `"Fortschritt (%)"` | Slider-Label im Hinzufügen-/Bearbeiten-Dialog — **optional**, hinzugefügt in v3.16.0 |
+| `filterAssigneeAll` | `"Alle"` | „Alle"-Option im Assignee-Filter-Dropdown — **optional**, hinzugefügt in v3.17.0 |
+| `filterAssigneeLabel` | `"Assignee"` | Label des Assignee-Filter-Selects in der Toolbar — **optional**, hinzugefügt in v3.17.0 |
 | `dialogDeleteConfirm` | `"Soll die Aufgabe \"{name}\" wirklich gelöscht werden?"` | Bestätigungstext. `{name}` wird durch den Task-Namen ersetzt. |
 
 **Vollständige englische Übersetzung:**
@@ -516,6 +585,8 @@ type GanttTranslations = {
     dialogFieldDependencies: 'Predecessors',
     dialogFieldDependenciesNone: '— None —',
     dialogFieldProgress: 'Progress (%)',   // optional — hinzugefügt in v3.16.0
+    filterAssigneeAll: 'All',              // optional — hinzugefügt in v3.17.0
+    filterAssigneeLabel: 'Assignee',       // optional — hinzugefügt in v3.17.0
     dialogDeleteConfirm: 'Delete task "{name}"?',
   }}
 />

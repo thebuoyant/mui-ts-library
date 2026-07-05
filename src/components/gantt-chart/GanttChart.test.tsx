@@ -988,6 +988,52 @@ describe("GanttChart — drag (draggable prop)", () => {
   });
 });
 
+describe("GanttChart — onDragStart callback", () => {
+  it("Should call onDragStart immediately on mousedown when dragging a bar", () => {
+    const onDragStart = vi.fn();
+    render(
+      <GanttChart
+        tasks={tasks}
+        draggable
+        timeScale="days"
+        defaultRangeStart={new Date("2025-01-01")}
+        defaultRangeEnd={new Date("2025-12-31")}
+        onDragStart={onDragStart}
+      />,
+    );
+    const bar = screen.getByTestId("gantt-bar-root");
+    fireEvent.mouseDown(bar, { clientX: 100 });
+    expect(onDragStart).toHaveBeenCalledOnce();
+    expect(onDragStart).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "root" }),
+      "move",
+    );
+    fireEvent.mouseUp(document);
+  });
+
+  it("Should call onDragStart with type 'resize' when resizing a bar", () => {
+    const onDragStart = vi.fn();
+    render(
+      <GanttChart
+        tasks={tasks}
+        resizable
+        timeScale="days"
+        defaultRangeStart={new Date("2025-01-01")}
+        defaultRangeEnd={new Date("2025-12-31")}
+        onDragStart={onDragStart}
+      />,
+    );
+    const handle = screen.getByTestId("gantt-resize-handle-root");
+    fireEvent.mouseDown(handle, { clientX: 100 });
+    expect(onDragStart).toHaveBeenCalledOnce();
+    expect(onDragStart).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "root" }),
+      "resize",
+    );
+    fireEvent.mouseUp(document);
+  });
+});
+
 describe("GanttChart — resize (resizable prop)", () => {
   it("Should render resize handles when resizable=true", () => {
     render(<GanttChart tasks={tasks} resizable />);
@@ -1581,5 +1627,75 @@ describe("GanttChart — dialog progress field", () => {
     expect(onTaskUpdated).toHaveBeenCalledWith(
       expect.objectContaining({ id: "prog", progress: 60 }),
     );
+  });
+});
+
+describe("GanttChart — assignee filter", () => {
+  const assigneeTasks: GanttTask[] = [
+    {
+      id: "parent",
+      name: "Parent Task",
+      status: "in-progress",
+      startDate: new Date("2025-01-01"),
+      endDate: new Date("2025-03-31"),
+    },
+    {
+      id: "alice-task",
+      parentId: "parent",
+      name: "Alice Task",
+      assignee: "Alice",
+      status: "planned",
+      startDate: new Date("2025-01-01"),
+      endDate: new Date("2025-01-31"),
+    },
+    {
+      id: "bob-task",
+      name: "Bob Task",
+      assignee: "Bob",
+      status: "planned",
+      startDate: new Date("2025-02-01"),
+      endDate: new Date("2025-02-28"),
+    },
+  ];
+
+  // Mirrors the pattern from the dependencies-dropdown tests: testid is on MUI's hidden
+  // native input, so we navigate up to the combobox trigger to open the dropdown.
+  function openAssigneeFilter() {
+    const hiddenInput = screen.getByTestId("gantt-assignee-filter");
+    const combobox = hiddenInput.parentElement!.querySelector('[role="combobox"]')!;
+    fireEvent.mouseDown(combobox);
+  }
+
+  it("Should render the assignee filter dropdown when showAssigneeFilter is true and tasks have assignees", () => {
+    render(<GanttChart tasks={assigneeTasks} toolbarConfig={{ showAssigneeFilter: true }} />);
+    expect(screen.getByTestId("gantt-assignee-filter")).toBeInTheDocument();
+  });
+
+  it("Should not render the assignee filter when showAssigneeFilter is false (default)", () => {
+    render(<GanttChart tasks={assigneeTasks} />);
+    expect(screen.queryByTestId("gantt-assignee-filter")).not.toBeInTheDocument();
+  });
+
+  it("Should show only matching tasks and their ancestors when an assignee is selected", () => {
+    render(<GanttChart tasks={assigneeTasks} toolbarConfig={{ showAssigneeFilter: true }} />);
+    openAssigneeFilter();
+    fireEvent.click(screen.getByRole("option", { name: "Alice" }));
+    expect(screen.getByText("Alice Task")).toBeInTheDocument();
+    // Ancestor of alice-task is shown even though its own assignee is unset
+    expect(screen.getByText("Parent Task")).toBeInTheDocument();
+    // Bob has no matching descendant — excluded
+    expect(screen.queryByText("Bob Task")).not.toBeInTheDocument();
+  });
+
+  it("Should show all tasks again when the 'Alle' option is selected after filtering", () => {
+    render(<GanttChart tasks={assigneeTasks} toolbarConfig={{ showAssigneeFilter: true }} />);
+    openAssigneeFilter();
+    fireEvent.click(screen.getByRole("option", { name: "Alice" }));
+    expect(screen.queryByText("Bob Task")).not.toBeInTheDocument();
+    openAssigneeFilter();
+    fireEvent.click(screen.getByRole("option", { name: "Alle" }));
+    expect(screen.getByText("Bob Task")).toBeInTheDocument();
+    expect(screen.getByText("Alice Task")).toBeInTheDocument();
+    expect(screen.getByText("Parent Task")).toBeInTheDocument();
   });
 });

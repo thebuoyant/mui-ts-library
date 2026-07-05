@@ -794,6 +794,44 @@ The editor border appears in `error.main` (MUI error color), and the `helperText
 
 **Important:** `onChange` does NOT fire when `value` is set externally via the prop (external sync via `setContent`). This prevents infinite loops in controlled mode.
 
+### Persisting to a backend — debouncing `onChange`
+
+`onChange` fires on **every user-driven content change** (keystroke, paste, formatting). For local state this is exactly what you want. If you also write to a backend on every change, you will flood it — apply a debounce in your own code:
+
+```tsx
+import { useCallback, useRef } from "react";
+
+function useDebounce<T extends (...args: Parameters<T>) => void>(fn: T, ms: number): T {
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  return useCallback((...args: Parameters<T>) => {
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => fn(...args), ms);
+  }, [fn, ms]) as T;
+}
+
+function MyEditor() {
+  const [content, setContent] = useState("<p>Hello</p>");
+
+  // Local state update is instant — no debounce needed here.
+  // Backend persistence is debounced to avoid flooding the API.
+  const saveToBackend = useDebounce((html: string) => {
+    api.saveContent(html);
+  }, 500);
+
+  return (
+    <RichTextEditor
+      value={content}
+      onChange={(html) => {
+        setContent(html);        // instant — for the controlled value
+        saveToBackend(html);     // debounced — for the backend call
+      }}
+    />
+  );
+}
+```
+
+**Why the library does not debounce internally:** The right delay (300–1000 ms for REST, 0 for local state, custom for real-time collab) depends on the application. An internal debounce would force all apps to fight it.
+
 ---
 
 ## Architecture Decisions

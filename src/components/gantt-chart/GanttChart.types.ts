@@ -78,6 +78,10 @@ export type GanttTranslations = {
   dialogFieldDependenciesNone: string;
   /** Label for the progress slider in the task dialog (0–100 %) @since 3.16.0 */
   dialogFieldProgress?: string;
+  /** "All" option label in the assignee filter dropdown @since 3.17.0 */
+  filterAssigneeAll?: string;
+  /** Assignee filter Select label in the toolbar @since 3.17.0 */
+  filterAssigneeLabel?: string;
   // Task-Panel — Aktions-Spalten-Header
   columnActions: string;
   /** Header label for the Assignee column — shown when showAssigneeColumn=true @since 2.7.0 */
@@ -130,6 +134,8 @@ export const DEFAULT_GANTT_TRANSLATIONS: Required<GanttTranslations> = {
   dialogFieldDependencies: "Vorgänger",
   dialogFieldDependenciesNone: "— Keine —",
   dialogFieldProgress: "Fortschritt (%)",
+  filterAssigneeAll: "Alle",
+  filterAssigneeLabel: "Assignee",
   scrollToTodayTooltip: "Zum heutigen Tag",
   expandAllTooltip: "Alle aufklappen",
   collapseAllTooltip: "Alle zuklappen",
@@ -175,6 +181,8 @@ export type GanttToolbarConfig = {
   showResetView?: boolean;   // Reset-Button (Skala + Bereich zurücksetzen)
   /** Show CSV export button in the toolbar (default: false) */
   showExportCSV?: boolean;
+  /** Show assignee filter dropdown in toolbar (default: false) */
+  showAssigneeFilter?: boolean;
 };
 
 export type GanttChartProps = {
@@ -234,6 +242,13 @@ export type GanttChartProps = {
   // Dialog-Callbacks — werden nur ausgelöst wenn enableBuiltinDialogs=true
   onTaskCreated?: (task: GanttTask) => void;
   onTaskDeleted?: (taskId: string) => void;
+  /**
+   * Fired once when the user presses the mouse button on a draggable bar (before any movement).
+   * Use this for optimistic UI, analytics, or showing a shadow element during drag.
+   * `type` distinguishes between a move gesture and a resize gesture.
+   * @since 3.17.0
+   */
+  onDragStart?: (task: GanttTask, type: "move" | "resize") => void;
   onTaskMoved?: (task: GanttTask, newStart: Date, newEnd: Date) => void;
   onTaskResized?: (task: GanttTask, newEnd: Date) => void;
   // Wird nach jeder CRUD-Aktion mit der vollständigen aktuellen Task-Liste aufgerufen.

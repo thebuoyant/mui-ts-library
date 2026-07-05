@@ -624,6 +624,42 @@ Die Platzhalter `{line}`, `{col}` und `{count}` werden zur Laufzeit ersetzt.
 | `onFocus` | `() => void` | Editor erhält Tastatur-Fokus | Visuelle Rückmeldung, bedingte UI |
 | `onBlur` | `() => void` | Editor verliert Tastatur-Fokus | Validierung auslösen, Auto-Save |
 
+### Ins Backend persistieren — `onChange` debouncen
+
+`onChange` feuert bei **jeder Inhaltsänderung** (Tastendruck, Einfügen, Formatierung). Für lokalen State ist das richtig. Wenn du ins Backend persistierst (z. B. Abfrage-Drafts automatisch speichern), debounce den Backend-Call:
+
+```tsx
+import { useCallback, useRef } from "react";
+
+function useDebounce<T extends (...args: Parameters<T>) => void>(fn: T, ms: number): T {
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  return useCallback((...args: Parameters<T>) => {
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => fn(...args), ms);
+  }, [fn, ms]) as T;
+}
+
+function MeinSqlEditor() {
+  const [sql, setSql] = useState("SELECT * FROM users;");
+
+  const saveToBackend = useDebounce((value: string) => {
+    api.saveDraft(value);
+  }, 500);
+
+  return (
+    <SqlEditor
+      value={sql}
+      onChange={(value) => {
+        setSql(value);           // sofort — für den kontrollierten State
+        saveToBackend(value);    // gedebounced — für das Backend
+      }}
+    />
+  );
+}
+```
+
+> **Hinweis:** `onExecute` feuert einmal pro Button-Klick oder Tastaturkürzel — kein Debounce nötig. `onLint` ist bereits intern mit 600 ms gedebounced.
+
 ---
 
 ## Storybook-Stories

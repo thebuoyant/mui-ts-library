@@ -39,6 +39,13 @@ Right-clicking a task bar opens a **context menu** to change its status without 
 
 ---
 
+> ### New in v3.17.0
+>
+> | Feature | Description | Jump to |
+> |---|---|---|
+> | **Assignee filter in toolbar** | `toolbarConfig={{ showAssigneeFilter: true }}` adds a Select dropdown that filters visible tasks by assignee. The filter is **ancestor-inclusive**: selecting an assignee also reveals parent tasks whose descendants match. Clearing the filter (selecting "Alle" / the translated label) shows all tasks again. Two new optional translation keys: `filterAssigneeAll`, `filterAssigneeLabel`. | [→ Toolbar config](#ganttoolbarconfig) · [→ Translations](#translations) |
+> | **`onDragStart` callback** | Fires immediately when the user presses the mouse button on a draggable or resizable bar — before any movement threshold is reached. Use this for optimistic UI, analytics, or showing a shadow element during drag. Receives the task and the gesture type (`"move"` or `"resize"`). | [→ Props](#props-reference) · [→ Backend integration](#backend-integration--debouncing) |
+
 > ### New in v3.16.0
 >
 > | Feature | Description | Jump to |
@@ -221,6 +228,7 @@ Allows selectively hiding individual toolbar elements. All fields are optional �
 |---|---|---|---|
 | `showDateRange` | `boolean` | `true` | From/To date inputs |
 | `showExpandCollapseAll` | `boolean` | `true` | Expand all / Collapse all |
+| `showAssigneeFilter` | `boolean` | `false` | Assignee filter dropdown in toolbar (ancestor-inclusive, **@since 3.17.0**) |
 | `showExportCSV` | `boolean` | `false` | CSV download button — triggers `onExportCSV` or browser download |
 | `showRangeReset` | `boolean` | `true` | Reset button (appears when range was manually adjusted) |
 | `showResetView` | `boolean` | `true` | Reset view (scale + range back to defaults) |
@@ -325,6 +333,7 @@ const ganttTheme: GanttTheme = {
 > | Add icon clicked (`enableBuiltinDialogs={false}`) | `onAddTask` |
 > | Edit icon clicked (`enableBuiltinDialogs={false}`) | `onEditTask` |
 > | Delete icon clicked (`enableBuiltinDialogs={false}`) | `onDeleteTask` |
+> | Mouse pressed on a draggable bar (before movement) | `onDragStart` |
 > | Task bar dragged (`draggable={true}`) | `onTaskMoved` · `onTasksChange` |
 > | Task bar right edge resized (`resizable={true}`) | `onTaskResized` · `onTasksChange` |
 > | CSV export button clicked | `onExportCSV` (or browser download if not provided) |
@@ -343,11 +352,66 @@ const ganttTheme: GanttTheme = {
 | `onAddTask` | `(parentTask?: GanttTask) => void` | Add icon clicked — **only** when `enableBuiltinDialogs={false}` | Custom Add dialog / drawer |
 | `onEditTask` | `(task: GanttTask) => void` | Edit icon clicked — **only** when `enableBuiltinDialogs={false}` | Custom Edit dialog / drawer |
 | `onDeleteTask` | `(task: GanttTask) => void` | Delete icon clicked — **only** when `enableBuiltinDialogs={false}` | Custom Delete confirmation |
+| `onDragStart` | `(task: GanttTask, type: "move" \| "resize") => void` | Mouse button pressed on a draggable/resizable bar — fires **before** any movement threshold, once per gesture. `type` is `"move"` for bar drags, `"resize"` for right-edge resize. **@since 3.17.0** | Optimistic UI, analytics, showing a shadow element |
 | `onTaskMoved` | `(task: GanttTask, newStart: Date, newEnd: Date) => void` | Task bar dragged to a new position (`draggable={true}`). `task` carries the original metadata; new dates are in `newStart`/`newEnd` | Persisting drag results to a backend |
 | `onTaskResized` | `(task: GanttTask, newEnd: Date) => void` | Task bar right edge dragged (`resizable={true}`) | Persisting resize results |
 | `onExportCSV` | `(csv: string, tasks: GanttTask[]) => void` | CSV export button clicked — when not provided, the chart triggers a browser download of `gantt-tasks.csv` automatically | Custom export handling (upload to server, custom filename) |
 
 > **Tip — `onTasksChange` vs. specific callbacks:** For simple data persistence, `onTasksChange` alone is sufficient. The specific callbacks (`onTaskCreated`, `onTaskUpdated`, etc.) are intended for applications that need to react differently to specific actions (e.g. separate API calls for Create/Update/Delete).
+
+---
+
+### Backend integration & debouncing
+
+#### Do I need to debounce GanttChart callbacks?
+
+**No.** Every GanttChart callback fires exactly once at a clear interaction boundary — there is nothing to debounce:
+
+| Callback | Fires | Already boundary-fired? |
+|---|---|---|
+| `onDragStart` | Once on mousedown (gesture starts) | ✅ Yes |
+| `onTaskMoved` | Once on mouseup — only when movement was ≥ 5 px | ✅ Yes |
+| `onTaskResized` | Once on mouseup — only when movement was ≥ 5 px | ✅ Yes |
+| `onTaskCreated/Updated/Deleted` | Once on dialog Save/Delete confirm | ✅ Yes |
+| `onTasksChange` | Once after every CRUD action, with the full list | ✅ Yes |
+| `onTaskClick`, `onMilestoneClick`, `onStatusChange` | Once per discrete user click | ✅ Yes |
+| `onExportCSV` | Once per button click | ✅ Yes |
+
+You can call your backend directly inside any of these callbacks without risk of flooding it.
+
+#### Typical drag-to-backend pattern
+
+```tsx
+<GanttChart
+  tasks={tasks}
+  draggable
+  resizable
+  onDragStart={(task, type) => {
+    // Called immediately on mousedown — use for optimistic UI
+    setDragging({ taskId: task.id, type });
+  }}
+  onTaskMoved={(task, newStart, newEnd) => {
+    // Called once on mouseup after a confirmed move
+    setDragging(null);
+    api.updateTask({ ...task, startDate: newStart, endDate: newEnd });
+  }}
+  onTaskResized={(task, newEnd) => {
+    setDragging(null);
+    api.updateTask({ ...task, endDate: newEnd });
+  }}
+/>
+```
+
+#### Why the library does not debounce internally
+
+Debouncing delay is application-specific:
+- 300 ms is common for a REST API
+- 0 ms is correct for local state or `useState`
+- Real-time collaboration (WebSockets, CRDTs) may need custom throttling
+
+A built-in debounce would force all apps to work around it. Keeping callbacks unthrottled lets each app apply exactly the strategy it needs — including none at all.
+
+> **Note for editor components:** The `RichTextEditor`, `SqlEditor`, and `JsonEditor` callbacks fire on every keystroke. If you persist those to a backend, see the debouncing guidance in their respective user manuals.
 
 ---
 
@@ -420,6 +484,8 @@ type GanttTranslations = {
   dialogFieldDependencies: string;
   dialogFieldDependenciesNone: string;
   dialogFieldProgress?: string;  // @since 3.16.0, optional — existing literals compile without changes
+  filterAssigneeAll?: string;    // @since 3.17.0, optional
+  filterAssigneeLabel?: string;  // @since 3.17.0, optional
 };
 ```
 
@@ -469,6 +535,8 @@ type GanttTranslations = {
 | `dialogFieldDependencies` | `"Vorgänger"` | Form field label for dependencies |
 | `dialogFieldDependenciesNone` | `"— Keine —"` | Option for "no dependencies" |
 | `dialogFieldProgress` | `"Fortschritt (%)"` | Slider label in the Add/Edit dialog — **optional**, added in v3.16.0 |
+| `filterAssigneeAll` | `"Alle"` | "All" option label in the assignee filter dropdown — **optional**, added in v3.17.0 |
+| `filterAssigneeLabel` | `"Assignee"` | Label for the assignee filter Select in the toolbar — **optional**, added in v3.17.0 |
 | `dialogDeleteConfirm` | `"Soll die Aufgabe \"{name}\" wirklich gelöscht werden?"` | Confirmation text. `{name}` is replaced with the task name. |
 
 **Full English translation:**
@@ -517,6 +585,8 @@ type GanttTranslations = {
     dialogFieldDependencies: 'Predecessors',
     dialogFieldDependenciesNone: '— None —',
     dialogFieldProgress: 'Progress (%)',   // optional — added in v3.16.0
+    filterAssigneeAll: 'All',              // optional — added in v3.17.0
+    filterAssigneeLabel: 'Assignee',       // optional — added in v3.17.0
     dialogDeleteConfirm: 'Delete task "{name}"?',
   }}
 />

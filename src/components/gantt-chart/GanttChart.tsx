@@ -90,6 +90,7 @@ const DEFAULT_TOOLBAR_CONFIG: Required<GanttToolbarConfig> = {
   showRangeReset: true,
   showResetView: true,
   showExportCSV: false,
+  showAssigneeFilter: false,
 };
 
 function GanttChartInner({
@@ -120,6 +121,7 @@ function GanttChartInner({
   virtualizeRows = false,
   showAssigneeColumn = false,
   onExportCSV,
+  onDragStart,
   onTaskMoved,
   onTaskResized,
 }: GanttChartInnerProps) {
@@ -300,6 +302,7 @@ function GanttChartInner({
           progressDraggable={progressDraggable}
           showCriticalPath={showCriticalPath}
           virtualizeRows={virtualizeRows}
+          onDragStart={onDragStart}
           onTaskMoved={onTaskMoved}
           onTaskResized={onTaskResized}
           onTasksChange={onTasksChange}
@@ -336,6 +339,7 @@ export function GanttChart({
   statusColors,
   ganttTheme,
   onExportCSV,
+  onDragStart,
   onTaskClick,
   onMilestoneClick,
   onAddTask,
@@ -395,6 +399,7 @@ export function GanttChart({
           virtualizeRows={virtualizeRows}
           showAssigneeColumn={showAssigneeColumn}
           onExportCSV={onExportCSV}
+          onDragStart={onDragStart}
           onTaskClick={onTaskClick}
           onMilestoneClick={onMilestoneClick}
           onAddTask={onAddTask}

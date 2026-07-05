@@ -7,7 +7,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { useGanttChartStore, useGanttTheme, useGanttTranslations, useRawGanttChartStore } from "./GanttChart";
 import type { GanttTask, GanttTaskNode, GanttTaskStatus, GanttTranslations } from "./GanttChart.types";
-import { getVisibleTasks } from "./util/gantt-chart.util";
+import { filterByAssignee, getVisibleTasks } from "./util/gantt-chart.util";
 import { ROW_HEIGHT, HEADER_HEIGHT, ACTIONS_COL_WIDTH, STATUS_COL_WIDTH, ASSIGNEE_COL_WIDTH, STATUS_BAR_COLOR, STATUS_CHIP_COLOR } from "./GanttChart.constants";
 import { GanttTaskDialog } from "./GanttTaskDialog";
 import { GanttDeleteDialog } from "./GanttDeleteDialog";
@@ -339,11 +339,15 @@ export function GanttTaskPanel({
   const storeAddTask = useGanttChartStore((s) => s.addTask);
   const storeUpdateTask = useGanttChartStore((s) => s.updateTask);
   const storeDeleteTask = useGanttChartStore((s) => s.deleteTask);
+  const assigneeFilter = useGanttChartStore((s) => s.assigneeFilter);
 
   // Selector würde bei jedem Aufruf eine neue Array-Referenz liefern → Endlosschleife.
   const visibleTasks = useMemo(
-    () => getVisibleTasks(taskTree, expandedIds),
-    [taskTree, expandedIds],
+    () => {
+      const flat = getVisibleTasks(taskTree, expandedIds);
+      return assigneeFilter ? filterByAssignee(flat, assigneeFilter) : flat;
+    },
+    [taskTree, expandedIds, assigneeFilter],
   );
 
   // eslint-disable-next-line react-hooks/incompatible-library
