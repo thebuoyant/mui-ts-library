@@ -143,6 +143,18 @@ export function getVisibleTasks(
   return result;
 }
 
+/**
+ * Ancestor-inclusive assignee filter on a flat visible-task list.
+ * A node is kept if it or any of its tree-descendants has the given assignee.
+ */
+export function filterByAssignee(flat: GanttTaskNode[], assignee: string): GanttTaskNode[] {
+  function nodeMatches(node: GanttTaskNode): boolean {
+    if (node.assignee === assignee) return true;
+    return node.children.some(nodeMatches);
+  }
+  return flat.filter(nodeMatches);
+}
+
 // ---------------------------------------------------------------------------
 // Datum-Hilfsfunktionen (keine externe Abhängigkeit nötig)
 // ---------------------------------------------------------------------------

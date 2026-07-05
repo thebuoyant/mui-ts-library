@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Box, IconButton, TextField, ToggleButton, ToggleButtonGroup, Tooltip } from "@mui/material";
+import { Box, FormControl, IconButton, InputLabel, MenuItem, Select, TextField, ToggleButton, ToggleButtonGroup, Tooltip } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import RestoreIcon from "@mui/icons-material/Restore";
@@ -44,6 +44,13 @@ export function GanttToolbar({ onScrollToToday, config, onExportCSV }: GanttTool
   const expandedIds = useGanttChartStore((s) => s.expandedIds);
   const expandAll = useGanttChartStore((s) => s.expandAll);
   const collapseAll = useGanttChartStore((s) => s.collapseAll);
+  const assigneeFilter = useGanttChartStore((s) => s.assigneeFilter);
+  const setAssigneeFilter = useGanttChartStore((s) => s.setAssigneeFilter);
+
+  const assignees = useMemo(
+    () => [...new Set(tasks.flatMap((t) => (t.assignee ? [t.assignee] : [])))].sort(),
+    [tasks],
+  );
 
   const allExpanded = tasks.length > 0 && tasks.every((t) => expandedIds.has(t.id));
   const isViewChanged = timeScale !== defaultTimeScale || isRangeCustomized || isExpandedCustomized;
@@ -114,6 +121,26 @@ export function GanttToolbar({ onScrollToToday, config, onExportCSV }: GanttTool
             </ToggleButton>
           ))}
         </ToggleButtonGroup>
+      )}
+
+      {config.showAssigneeFilter && assignees.length > 0 && (
+        <FormControl size="small" sx={{ minWidth: 140 }}>
+          <InputLabel id="gantt-assignee-filter-label">
+            {t.filterAssigneeLabel ?? "Assignee"}
+          </InputLabel>
+          <Select
+            labelId="gantt-assignee-filter-label"
+            value={assigneeFilter}
+            label={t.filterAssigneeLabel ?? "Assignee"}
+            onChange={(e) => setAssigneeFilter(e.target.value)}
+            inputProps={{ "data-testid": "gantt-assignee-filter" }}
+          >
+            <MenuItem value="">{t.filterAssigneeAll ?? "Alle"}</MenuItem>
+            {assignees.map((a) => (
+              <MenuItem key={a} value={a}>{a}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       )}
 
       <Box sx={{ ml: "auto", display: "flex", alignItems: "center", gap: 1 }}>

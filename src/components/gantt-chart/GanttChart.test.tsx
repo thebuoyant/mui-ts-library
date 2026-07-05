@@ -1583,3 +1583,73 @@ describe("GanttChart — dialog progress field", () => {
     );
   });
 });
+
+describe("GanttChart — assignee filter", () => {
+  const assigneeTasks: GanttTask[] = [
+    {
+      id: "parent",
+      name: "Parent Task",
+      status: "in-progress",
+      startDate: new Date("2025-01-01"),
+      endDate: new Date("2025-03-31"),
+    },
+    {
+      id: "alice-task",
+      parentId: "parent",
+      name: "Alice Task",
+      assignee: "Alice",
+      status: "planned",
+      startDate: new Date("2025-01-01"),
+      endDate: new Date("2025-01-31"),
+    },
+    {
+      id: "bob-task",
+      name: "Bob Task",
+      assignee: "Bob",
+      status: "planned",
+      startDate: new Date("2025-02-01"),
+      endDate: new Date("2025-02-28"),
+    },
+  ];
+
+  // Mirrors the pattern from the dependencies-dropdown tests: testid is on MUI's hidden
+  // native input, so we navigate up to the combobox trigger to open the dropdown.
+  function openAssigneeFilter() {
+    const hiddenInput = screen.getByTestId("gantt-assignee-filter");
+    const combobox = hiddenInput.parentElement!.querySelector('[role="combobox"]')!;
+    fireEvent.mouseDown(combobox);
+  }
+
+  it("Should render the assignee filter dropdown when showAssigneeFilter is true and tasks have assignees", () => {
+    render(<GanttChart tasks={assigneeTasks} toolbarConfig={{ showAssigneeFilter: true }} />);
+    expect(screen.getByTestId("gantt-assignee-filter")).toBeInTheDocument();
+  });
+
+  it("Should not render the assignee filter when showAssigneeFilter is false (default)", () => {
+    render(<GanttChart tasks={assigneeTasks} />);
+    expect(screen.queryByTestId("gantt-assignee-filter")).not.toBeInTheDocument();
+  });
+
+  it("Should show only matching tasks and their ancestors when an assignee is selected", () => {
+    render(<GanttChart tasks={assigneeTasks} toolbarConfig={{ showAssigneeFilter: true }} />);
+    openAssigneeFilter();
+    fireEvent.click(screen.getByRole("option", { name: "Alice" }));
+    expect(screen.getByText("Alice Task")).toBeInTheDocument();
+    // Ancestor of alice-task is shown even though its own assignee is unset
+    expect(screen.getByText("Parent Task")).toBeInTheDocument();
+    // Bob has no matching descendant — excluded
+    expect(screen.queryByText("Bob Task")).not.toBeInTheDocument();
+  });
+
+  it("Should show all tasks again when the 'Alle' option is selected after filtering", () => {
+    render(<GanttChart tasks={assigneeTasks} toolbarConfig={{ showAssigneeFilter: true }} />);
+    openAssigneeFilter();
+    fireEvent.click(screen.getByRole("option", { name: "Alice" }));
+    expect(screen.queryByText("Bob Task")).not.toBeInTheDocument();
+    openAssigneeFilter();
+    fireEvent.click(screen.getByRole("option", { name: "Alle" }));
+    expect(screen.getByText("Bob Task")).toBeInTheDocument();
+    expect(screen.getByText("Alice Task")).toBeInTheDocument();
+    expect(screen.getByText("Parent Task")).toBeInTheDocument();
+  });
+});

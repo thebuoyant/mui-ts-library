@@ -22,6 +22,9 @@ export type GanttChartStoreState = {
   // true sobald expandAll/collapseAll aufgerufen wurde — aktiviert den Reset-Button.
   isExpandedCustomized: boolean;
 
+  assigneeFilter: string;
+  setAssigneeFilter: (assignee: string) => void;
+
   setTasks: (tasks: GanttTask[]) => void;
   addTask: (task: GanttTask) => void;
   updateTask: (task: GanttTask) => void;
@@ -81,6 +84,9 @@ export function createGanttChartStore(
     defaultTimeScale: initialTimeScale,
     initialExpandAll,
     isExpandedCustomized: false,
+    assigneeFilter: "",
+
+    setAssigneeFilter: (assignee) => set({ assigneeFilter: assignee }),
 
     setTasks: (tasks) => {
       set((state) => ({
@@ -178,6 +184,7 @@ export function createGanttChartStore(
         timelineRange: getTimelineRange(state.tasks),
         isRangeCustomized: false,
         isExpandedCustomized: false,
+        assigneeFilter: "",
         expandedIds: state.initialExpandAll
           ? new Set(state.tasks.map((t) => t.id))
           : new Set(state.tasks.filter((t) => !t.parentId).map((t) => t.id)),

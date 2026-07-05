@@ -13,6 +13,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.17.0] — 2026-07-05
+
+### Added
+
+#### `GanttChart` — Assignee filter in the toolbar
+
+A new **assignee filter dropdown** in the toolbar lets users narrow the chart view to tasks assigned to a specific person or team — without touching the data.
+
+**How to enable:**
+
+```tsx
+<GanttChart
+  tasks={tasks}
+  showAssigneeColumn={true}            // optional — makes assignees visible in the panel
+  toolbarConfig={{ showAssigneeFilter: true }}
+/>
+```
+
+**Behavior:**
+
+- Disabled by default (`showAssigneeFilter: false`) — fully backwards-compatible.
+- The dropdown is populated automatically from the unique, non-empty `GanttTask.assignee` values in the current task list — sorted alphabetically. Hidden when no tasks have an assignee.
+- **Ancestor-inclusive filter**: selecting an assignee also reveals parent tasks whose descendants match — the tree hierarchy stays readable.
+- Selecting "Alle" (or the translated equivalent) resets the filter and shows all tasks.
+- The "Reset view" button also clears the assignee filter.
+
+**New optional translation keys:**
+
+| Key | Default | Description |
+|---|---|---|
+| `filterAssigneeAll` | `"Alle"` | "All" option label in the dropdown |
+| `filterAssigneeLabel` | `"Assignee"` | Select label shown above the dropdown |
+
+Both keys are declared as `optional` (`?`) in `GanttTranslations` — all existing full translation literals continue to compile without changes.
+
+**Tests:** 4 new tests added (render, default hidden, ancestor-inclusive filter, reset to all) — **130 tests total**, all passing.
+
+**New Storybook story:** `WithAssigneeFilter` — demonstrates the dropdown with a multi-assignee project and the ancestor-inclusive filter behavior.
+
+---
+
 ## [3.16.0] — 2026-07-03
 
 ### Added

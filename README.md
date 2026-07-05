@@ -475,6 +475,13 @@ This project follows [Semantic Versioning](https://semver.org/). In practice:
 
 ## Changelog
 
+### [3.17.0] — 2026-07-05
+
+**Added**
+- `GanttChart`: assignee filter dropdown in the toolbar — `toolbarConfig={{ showAssigneeFilter: true }}` adds a Select that filters visible tasks by assignee. The filter is ancestor-inclusive (parents are kept when descendants match). Two new optional translation keys: `filterAssigneeAll`, `filterAssigneeLabel`. See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.
+
+---
+
 ### [3.16.0] — 2026-07-03
 
 **Added**

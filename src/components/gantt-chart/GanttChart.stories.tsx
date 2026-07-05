@@ -878,6 +878,33 @@ export const WithCSVExport: Story = {
   ),
 };
 
+export const WithAssigneeFilter: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`toolbarConfig={{ showAssigneeFilter: true }}` — adds a Select dropdown to the toolbar ' +
+          'that filters visible tasks by assignee. The filter is ancestor-inclusive: selecting an assignee ' +
+          'also shows parent tasks whose descendants match. Combine with `showAssigneeColumn={true}` to make ' +
+          'assignees visible in the task panel. Selecting "Alle" (or the translated equivalent) resets the filter.',
+      },
+    },
+  },
+  args: {
+    tasks: assigneeTasks,
+    showAssigneeColumn: true,
+    toolbarConfig: { showAssigneeFilter: true },
+    initialExpandAll: true,
+    timeScale: "months",
+    height: 420,
+  },
+  render: (args) => (
+    <Box sx={{ width: "100%" }}>
+      <GanttChart {...args} />
+    </Box>
+  ),
+};
+
 // ── Use case: construction project ───────────────────────────────────────────
 
 const constructionTasks: GanttTask[] = [

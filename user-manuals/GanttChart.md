@@ -39,6 +39,12 @@ Right-clicking a task bar opens a **context menu** to change its status without 
 
 ---
 
+> ### New in v3.17.0
+>
+> | Feature | Description | Jump to |
+> |---|---|---|
+> | **Assignee filter in toolbar** | `toolbarConfig={{ showAssigneeFilter: true }}` adds a Select dropdown that filters visible tasks by assignee. The filter is **ancestor-inclusive**: selecting an assignee also reveals parent tasks whose descendants match. Clearing the filter (selecting "Alle" / the translated label) shows all tasks again. Two new optional translation keys: `filterAssigneeAll`, `filterAssigneeLabel`. | [→ Toolbar config](#ganttoolbarconfig) · [→ Translations](#translations) |
+
 > ### New in v3.16.0
 >
 > | Feature | Description | Jump to |
@@ -221,6 +227,7 @@ Allows selectively hiding individual toolbar elements. All fields are optional �
 |---|---|---|---|
 | `showDateRange` | `boolean` | `true` | From/To date inputs |
 | `showExpandCollapseAll` | `boolean` | `true` | Expand all / Collapse all |
+| `showAssigneeFilter` | `boolean` | `false` | Assignee filter dropdown in toolbar (ancestor-inclusive, **@since 3.17.0**) |
 | `showExportCSV` | `boolean` | `false` | CSV download button — triggers `onExportCSV` or browser download |
 | `showRangeReset` | `boolean` | `true` | Reset button (appears when range was manually adjusted) |
 | `showResetView` | `boolean` | `true` | Reset view (scale + range back to defaults) |
@@ -420,6 +427,8 @@ type GanttTranslations = {
   dialogFieldDependencies: string;
   dialogFieldDependenciesNone: string;
   dialogFieldProgress?: string;  // @since 3.16.0, optional — existing literals compile without changes
+  filterAssigneeAll?: string;    // @since 3.17.0, optional
+  filterAssigneeLabel?: string;  // @since 3.17.0, optional
 };
 ```
 
@@ -469,6 +478,8 @@ type GanttTranslations = {
 | `dialogFieldDependencies` | `"Vorgänger"` | Form field label for dependencies |
 | `dialogFieldDependenciesNone` | `"— Keine —"` | Option for "no dependencies" |
 | `dialogFieldProgress` | `"Fortschritt (%)"` | Slider label in the Add/Edit dialog — **optional**, added in v3.16.0 |
+| `filterAssigneeAll` | `"Alle"` | "All" option label in the assignee filter dropdown — **optional**, added in v3.17.0 |
+| `filterAssigneeLabel` | `"Assignee"` | Label for the assignee filter Select in the toolbar — **optional**, added in v3.17.0 |
 | `dialogDeleteConfirm` | `"Soll die Aufgabe \"{name}\" wirklich gelöscht werden?"` | Confirmation text. `{name}` is replaced with the task name. |
 
 **Full English translation:**
@@ -517,6 +528,8 @@ type GanttTranslations = {
     dialogFieldDependencies: 'Predecessors',
     dialogFieldDependenciesNone: '— None —',
     dialogFieldProgress: 'Progress (%)',   // optional — added in v3.16.0
+    filterAssigneeAll: 'All',              // optional — added in v3.17.0
+    filterAssigneeLabel: 'Assignee',       // optional — added in v3.17.0
     dialogDeleteConfirm: 'Delete task "{name}"?',
   }}
 />

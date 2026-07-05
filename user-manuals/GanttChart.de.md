@@ -39,6 +39,12 @@ Rechtsklick auf einen Balken öffnet ein **Kontextmenü** zum direkten Ändern d
 
 ---
 
+> ### Neu in v3.17.0
+>
+> | Feature | Beschreibung | Springe zu |
+> |---|---|---|
+> | **Assignee-Filter in der Toolbar** | `toolbarConfig={{ showAssigneeFilter: true }}` fügt ein Select-Dropdown hinzu, das sichtbare Tasks nach Assignee filtert. Der Filter ist **vorfahren-inklusiv**: ein ausgewählter Assignee zeigt auch Parent-Tasks, deren Nachkommen passen. Zurücksetzen (Option „Alle" / übersetzte Bezeichnung) zeigt wieder alle Tasks. Zwei neue optionale Übersetzungsschlüssel: `filterAssigneeAll`, `filterAssigneeLabel`. | [→ Toolbar-Konfiguration](#ganttoolbarconfig) · [→ Übersetzungen](#übersetzungen) |
+
 > ### Neu in v3.16.0
 >
 > | Feature | Beschreibung | Springe zu |
@@ -226,6 +232,7 @@ Erlaubt die selektive Ausblendung einzelner Toolbar-Elemente. Alle Felder sind o
 | `showExpandCollapseAll` | `boolean` | `true` | Alle aufklappen / Alle zuklappen |
 | `showScrollToToday` | `boolean` | `true` | „Zum heutigen Tag"-Button |
 | `showDateRange` | `boolean` | `true` | Von/Bis-Datumseingaben |
+| `showAssigneeFilter` | `boolean` | `false` | Assignee-Filter-Dropdown in der Toolbar (vorfahren-inklusiv, **@since 3.17.0**) |
 | `showExportCSV` | `boolean` | `false` | CSV-Download-Button — löst `onExportCSV` aus oder Browser-Download |
 | `showRangeReset` | `boolean` | `true` | Zurücksetzen-Button (erscheint nur wenn Bereich manuell angepasst wurde) |
 | `showResetView` | `boolean` | `true` | Ansicht zurücksetzen (Skala + Bereich auf Standardwerte) |
@@ -419,6 +426,9 @@ type GanttTranslations = {
   dialogDeleteConfirm: string;  // {name} wird durch den Task-Namen ersetzt
   dialogFieldDependencies: string;
   dialogFieldDependenciesNone: string;
+  dialogFieldProgress?: string;  // @since 3.16.0, optional — bestehende Literals kompilieren ohne Änderungen
+  filterAssigneeAll?: string;    // @since 3.17.0, optional
+  filterAssigneeLabel?: string;  // @since 3.17.0, optional
 };
 ```
 
@@ -468,6 +478,8 @@ type GanttTranslations = {
 | `dialogFieldDependencies` | `"Vorgänger"` | Formularfeld-Label für Abhängigkeiten |
 | `dialogFieldDependenciesNone` | `"— Keine —"` | Option für „keine Abhängigkeiten" |
 | `dialogFieldProgress` | `"Fortschritt (%)"` | Slider-Label im Hinzufügen-/Bearbeiten-Dialog — **optional**, hinzugefügt in v3.16.0 |
+| `filterAssigneeAll` | `"Alle"` | „Alle"-Option im Assignee-Filter-Dropdown — **optional**, hinzugefügt in v3.17.0 |
+| `filterAssigneeLabel` | `"Assignee"` | Label des Assignee-Filter-Selects in der Toolbar — **optional**, hinzugefügt in v3.17.0 |
 | `dialogDeleteConfirm` | `"Soll die Aufgabe \"{name}\" wirklich gelöscht werden?"` | Bestätigungstext. `{name}` wird durch den Task-Namen ersetzt. |
 
 **Vollständige englische Übersetzung:**
@@ -516,6 +528,8 @@ type GanttTranslations = {
     dialogFieldDependencies: 'Predecessors',
     dialogFieldDependenciesNone: '— None —',
     dialogFieldProgress: 'Progress (%)',   // optional — hinzugefügt in v3.16.0
+    filterAssigneeAll: 'All',              // optional — hinzugefügt in v3.17.0
+    filterAssigneeLabel: 'Assignee',       // optional — hinzugefügt in v3.17.0
     dialogDeleteConfirm: 'Delete task "{name}"?',
   }}
 />

@@ -10,6 +10,7 @@ import { useGanttDrag } from "./hooks/useGanttDrag";
 import {
   calculateTaskPosition,
   computeCriticalPath,
+  filterByAssignee,
   getDaysInRange,
   getDisplayRange,
   getISOWeekNumber,
@@ -155,10 +156,15 @@ export function GanttTimeline({
   const instanceId = useId().replace(/:/g, "");
   const arrowMarkerId = `gantt-arrow-${instanceId}`;
 
+  const assigneeFilter = useGanttChartStore((s) => s.assigneeFilter);
+
   // Selector würde bei jedem Aufruf eine neue Array-Referenz liefern → Endlosschleife.
   const visibleTasks = useMemo(
-    () => getVisibleTasks(taskTree, expandedIds),
-    [taskTree, expandedIds],
+    () => {
+      const flat = getVisibleTasks(taskTree, expandedIds);
+      return assigneeFilter ? filterByAssignee(flat, assigneeFilter) : flat;
+    },
+    [taskTree, expandedIds, assigneeFilter],
   );
 
   // Anzeigebereich auf Spalten-Grenzen ausweiten damit Balken-Prozente korrekt ausgerichtet sind.

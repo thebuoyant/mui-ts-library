@@ -13,6 +13,47 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [3.17.0] — 2026-07-05
+
+### Hinzugefügt
+
+#### `GanttChart` — Assignee-Filter in der Toolbar
+
+Ein neues **Assignee-Filter-Dropdown** in der Toolbar ermöglicht es, die Chart-Ansicht auf Tasks einer bestimmten Person oder eines Teams einzuschränken — ohne die Daten zu ändern.
+
+**Aktivierung:**
+
+```tsx
+<GanttChart
+  tasks={tasks}
+  showAssigneeColumn={true}            // optional — macht Assignees im Panel sichtbar
+  toolbarConfig={{ showAssigneeFilter: true }}
+/>
+```
+
+**Verhalten:**
+
+- Standardmäßig deaktiviert (`showAssigneeFilter: false`) — vollständig abwärtskompatibel.
+- Das Dropdown wird automatisch aus den eindeutigen, nicht-leeren `GanttTask.assignee`-Werten der aktuellen Task-Liste befüllt — alphabetisch sortiert. Verborgen wenn kein Task einen Assignee hat.
+- **Vorfahren-inklusiver Filter**: Ein ausgewählter Assignee zeigt auch Parent-Tasks, deren Nachkommen passen — die Baumhierarchie bleibt lesbar.
+- Die Auswahl von „Alle" (oder der übersetzten Bezeichnung) setzt den Filter zurück und zeigt alle Tasks.
+- Der „Ansicht zurücksetzen"-Button löscht den Assignee-Filter ebenfalls.
+
+**Neue optionale Übersetzungsschlüssel:**
+
+| Schlüssel | Standard | Beschreibung |
+|---|---|---|
+| `filterAssigneeAll` | `"Alle"` | Bezeichnung der „Alle"-Option im Dropdown |
+| `filterAssigneeLabel` | `"Assignee"` | Select-Label über dem Dropdown |
+
+Beide Schlüssel sind in `GanttTranslations` als `optional` (`?`) deklariert — alle bestehenden vollständigen Übersetzungs-Literale kompilieren ohne Änderungen weiter.
+
+**Tests:** 4 neue Tests ergänzt (Render, Standard verborgen, vorfahren-inklusiver Filter, Zurücksetzen auf Alle) — **130 Tests gesamt**, alle grün.
+
+**Neue Storybook-Story:** `WithAssigneeFilter` — zeigt das Dropdown mit einem Mehrpersonen-Projekt und das vorfahren-inklusive Filterverhalten.
+
+---
+
 ## [3.16.0] — 2026-07-03
 
 ### Hinzugefügt

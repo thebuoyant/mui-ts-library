@@ -90,6 +90,7 @@ const DEFAULT_TOOLBAR_CONFIG: Required<GanttToolbarConfig> = {
   showRangeReset: true,
   showResetView: true,
   showExportCSV: false,
+  showAssigneeFilter: false,
 };
 
 function GanttChartInner({
