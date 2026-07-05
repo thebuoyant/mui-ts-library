@@ -53,7 +53,7 @@ export function GanttToolbar({ onScrollToToday, config, onExportCSV }: GanttTool
   );
 
   const allExpanded = tasks.length > 0 && tasks.every((t) => expandedIds.has(t.id));
-  const isViewChanged = timeScale !== defaultTimeScale || isRangeCustomized || isExpandedCustomized;
+  const isViewChanged = timeScale !== defaultTimeScale || isRangeCustomized || isExpandedCustomized || assigneeFilter !== "";
 
   // eslint-disable-next-line react-hooks/purity
   const now = useMemo(() => Date.now(), []);

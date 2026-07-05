@@ -234,9 +234,9 @@ Erlaubt die selektive Ausblendung einzelner Toolbar-Elemente. Alle Felder sind o
 | `showScrollToToday` | `boolean` | `true` | „Zum heutigen Tag"-Button |
 | `showDateRange` | `boolean` | `true` | Von/Bis-Datumseingaben |
 | `showAssigneeFilter` | `boolean` | `false` | Assignee-Filter-Dropdown in der Toolbar (vorfahren-inklusiv, **@since 3.17.0**) |
-| `showExportCSV` | `boolean` | `false` | CSV-Download-Button — löst `onExportCSV` aus oder Browser-Download |
+| `showExportCSV` | `boolean` | `false` | CSV-Download-Button — löst `onExportCSV` aus oder Browser-Download. **Exportiert immer alle Tasks, unabhängig von einem aktiven Assignee-Filter.** |
 | `showRangeReset` | `boolean` | `true` | Zurücksetzen-Button (erscheint nur wenn Bereich manuell angepasst wurde) |
-| `showResetView` | `boolean` | `true` | Ansicht zurücksetzen (Skala + Bereich auf Standardwerte) |
+| `showResetView` | `boolean` | `true` | Ansicht-Zurücksetzen-Button — setzt Zeitskala, Datumsbereich, Expand/Collapse-Zustand **und den Assignee-Filter** auf die Standardwerte zurück. Der Button ist deaktiviert solange die Ansicht im Ausgangszustand ist. |
 
 **TypeScript-Typ:**
 
@@ -355,7 +355,7 @@ const ganttTheme: GanttTheme = {
 | `onDragStart` | `(task: GanttTask, type: "move" \| "resize") => void` | Maustaste auf zieh-/skalierbarem Balken gedrückt — feuert **vor** jedem Bewegungs-Schwellwert, einmal pro Geste. `type` ist `"move"` für Balken-Drag, `"resize"` für Rechtsrand-Resize. **@since 3.17.0** | Optimistisches UI, Analytics, Shadow-Element anzeigen |
 | `onTaskMoved` | `(task: GanttTask, newStart: Date, newEnd: Date) => void` | Task-Balken per Drag horizontal verschoben (`draggable={true}`). `task` enthält die ursprünglichen Metadaten; neue Daten in `newStart`/`newEnd` | Drag-Ergebnisse ins Backend persistieren |
 | `onTaskResized` | `(task: GanttTask, newEnd: Date) => void` | Rechter Balkenrand per Drag verändert (`resizable={true}`) | Resize-Ergebnisse persistieren |
-| `onExportCSV` | `(csv: string, tasks: GanttTask[]) => void` | CSV-Export-Button geklickt — ohne Callback: automatischer Browser-Download `gantt-tasks.csv` | Eigener Export (Server-Upload, eigener Dateiname) |
+| `onExportCSV` | `(csv: string, tasks: GanttTask[]) => void` | CSV-Export-Button geklickt — ohne Callback: automatischer Browser-Download `gantt-tasks.csv`. Der `tasks`-Parameter enthält **immer alle Tasks** (nicht nur die aktuell gefilterte Teilmenge). | Eigener Export (Server-Upload, eigener Dateiname) |
 
 > **Tipp — `onTasksChange` vs. spezifische Callbacks:** Für einfache Datenspeicherung reicht `onTasksChange` allein aus. Die spezifischen Callbacks (`onTaskCreated`, `onTaskUpdated` etc.) sind für Anwendungen gedacht, die auf bestimmte Aktionen unterschiedlich reagieren müssen (z. B. separate API-Calls für Create/Update/Delete).
 

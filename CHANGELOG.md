@@ -13,6 +13,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.17.1] — 2026-07-05
+
+### Fixed
+
+#### `GanttChart` — Reset View button stays disabled when assignee filter is active
+
+The **Reset View** button (`showResetView`) was not activated when an assignee filter was set via `toolbarConfig={{ showAssigneeFilter: true }}`. The internal `isViewChanged` flag did not include the assignee filter state, so the button remained disabled even though clicking it would correctly clear the filter.
+
+**Impact:** When an assignee filter was the only active view change, users had no way to clear it via the toolbar Reset View button. The workaround was to manually select "Alle" (All) in the filter dropdown.
+
+**Fix:** `isViewChanged` now includes `assigneeFilter !== ""`. The Reset View button activates as soon as any view state diverges from the default — including the assignee filter.
+
+**Documented:** `showResetView` and `onExportCSV` descriptions in `GanttToolbarConfig` and the callbacks table were updated to clarify:
+- Reset View resets **all** view state: scale, date range, expand/collapse, and the assignee filter.
+- CSV export always exports **all** tasks regardless of any active assignee filter.
+
+---
+
 ## [3.17.0] — 2026-07-05
 
 ### Added

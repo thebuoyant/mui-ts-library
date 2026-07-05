@@ -229,9 +229,9 @@ Allows selectively hiding individual toolbar elements. All fields are optional �
 | `showDateRange` | `boolean` | `true` | From/To date inputs |
 | `showExpandCollapseAll` | `boolean` | `true` | Expand all / Collapse all |
 | `showAssigneeFilter` | `boolean` | `false` | Assignee filter dropdown in toolbar (ancestor-inclusive, **@since 3.17.0**) |
-| `showExportCSV` | `boolean` | `false` | CSV download button — triggers `onExportCSV` or browser download |
+| `showExportCSV` | `boolean` | `false` | CSV download button — triggers `onExportCSV` or browser download. **Always exports all tasks, regardless of any active assignee filter.** |
 | `showRangeReset` | `boolean` | `true` | Reset button (appears when range was manually adjusted) |
-| `showResetView` | `boolean` | `true` | Reset view (scale + range back to defaults) |
+| `showResetView` | `boolean` | `true` | Reset view button — resets time scale, date range, expand/collapse state, **and the assignee filter** back to defaults. Button is disabled when the view is at its default state. |
 | `showScaleDays` | `boolean` | `true` | Days scale button |
 | `showScaleMonths` | `boolean` | `true` | Months scale button |
 | `showScaleQuarters` | `boolean` | `true` | Quarters scale button |
@@ -355,7 +355,7 @@ const ganttTheme: GanttTheme = {
 | `onDragStart` | `(task: GanttTask, type: "move" \| "resize") => void` | Mouse button pressed on a draggable/resizable bar — fires **before** any movement threshold, once per gesture. `type` is `"move"` for bar drags, `"resize"` for right-edge resize. **@since 3.17.0** | Optimistic UI, analytics, showing a shadow element |
 | `onTaskMoved` | `(task: GanttTask, newStart: Date, newEnd: Date) => void` | Task bar dragged to a new position (`draggable={true}`). `task` carries the original metadata; new dates are in `newStart`/`newEnd` | Persisting drag results to a backend |
 | `onTaskResized` | `(task: GanttTask, newEnd: Date) => void` | Task bar right edge dragged (`resizable={true}`) | Persisting resize results |
-| `onExportCSV` | `(csv: string, tasks: GanttTask[]) => void` | CSV export button clicked — when not provided, the chart triggers a browser download of `gantt-tasks.csv` automatically | Custom export handling (upload to server, custom filename) |
+| `onExportCSV` | `(csv: string, tasks: GanttTask[]) => void` | CSV export button clicked — when not provided, the chart triggers a browser download of `gantt-tasks.csv` automatically. The `tasks` array **always contains all tasks** (not just the currently filtered subset). | Custom export handling (upload to server, custom filename) |
 
 > **Tip — `onTasksChange` vs. specific callbacks:** For simple data persistence, `onTasksChange` alone is sufficient. The specific callbacks (`onTaskCreated`, `onTaskUpdated`, etc.) are intended for applications that need to react differently to specific actions (e.g. separate API calls for Create/Update/Delete).
 

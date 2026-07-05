@@ -1698,4 +1698,41 @@ describe("GanttChart — assignee filter", () => {
     expect(screen.getByText("Alice Task")).toBeInTheDocument();
     expect(screen.getByText("Parent Task")).toBeInTheDocument();
   });
+
+  it("Should enable the reset-view button when an assignee filter is active", () => {
+    render(
+      <GanttChart
+        tasks={assigneeTasks}
+        toolbarConfig={{ showAssigneeFilter: true, showResetView: true }}
+      />,
+    );
+    // Initially disabled — nothing changed
+    expect(screen.getByTestId("gantt-reset-view")).toBeDisabled();
+
+    openAssigneeFilter();
+    fireEvent.click(screen.getByRole("option", { name: "Alice" }));
+
+    // Filter is active → reset-view must become enabled
+    expect(screen.getByTestId("gantt-reset-view")).not.toBeDisabled();
+  });
+
+  it("Should clear the assignee filter when reset-view is clicked", () => {
+    render(
+      <GanttChart
+        tasks={assigneeTasks}
+        toolbarConfig={{ showAssigneeFilter: true, showResetView: true }}
+      />,
+    );
+    openAssigneeFilter();
+    fireEvent.click(screen.getByRole("option", { name: "Alice" }));
+    expect(screen.queryByText("Bob Task")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId("gantt-reset-view"));
+
+    // All tasks visible again → filter was cleared
+    expect(screen.getByText("Bob Task")).toBeInTheDocument();
+    expect(screen.getByText("Alice Task")).toBeInTheDocument();
+    // Reset-view button is disabled again
+    expect(screen.getByTestId("gantt-reset-view")).toBeDisabled();
+  });
 });
