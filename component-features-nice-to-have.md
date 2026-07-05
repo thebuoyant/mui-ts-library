@@ -42,7 +42,7 @@ auf eine Wand laufen — entweder gibt's nichts, oder nur in MUI X Pro/Premium g
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
 | ⭐ Keyboard Navigation | `↑`/`↓` wählt die nächste/vorherige Task-Zeile, `Enter` öffnet den Bearbeiten-Dialog für die ausgewählte Zeile, `Escape` schließt ihn. Aktuell nur mausbedienbar — fehlende Accessibility-Grundlage. | Mittel | — |
-| ⭐ Panel-Splitter per Drag | `minPanelWidth` / `maxPanelWidth` sind nur statische Props. Ein Drag-Handle zwischen Task-Panel und Timeline würde erlauben, die Breite zur Laufzeit anzupassen — Standard-Pattern aus Excel/MS Project/Jira. | Mittel | — |
+| ~~⭐ Panel-Splitter per Drag~~ | ~~`minPanelWidth` / `maxPanelWidth` als statische Props.~~ Drag-Handle zwischen Task-Panel und Timeline war bereits von Anfang an implementiert (`handleDividerMouseDown`, `cursor: col-resize`, `minPanelWidth`/`maxPanelWidth` als Constraints). Storybook-Controls vorhanden. | ~~Mittel~~ | ✅ seit v1.x |
 | Assignee-Filter in Toolbar | Dropdown-Filter in der Toolbar zum Einschränken auf einen Assignee — baut auf `showAssigneeColumn` + `GanttTask.assignee` auf, kein neues Datenmodell. | Mittel | — |
 | `onDragStart` Callback | Feuert wenn der User beginnt, einen Balken zu verschieben oder zu resizen — für optimistic UI / Shadow-Balken während des Dragens. Aktuell gibt es nur das Endergebnis via `onTaskMoved` / `onTaskResized`. | Niedrig | — |
 | Export PNG/PDF | Sichtbarer Ausschnitt der Timeline als Bild — andere Rendering-Basis als die D3-Charts (Mix aus HTML-Panel + SVG-Timeline statt reines SVG), daher eigene Lösung nötig, nicht über die D3-Charts-Export-Utility wiederverwendbar. | Hoch | — |
