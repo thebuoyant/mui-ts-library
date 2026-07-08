@@ -475,6 +475,13 @@ This project follows [Semantic Versioning](https://semver.org/). In practice:
 
 ## Changelog
 
+### [3.19.0] — 2026-07-08
+
+**Added**
+- `RichTextEditor`: new `defaultValue?: string` prop for uncontrolled usage — sets the initial HTML content once on mount, no external state required. Analogous to MUI TextField's `defaultValue`. When both `value` and `defaultValue` are provided, `value` takes precedence. Purely additive — no existing behaviour changes. See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.
+
+---
+
 ### [3.18.0] — 2026-07-08
 
 **Added**

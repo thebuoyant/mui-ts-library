@@ -215,6 +215,13 @@ export type RichTextEditorProps = {
   toolbarConfig?:      RichTextEditorToolbarConfig;
   translation?:        Partial<RichTextEditorTranslation>;
   value?:              string;
+  /**
+   * Initial HTML content for uncontrolled usage — set once on mount, never re-synced.
+   * Analogous to MUI TextField's `defaultValue`: the editor manages its own content
+   * after initialisation, no external state required.
+   * When both `value` and `defaultValue` are provided, `value` takes precedence.
+   */
+  defaultValue?:       string;
   /** Breite des Editors. Zahlen → px. "auto" oder leer → 100% des Elternelements. */
   width?:              number | string;
   /**

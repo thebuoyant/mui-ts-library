@@ -13,6 +13,32 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [3.19.0] — 2026-07-08
+
+### Hinzugefügt
+
+#### `RichTextEditor` — `defaultValue`-Prop (unkontrollierter Modus)
+
+Neue Prop `defaultValue?: string` — setzt den initialen HTML-Inhalt einmalig beim Mount, analog zu MUI TextFields `defaultValue`. Kein externer State erforderlich: der Editor verwaltet seinen Inhalt nach der Initialisierung selbst.
+
+```tsx
+// Unkontrolliert — kein useState nötig
+<RichTextEditor
+  defaultValue="<p>Initialer Inhalt</p>"
+  onChange={(html) => console.log(html)}  // optional: bei Änderung auslesen
+/>
+
+// Kontrolliert (bestehendes Verhalten, unverändert)
+<RichTextEditor
+  value={html}
+  onChange={setHtml}
+/>
+```
+
+Wenn sowohl `value` als auch `defaultValue` angegeben werden, hat `value` Vorrang.
+
+---
+
 ## [3.18.0] — 2026-07-08
 
 ### Hinzugefügt

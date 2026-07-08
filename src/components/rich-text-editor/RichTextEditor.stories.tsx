@@ -24,6 +24,7 @@ const meta: Meta<typeof RichTextEditor> = {
     // Zahlen ("600"), Pixel-Strings ("600px"), Prozent ("50%") — leer = 100%
     width:              { control: "text" },
     // Komplexe Objekte / kontrollierter Modus — dedizierte Stories verwenden
+    defaultValue:      { control: false },
     mentionItems:      { control: false },
     onMentionSearch:   { control: false },
     toolbarConfig:     { control: false },
@@ -621,6 +622,25 @@ export const SupportTicketReply: Story = {
       showTableButton: false, showImageButton: false, showEmojiButton: true,
       showUndoRedo: true, showClearFormat: false, showFullscreenButton: false,
     },
+  },
+};
+
+export const WithDefaultValue: Story = {
+  name: "defaultValue (unkontrollierter Modus)",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '**Uncontrolled usage with `defaultValue`** — sets the initial HTML content once on mount. ' +
+          'No external state required: type freely, the editor manages its own content. ' +
+          'Analogous to MUI TextField\'s `defaultValue`. ' +
+          '`onChange` still fires on every change if you need to read the current value (e.g. on form submit).',
+      },
+    },
+  },
+  args: {
+    defaultValue: "<p>This content was set via <strong>defaultValue</strong> — no external state needed. Type freely.</p>",
+    height: 200,
   },
 };
 

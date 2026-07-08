@@ -105,6 +105,7 @@ function App() {
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
+| `defaultValue` | `string` | — | Initial HTML content for uncontrolled usage — set once on mount, never re-synced. No external state required. When both `value` and `defaultValue` are provided, `value` takes precedence. |
 | `disabled` | `boolean` | `false` | Disables the editor and toolbar completely |
 | `error` | `boolean` | `false` | Red border in error state |
 | `height` | `number \| string` | `200` | Total height of the editor (toolbar + content). Numbers → px. `"auto"` → fills the surrounding flex container. Excess content scrolls vertically. |

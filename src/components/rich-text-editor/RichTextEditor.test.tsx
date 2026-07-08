@@ -434,6 +434,42 @@ describe("RichTextEditor", () => {
     });
   });
 
+  // ── defaultValue ───────────────────────────────────────────────────────────
+
+  describe("defaultValue (uncontrolled mode)", () => {
+    it("Should render initial content from defaultValue", async () => {
+      render(<RichTextEditor defaultValue="<p>Hello uncontrolled</p>" />);
+      await waitFor(() =>
+        expect(document.querySelector(".ProseMirror")?.textContent).toContain("Hello uncontrolled"),
+      );
+    });
+
+    it("Should call onChange when editing content initialized with defaultValue", async () => {
+      const onChange = vi.fn();
+      render(<RichTextEditor defaultValue="<p>Start</p>" onChange={onChange} />);
+      const editorEl = document.querySelector(".ProseMirror") as HTMLElement;
+      await act(async () => {
+        editorEl.innerHTML = "<p>Start changed</p>";
+        editorEl.dispatchEvent(new Event("input", { bubbles: true }));
+      });
+      await waitFor(() => expect(onChange).toHaveBeenCalled(), { timeout: 3000 });
+    });
+
+    it("Should prefer value over defaultValue when both are provided", async () => {
+      render(<RichTextEditor value="<p>controlled</p>" defaultValue="<p>ignored</p>" />);
+      await waitFor(() => {
+        const text = document.querySelector(".ProseMirror")?.textContent ?? "";
+        expect(text).toContain("controlled");
+        expect(text).not.toContain("ignored");
+      });
+    });
+
+    it("Should render empty editor when neither value nor defaultValue is provided", () => {
+      render(<RichTextEditor />);
+      expect(document.querySelector(".ProseMirror")).toBeInTheDocument();
+    });
+  });
+
   // ── Mention (@) ────────────────────────────────────────────────────────────
 
   describe("Mention (@) feature — RichTextEditor integration", () => {

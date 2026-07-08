@@ -32,6 +32,7 @@ import { RichTextEditorFooter } from "./RichTextEditorFooter";
 import { normalizeSize } from "../shared/normalizeSize";
 
 export function RichTextEditor({
+  defaultValue,
   disabled = false,
   error = false,
   height,
@@ -130,7 +131,7 @@ export function RichTextEditor({
           : [CharacterCount]
         : []),
     ],
-    content: value ?? "",
+    content: value ?? defaultValue ?? "",
     editable: !disabled && !readonly,
     // editorProps.handlePaste wird vor den Plugin-Handlern der Markdown-Extension geprüft
     // (ProseMirror someProp-Reihenfolge) — überschreibt deren Auto-Konvertierung gezielt.
