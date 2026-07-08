@@ -13,6 +13,28 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [3.18.0] — 2026-07-08
+
+### Hinzugefügt
+
+#### `RichTextEditor` — `onSave`-Callback (Ctrl+S / Cmd+S)
+
+Neue Prop `onSave?: () => void` — feuert, wenn der Nutzer innerhalb des Editors **Ctrl+S** (Windows/Linux) oder **Cmd+S** (macOS) drückt. Der native „Seite speichern"-Dialog des Browsers wird im Editor immer unterdrückt, unabhängig davon ob `onSave` gesetzt ist.
+
+Die Komponente hat keine eigene Speicher-Schicht — der Consumer bestimmt was passiert (API-Aufruf, Local Storage, Status-Anzeige usw.):
+
+```tsx
+<RichTextEditor
+  value={html}
+  onChange={setHtml}
+  onSave={() => saveToServer(html)}
+/>
+```
+
+Dies entspricht dem Tastaturkürzel-Standard jedes verbreiteten webbasierten Editors (Notion, Google Docs, Confluence).
+
+---
+
 ## [3.17.1] — 2026-07-05
 
 ### Behoben

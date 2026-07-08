@@ -33,6 +33,7 @@ const meta: Meta<typeof RichTextEditor> = {
     onChange:          { control: false },
     onFocus:           { control: false },
     onMarkdownChange:  { control: false },
+    onSave:            { control: false },
   },
   args: {
     // A–Z
@@ -53,6 +54,7 @@ const meta: Meta<typeof RichTextEditor> = {
     onChange:           fn(),
     onFocus:            fn(),
     onMarkdownChange:   fn(),
+    onSave:             fn(),
   },
   parameters: {
     controls: { sort: 'alpha' },
@@ -619,5 +621,23 @@ export const SupportTicketReply: Story = {
       showTableButton: false, showImageButton: false, showEmojiButton: true,
       showUndoRedo: true, showClearFormat: false, showFullscreenButton: false,
     },
+  },
+};
+
+export const WithOnSave: Story = {
+  name: "Ctrl+S / Cmd+S → onSave",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '**`onSave` callback** — fires when the user presses **Ctrl+S** (Windows/Linux) or **Cmd+S** (macOS) ' +
+          'inside the editor. The browser\'s native "Save Page" dialog is always suppressed within the editor. ' +
+          'Click into the editor, type something, then press **Ctrl/Cmd+S** — the `onSave` event appears in the Actions panel.',
+      },
+    },
+  },
+  args: {
+    value: "<p>Click here, then press <strong>Ctrl+S</strong> (or Cmd+S on macOS) to trigger the save callback.</p>",
+    height: 200,
   },
 };

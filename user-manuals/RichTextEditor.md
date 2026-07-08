@@ -127,6 +127,7 @@ function App() {
 | `onFocus` | `() => void` | — | Called when the editor gains focus |
 | `onMarkdownChange` | `(markdown: string) => void` | — | Called alongside `onChange` on every content change, with the content as Markdown |
 | `onMentionSearch` | `(query: string) => MentionItem[] \| Promise<MentionItem[]>` | — | Custom search/filter function for mentions. When provided, `mentionItems` is ignored for filtering — return the matching subset (supports async for server-side search) |
+| `onSave` | `() => void` | — | Called when the user presses **Ctrl+S** (Windows/Linux) or **Cmd+S** (macOS). The browser's "Save Page" dialog is always suppressed inside the editor. |
 
 ---
 
@@ -782,6 +783,7 @@ The editor border appears in `error.main` (MUI error color), and the `helperText
 > | Typing, formatting, pasting, toolbar action | `onChange`, `onMarkdownChange` |
 > | Editor gains focus | `onFocus` |
 > | Editor loses focus | `onBlur` |
+> | Ctrl+S / Cmd+S pressed | `onSave` |
 > | `value` prop updated externally | *(none — prevents infinite loops)* |
 
 | Callback | Signature | When it fires | Use it when... |
@@ -791,6 +793,7 @@ The editor border appears in `error.main` (MUI error color), and the `helperText
 | `onMentionSearch` | `(query: string) => MentionItem[] \| Promise<MentionItem[]>` | Every keystroke after `@` | Async/server-side mention search — replaces built-in client-side filter |
 | `onFocus` | `() => void` | The editor area gains keyboard focus | Highlighting an active editor, showing toolbars conditionally |
 | `onBlur` | `() => void` | The editor area loses keyboard focus | Triggering validation, auto-saving on leave |
+| `onSave` | `() => void` | User presses Ctrl+S or Cmd+S | Saving content to a backend or local storage — the browser's "Save Page" dialog is always suppressed inside the editor |
 
 **Important:** `onChange` does NOT fire when `value` is set externally via the prop (external sync via `setContent`). This prevents infinite loops in controlled mode.
 

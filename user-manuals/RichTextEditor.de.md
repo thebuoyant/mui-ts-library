@@ -123,6 +123,7 @@ function App() {
 | `mentionItems` | `MentionItem[]` | — | Itemliste für `@`-Mention-Autocomplete. Die Mention-Extension wird nur aktiviert wenn diese Prop oder `onMentionSearch` gesetzt ist. Wird für clientseitige Filterung verwendet wenn `onMentionSearch` nicht angegeben ist. |
 | `mentionTriggerChar` | `string` | `"@"` | Zeichen das das Mention-Autocomplete-Popup öffnet |
 | `onBlur` | `() => void` | — | Wird aufgerufen wenn der Editor den Fokus verliert |
+| `onSave` | `() => void` | — | Wird aufgerufen wenn der Nutzer **Ctrl+S** (Windows/Linux) oder **Cmd+S** (macOS) drückt. Der native „Seite speichern"-Dialog des Browsers wird im Editor immer unterdrückt. |
 | `onChange` | `(value: string) => void` | — | Wird bei jeder Inhaltsänderung aufgerufen |
 | `onFocus` | `() => void` | — | Wird aufgerufen wenn der Editor den Fokus erhält |
 | `onMarkdownChange` | `(markdown: string) => void` | — | Wird zusätzlich zu `onChange` bei jeder Inhaltsänderung mit dem Inhalt als Markdown aufgerufen |
@@ -782,6 +783,7 @@ Der Editor-Rahmen erscheint in `error.main` (MUI-Fehlerfarbe), der `helperText` 
 > | Tippen, Formatieren, Einfügen, Toolbar-Aktion | `onChange`, `onMarkdownChange` |
 > | Editor erhält Fokus | `onFocus` |
 > | Editor verliert Fokus | `onBlur` |
+> | Ctrl+S / Cmd+S gedrückt | `onSave` |
 > | `value`-Prop von außen aktualisiert | *(keiner — verhindert Endlosschleifen)* |
 
 | Callback | Signatur | Wann ausgelöst | Verwenden wenn... |
@@ -791,6 +793,7 @@ Der Editor-Rahmen erscheint in `error.main` (MUI-Fehlerfarbe), der `helperText` 
 | `onMentionSearch` | `(query: string) => MentionItem[] \| Promise<MentionItem[]>` | Bei jedem Tastendruck nach `@` | Async/serverseitige Mention-Suche — ersetzt die eingebaute clientseitige Filterung |
 | `onFocus` | `() => void` | Der Editor-Bereich erhält Tastatur-Fokus | Aktiven Editor hervorheben, Toolbar bedingt anzeigen |
 | `onBlur` | `() => void` | Der Editor-Bereich verliert Tastatur-Fokus | Validierung auslösen, Auto-Save beim Verlassen |
+| `onSave` | `() => void` | Nutzer drückt Ctrl+S oder Cmd+S | Inhalt ins Backend oder Local Storage speichern — der native „Seite speichern"-Dialog wird im Editor immer unterdrückt |
 
 **Wichtig:** `onChange` feuert NICHT wenn `value` von außen über die Prop gesetzt wird (externer Sync via `setContent`). Dies verhindert Endlosschleifen im kontrollierten Modus.
 

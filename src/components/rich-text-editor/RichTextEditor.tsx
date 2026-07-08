@@ -54,22 +54,25 @@ export function RichTextEditor({
   onChange,
   onFocus,
   onMarkdownChange,
+  onSave,
 }: RichTextEditorProps) {
   const t = { ...DEFAULT_RICH_TEXT_EDITOR_TRANSLATION, ...translation };
   const tc = { ...DEFAULT_RICH_TEXT_EDITOR_TOOLBAR_CONFIG, ...toolbarConfig };
 
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Per Ref statt nur State gespiegelt, da editorProps.handlePaste einmalig beim
-  // useEditor-Aufruf gebunden wird und sonst auf einen veralteten Wert zugreifen würde.
+  // Per Ref statt nur State gespiegelt, da editorProps-Handler einmalig beim
+  // useEditor-Aufruf gebunden werden und sonst auf veraltete Werte zugreifen würden.
   const [pasteAsPlainText, setPasteAsPlainText] = useState(false);
   const pasteAsPlainTextRef = useRef(pasteAsPlainText);
+  const onSaveRef = useRef(onSave);
 
   // Mention items ref so the suggestion closure always reads the latest prop without recreating
   // the extension on every render.
   const mentionItemsRef = useRef<MentionItem[]>(mentionItems ?? []);
   useEffect(() => { mentionItemsRef.current = mentionItems ?? []; }, [mentionItems]);
   useEffect(() => { pasteAsPlainTextRef.current = pasteAsPlainText; }, [pasteAsPlainText]);
+  useEffect(() => { onSaveRef.current = onSave; }, [onSave]);
 
   const normH      = normalizeSize(height);
   const normW      = normalizeSize(width);
@@ -143,6 +146,14 @@ export function RichTextEditor({
         const { state } = view;
         view.dispatch(state.tr.insertText(text, state.selection.from, state.selection.to));
         return true;
+      },
+      handleKeyDown(_view, event) {
+        if ((event.ctrlKey || event.metaKey) && event.key === "s") {
+          event.preventDefault();
+          onSaveRef.current?.();
+          return true;
+        }
+        return false;
       },
     },
     onUpdate({ editor: e }) {

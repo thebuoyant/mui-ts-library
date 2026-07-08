@@ -241,4 +241,10 @@ export type RichTextEditorProps = {
   onFocus?:  () => void;
   /** Wird bei jeder Änderung zusätzlich zu onChange mit dem Inhalt als Markdown aufgerufen */
   onMarkdownChange?: (markdown: string) => void;
+  /**
+   * Fires when the user presses Ctrl+S (Windows/Linux) or Cmd+S (macOS) inside the editor.
+   * The browser's native "Save Page" dialog is always suppressed within the editor.
+   * When provided, implement your own save logic (API call, local storage, etc.).
+   */
+  onSave?: () => void;
 };

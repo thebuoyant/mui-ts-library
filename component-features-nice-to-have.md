@@ -71,7 +71,7 @@ die Timeline hat bereits Scroll + Zoom-Controls.
 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
-| ⭐ `onSave` / Ctrl+S | Callback-Prop `onSave?: () => void` — feuert bei Ctrl/Cmd+S. Standardmuster in jedem webbasierten Editor (Notion, Google Docs, Confluence). Die Komponente braucht dafür keinen eigenen Speicher-Layer — der Consumer bestimmt was passiert. | Niedrig | — |
+| ⭐ `onSave` / Ctrl+S | Callback-Prop `onSave?: () => void` — feuert bei Ctrl/Cmd+S. Standardmuster in jedem webbasierten Editor (Notion, Google Docs, Confluence). Die Komponente braucht dafür keinen eigenen Speicher-Layer — der Consumer bestimmt was passiert. | Niedrig | ✅ v3.18.0 |
 | ⭐ `defaultValue` (unkontrollierter Modus) | `value` ist aktuell für kontrolliertes und unkontrolliertes Verhalten zuständig, kein `defaultValue`. Eine unkontrollierte `defaultValue`-Prop — analog zu MUI TextField — würde einfachere Integration ohne externen State ermöglichen. | Niedrig | — |
 | ⭐ `onMentionInserted` Callback | Wenn ein Mention eingefügt wird (`@Name`), gibt es keinen Callback mit dem eingefügten `MentionItem`. Consumer können nicht wissen, welche Mentions im Text enthalten sind, ohne den HTML zu parsen. `onMentionInserted?: (item: MentionItem) => void` | Niedrig | — |
 | Toolbar Extensions | `toolbarExtensions?: React.ReactNode` — Consumer können eigene Buttons neben den Standard-Buttons platzieren ohne Fork. Setzt keine neue Interne Struktur voraus, nur ein Render-Slot am Ende der Toolbar. | Mittel | — |

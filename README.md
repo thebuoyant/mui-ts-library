@@ -475,6 +475,13 @@ This project follows [Semantic Versioning](https://semver.org/). In practice:
 
 ## Changelog
 
+### [3.18.0] — 2026-07-08
+
+**Added**
+- `RichTextEditor`: new `onSave?: () => void` prop — fires when the user presses **Ctrl+S** (Windows/Linux) or **Cmd+S** (macOS) inside the editor. The browser's native "Save Page" dialog is always suppressed within the editor. Purely additive — no existing behaviour changes. See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.
+
+---
+
 ### [3.17.1] — 2026-07-05
 
 **Fixed**

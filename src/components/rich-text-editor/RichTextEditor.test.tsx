@@ -392,6 +392,48 @@ describe("RichTextEditor", () => {
     });
   });
 
+  // ── onSave / Ctrl+S ────────────────────────────────────────────────────────
+
+  describe("onSave callback", () => {
+    it("Should call onSave when Ctrl+S is pressed", async () => {
+      const onSave = vi.fn();
+      render(<RichTextEditor onSave={onSave} />);
+      const editorEl = document.querySelector(".ProseMirror") as HTMLElement;
+      await act(async () => {
+        editorEl.dispatchEvent(new KeyboardEvent("keydown", { key: "s", ctrlKey: true, bubbles: true }));
+      });
+      expect(onSave).toHaveBeenCalledOnce();
+    });
+
+    it("Should call onSave when Cmd+S is pressed (macOS)", async () => {
+      const onSave = vi.fn();
+      render(<RichTextEditor onSave={onSave} />);
+      const editorEl = document.querySelector(".ProseMirror") as HTMLElement;
+      await act(async () => {
+        editorEl.dispatchEvent(new KeyboardEvent("keydown", { key: "s", metaKey: true, bubbles: true }));
+      });
+      expect(onSave).toHaveBeenCalledOnce();
+    });
+
+    it("Should not call onSave when S is pressed without modifier key", async () => {
+      const onSave = vi.fn();
+      render(<RichTextEditor onSave={onSave} />);
+      const editorEl = document.querySelector(".ProseMirror") as HTMLElement;
+      await act(async () => {
+        editorEl.dispatchEvent(new KeyboardEvent("keydown", { key: "s", bubbles: true }));
+      });
+      expect(onSave).not.toHaveBeenCalled();
+    });
+
+    it("Should not throw when Ctrl+S is pressed without onSave provided", async () => {
+      render(<RichTextEditor />);
+      const editorEl = document.querySelector(".ProseMirror") as HTMLElement;
+      await expect(act(async () => {
+        editorEl.dispatchEvent(new KeyboardEvent("keydown", { key: "s", ctrlKey: true, bubbles: true }));
+      })).resolves.not.toThrow();
+    });
+  });
+
   // ── Mention (@) ────────────────────────────────────────────────────────────
 
   describe("Mention (@) feature — RichTextEditor integration", () => {
