@@ -500,6 +500,12 @@ describe("RichTextEditor", () => {
       expect(document.querySelector(".ProseMirror")).toBeInTheDocument();
     });
 
+    it("Should render without errors when onMentionInserted is provided", () => {
+      const onMentionInserted = vi.fn();
+      render(<RichTextEditor mentionItems={MENTION_ITEMS} onMentionInserted={onMentionInserted} />);
+      expect(document.querySelector(".ProseMirror")).toBeInTheDocument();
+    });
+
     it("Should use the custom mentionNoResults translation label", () => {
       const mockRect = () => new DOMRect(0, 0, 100, 20);
       render(

@@ -26,6 +26,7 @@ const meta: Meta<typeof RichTextEditor> = {
     // Komplexe Objekte / kontrollierter Modus — dedizierte Stories verwenden
     defaultValue:      { control: false },
     mentionItems:      { control: false },
+    onMentionInserted: { control: false },
     onMentionSearch:   { control: false },
     toolbarConfig:     { control: false },
     translation:       { control: false },
@@ -55,6 +56,7 @@ const meta: Meta<typeof RichTextEditor> = {
     onChange:           fn(),
     onFocus:            fn(),
     onMarkdownChange:   fn(),
+    onMentionInserted:  fn(),
     onSave:             fn(),
   },
   parameters: {
@@ -466,6 +468,30 @@ function MentionHashStory(props: ComponentProps<typeof RichTextEditor>) {
   );
   return <RichTextEditor {...props} value={value} onChange={setValue} />;
 }
+
+export const WithMentionInsertedCallback: Story = {
+  name: "@Mention → onMentionInserted",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "**`onMentionInserted` callback** — fires immediately after the user selects a person from the `@` dropdown. " +
+          "The callback receives the full `MentionItem` (`{ id, label }`), so the consumer knows exactly who was mentioned " +
+          "without having to parse the HTML output. " +
+          "Type **@** and select a name — the event appears in the Actions panel.",
+      },
+    },
+  },
+  args: {
+    mentionItems: [
+      { id: "alice",   label: "Alice" },
+      { id: "bob",     label: "Bob" },
+      { id: "charlie", label: "Charlie" },
+    ],
+    height: 240,
+    placeholder: "Type @ to mention someone…",
+  },
+};
 
 export const WithMentionCustomTrigger: Story = {
   parameters: {

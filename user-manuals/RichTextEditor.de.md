@@ -128,6 +128,7 @@ function App() {
 | `onChange` | `(value: string) => void` | — | Wird bei jeder Inhaltsänderung aufgerufen |
 | `onFocus` | `() => void` | — | Wird aufgerufen wenn der Editor den Fokus erhält |
 | `onMarkdownChange` | `(markdown: string) => void` | — | Wird zusätzlich zu `onChange` bei jeder Inhaltsänderung mit dem Inhalt als Markdown aufgerufen |
+| `onMentionInserted` | `(item: MentionItem) => void` | — | Wird aufgerufen wenn der Nutzer ein Element aus dem `@`-Mention-Dropdown auswählt. Erhält das vollständige `MentionItem` — kein HTML-Parsen nötig um zu verfolgen wer erwähnt wurde. Nur aktiv wenn die Mention-Extension aktiviert ist. |
 | `onMentionSearch` | `(query: string) => MentionItem[] \| Promise<MentionItem[]>` | — | Eigene Such-/Filterfunktion für Mentions. Wenn angegeben wird `mentionItems` nicht gefiltert — die zurückgegebene Teilmenge wird verwendet (unterstützt async für serverseitige Suche) |
 
 ---

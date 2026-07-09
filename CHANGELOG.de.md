@@ -13,6 +13,28 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [3.20.0] — 2026-07-09
+
+### Hinzugefügt
+
+#### `RichTextEditor` — `onMentionInserted`-Callback
+
+Neue Prop `onMentionInserted?: (item: MentionItem) => void` — feuert unmittelbar nachdem der Nutzer ein Element aus dem `@`-Mention-Dropdown auswählt. Der Callback erhält das vollständige `MentionItem` (`{ id, label }`), sodass der Consumer genau weiß, wer erwähnt wurde — ohne den HTML-Output zu parsen.
+
+```tsx
+<RichTextEditor
+  mentionItems={users}
+  onMentionInserted={(item) => {
+    console.log(`${item.label} (${item.id}) wurde erwähnt`);
+    notifyUser(item.id);
+  }}
+/>
+```
+
+Nur aktiv wenn `mentionItems` oder `onMentionSearch` angegeben ist (d.h. wenn die Mention-Extension aktiviert ist). Rein additiv — kein bestehendes Verhalten ändert sich.
+
+---
+
 ## [3.19.0] — 2026-07-08
 
 ### Hinzugefügt

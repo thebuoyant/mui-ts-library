@@ -127,6 +127,7 @@ function App() {
 | `onChange` | `(value: string) => void` | — | Called on every content change |
 | `onFocus` | `() => void` | — | Called when the editor gains focus |
 | `onMarkdownChange` | `(markdown: string) => void` | — | Called alongside `onChange` on every content change, with the content as Markdown |
+| `onMentionInserted` | `(item: MentionItem) => void` | — | Called when the user selects an item from the `@` mention dropdown. Receives the full `MentionItem` — no HTML parsing needed to track who was mentioned. Only active when the Mention extension is enabled. |
 | `onMentionSearch` | `(query: string) => MentionItem[] \| Promise<MentionItem[]>` | — | Custom search/filter function for mentions. When provided, `mentionItems` is ignored for filtering — return the matching subset (supports async for server-side search) |
 | `onSave` | `() => void` | — | Called when the user presses **Ctrl+S** (Windows/Linux) or **Cmd+S** (macOS). The browser's "Save Page" dialog is always suppressed inside the editor. |
 
