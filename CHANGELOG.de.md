@@ -13,6 +13,21 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [3.22.0] — 2026-07-09
+
+### Hinzugefügt
+
+#### D3-Charts — `valueFormatter`-Prop (4 Komponenten)
+
+Neue Prop `valueFormatter` für alle D3-Charts die numerische Werte in Tooltips anzeigen. Überschreibt die bestehenden `valueDecimalCount` / `valueDecimalSeparator` / `valueThousandsSeparator`-Props wenn gesetzt. Alle vier Änderungen sind rein additiv — bestehendes Verhalten bleibt unverändert.
+
+- **`RadialStackedBarChart`**: `valueFormatter?: (value: number, seriesKey: string) => string` — `seriesKey` ermöglicht unterschiedliche Einheiten pro Serie (z.B. `€` für Umsatz, `kg` für Gewicht).
+- **`ChordChart`**: `valueFormatter?: (value: number) => string` — formatiert alle numerischen Werte in Gruppen- und Chord-Tooltips.
+- **`SunburstChart`**: `valueFormatter?: (value: number) => string` — formatiert den aggregierten Wert im Segment-Tooltip.
+- **`CirclePackingChart`**: `valueFormatter?: (value: number) => string` — formatiert Knotenwerte im Tooltip (bisher immer `toLocaleString()`).
+
+---
+
 ## [3.21.0] — 2026-07-09
 
 ### Hinzugefügt

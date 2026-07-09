@@ -461,19 +461,26 @@ import type {
 
 ## Versioning & Compatibility
 
-This project follows [Semantic Versioning](https://semver.org/). In practice:
+This project follows [Semantic Versioning](https://semver.org/):
 
-- **Patch** (`3.7.0` → `3.7.1`) — bug fixes only, always safe to upgrade.
-- **Minor** (`3.6.0` → `3.7.0`) — new features, fully backwards compatible.
-- **Major** (`2.x` → `3.0.0`) — breaking changes, called out explicitly in the [Changelog](#changelog).
+- **Patch** — bug fixes only, always safe to upgrade.
+- **Minor** — new features, fully backwards compatible.
+- **Major** — breaking changes, called out explicitly in the [Changelog](#changelog).
 
-**Only one breaking release to date:** [`3.0.0`](#300--2026-06-15--breaking-changes) removed `ConfirmDialog` / `ConfirmDialogProvider` / `useConfirm` and changed `TagSelection`'s `onTagCreate` signature. Every other release since has been additive.
+**Only one breaking release to date:** [`3.0.0`](#300--2026-06-15--breaking-changes) removed `ConfirmDialog` / `ConfirmDialogProvider` / `useConfirm` and changed `TagSelection`'s `onTagCreate` signature. Every other release has been additive.
 
-**TypeScript note:** translation types (e.g. `TagSelectionTranslation`, `SqlEditorTranslation`, `GanttTranslations`) gain new optional fields over time as features are added — passing a `Partial<...>` object straight to the `translation`/`translations` prop (the pattern used throughout this README) is always forward-compatible. Declaring a standalone variable typed against the full named type only stays compatible if new fields are optional. An audit across all components turned up one gap — `GanttTranslations` had 3 required fields added after release — fixed in `3.9.1` (see [Changelog](#391--2026-06-25)). Every translation type is optional-safe as of that version.
+**TypeScript note:** Always pass translation objects as `Partial<...>` inline — e.g. `translation={{ noData: 'No data' }}`. Translation types gain new optional fields as features are added; using `Partial<...>` keeps your code forward-compatible automatically.
 
 ---
 
 ## Changelog
+
+### [3.22.0] — 2026-07-09
+
+**Added**
+- `RadialStackedBarChart`, `ChordChart`, `SunburstChart`, `CirclePackingChart`: new `valueFormatter` prop for full control over numeric values in tooltips — replaces the built-in `valueDecimalCount`/separator props when set. `RadialStackedBarChart` additionally receives a `seriesKey` argument for per-series formatting. See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.
+
+---
 
 ### [3.21.0] — 2026-07-09
 

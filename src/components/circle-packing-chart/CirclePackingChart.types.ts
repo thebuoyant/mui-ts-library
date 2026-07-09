@@ -108,6 +108,13 @@ export type CirclePackingChartProps = {
   onCircleClick?:    (info: CirclePackingNodeInfo, event: React.MouseEvent<SVGCircleElement>) => void;
   /** Fires when the zoom focus changes */
   onZoomChange?:     (zoom: CirclePackingZoomInfo) => void;
+  /**
+   * Custom formatter for numeric node values shown in tooltips.
+   * When omitted, values are formatted with `toLocaleString()`.
+   * Example: `(v) => \`${v.toLocaleString('de-DE')} MB\``
+   * @since 3.22.0
+   */
+  valueFormatter?:   (value: number) => string;
   /** Override translation strings */
   translation?:      Partial<CirclePackingTranslation>;
 };

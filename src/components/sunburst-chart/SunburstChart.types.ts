@@ -68,6 +68,13 @@ export type SunburstChartProps = {
   valueDecimalSeparator?:   string;
   /** Thousands separator for values (default: ',') */
   valueThousandsSeparator?: string;
+  /**
+   * Custom formatter for numeric values in tooltips. Overrides `valueDecimalCount`,
+   * `valueDecimalSeparator`, and `valueThousandsSeparator`.
+   * Example: `(v) => \`${v.toLocaleString('de-DE')} MB\``
+   * @since 3.22.0
+   */
+  valueFormatter?:          (value: number) => string;
   /** Enable Ctrl+Scroll zoom — content outside `size` is clipped (default: false) */
   zoomable?:                boolean;
   /** Drill-down/out transition duration in ms — set to 0 to disable animation (default: 750) */

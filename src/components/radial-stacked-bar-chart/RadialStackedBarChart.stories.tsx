@@ -25,6 +25,7 @@ const meta: Meta<typeof RadialStackedBarChart> = {
     colorConfig:             { control: false },
     data:                    { control: false },
     gridValueFormatter:      { control: false },
+    valueFormatter:          { control: false },
     keys:                    { control: false },
     translation:             { control: false },
     onBarClick:              { control: false },
@@ -277,6 +278,26 @@ export const ZoomableWithCtrlScroll: Story = {
     size:     600,
     zoomable: true,
     gridValueFormatter: (v) => `${(v / 1e6).toFixed(0)}M`,
+  },
+};
+
+export const WithValueFormatter: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`valueFormatter` gives full control over tooltip bar values — " +
+          "here quarterly sales are formatted as `€ X,XXX` with locale separators. " +
+          "Use `seriesKey` to apply different units per series.",
+      },
+    },
+  },
+  args: {
+    data:           SALES_DATA,
+    keys:           QUARTERLY_KEYS,
+    size:           480,
+    valueFormatter: (v, _key) => `€ ${v.toLocaleString("de-DE")}`,
+    gridValueFormatter: (v) => `€${v}k`,
   },
 };
 

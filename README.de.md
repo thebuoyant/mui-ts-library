@@ -461,19 +461,26 @@ import type {
 
 ## Versionierung & Abwärtskompatibilität
 
-Dieses Projekt folgt [Semantic Versioning](https://semver.org/). In der Praxis bedeutet das:
+Dieses Projekt folgt [Semantic Versioning](https://semver.org/):
 
-- **Patch** (`3.7.0` → `3.7.1`) — nur Bugfixes, jederzeit gefahrlos aktualisierbar.
-- **Minor** (`3.6.0` → `3.7.0`) — neue Features, vollständig abwärtskompatibel.
-- **Major** (`2.x` → `3.0.0`) — Breaking Changes, explizit im [Changelog](#changelog) gekennzeichnet.
+- **Patch** — nur Bugfixes, jederzeit gefahrlos aktualisierbar.
+- **Minor** — neue Features, vollständig abwärtskompatibel.
+- **Major** — Breaking Changes, explizit im [Changelog](#changelog) gekennzeichnet.
 
-**Bisher nur ein Breaking Release:** [`3.0.0`](#300--2026-06-15--breaking-changes) hat `ConfirmDialog` / `ConfirmDialogProvider` / `useConfirm` entfernt und die Signatur von `TagSelection`s `onTagCreate` geändert. Jedes Release seitdem war additiv.
+**Bisher nur ein Breaking Release:** [`3.0.0`](#300--2026-06-15--breaking-changes) hat `ConfirmDialog` / `ConfirmDialogProvider` / `useConfirm` entfernt und die Signatur von `TagSelection`s `onTagCreate` geändert. Jedes andere Release war additiv.
 
-**TypeScript-Hinweis:** Translation-Typen (z.B. `TagSelectionTranslation`, `SqlEditorTranslation`, `GanttTranslations`) bekommen mit der Zeit neue optionale Felder, wenn Features hinzukommen — ein `Partial<...>`-Objekt direkt an die `translation`/`translations`-Prop zu übergeben (das in dieser README durchgängig verwendete Muster) ist immer vorwärtskompatibel. Eine eigenständige Variable, die gegen den vollen benannten Typ deklariert wird, bleibt nur kompatibel, solange neue Felder optional sind. Ein Audit über alle Komponenten fand eine Lücke — `GanttTranslations` hatte 3 nach Release ergänzte required Felder — behoben in `3.9.1` (siehe [Changelog](#391--2026-06-25)). Seit dieser Version ist jeder Translation-Typ optional-sicher.
+**TypeScript-Hinweis:** Translation-Objekte immer als `Partial<...>` inline übergeben — z.B. `translation={{ noData: 'Keine Daten' }}`. Translation-Typen bekommen mit neuen Features optionale Felder hinzu; `Partial<...>` macht den Code automatisch vorwärtskompatibel.
 
 ---
 
 ## Changelog
+
+### [3.22.0] — 2026-07-09
+
+**Hinzugefügt**
+- `RadialStackedBarChart`, `ChordChart`, `SunburstChart`, `CirclePackingChart`: neue `valueFormatter`-Prop für vollständige Kontrolle über numerische Tooltip-Werte — überschreibt die eingebauten `valueDecimalCount`/Separator-Props wenn gesetzt. `RadialStackedBarChart` erhält zusätzlich ein `seriesKey`-Argument für serienabhängige Formatierung. Siehe [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) für Details.
+
+---
 
 ### [3.21.0] — 2026-07-09
 

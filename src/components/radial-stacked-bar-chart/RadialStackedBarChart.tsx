@@ -37,18 +37,21 @@ function normalizeSeries(keys: RadialStackedBarSeries[] | string[]): RadialStack
 // ── tooltip content ───────────────────────────────────────────────────────────
 
 type TooltipTitleProps = {
-  barData:    RadialStackedBarData;
-  seriesKey:  string;
-  seriesLabel: string;
-  decimals:   number;
-  decimalSep: string;
-  thousandSep: string;
+  barData:        RadialStackedBarData;
+  seriesKey:      string;
+  seriesLabel:    string;
+  decimals:       number;
+  decimalSep:     string;
+  thousandSep:    string;
+  valueFormatter?: (value: number, seriesKey: string) => string;
 };
 
-function TooltipTitle({ barData, seriesKey, seriesLabel, decimals, decimalSep, thousandSep }: TooltipTitleProps) {
+function TooltipTitle({ barData, seriesKey, seriesLabel, decimals, decimalSep, thousandSep, valueFormatter }: TooltipTitleProps) {
   const segValue = barData.values[seriesKey] ?? 0;
   const total    = d3.sum(Object.values(barData.values));
   const pct      = total > 0 ? Math.round((segValue / total) * 1000) / 10 : 0;
+  const fmt      = (v: number, key: string) =>
+    valueFormatter ? valueFormatter(v, key) : formatNumber(v, decimals, decimalSep, thousandSep);
 
   return (
     <Box sx={{ py: 0.25 }}>
@@ -56,10 +59,10 @@ function TooltipTitle({ barData, seriesKey, seriesLabel, decimals, decimalSep, t
         {barData.label}
       </Typography>
       <Typography variant="caption" sx={{ display: "block", opacity: 0.85 }}>
-        {seriesLabel}: {formatNumber(segValue, decimals, decimalSep, thousandSep)}
+        {seriesLabel}: {fmt(segValue, seriesKey)}
       </Typography>
       <Typography variant="caption" sx={{ display: "block", opacity: 0.65, mt: 0.25 }}>
-        {pct}% · Total: {formatNumber(total, decimals, decimalSep, thousandSep)}
+        {pct}% · Total: {fmt(total, "")}
       </Typography>
     </Box>
   );
@@ -84,6 +87,7 @@ export function RadialStackedBarChart({
   valueDecimalCount = 0,
   valueDecimalSeparator = ".",
   valueThousandsSeparator = ",",
+  valueFormatter,
   gridValueFormatter,
   zoomable = false,
   onBarClick,
@@ -398,6 +402,7 @@ export function RadialStackedBarChart({
                           decimals={valueDecimalCount}
                           decimalSep={valueDecimalSeparator}
                           thousandSep={valueThousandsSeparator}
+                          valueFormatter={valueFormatter}
                         />
                       }
                     >

@@ -43,6 +43,7 @@ type SegmentTooltipTitleProps = {
   valueDecimalCount: number;
   valueDecimalSep:   string;
   valueThousandsSep: string;
+  valueFormatter?:   (value: number) => string;
 };
 
 function SegmentTooltipTitle({
@@ -50,9 +51,12 @@ function SegmentTooltipTitle({
   valueDecimalCount,
   valueDecimalSep,
   valueThousandsSep,
+  valueFormatter,
 }: SegmentTooltipTitleProps) {
   const hasValue   = (node.value ?? 0) > 0;
   const breadcrumb = node.ancestors().map((a) => a.data.name).reverse().join(" › ");
+  const fmtValue   = (v: number) =>
+    valueFormatter ? valueFormatter(v) : formatNumber(v, valueDecimalCount, valueDecimalSep, valueThousandsSep);
 
   return (
     <Box sx={{ py: 0.25 }}>
@@ -61,7 +65,7 @@ function SegmentTooltipTitle({
       </Typography>
       {hasValue && (
         <Typography variant="caption" sx={{ display: "block", opacity: 0.85 }}>
-          {formatNumber(node.value ?? 0, valueDecimalCount, valueDecimalSep, valueThousandsSep)}
+          {fmtValue(node.value ?? 0)}
         </Typography>
       )}
       {node.depth > 0 && (
@@ -88,6 +92,7 @@ export function SunburstChart({
   valueDecimalCount = 0,
   valueDecimalSeparator = ".",
   valueThousandsSeparator = ",",
+  valueFormatter,
   zoomable = false,
   duration = 750,
   disabled = false,
@@ -458,6 +463,7 @@ export function SunburstChart({
                         valueDecimalCount={valueDecimalCount}
                         valueDecimalSep={valueDecimalSeparator}
                         valueThousandsSep={valueThousandsSeparator}
+                        valueFormatter={valueFormatter}
                       />
                     ) : ""
                   }

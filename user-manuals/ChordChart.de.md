@@ -111,6 +111,7 @@ function App() {
 | `valueDecimalCount` | `number` | `0` | Dezimalstellen in Tooltip-Werten |
 | `valueDecimalSeparator` | `string` | `'.'` | Dezimaltrennzeichen |
 | `valueThousandsSeparator` | `string` | `','` | Tausendertrennzeichen |
+| `valueFormatter` | `(value: number) => string` | — | Eigene Formatierungsfunktion für alle Tooltip-Werte. Überschreibt `valueDecimalCount` / `valueDecimalSeparator` / `valueThousandsSeparator`. *Ab v3.22.0* |
 | `onGroupClick` | `(info, event) => void` | — | Klick auf einen Arc |
 | `onChordClick` | `(info, event) => void` | — | Klick auf ein Band |
 | `zoomable` | `boolean` | `false` | `Ctrl / Cmd ⌘ + Scroll` visueller Zoom — clippt am `size`-Rand |

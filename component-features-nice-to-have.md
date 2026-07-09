@@ -198,6 +198,7 @@ Cross-Cutting-Ideen, die für alle D3-Charts gleich umgesetzt werden würden —
 | `focusedNodeId` controlled prop | Von außen programmatisch einen Knoten als Drill-down-Fokus setzen (z.B. wenn ein Breadcrumb außerhalb des Charts geklickt wird). Aktuell nur interaktiv per Ctrl+Click steuerbar. | Mittel | — |
 | `maxDepth` | Rendert nur N Ebenen tief — für sehr tiefe Hierarchien, wo die inneren Ringe unlesbar klein werden. | Mittel | — |
 | ~~Animierte Drill-Down-Übergänge~~ | ~~Zoom passierte als Hard-Cut (kein `.transition()`)~~ — Als React-State+rAF-Tween umgesetzt (kein D3-Imperativ-Umbau nötig), `duration`-Prop, Default 750ms. | ~~Mittel~~ | ✅ v3.10.0 |
+| ~~`valueFormatter` Prop~~ | ~~Aktuell gibt es `valueDecimalCount` / `valueDecimalSeparator` / `valueThousandsSeparator` für Tooltips — aber kein `valueFormatter`~~ — alle Tooltip-Werte formatierbar. | ~~Niedrig~~ | ✅ v3.22.0 |
 
 ---
 
@@ -208,7 +209,7 @@ Cross-Cutting-Ideen, die für alle D3-Charts gleich umgesetzt werden würden —
 | ⭐ Legende | Bei vielen Gruppen schwer erkennbar, welche Farbe zu welcher Gruppe gehört | Niedrig | — |
 | Gruppen-Filter | Klick auf Legenden-Eintrag blendet die Gruppe + ihre Ribbons ein/aus — baut auf der Legende oben auf, macht ohne sie keinen Sinn | Mittel | — |
 | Such-Highlighting | Gruppenname eingeben → hervorheben, Rest abdunkeln | Niedrig | — |
-| `valueFormatter` Prop | Aktuell gibt es `valueDecimalCount` / `valueDecimalSeparator` / `valueThousandsSeparator` für Tooltips — aber kein `valueFormatter?: (v: number) => string` für komplett eigene Formatierung (z.B. "3,2 Mrd. €" oder Einheiten wie "kg"). Gleiche Lücke wie bei anderen Charts. | Niedrig | — |
+| ~~`valueFormatter` Prop~~ | ~~Aktuell gibt es `valueDecimalCount` / `valueDecimalSeparator` / `valueThousandsSeparator` für Tooltips — aber kein `valueFormatter`~~ — alle numerischen Werte in Gruppen- und Chord-Tooltips. | ~~Niedrig~~ | ✅ v3.22.0 |
 
 ---
 
@@ -231,6 +232,7 @@ Cross-Cutting-Ideen, die für alle D3-Charts gleich umgesetzt werden würden —
 | ⭐ Eingebautes Breadcrumb | HorizontalTreeChart hat es, RadialTreeChart hat es noch nicht (separate Sektion), CirclePackingChart auch nicht — obwohl alle drei Drill-down-fähig sind. Konsistenz über alle Tree-Charts hinweg. | Niedrig | — |
 | Legende | Farbzuordnung Kategorie ↔ Farbe als eigene Komponente | Mittel | — |
 | Such-Highlighting | Knoten per Name finden, Pfad zur Wurzel hervorheben | Mittel | — |
+| ~~`valueFormatter` Prop~~ | ~~Tooltip-Wert wird mit `toLocaleString()` formatiert — kein `valueFormatter` für eigene Einheit oder Währungsformat~~ — Tooltip-Wert über eigene Funktion formatierbar. | ~~Niedrig~~ | ✅ v3.22.0 |
 
 ---
 
@@ -254,7 +256,7 @@ Neue Komponente seit v3.15.0 — Sektion wächst mit den ersten Erfahrungen aus 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
 | ⭐ PNG/SVG Export | Via die geplante D3-Charts-Shared-Export-Utility — identisches Pattern wie alle anderen D3-Charts. | Mittel | — |
-| ⭐ `valueFormatter` Prop | `valueFormatter?: (value: number, seriesKey: string) => string` — eigene Formatierung der Tooltip-Werte, unabhängig von `gridValueFormatter` (der nur Grid-Ring-Labels formatiert). Aktuell nutzt der Tooltip intern `formatNumber` mit den `valueDecimal*`-Props. | Niedrig | — |
+| ~~⭐ `valueFormatter` Prop~~ | ~~`valueFormatter?: (value: number, seriesKey: string) => string`~~ — `seriesKey` ermöglicht serienabhängige Formatierung (z.B. `€` für Umsatz, `kg` für Gewicht). Unabhängig von `gridValueFormatter`. | ~~Niedrig~~ | ✅ v3.22.0 |
 | Animierte Daten-Übergänge | Wenn `data` sich ändert, animierter Übergang der Balken (D3 `transition()` auf den Arc-Paths) — analog zu `duration`-Prop bei SunburstChart / RadialTreeChart. | Mittel | — |
 | `startAngle` Prop | In Grad ab welchem Winkel der erste Balken startet — Standard ist 12 Uhr (−90° = 0° intern). `startAngle?: number` würde erlauben, den Chart z.B. bei 3 Uhr zu beginnen. | Niedrig | — |
 | `selectedBarId` controlled prop | Von außen einen Balken hervorheben (z.B. wenn eine Tabellenzeile daneben selektiert wird) — linked views. Aktuell nur intern bei Hover via Opacity-Effekt. | Mittel | — |
