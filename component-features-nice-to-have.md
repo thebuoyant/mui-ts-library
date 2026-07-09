@@ -266,7 +266,7 @@ Neue Komponente seit v3.15.0 — Sektion wächst mit den ersten Erfahrungen aus 
 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
-| ⭐ GitHub Releases anlegen | Für `v3.0.0`, `v3.1.0`, `v3.1.1` — GitHub zeigt Releases prominent in der Sidebar; aktuell nur nackte Tags ohne Beschreibung | Niedrig | ⚡ offen |
+| ⭐ GitHub Releases anlegen | Für alle historischen Tags (v1.x–v3.20.0) — GitHub zeigt Releases prominent in der Sidebar; aktuell nur nackte Tags ohne Beschreibung | Niedrig | ⚡ offen |
 | Playwright Visual Tests | Screenshot-Vergleiche für Chart-Rendering — Qualitätsinvestition, kein User-Feature | Hoch | — |
 | ~~Live Storybook~~ | ~~`https://thebuoyant.github.io/mui-ts-library/`~~ | ~~Mittel~~ | ✅ aktiv — auto-deploy |
 | ~~npm-app Showcase/Playground~~ | ~~Eigenständige Vite-React-App~~ — ~~ersetzt durch stackblitz-demo~~ | ~~Hoch~~ | ✅ entfernt v3.2.0 |

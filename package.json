@@ -125,7 +125,13 @@
     "tree-diagram",
     "org-chart",
     "dashboard",
-    "analytics"
+    "analytics",
+    "color-picker",
+    "color-palette",
+    "radial-stacked-bar-chart",
+    "stacked-bar-chart",
+    "mention",
+    "mention-input"
   ],
   "scripts": {
     "dev": "vite",
