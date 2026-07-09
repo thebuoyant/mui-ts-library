@@ -63,6 +63,7 @@ function TestWrapper({
       allowCreate={allowCreate}
       inputSize="medium"
       chipSize="medium"
+      chipVariant="filled"
     />
   );
 }
@@ -173,6 +174,7 @@ describe("TagSelectionAutocomplete", () => {
         onTagSelect={vi.fn()}
         inputSize="medium"
         chipSize="medium"
+        chipVariant="filled"
         isMaxReached={true}
       />,
     );

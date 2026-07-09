@@ -61,6 +61,12 @@ export type TagSelectionProps = {
   // Ermöglicht das Erstellen neuer Tags durch freie Texteingabe.
   allowCreate?: boolean;
   chipSize?: "small" | "medium";
+  /** Controls the MUI Chip variant for selected tag chips and autocomplete option chips.
+   * Useful for consumers with a custom design system that prefer `outlined` chips.
+   * Default: `'filled'`.
+   * @since 3.21.0
+   */
+  chipVariant?: "filled" | "outlined";
   disabled?: boolean;
   inputSize?: "small" | "medium";
   // Maximale Höhe der Autocomplete-Dropdown-Liste in px. Standard: MUI-Default.

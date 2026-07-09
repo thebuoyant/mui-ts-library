@@ -12,6 +12,7 @@ type TagSelectionSelectedTagsProps = {
   onTagDelete: (tag: TagSelectionItem) => void;
   showSelectedTagsLabel: boolean;
   chipSize: "small" | "medium";
+  chipVariant: "filled" | "outlined";
   disabled?: boolean;
   maxVisibleChips?: number;
   popoverPlacement?: "top" | "bottom";
@@ -23,6 +24,7 @@ export function TagSelectionSelectedTags({
   onTagDelete,
   showSelectedTagsLabel,
   chipSize = "medium",
+  chipVariant = "filled",
   disabled = false,
   maxVisibleChips,
   popoverPlacement = "bottom",
@@ -68,6 +70,7 @@ export function TagSelectionSelectedTags({
               tag={tag}
               onDelete={onTagDelete}
               chipSize={chipSize}
+              chipVariant={chipVariant}
               disabled={disabled}
             />
           ))}
@@ -103,6 +106,7 @@ export function TagSelectionSelectedTags({
                       tag={tag}
                       onDelete={disabled ? undefined : onTagDelete}
                       chipSize={chipSize}
+                      chipVariant={chipVariant}
                       disabled={disabled}
                     />
                   ))}

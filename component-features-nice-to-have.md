@@ -134,7 +134,7 @@ eigenen Tab-Layout des Consumers erreichen, ohne dass die Bibliothek selbst Tabs
 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
-| ⭐ `chipVariant` Prop | `chipVariant?: 'filled' | 'outlined'` — MUI Chip unterstützt beide Varianten nativ, aber TagSelection exponiert das nicht. Consumer mit eigenem Design-System wollen oft `outlined`. Niedrig-Aufwand: eine Prop, die direkt an MUI Chip weitergereicht wird. | Niedrig | — |
+| ~~⭐ `chipVariant` Prop~~ | ~~`chipVariant?: 'filled' | 'outlined'`~~ — `chipVariant="filled"` (Default) oder `"outlined"`, wird an alle Tag-Chips weitergereicht (Auswahl-Bereich + Autocomplete-Dropdown). Interne Farb-Selector-Chips der Create-UI sind bewusst ausgenommen. | ~~Niedrig~~ | ✅ v3.21.0 |
 | Tag Groups | Tags in Kategorien einteilen (Group-Header im Dropdown) — reine Darstellungsfrage, keine neue Datenstruktur (Gruppierung über ein optionales `group`-Feld pro Tag). | Mittel | — |
 | `showSelectAll` | Checkbox "Alle auswählen / Alle abwählen" im Dropdown-Footer — für Bulk-Workflows wo viele Tags auf einmal selektiert werden. | Mittel | — |
 | Drag to Reorder | Ausgewählte Tags per Drag neu sortieren. | Mittel | — |
@@ -267,6 +267,7 @@ Neue Komponente seit v3.15.0 — Sektion wächst mit den ersten Erfahrungen aus 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
 | ⭐ GitHub Releases anlegen | Für alle historischen Tags (v1.x–v3.20.0) — GitHub zeigt Releases prominent in der Sidebar; aktuell nur nackte Tags ohne Beschreibung | Niedrig | ⚡ offen |
+| CSS-Klassen-API (Slot-Klassen) | Dokumentierte, stabile CSS-Klassen für Komponenten-Slots — analog zu MUIs CSS Classes API. Ermöglicht Styling via CSS Modules, Tailwind oder Plain CSS ohne JS-only-Hooks. **Konvention (beschlossen):** Präfix `MuiTs` — Slot-Klassen `.MuiTs<Component>-<slot>` (z.B. `.MuiTsTagSelection-chip`), State-Varianten inline camelCase (`.MuiTsPasswordStrengthMeter-strengthBarWeak`), shared State-Klassen `.MuiTs-disabled` / `.MuiTs-selected` / `.MuiTs-focused` / `.MuiTs-error`. **Scope:** Zuerst einfache Komponenten (TagSelection, PasswordStrengthMeter, ColorPicker, ConfirmDialog) — GanttChart, RichTextEditor und D3-Charts erst später und gezielt: zu viele interne DOM-Knoten würden eine schlecht wartbare stabile API erzeugen. | Mittel | — |
 | Playwright Visual Tests | Screenshot-Vergleiche für Chart-Rendering — Qualitätsinvestition, kein User-Feature | Hoch | — |
 | ~~Live Storybook~~ | ~~`https://thebuoyant.github.io/mui-ts-library/`~~ | ~~Mittel~~ | ✅ aktiv — auto-deploy |
 | ~~npm-app Showcase/Playground~~ | ~~Eigenständige Vite-React-App~~ — ~~ersetzt durch stackblitz-demo~~ | ~~Hoch~~ | ✅ entfernt v3.2.0 |

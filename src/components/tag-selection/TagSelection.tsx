@@ -40,6 +40,7 @@ function TagSelectionInner({
   showAutoComplete = true,
   inputSize = "medium",
   chipSize = "small",
+  chipVariant = "filled",
   disabled = false,
   loading = false,
   maxTags,
@@ -196,6 +197,7 @@ function TagSelectionInner({
             onTagDelete={handleTagDelete}
             showSelectedTagsLabel={showSelectedTagsLabel}
             chipSize={chipSize}
+            chipVariant={chipVariant}
             disabled={disabled}
             maxVisibleChips={maxVisibleChips}
             popoverPlacement={popoverPlacement}
@@ -212,6 +214,7 @@ function TagSelectionInner({
             onTagCreate={handleTagCreate}
             inputSize={inputSize}
             chipSize={chipSize}
+            chipVariant={chipVariant}
             disabled={disabled}
             loading={loading}
             isMaxReached={isMaxReached}
@@ -233,6 +236,7 @@ export function TagSelection({
   translation,
   inputSize = "medium",
   chipSize = "small",
+  chipVariant = "filled",
   disabled = false,
   loading = false,
   maxTags,
@@ -261,6 +265,7 @@ export function TagSelection({
         translation={t}
         inputSize={inputSize}
         chipSize={chipSize}
+        chipVariant={chipVariant}
         disabled={disabled}
         loading={loading}
         maxTags={maxTags}

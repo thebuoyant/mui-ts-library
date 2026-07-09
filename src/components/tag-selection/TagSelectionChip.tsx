@@ -6,6 +6,7 @@ type TagSelectionChipProps = {
   onDelete?: (tag: TagSelectionItem) => void;
   onClick?: (tag: TagSelectionItem) => void;
   chipSize: "small" | "medium";
+  chipVariant: "filled" | "outlined";
   disabled?: boolean;
 };
 
@@ -14,6 +15,7 @@ export function TagSelectionChip({
   onDelete,
   onClick,
   chipSize = "medium",
+  chipVariant = "filled",
   disabled = false,
 }: TagSelectionChipProps) {
   const hasCustomColors = Boolean(tag.foregroundColor || tag.backgroundColor);
@@ -26,7 +28,7 @@ export function TagSelectionChip({
       onClick={onClick ? () => onClick(tag) : undefined}
       clickable={Boolean(onClick) && !tag.disabled && !disabled}
       disabled={disabled || tag.disabled}
-      variant={tag.selected ? "filled" : "outlined"}
+      variant={chipVariant}
       color={!hasCustomColors ? (tag.color ?? "default") : undefined}
       sx={{
         ...(hasCustomColors && {
