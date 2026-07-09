@@ -28,6 +28,7 @@ const meta: Meta<typeof CirclePackingChart> = {
     // Callbacks A–Z
     onCircleClick:       { control: false },
     onZoomChange:        { control: false },
+    valueFormatter:      { control: false },
   },
   args: {
     background:         "",
@@ -399,6 +400,21 @@ const DISK_USAGE: CirclePackingData = {
       { name: "Caches", value: 24 },
     ]},
   ],
+};
+
+export const WithValueFormatter: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`valueFormatter` customizes how numeric node values appear in tooltips — " +
+          "here disk-usage raw values are converted to a human-readable `GB` string.",
+      },
+    },
+  },
+  args: {
+    valueFormatter: (v) => `${(v / 1024).toFixed(1)} GB`,
+  },
 };
 
 export const DiskUsageBreakdown: Story = {

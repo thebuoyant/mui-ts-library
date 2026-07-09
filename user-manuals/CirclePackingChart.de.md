@@ -110,6 +110,7 @@ function App() {
 | `disabled` | `boolean` | `false` | Deaktiviert alle Interaktionen |
 | `onCircleClick` | `(info, event) => void` | — | Einfacher Klick auf Kreis |
 | `onZoomChange` | `(zoom) => void` | — | Bei jedem Zoom-Übergang |
+| `valueFormatter` | `(value: number) => string` | `toLocaleString()` | Eigene Formatierungsfunktion für den Tooltip-Wert. Überschreibt `toLocaleString()`. *Ab v3.22.0* |
 | `translation` | `Partial<CirclePackingTranslation>` | EN-Standard | Strings überschreiben |
 
 ---

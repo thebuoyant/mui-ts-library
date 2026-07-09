@@ -129,6 +129,7 @@ function App() {
 | `valueDecimalCount` | `number` | `0` | Dezimalstellen in Tooltip-Werten |
 | `valueDecimalSeparator` | `string` | `'.'` | Dezimaltrennzeichen |
 | `valueThousandsSeparator` | `string` | `','` | Tausendertrennzeichen |
+| `valueFormatter` | `(value: number) => string` | — | Eigene Formatierungsfunktion für Tooltip-Werte. Überschreibt `valueDecimalCount` / `valueDecimalSeparator` / `valueThousandsSeparator`. *Ab v3.22.0* |
 | `disabled` | `boolean` | `false` | Deaktiviert alle Interaktionen, reduziert Opacity |
 | `translation` | `Partial<SunburstChartTranslation>` | EN-Standard | Tooltip-Hinweistexte überschreiben |
 

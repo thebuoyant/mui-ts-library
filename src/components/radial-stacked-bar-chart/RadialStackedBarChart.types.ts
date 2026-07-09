@@ -81,6 +81,14 @@ export type RadialStackedBarChartProps = {
   /** Thousands separator for values (default: ',') */
   valueThousandsSeparator?: string;
   /**
+   * Custom formatter for tooltip bar values. Overrides `valueDecimalCount`,
+   * `valueDecimalSeparator`, and `valueThousandsSeparator` when provided.
+   * `seriesKey` is the key from `series` — use it to format different series differently.
+   * Example: `(v, key) => key === 'revenue' ? \`$${v.toFixed(0)}\` : \`${v} kg\``
+   * @since 3.22.0
+   */
+  valueFormatter?:          (value: number, seriesKey: string) => string;
+  /**
    * Custom formatter for the grid ring value labels.
    * Defaults to compact notation (e.g. 30000 → "30k", 3000000 → "3M").
    * Example: `(v) => \`${(v / 1e6).toFixed(0)}M\``

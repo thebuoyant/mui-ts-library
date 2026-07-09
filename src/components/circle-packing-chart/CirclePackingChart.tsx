@@ -40,6 +40,7 @@ export function CirclePackingChart({
   disabled = false,
   onCircleClick,
   onZoomChange,
+  valueFormatter,
   translation,
 }: CirclePackingChartProps) {
   const theme = useTheme();
@@ -372,7 +373,7 @@ export function CirclePackingChart({
                   <Box sx={{ mt: 0.75, borderTop: "1px solid rgba(255,255,255,0.2)", pt: 0.75 }}>
                     <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
                       <Typography variant="caption" sx={{ opacity: 0.6 }}>Value</Typography>
-                      <Typography variant="caption">{d.value?.toLocaleString()}</Typography>
+                      <Typography variant="caption">{valueFormatter ? valueFormatter(d.value ?? 0) : (d.value ?? 0).toLocaleString()}</Typography>
                     </Box>
                     <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
                       <Typography variant="caption" sx={{ opacity: 0.6 }}>Share</Typography>

@@ -25,6 +25,7 @@ const meta: Meta<typeof SunburstChart> = {
     // Callbacks A–Z
     onSegmentClick:          { control: false },
     onZoomChange:            { control: false },
+    valueFormatter:          { control: false },
   },
   args: {
     size:                    500,
@@ -400,6 +401,23 @@ const DISK_USAGE_DATA: SunburstChartData = {
       ],
     },
   ],
+};
+
+export const WithValueFormatter: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`valueFormatter` replaces the built-in decimal/separator formatting in tooltips — " +
+          "here disk-usage values (raw bytes) are converted to a human-readable `GB` string.",
+      },
+    },
+  },
+  args: {
+    valueFormatter: (v) => `${(v / 1024).toFixed(1)} GB`,
+    valueDecimalCount: 0,
+    showSegmentLabels: true,
+  },
 };
 
 export const DiskUsageBreakdown: Story = {

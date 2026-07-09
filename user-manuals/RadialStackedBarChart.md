@@ -150,6 +150,7 @@ function App() {
 | `valueDecimalCount` | `number` | `0` | Decimal places for segment values in tooltips. |
 | `valueDecimalSeparator` | `string` | `'.'` | Decimal separator character. |
 | `valueThousandsSeparator` | `string` | `','` | Thousands separator character. |
+| `valueFormatter` | `(value: number, seriesKey: string) => string` | — | Custom formatter for all tooltip values. When set, overrides `valueDecimalCount` / `valueDecimalSeparator` / `valueThousandsSeparator`. `seriesKey` is the series key for segment values, or an empty string `""` for the bar total line. *Since v3.22.0* |
 
 ### Colors
 

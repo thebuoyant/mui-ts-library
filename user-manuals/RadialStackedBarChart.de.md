@@ -150,6 +150,7 @@ function App() {
 | `valueDecimalCount` | `number` | `0` | Dezimalstellen für Segmentwerte in Tooltips. |
 | `valueDecimalSeparator` | `string` | `'.'` | Dezimaltrennzeichen. |
 | `valueThousandsSeparator` | `string` | `','` | Tausendertrennzeichen. |
+| `valueFormatter` | `(value: number, seriesKey: string) => string` | — | Eigene Formatierungsfunktion für alle Tooltip-Werte. Überschreibt `valueDecimalCount` / `valueDecimalSeparator` / `valueThousandsSeparator`. `seriesKey` ist der Reihenschlüssel für Segmentwerte oder ein leerer String `""` für die Gesamtzeile. *Ab v3.22.0* |
 
 ### Farben
 

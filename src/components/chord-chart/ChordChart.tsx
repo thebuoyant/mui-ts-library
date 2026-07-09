@@ -94,6 +94,7 @@ export function ChordChart({
   valueDecimalCount = 0,
   valueDecimalSeparator = ".",
   valueThousandsSeparator = ",",
+  valueFormatter,
   onGroupClick,
   onChordClick,
   zoomable = false,
@@ -122,8 +123,8 @@ export function ChordChart({
   const ribbonPad    = ribbonPadAngle ?? 1 / radiusInner;
 
   const fmt = useCallback(
-    (n: number) => formatNumber(n, valueDecimalCount, valueDecimalSeparator, valueThousandsSeparator),
-    [valueDecimalCount, valueDecimalSeparator, valueThousandsSeparator],
+    (n: number) => valueFormatter ? valueFormatter(n) : formatNumber(n, valueDecimalCount, valueDecimalSeparator, valueThousandsSeparator),
+    [valueFormatter, valueDecimalCount, valueDecimalSeparator, valueThousandsSeparator],
   );
 
   // ── matrix from link list ───────────────────────────────────────────────

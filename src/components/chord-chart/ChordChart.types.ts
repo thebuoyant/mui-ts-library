@@ -83,6 +83,13 @@ export type ChordChartProps = {
   valueDecimalSeparator?:   string;
   /** Thousands separator (default: ',') */
   valueThousandsSeparator?: string;
+  /**
+   * Custom formatter for all numeric values shown in tooltips. Overrides
+   * `valueDecimalCount`, `valueDecimalSeparator`, and `valueThousandsSeparator`.
+   * Example: `(v) => \`${v.toLocaleString('de-DE')} kg\``
+   * @since 3.22.0
+   */
+  valueFormatter?:          (value: number) => string;
   /** Fired on click of a group arc */
   onGroupClick?:            (info: ChordGroupInfo, event: React.MouseEvent<SVGGElement>) => void;
   /** Fired on click of a ribbon */

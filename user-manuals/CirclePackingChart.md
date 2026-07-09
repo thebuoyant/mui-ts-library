@@ -110,6 +110,7 @@ function App() {
 | `disabled` | `boolean` | `false` | Mutes all interactions |
 | `onCircleClick` | `(info, event) => void` | — | Fires on single click |
 | `onZoomChange` | `(zoom) => void` | — | Fires on every zoom transition |
+| `valueFormatter` | `(value: number) => string` | `toLocaleString()` | Custom formatter for the value shown in tooltips. When set, overrides the built-in `toLocaleString()`. *Since v3.22.0* |
 | `translation` | `Partial<CirclePackingTranslation>` | EN defaults | Override strings |
 
 ---

@@ -32,6 +32,7 @@ const meta: Meta<typeof ChordChart> = {
     // Callbacks A–Z
     onChordClick:            { control: false },
     onGroupClick:            { control: false },
+    valueFormatter:          { control: false },
   },
   args: {
     directed:                true,
@@ -211,6 +212,21 @@ const TRADE_DATA: ChordChartData[] = [
   { source: "Japan",   target: "EU",            value: 76 },
   { source: "China",   target: "Mexico",        value: 45 },
 ];
+
+export const WithValueFormatter: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`valueFormatter` replaces the built-in `valueDecimalCount`/`valueDecimalSeparator` formatting " +
+          "for all numbers shown in tooltips — here trade flows are displayed in billions with a `$` prefix.",
+      },
+    },
+  },
+  args: {
+    valueFormatter: (v) => `$${v.toFixed(1)} B`,
+  },
+};
 
 export const TradeRelationships: Story = {
   parameters: {
