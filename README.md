@@ -475,6 +475,13 @@ This project follows [Semantic Versioning](https://semver.org/). In practice:
 
 ## Changelog
 
+### [3.20.0] — 2026-07-09
+
+**Added**
+- `RichTextEditor`: new `onMentionInserted?: (item: MentionItem) => void` prop — fires when the user selects an item from the `@` mention dropdown. The full `MentionItem` (`{ id, label }`) is passed to the callback, so no HTML parsing is needed to track who was mentioned. Purely additive. See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.
+
+---
+
 ### [3.19.0] — 2026-07-08
 
 **Added**

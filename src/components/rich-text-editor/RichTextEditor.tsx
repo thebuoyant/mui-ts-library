@@ -41,6 +41,7 @@ export function RichTextEditor({
   mentionItems,
   mentionTriggerChar = "@",
   name,
+  onMentionInserted,
   onMentionSearch,
   placeholder,
   readonly = false,
@@ -72,6 +73,8 @@ export function RichTextEditor({
   // the extension on every render.
   const mentionItemsRef = useRef<MentionItem[]>(mentionItems ?? []);
   useEffect(() => { mentionItemsRef.current = mentionItems ?? []; }, [mentionItems]);
+  const onMentionInsertedRef = useRef(onMentionInserted);
+  useEffect(() => { onMentionInsertedRef.current = onMentionInserted; }, [onMentionInserted]);
   useEffect(() => { pasteAsPlainTextRef.current = pasteAsPlainText; }, [pasteAsPlainText]);
   useEffect(() => { onSaveRef.current = onSave; }, [onSave]);
 
@@ -96,6 +99,7 @@ export function RichTextEditor({
       suggestion: buildMentionSuggestion({
         getItems: () => mentionItemsRef.current,
         onMentionSearch,
+        onMentionInserted: (item) => onMentionInsertedRef.current?.(item),
         noResultsLabel: t.mentionNoResults ?? "No results",
       }),
     });

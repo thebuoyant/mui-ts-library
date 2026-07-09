@@ -9,12 +9,25 @@ import type { MentionItem } from "./RichTextEditor.types";
 type BuildSuggestionOptions = {
   getItems: () => MentionItem[];
   onMentionSearch?: (query: string) => MentionItem[] | Promise<MentionItem[]>;
+  onMentionInserted?: (item: MentionItem) => void;
   noResultsLabel: string;
 };
+
+/** Pure handler factory — extracted for testability without mocking ReactRenderer. */
+export function createMentionSelectHandler(
+  command: (attrs: { id: string; label: string }) => void,
+  onMentionInserted?: (item: MentionItem) => void,
+): (item: MentionItem) => void {
+  return (item) => {
+    command({ id: item.id, label: item.label });
+    onMentionInserted?.(item);
+  };
+}
 
 export function buildMentionSuggestion({
   getItems,
   onMentionSearch,
+  onMentionInserted,
   noResultsLabel,
 }: BuildSuggestionOptions): Partial<SuggestionOptions<MentionItem>> {
   return {
@@ -35,7 +48,7 @@ export function buildMentionSuggestion({
               items: props.items,
               noResultsLabel,
               clientRect: props.clientRect,
-              onSelect: (item: MentionItem) => props.command({ id: item.id, label: item.label }),
+              onSelect: createMentionSelectHandler(props.command, onMentionInserted),
             },
             editor: props.editor,
           });

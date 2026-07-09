@@ -238,6 +238,13 @@ export type RichTextEditorProps = {
    */
   onMentionSearch?: (query: string) => MentionItem[] | Promise<MentionItem[]>;
   /**
+   * Called when the user selects a mention item from the autocomplete dropdown.
+   * Fires immediately after the mention node is inserted into the editor.
+   * Useful for tracking which people are mentioned without parsing the HTML output.
+   * @since 3.20.0
+   */
+  onMentionInserted?: (item: MentionItem) => void;
+  /**
    * Character that triggers the mention autocomplete popup. Default: "@"
    * @since 3.14.0
    */
