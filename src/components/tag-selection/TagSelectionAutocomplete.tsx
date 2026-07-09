@@ -58,6 +58,7 @@ function highlightMatch(text: string, query: string) {
 type TagSelectionAutocompleteProps = {
   inputSize: "medium" | "small";
   chipSize: "medium" | "small";
+  chipVariant: "filled" | "outlined";
   availableTags: TagSelectionItem[];
   searchValue: string;
   translation: Required<TagSelectionTranslation>;
@@ -161,6 +162,7 @@ export function TagSelectionAutocomplete({
   onTagCreate,
   inputSize = "medium",
   chipSize = "medium",
+  chipVariant = "filled",
   disabled = false,
   loading = false,
   isMaxReached = false,
@@ -368,6 +370,7 @@ export function TagSelectionAutocomplete({
             <li key={key} {...props} style={{ width: "auto", padding: 0, margin: 0 }}>
               <Chip
                 size={chipSize}
+                variant={chipVariant}
                 label={highlightMatch(option.label, searchValue)}
                 color={!hasCustomColors ? (option.color ?? "default") : undefined}
                 sx={

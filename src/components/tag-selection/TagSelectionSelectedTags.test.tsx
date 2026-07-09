@@ -29,6 +29,7 @@ describe("TagSelectionSelectedTags", () => {
         onTagDelete={vi.fn()}
         showSelectedTagsLabel
         chipSize="medium"
+        chipVariant="filled"
       />,
     );
 
@@ -47,6 +48,7 @@ describe("TagSelectionSelectedTags", () => {
         onTagDelete={handleDelete}
         showSelectedTagsLabel={false}
         chipSize="small"
+        chipVariant="filled"
       />,
     );
 
@@ -72,6 +74,7 @@ describe("TagSelectionSelectedTags", () => {
         onTagDelete={vi.fn()}
         showSelectedTagsLabel
         chipSize="medium"
+        chipVariant="filled"
       />,
     );
 
@@ -95,6 +98,7 @@ describe("TagSelectionSelectedTags", () => {
         onTagDelete={vi.fn()}
         showSelectedTagsLabel
         chipSize="medium"
+        chipVariant="filled"
         maxVisibleChips={3}
       />,
     );
@@ -121,6 +125,7 @@ describe("TagSelectionSelectedTags", () => {
         onTagDelete={vi.fn()}
         showSelectedTagsLabel
         chipSize="medium"
+        chipVariant="filled"
         maxVisibleChips={1}
       />,
     );
@@ -145,6 +150,7 @@ describe("TagSelectionSelectedTags", () => {
         onTagDelete={handleDelete}
         showSelectedTagsLabel
         chipSize="medium"
+        chipVariant="filled"
         maxVisibleChips={1}
       />,
     );
@@ -168,10 +174,28 @@ describe("TagSelectionSelectedTags", () => {
         onTagDelete={vi.fn()}
         showSelectedTagsLabel={false}
         chipSize="medium"
+        chipVariant="filled"
       />,
     );
 
     expect(screen.queryByText("Selected tags")).not.toBeInTheDocument();
     expect(screen.getByText("No tags selected.")).toBeInTheDocument();
+  });
+
+  it("Should render outlined chips when chipVariant is 'outlined'", () => {
+    render(
+      <TagSelectionSelectedTags
+        selectedTags={[{ id: "react", label: "React", selected: true }]}
+        translation={translation}
+        onTagDelete={vi.fn()}
+        showSelectedTagsLabel={false}
+        chipSize="medium"
+        chipVariant="outlined"
+      />,
+    );
+
+    const chip = screen.getByText("React").closest(".MuiChip-root");
+
+    expect(chip).toHaveClass("MuiChip-outlined");
   });
 });

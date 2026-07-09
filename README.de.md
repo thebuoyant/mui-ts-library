@@ -475,6 +475,13 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/). In der Praxis b
 
 ## Changelog
 
+### [3.21.0] — 2026-07-09
+
+**Hinzugefügt**
+- `TagSelection`: neue Prop `chipVariant?: 'filled' | 'outlined'` (Standard: `'filled'`) — steuert die MUI-Chip-Variante für alle Tag-Chips im Auswahl-Bereich und im Autocomplete-Dropdown. Consumer mit eigenem Design-System, das `outlined`-Chips bevorzugt, müssen keine Styles mehr manuell überschreiben. Siehe [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) für Details.
+
+---
+
 ### [3.20.0] — 2026-07-09
 
 **Hinzugefügt**

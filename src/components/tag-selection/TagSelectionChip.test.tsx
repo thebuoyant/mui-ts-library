@@ -13,7 +13,7 @@ const baseTag = {
 
 describe("TagSelectionChip", () => {
   it("Should render a filled chip for selected tags and apply custom colors", () => {
-    render(<TagSelectionChip tag={baseTag} chipSize="small" />);
+    render(<TagSelectionChip tag={baseTag} chipSize="small" chipVariant="filled" />);
 
     const chip = screen.getByText("React").closest(".MuiChip-root");
 
@@ -25,11 +25,12 @@ describe("TagSelectionChip", () => {
     });
   });
 
-  it("Should render an outlined chip for non-selected tags", () => {
+  it("Should render an outlined chip when chipVariant is 'outlined'", () => {
     render(
       <TagSelectionChip
-        tag={{ ...baseTag, selected: false }}
+        tag={baseTag}
         chipSize="medium"
+        chipVariant="outlined"
       />,
     );
 
@@ -43,6 +44,7 @@ describe("TagSelectionChip", () => {
       <TagSelectionChip
         tag={{ id: "ts", label: "TypeScript", selected: true, color: "primary" }}
         chipSize="medium"
+        chipVariant="filled"
       />,
     );
 
@@ -62,6 +64,7 @@ describe("TagSelectionChip", () => {
           backgroundColor: "rgb(200, 210, 220)",
         }}
         chipSize="medium"
+        chipVariant="filled"
       />,
     );
 
@@ -80,6 +83,7 @@ describe("TagSelectionChip", () => {
       <TagSelectionChip
         tag={baseTag}
         chipSize="medium"
+        chipVariant="filled"
         onClick={handleClick}
         onDelete={handleDelete}
       />,
@@ -104,6 +108,7 @@ describe("TagSelectionChip", () => {
       <TagSelectionChip
         tag={{ id: "vue", label: "Vue", selected: true }}
         chipSize="medium"
+        chipVariant="filled"
         onDelete={handleDelete}
       />,
     );
@@ -121,6 +126,7 @@ describe("TagSelectionChip", () => {
       <TagSelectionChip
         tag={{ ...baseTag, disabled: true, selected: false }}
         chipSize="medium"
+        chipVariant="filled"
         onClick={vi.fn()}
       />,
     );
@@ -128,7 +134,7 @@ describe("TagSelectionChip", () => {
     const chip = screen.getByText("React").closest(".MuiChip-root");
 
     expect(chip).toHaveClass("Mui-disabled");
-    expect(chip).toHaveClass("MuiChip-outlined");
+    expect(chip).toHaveClass("MuiChip-filled");
     expect(chip).toHaveStyle({ cursor: "default" });
   });
 });

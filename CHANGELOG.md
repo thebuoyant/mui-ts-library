@@ -13,6 +13,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.21.0] — 2026-07-09
+
+### Added
+
+#### `TagSelection` — `chipVariant` prop
+
+- New prop `chipVariant?: 'filled' | 'outlined'` (default: `'filled'`) controls the MUI Chip variant for all tag chips — both in the selected-tags area and in the autocomplete dropdown options.
+- Consumers using a design system that prefers `outlined` chips can now set `chipVariant="outlined"` instead of overriding styles manually.
+
+---
+
 ## [3.20.0] — 2026-07-09
 
 ### Added

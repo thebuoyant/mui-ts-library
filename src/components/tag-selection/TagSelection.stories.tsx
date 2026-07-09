@@ -25,6 +25,7 @@ const meta: Meta<typeof TagSelection> = {
     // A–Z
     allowCreate:          true,
     chipSize:             "small",
+    chipVariant:          "filled",
     disabled:             false,
     inputSize:            "medium",
     listboxMaxHeight:     300,
@@ -47,6 +48,7 @@ const meta: Meta<typeof TagSelection> = {
     // A–Z
     allowCreate:          { control: "boolean" },
     chipSize:             { control: "radio", options: ["small", "medium"] },
+    chipVariant:          { control: "radio", options: ["filled", "outlined"] },
     disabled:             { control: "boolean" },
     inputSize:            { control: "radio", options: ["small", "medium"] },
     listboxMaxHeight:     { control: "number" },
@@ -79,6 +81,17 @@ export default meta;
 type Story = StoryObj<typeof TagSelection>;
 
 export const Default: Story = {
+  render: (args) => (
+    <Box sx={{ maxWidth: 420 }}>
+      <TagSelection {...args} />
+    </Box>
+  ),
+};
+
+export const OutlinedChips: Story = {
+  args: {
+    chipVariant: "outlined",
+  },
   render: (args) => (
     <Box sx={{ maxWidth: 420 }}>
       <TagSelection {...args} />
