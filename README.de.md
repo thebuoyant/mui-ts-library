@@ -2,6 +2,10 @@
 
 > [English Version →](README.md)
 
+[![CI](https://github.com/thebuoyant/mui-ts-library/actions/workflows/ci.yml/badge.svg)](https://github.com/thebuoyant/mui-ts-library/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/@thebuoyant-tsdev/mui-ts-library)](https://www.npmjs.com/package/@thebuoyant-tsdev/mui-ts-library)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **MUI (Material UI v9)**. Die Komponenten folgen MUI's Design-Sprache, unterstützen Dark Mode und Theming von Haus aus und werden mit vollständigen TypeScript-Typen, Storybook-Stories und Unit-Tests ausgeliefert.
 
 **[→ Live-Storybook](https://thebuoyant.github.io/mui-ts-library/)** — alle Komponenten interaktiv erkunden, ohne Installation.
@@ -478,6 +482,28 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/):
 ---
 
 ## Changelog
+
+### [3.24.1] — 2026-07-10
+
+**Behoben**
+- `RichTextEditor`-Toolbar: `H1`/`H2`/`H3`- und `MD`-Button werden jetzt als `<svg><text>` gerendert statt als HTML-`<span>` — konsistente Render-Engine, Strichgewicht und Farbverhalten wie alle anderen SVG-Toolbar-Icons.
+- `RadialStackedBarChart`-Stories: ungenutzten Parameter entfernt, der einen ESLint-Fehler verursachte.
+
+---
+
+### [3.24.0] — 2026-07-10
+
+**Hinzugefügt**
+- **CSS-Klassen-API** für `TagSelection`, `PasswordStrengthMeter` und `ColorPicker` — jedes bedeutende DOM-Element trägt jetzt einen stabilen `.MuiTs<Komponente>-<Slot>`-Klassennamen. Einzelne Slots per Plain CSS, CSS Modules oder Tailwind stylen ohne MUI-Interna anzufassen. Drei typisierte Konstanten-Objekte exportiert: `tagSelectionClasses`, `passwordStrengthMeterClasses`, `colorPickerClasses` + geteilte `muiTsStateClasses` (`.MuiTs-disabled`, `.MuiTs-error`, …). Siehe [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.de.md) für Details.
+
+---
+
+### [3.23.0] — 2026-07-10
+
+**Hinzugefügt**
+- `ColorPicker`: neue `format?: 'hex' | 'rgb' | 'hsl'`-Prop — kontrolliertes Anzeigeformat, ermöglicht dem Parent die Kontrolle über das aktive Format (z.B. für programmatische Form-Resets). Mit `onFormatChange` kombinieren. Ohne diese Prop bleibt das bisherige unkontrollierte Verhalten erhalten. Siehe [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.de.md) für Details.
+
+---
 
 ### [3.22.0] — 2026-07-09
 

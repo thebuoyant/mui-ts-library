@@ -2,6 +2,10 @@
 
 > [Deutsche Version →](README.de.md)
 
+[![CI](https://github.com/thebuoyant/mui-ts-library/actions/workflows/ci.yml/badge.svg)](https://github.com/thebuoyant/mui-ts-library/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/@thebuoyant-tsdev/mui-ts-library)](https://www.npmjs.com/package/@thebuoyant-tsdev/mui-ts-library)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 A type-safe React component library built on **TypeScript** and **MUI (Material UI v9)**. Components follow MUI's design language, support dark mode and theming out of the box, and ship with complete TypeScript types, Storybook stories, and unit tests.
 
 **[→ Live Storybook](https://thebuoyant.github.io/mui-ts-library/)** — explore all components interactively, no installation needed.
@@ -478,6 +482,28 @@ This project follows [Semantic Versioning](https://semver.org/):
 ---
 
 ## Changelog
+
+### [3.24.1] — 2026-07-10
+
+**Fixed**
+- `RichTextEditor` toolbar: `H1`/`H2`/`H3` and `MD` buttons now render as `<svg><text>` instead of a plain HTML `<span>` — consistent rendering engine, stroke weight, and color behaviour with all other SVG toolbar icons.
+- `RadialStackedBarChart` stories: removed unused parameter that caused an ESLint error.
+
+---
+
+### [3.24.0] — 2026-07-10
+
+**Added**
+- **CSS Classes API** for `TagSelection`, `PasswordStrengthMeter`, and `ColorPicker` — every significant DOM node now carries a stable `.MuiTs<Component>-<slot>` class name. Style individual slots via plain CSS, CSS Modules, or Tailwind without touching MUI internals. Three typed constants objects exported: `tagSelectionClasses`, `passwordStrengthMeterClasses`, `colorPickerClasses` + shared `muiTsStateClasses` (`.MuiTs-disabled`, `.MuiTs-error`, …). See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.
+
+---
+
+### [3.23.0] — 2026-07-10
+
+**Added**
+- `ColorPicker`: new `format?: 'hex' | 'rgb' | 'hsl'` prop — controlled display format, lets the parent own the active format (e.g. for programmatic form resets). Combine with `onFormatChange`. Omit to keep existing uncontrolled behaviour. See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.
+
+---
 
 ### [3.22.0] — 2026-07-09
 
