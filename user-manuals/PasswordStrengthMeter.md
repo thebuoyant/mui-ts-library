@@ -575,4 +575,91 @@ type CustomRequirement = {
 | **`value` without `onPasswordChange`** | In controlled mode (`value` set) without `onPasswordChange`, the field is read-only — the user cannot type. Always set `onPasswordChange` when using `value`. |
 | **Penalty rules do not accumulate** | Only one of the two penalty factors (repeated characters **or** known patterns) can be applied per password — not both simultaneously. The algorithm detects the first matching pattern. |
 | **`checkColors` is not a Partial** | Unlike `meterColors` and `translation`, `checkColors` must be passed as a complete object (both fields `failure` and `success` are required). |
+
+---
+
+## CSS Classes API
+
+Every significant DOM node in `PasswordStrengthMeter` carries a stable, documented CSS class name. Use these to style individual slots via plain CSS, CSS Modules, Tailwind, or any other CSS approach — without relying on MUI's internal class names, which can change between MUI versions.
+
+### Importing the class name constants
+
+```ts
+import { passwordStrengthMeterClasses, muiTsStateClasses } from '@thebuoyant-tsdev/mui-ts-library';
+```
+
+### Slot reference
+
+| Class name | Constant key | DOM element | Notes |
+|---|---|---|---|
+| `.MuiTsPasswordStrengthMeter-root` | `passwordStrengthMeterClasses.root` | Outermost `<div>` wrapping the whole component | Also receives `.MuiTs-disabled` and `.MuiTs-error` state classes |
+| `.MuiTsPasswordStrengthMeter-input` | `passwordStrengthMeterClasses.input` | `<div>` (MUI FormControl) containing the password input | |
+| `.MuiTsPasswordStrengthMeter-generatorButton` | `passwordStrengthMeterClasses.generatorButton` | The "Generate password" `<button>` | Only present when `showPasswordGenerator={true}` |
+| `.MuiTsPasswordStrengthMeter-confirmInput` | `passwordStrengthMeterClasses.confirmInput` | `<div>` (MUI FormControl) containing the confirm field | Only present when `showConfirmField={true}` |
+| `.MuiTsPasswordStrengthMeter-strengthBar` | `passwordStrengthMeterClasses.strengthBar` | The strength progress bar element | Also receives one of the four strength-state classes (see below). Only present when `showMeter={true}` |
+| `.MuiTsPasswordStrengthMeter-strengthBarWeak` | `passwordStrengthMeterClasses.strengthBarWeak` | Added to `.strengthBar` | Score 0–25 % |
+| `.MuiTsPasswordStrengthMeter-strengthBarOk` | `passwordStrengthMeterClasses.strengthBarOk` | Added to `.strengthBar` | Score ~50 % |
+| `.MuiTsPasswordStrengthMeter-strengthBarGood` | `passwordStrengthMeterClasses.strengthBarGood` | Added to `.strengthBar` | Score ~75 % |
+| `.MuiTsPasswordStrengthMeter-strengthBarVeryGood` | `passwordStrengthMeterClasses.strengthBarVeryGood` | Added to `.strengthBar` | Score 100 % |
+| `.MuiTsPasswordStrengthMeter-summary` | `passwordStrengthMeterClasses.summary` | The requirements-checklist `<div>` | Only present when `showSummary={true}` (default) |
+| `.MuiTsPasswordStrengthMeter-requirementItem` | `passwordStrengthMeterClasses.requirementItem` | Each individual requirement row `<div>` (label + icon) | |
+
+### Shared state classes
+
+| Class name | Constant key | When applied |
+|---|---|---|
+| `.MuiTs-disabled` | `muiTsStateClasses.disabled` | On `.MuiTsPasswordStrengthMeter-root` when `disabled={true}` |
+| `.MuiTs-error` | `muiTsStateClasses.error` | On `.MuiTsPasswordStrengthMeter-root` when `error={true}` |
+
+### Examples
+
+**Custom strength-bar colors via CSS (overrides `meterColors`):**
+```css
+.MuiTsPasswordStrengthMeter-strengthBar.MuiTsPasswordStrengthMeter-strengthBarWeak    { background: #d32f2f; }
+.MuiTsPasswordStrengthMeter-strengthBar.MuiTsPasswordStrengthMeter-strengthBarOk      { background: #f57c00; }
+.MuiTsPasswordStrengthMeter-strengthBar.MuiTsPasswordStrengthMeter-strengthBarGood    { background: #1976d2; }
+.MuiTsPasswordStrengthMeter-strengthBar.MuiTsPasswordStrengthMeter-strengthBarVeryGood{ background: #388e3c; }
+```
+
+**Highlight the entire component in an error state:**
+```css
+.MuiTsPasswordStrengthMeter-root.MuiTs-error .MuiTsPasswordStrengthMeter-strengthBar {
+  opacity: 0.5;
+}
+```
+
+**Custom requirements list layout:**
+```css
+/* Two-column layout for the requirements checklist */
+.MuiTsPasswordStrengthMeter-summary > * {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+```
+
+**Using constants in a `sx` prop:**
+```tsx
+import { passwordStrengthMeterClasses, muiTsStateClasses } from '@thebuoyant-tsdev/mui-ts-library';
+
+<Box
+  sx={{
+    [`& .${passwordStrengthMeterClasses.strengthBar}.${passwordStrengthMeterClasses.strengthBarVeryGood}`]: {
+      boxShadow: '0 0 8px rgba(56, 142, 60, 0.5)',
+    },
+    [`& .${passwordStrengthMeterClasses.root}.${muiTsStateClasses.disabled}`]: {
+      filter: 'grayscale(1)',
+    },
+  }}
+>
+  <PasswordStrengthMeter value={pwd} onPasswordChange={setPwd} />
+</Box>
+```
+
+**CSS Modules:**
+```css
+/* passwordMeter.module.css */
+.container :global(.MuiTsPasswordStrengthMeter-strengthBarVeryGood) {
+  box-shadow: 0 0 8px rgba(56, 142, 60, 0.5);
+}
+```
 | **No server-side validation** | The scoring algorithm runs entirely client-side. It does not replace server-side password policy checks. It serves as a UX aid for the user. |

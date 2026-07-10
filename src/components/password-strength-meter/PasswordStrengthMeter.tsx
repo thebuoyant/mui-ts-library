@@ -11,6 +11,8 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import { passwordStrengthMeterClasses } from "./passwordStrengthMeterClasses";
+import { muiTsStateClasses } from "../../utils/muiTsClasses";
 import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -85,7 +87,7 @@ function RequirementItem({
   checkColors,
 }: RequirementItemProps) {
   return (
-    <Stack direction="row" sx={{ alignItems: "center", mb: 0.25 }} spacing={0.5}>
+    <Stack direction="row" sx={{ alignItems: "center", mb: 0.25 }} spacing={0.5} className={passwordStrengthMeterClasses.requirementItem}>
       <Typography variant="caption">{label}</Typography>
       {fulfilled ? (
         <CheckCircleOutlineIcon
@@ -225,9 +227,17 @@ export function PasswordStrengthMeter({
     }
   };
 
+  const strengthBarClass = [
+    passwordStrengthMeterClasses.strengthBar,
+    strengthResult.meterStatus === "weak"      && passwordStrengthMeterClasses.strengthBarWeak,
+    strengthResult.meterStatus === "ok"        && passwordStrengthMeterClasses.strengthBarOk,
+    strengthResult.meterStatus === "good"      && passwordStrengthMeterClasses.strengthBarGood,
+    strengthResult.meterStatus === "very good" && passwordStrengthMeterClasses.strengthBarVeryGood,
+  ].filter(Boolean).join(" ");
+
   return (
-    <Stack>
-      <FormControl variant="outlined" fullWidth error={error}>
+    <Stack className={[passwordStrengthMeterClasses.root, disabled && muiTsStateClasses.disabled, error && muiTsStateClasses.error].filter(Boolean).join(" ")}>
+      <FormControl variant="outlined" fullWidth error={error} className={passwordStrengthMeterClasses.input}>
         <InputLabel htmlFor={inputId} size={inputSize}>
           {t.label}
         </InputLabel>
@@ -293,6 +303,7 @@ export function PasswordStrengthMeter({
               startIcon={<AutoFixHighIcon fontSize="small" />}
               disabled={disabled}
               onClick={handleGenerate}
+              className={passwordStrengthMeterClasses.generatorButton}
               sx={{ mt: 0.5, alignSelf: "flex-start", textTransform: "none" }}
             >
               {t.generatePasswordLabel}
@@ -302,7 +313,7 @@ export function PasswordStrengthMeter({
       )}
 
       {showConfirmField && (
-        <FormControl variant="outlined" fullWidth error={confirmFilled && !passwordsMatch} sx={{ mt: 1 }}>
+        <FormControl variant="outlined" fullWidth error={confirmFilled && !passwordsMatch} sx={{ mt: 1 }} className={passwordStrengthMeterClasses.confirmInput}>
           <InputLabel htmlFor={`${uniqueId}-confirm`} size={inputSize}>
             {t.confirmLabel}
           </InputLabel>
@@ -350,11 +361,12 @@ export function PasswordStrengthMeter({
           color={calculateStrengthColor(strengthResult)}
           ariaLabel={t.meterAriaLabel}
           segments={showSegmentedBar}
+          className={strengthBarClass}
         />
       )}
 
       {showSummary && (
-        <Box data-testid="psm-summary" sx={{ mt: 0.5, p: 0.5 }}>
+        <Box data-testid="psm-summary" sx={{ mt: 0.5, p: 0.5 }} className={passwordStrengthMeterClasses.summary}>
           <Typography
             variant="caption"
             gutterBottom

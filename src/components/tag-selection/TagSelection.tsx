@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Box, Stack } from "@mui/material";
 import { useStore } from "zustand";
+import { tagSelectionClasses } from "./tagSelectionClasses";
+import { muiTsStateClasses } from "../../utils/muiTsClasses";
 import {
   createTagSelectionStore,
   type TagSelectionStore,
@@ -188,7 +190,10 @@ function TagSelectionInner({
   };
 
   return (
-    <Box sx={{ width: "100%" }}>
+    <Box
+      sx={{ width: "100%" }}
+      className={[tagSelectionClasses.root, disabled && muiTsStateClasses.disabled].filter(Boolean).join(" ")}
+    >
       <Stack>
         {showSelectedTags && (
           <TagSelectionSelectedTags

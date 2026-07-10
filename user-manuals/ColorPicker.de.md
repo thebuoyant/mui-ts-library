@@ -350,4 +350,119 @@ type ColorPickerProps = {
 |---|---|
 | **Browser-Unterstützung der Pipette** | Die [EyeDropper-API](https://developer.mozilla.org/de/docs/Web/API/EyeDropper) ist Stand jetzt nur in Chromium-basierten Browsern verfügbar (Chrome, Edge, Opera) — nicht in Safari oder Firefox. Der Button wird bei fehlender Unterstützung automatisch ausgeblendet, unabhängig von `showEyeDropper`. |
 | **Kein eingebautes Popover/Auslöser** | `ColorPicker` ist nur das Panel — siehe [In ein Popover einbetten](#in-ein-popover-einbetten) für das empfohlene Einbindungsmuster. |
+
+---
+
+## CSS-Klassen-API
+
+Jedes bedeutende DOM-Element in `ColorPicker` trägt einen stabilen, dokumentierten CSS-Klassennamen. Diese können verwendet werden, um einzelne Slots über Plain CSS, CSS Modules, Tailwind oder andere CSS-Ansätze zu stylen — ohne sich auf MUIs interne Klassennamen verlassen zu müssen, die sich zwischen MUI-Versionen ändern können.
+
+### Klassen-Konstanten importieren
+
+```ts
+import { colorPickerClasses, muiTsStateClasses } from '@thebuoyant-tsdev/mui-ts-library';
+```
+
+### Slot-Referenz
+
+| Klassenname | Konstanten-Key | DOM-Element | Hinweise |
+|---|---|---|---|
+| `.MuiTsColorPicker-root` | `colorPickerClasses.root` | Äußerstes `<div>` des gesamten Panels | Erhält zusätzlich `.MuiTs-disabled` wenn `disabled={true}` |
+| `.MuiTsColorPicker-gradientArea` | `colorPickerClasses.gradientArea` | Die 2D-Gradient-Fläche `<div>` zur Sättigungs- und Helligkeitsauswahl | Immer vorhanden |
+| `.MuiTsColorPicker-gradientThumb` | `colorPickerClasses.gradientThumb` | Der ziehbare Kreis (Thumb) in der Gradient-Fläche | |
+| `.MuiTsColorPicker-sliderSection` | `colorPickerClasses.sliderSection` | Zeile mit Pipette-Button und Hue/Alpha-Slidern | Nur vorhanden wenn `showSliderSection={true}` (Standard) |
+| `.MuiTsColorPicker-hueSlider` | `colorPickerClasses.hueSlider` | Der horizontale Farbton-Slider | |
+| `.MuiTsColorPicker-alphaSlider` | `colorPickerClasses.alphaSlider` | Der horizontale Transparenz-Slider | Nur vorhanden wenn `showAlpha={true}` (Standard) |
+| `.MuiTsColorPicker-inputSection` | `colorPickerClasses.inputSection` | Spalte mit Format-Dropdown und Eingabefeldern | Nur vorhanden wenn `showInputSection={true}` (Standard) |
+| `.MuiTsColorPicker-savedColors` | `colorPickerClasses.savedColors` | Wrapper-`<div>` um die gespeicherten Farben | Nur vorhanden wenn `savedColors` nicht leer ist |
+| `.MuiTsColorPicker-swatchList` | `colorPickerClasses.swatchList` | Flex-Zeile mit allen Swatch-Buttons | |
+| `.MuiTsColorPicker-swatch` | `colorPickerClasses.swatch` | Jeder gespeicherte Farb-`<button>` | |
+
+### Geteilte State-Klassen
+
+| Klassenname | Konstanten-Key | Wann vergeben |
+|---|---|---|
+| `.MuiTs-disabled` | `muiTsStateClasses.disabled` | Auf `.MuiTsColorPicker-root` wenn `disabled={true}` |
+
+### Beispiele
+
+**Eigenes Panel-Styling (Rahmen und Schatten):**
+```css
+.MuiTsColorPicker-root {
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+  padding: 12px;
+}
+```
+
+**Größere Gradient-Fläche:**
+```css
+.MuiTsColorPicker-gradientArea {
+  height: 220px !important;
+}
+```
+
+**Runde Swatch-Buttons:**
+```css
+.MuiTsColorPicker-swatch {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+}
+```
+
+**Panel im deaktivierten Zustand abdimmen:**
+```css
+.MuiTsColorPicker-root.MuiTs-disabled {
+  pointer-events: none;
+  filter: grayscale(0.6);
+}
+```
+
+**Konstanten in einem `sx`-Prop verwenden:**
+```tsx
+import { colorPickerClasses, muiTsStateClasses } from '@thebuoyant-tsdev/mui-ts-library';
+
+<Box
+  sx={{
+    [`& .${colorPickerClasses.root}`]: {
+      borderRadius: '12px',
+      boxShadow: '0 4px 24px rgba(0,0,0,0.12)',
+    },
+    [`& .${colorPickerClasses.swatch}`]: {
+      borderRadius: '50%',
+    },
+    [`& .${colorPickerClasses.root}.${muiTsStateClasses.disabled}`]: {
+      filter: 'grayscale(0.6)',
+    },
+  }}
+>
+  <ColorPicker value={color} onChange={setColor} />
+</Box>
+```
+
+**CSS Modules:**
+```css
+/* colorPicker.module.css */
+.panel :global(.MuiTsColorPicker-root) {
+  border-radius: 12px;
+}
+.panel :global(.MuiTsColorPicker-swatch) {
+  border-radius: 50%;
+}
+```
+
+**Integration in ein Design-System:**
+```css
+/* design-system.css */
+:root {
+  --brand-picker-radius: 8px;
+  --brand-swatch-size: 28px;
+}
+
+.MuiTsColorPicker-root              { border-radius: var(--brand-picker-radius); }
+.MuiTsColorPicker-gradientArea      { border-radius: calc(var(--brand-picker-radius) - 2px); }
+.MuiTsColorPicker-swatch            { width: var(--brand-swatch-size); height: var(--brand-swatch-size); }
+```
 | **HSV/HSL-Präzision nahe Schwarz/Weiß** | Wie praktisch alle Sättigung/Helligkeit-Farbwähler wird der Farbton bei reinem Schwarz oder Weiß mathematisch undefiniert — durch diese Ecken zu ziehen kann den Farbton auf einem anderen Wert belassen, als wo man gestartet ist. Das ist normales, erwartetes Verhalten für diesen Picker-Typ, kein Bug. |

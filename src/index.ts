@@ -1,3 +1,7 @@
+export * from "./utils/muiTsClasses";
+export * from "./components/tag-selection/tagSelectionClasses";
+export * from "./components/password-strength-meter/passwordStrengthMeterClasses";
+export * from "./components/color-picker/colorPickerClasses";
 export * from "./components/json-editor/JsonEditor";
 export * from "./components/json-editor/JsonEditor.types";
 export * from "./components/gantt-chart/GanttChart";

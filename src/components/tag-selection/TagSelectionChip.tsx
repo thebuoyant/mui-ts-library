@@ -1,5 +1,7 @@
 import { Chip } from "@mui/material";
 import type { TagSelectionItem } from "./TagSelection.types";
+import { tagSelectionClasses } from "./tagSelectionClasses";
+import { muiTsStateClasses } from "../../utils/muiTsClasses";
 
 type TagSelectionChipProps = {
   tag: TagSelectionItem;
@@ -20,6 +22,7 @@ export function TagSelectionChip({
 }: TagSelectionChipProps) {
   const hasCustomColors = Boolean(tag.foregroundColor || tag.backgroundColor);
 
+  const isDisabled = disabled || tag.disabled;
   return (
     <Chip
       size={chipSize}
@@ -27,9 +30,10 @@ export function TagSelectionChip({
       onDelete={onDelete ? () => onDelete(tag) : undefined}
       onClick={onClick ? () => onClick(tag) : undefined}
       clickable={Boolean(onClick) && !tag.disabled && !disabled}
-      disabled={disabled || tag.disabled}
+      disabled={isDisabled}
       variant={chipVariant}
       color={!hasCustomColors ? (tag.color ?? "default") : undefined}
+      className={[tagSelectionClasses.chip, isDisabled && muiTsStateClasses.disabled].filter(Boolean).join(" ")}
       sx={{
         ...(hasCustomColors && {
           color: tag.foregroundColor ?? "inherit",
@@ -40,7 +44,7 @@ export function TagSelectionChip({
             "&:hover": { color: tag.foregroundColor ?? "inherit" },
           },
         }),
-        cursor: onClick && !tag.disabled && !disabled ? "pointer" : "default",
+        cursor: onClick && !tag.disabled && !isDisabled ? "pointer" : "default",
       }}
     />
   );

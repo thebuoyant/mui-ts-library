@@ -351,3 +351,118 @@ type ColorPickerProps = {
 | **Browser support for the eyedropper** | The [EyeDropper API](https://developer.mozilla.org/en-US/docs/Web/API/EyeDropper) is Chromium-only as of writing (Chrome, Edge, Opera) — not supported in Safari or Firefox. The button is automatically hidden when unsupported, regardless of `showEyeDropper`. |
 | **No built-in popover/trigger** | `ColorPicker` is the panel only — see [Embedding in a Popover](#embedding-in-a-popover) for the recommended wrapping pattern. |
 | **HSV/HSL precision near black/white** | Like virtually all saturation/value color pickers, hue becomes mathematically undefined at pure black or white — dragging through those corners can leave hue at a different value. This is standard behavior for this style of picker, not a bug. |
+
+---
+
+## CSS Classes API
+
+Every significant DOM node in `ColorPicker` carries a stable, documented CSS class name. Use these to style individual slots via plain CSS, CSS Modules, Tailwind, or any other CSS approach — without relying on MUI's internal class names, which can change between MUI versions.
+
+### Importing the class name constants
+
+```ts
+import { colorPickerClasses, muiTsStateClasses } from '@thebuoyant-tsdev/mui-ts-library';
+```
+
+### Slot reference
+
+| Class name | Constant key | DOM element | Notes |
+|---|---|---|---|
+| `.MuiTsColorPicker-root` | `colorPickerClasses.root` | Outermost `<div>` wrapping the whole panel | Also receives `.MuiTs-disabled` when `disabled={true}` |
+| `.MuiTsColorPicker-gradientArea` | `colorPickerClasses.gradientArea` | The 2D gradient canvas `<div>` used to pick saturation and brightness | Always present |
+| `.MuiTsColorPicker-gradientThumb` | `colorPickerClasses.gradientThumb` | The draggable circle inside the gradient area | |
+| `.MuiTsColorPicker-sliderSection` | `colorPickerClasses.sliderSection` | Row containing the eyedropper button and the hue/alpha sliders | Only present when `showSliderSection={true}` (default) |
+| `.MuiTsColorPicker-hueSlider` | `colorPickerClasses.hueSlider` | The horizontal hue slider bar | |
+| `.MuiTsColorPicker-alphaSlider` | `colorPickerClasses.alphaSlider` | The horizontal alpha/opacity slider bar | Only present when `showAlpha={true}` (default) |
+| `.MuiTsColorPicker-inputSection` | `colorPickerClasses.inputSection` | Column containing the format dropdown and value input fields | Only present when `showInputSection={true}` (default) |
+| `.MuiTsColorPicker-savedColors` | `colorPickerClasses.savedColors` | Wrapper `<div>` around the saved-colors heading and swatch row | Only present when `savedColors` is non-empty |
+| `.MuiTsColorPicker-swatchList` | `colorPickerClasses.swatchList` | Flex row wrapping all swatch buttons | |
+| `.MuiTsColorPicker-swatch` | `colorPickerClasses.swatch` | Each saved-color `<button>` element | |
+
+### Shared state classes
+
+| Class name | Constant key | When applied |
+|---|---|---|
+| `.MuiTs-disabled` | `muiTsStateClasses.disabled` | On `.MuiTsColorPicker-root` when `disabled={true}` |
+
+### Examples
+
+**Custom border and shadow around the whole panel:**
+```css
+.MuiTsColorPicker-root {
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+  padding: 12px;
+}
+```
+
+**Taller gradient area:**
+```css
+.MuiTsColorPicker-gradientArea {
+  height: 220px !important;
+}
+```
+
+**Larger swatch buttons:**
+```css
+.MuiTsColorPicker-swatch {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+}
+```
+
+**Dim the whole panel in disabled state:**
+```css
+.MuiTsColorPicker-root.MuiTs-disabled {
+  pointer-events: none;
+  filter: grayscale(0.6);
+}
+```
+
+**Using constants in a `sx` prop:**
+```tsx
+import { colorPickerClasses, muiTsStateClasses } from '@thebuoyant-tsdev/mui-ts-library';
+
+<Box
+  sx={{
+    [`& .${colorPickerClasses.root}`]: {
+      borderRadius: '12px',
+      boxShadow: '0 4px 24px rgba(0,0,0,0.12)',
+    },
+    [`& .${colorPickerClasses.swatch}`]: {
+      borderRadius: '50%',
+    },
+    [`& .${colorPickerClasses.root}.${muiTsStateClasses.disabled}`]: {
+      filter: 'grayscale(0.6)',
+    },
+  }}
+>
+  <ColorPicker value={color} onChange={setColor} />
+</Box>
+```
+
+**CSS Modules:**
+```css
+/* colorPicker.module.css */
+.panel :global(.MuiTsColorPicker-root) {
+  border-radius: 12px;
+}
+.panel :global(.MuiTsColorPicker-swatch) {
+  border-radius: 50%;
+}
+```
+
+**Embedding in a branded design system:**
+```css
+/* your-design-system.css */
+:root {
+  --brand-picker-radius: 8px;
+  --brand-swatch-size: 28px;
+}
+
+.MuiTsColorPicker-root              { border-radius: var(--brand-picker-radius); }
+.MuiTsColorPicker-gradientArea      { border-radius: calc(var(--brand-picker-radius) - 2px); }
+.MuiTsColorPicker-swatch            { width: var(--brand-swatch-size); height: var(--brand-swatch-size); }
+```
