@@ -5,11 +5,12 @@ import { Box } from "@mui/material";
 // ---------------------------------------------------------------------------
 
 type PasswordStrengthBarProps = {
-  percent:   number;
-  color:     string;
-  ariaLabel: string;
+  percent:    number;
+  color:      string;
+  ariaLabel:  string;
   /** When true, renders 4 separate animated segments instead of a single bar. */
-  segments?: boolean;
+  segments?:  boolean;
+  className?: string;
 };
 
 // ---------------------------------------------------------------------------
@@ -21,7 +22,7 @@ type PasswordStrengthBarProps = {
  * role="progressbar" macht die Anzeige für Screenreader zugänglich —
  * ohne aria-Attribute wäre sie für assistive Technologien unsichtbar.
  */
-export function PasswordStrengthBar({ percent, color, ariaLabel, segments = false }: PasswordStrengthBarProps) {
+export function PasswordStrengthBar({ percent, color, ariaLabel, segments = false, className }: PasswordStrengthBarProps) {
   if (segments) {
     // 4 separate segments: filled segments = Math.round(percent / 25)
     const filledCount = Math.round(percent / 25);
@@ -33,6 +34,7 @@ export function PasswordStrengthBar({ percent, color, ariaLabel, segments = fals
         aria-valuenow={percent}
         aria-valuemin={0}
         aria-valuemax={100}
+        className={className}
         sx={{
           width:   "100%",
           display: "flex",
@@ -66,6 +68,7 @@ export function PasswordStrengthBar({ percent, color, ariaLabel, segments = fals
       aria-valuenow={percent}
       aria-valuemin={0}
       aria-valuemax={100}
+      className={className}
       sx={{
         width:        "100%",
         height:       "8px",

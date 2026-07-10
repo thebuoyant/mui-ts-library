@@ -5,6 +5,7 @@ import type {
   TagSelectionItem,
   TagSelectionTranslation,
 } from "./TagSelection.types";
+import { tagSelectionClasses } from "./tagSelectionClasses";
 
 type TagSelectionSelectedTagsProps = {
   selectedTags: TagSelectionItem[];
@@ -52,9 +53,9 @@ export function TagSelectionSelectedTags({
       : ({ vertical: "top", horizontal: "left" } as const);
 
   return (
-    <Box sx={{ mb: 2 }}>
+    <Box sx={{ mb: 2 }} className={tagSelectionClasses.selectedTags}>
       {showSelectedTagsLabel && (
-        <Typography variant="subtitle2" gutterBottom>
+        <Typography variant="subtitle2" gutterBottom className={tagSelectionClasses.selectedTagsLabel}>
           {translation.selectedTagsLabel}
         </Typography>
       )}
@@ -63,7 +64,7 @@ export function TagSelectionSelectedTags({
           {translation.noSelectedTagsText}
         </Typography>
       ) : (
-        <Stack direction="row" sx={{ flexWrap: "wrap", gap: 1 }}>
+        <Stack direction="row" sx={{ flexWrap: "wrap", gap: 1 }} className={tagSelectionClasses.chipsStack}>
           {visibleTags.map((tag) => (
             <TagSelectionChip
               key={tag.id}
@@ -83,6 +84,7 @@ export function TagSelectionSelectedTags({
                 variant="outlined"
                 clickable
                 onClick={(e) => setPopoverAnchor(e.currentTarget)}
+                className={tagSelectionClasses.overflowChip}
               />
               <Popover
                 open={isPopoverOpen}
@@ -99,6 +101,7 @@ export function TagSelectionSelectedTags({
                     gap: 0.5,
                     maxWidth: 320,
                   }}
+                  className={tagSelectionClasses.overflowPopover}
                 >
                   {overflowTags.map((tag) => (
                     <TagSelectionChip

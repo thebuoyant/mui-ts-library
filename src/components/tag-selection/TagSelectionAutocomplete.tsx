@@ -17,6 +17,7 @@ import type {
   TagSelectionItem,
   TagSelectionTranslation,
 } from "./TagSelection.types";
+import { tagSelectionClasses } from "./tagSelectionClasses";
 
 const TAG_COLORS: TagColor[] = [
   "default", "primary", "secondary", "error", "info", "success", "warning",
@@ -277,7 +278,7 @@ export function TagSelectionAutocomplete({
   const preventBlur = (e: React.MouseEvent) => e.preventDefault();
 
   return (
-    <Box sx={{ mb: 2 }}>
+    <Box sx={{ mb: 2 }} className={tagSelectionClasses.autocomplete}>
       <Autocomplete<TagSelectionItem, false, false, false>
         options={availableTags}
         // Without this, MUI's own default filtering would additionally re-filter
@@ -373,6 +374,7 @@ export function TagSelectionAutocomplete({
                 variant={chipVariant}
                 label={highlightMatch(option.label, searchValue)}
                 color={!hasCustomColors ? (option.color ?? "default") : undefined}
+                className={tagSelectionClasses.option}
                 sx={
                   hasCustomColors
                     ? { color: option.foregroundColor ?? "inherit", backgroundColor: option.backgroundColor ?? "transparent" }
@@ -390,7 +392,7 @@ export function TagSelectionAutocomplete({
       {isCreateMode && (
         // position: relative → Anker für das absolut positionierte Palette-Panel.
         // onMouseDown → Autocomplete-Input behält Fokus (verhindert clearOnBlur).
-        <Box sx={{ position: "relative" }} onMouseDown={preventBlur}>
+        <Box sx={{ position: "relative" }} onMouseDown={preventBlur} className={tagSelectionClasses.createPanel}>
 
           {/* Zeile 1: semantische Farb-Chips + Rainbow-Chip */}
           <Stack direction="row" sx={{ mt: 0.5, flexWrap: "wrap", gap: 0.5, alignItems: "center" }}>

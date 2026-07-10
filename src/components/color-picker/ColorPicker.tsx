@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { Box, IconButton, MenuItem, Select, TextField, Tooltip, Typography, useTheme } from "@mui/material";
 import ColorizeIcon from "@mui/icons-material/Colorize";
+import { colorPickerClasses } from "./colorPickerClasses";
+import { muiTsStateClasses } from "../../utils/muiTsClasses";
 import {
   clamp,
   hsvaToHsla,
@@ -218,6 +220,7 @@ export function ColorPicker({
         flexDirection: "column",
         gap: 1,
       }}
+      className={[colorPickerClasses.root, disabled && muiTsStateClasses.disabled].filter(Boolean).join(" ")}
     >
       <Box
         ref={gradientRef}
@@ -228,6 +231,7 @@ export function ColorPicker({
         onPointerDown={(e) => { e.currentTarget.setPointerCapture?.(e.pointerId); handleGradientPointer(e); }}
         onPointerMove={(e) => { if (e.buttons === 1) handleGradientPointer(e); }}
         onPointerUp={fireCommitted}
+        className={colorPickerClasses.gradientArea}
         sx={{
           position: "relative",
           width: "100%",
@@ -242,6 +246,7 @@ export function ColorPicker({
         }}
       >
         <Box
+          className={colorPickerClasses.gradientThumb}
           sx={{
             position: "absolute",
             left: thumbPosition(hsva.s, thumbSize),
@@ -259,7 +264,7 @@ export function ColorPicker({
       </Box>
 
       {showSliderSection && (
-      <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+      <Box sx={{ display: "flex", gap: 1, alignItems: "center" }} className={colorPickerClasses.sliderSection}>
         {showEyeDropper && eyeDropperSupported && (
           <Tooltip title={t.eyeDropperLabel}>
             <span>
@@ -286,6 +291,7 @@ export function ColorPicker({
             onPointerDown={(e) => { e.currentTarget.setPointerCapture?.(e.pointerId); handleHuePointer(e); }}
             onPointerMove={(e) => { if (e.buttons === 1) handleHuePointer(e); }}
             onPointerUp={fireCommitted}
+            className={colorPickerClasses.hueSlider}
             sx={{
               position: "relative",
               width: "100%",
@@ -325,6 +331,7 @@ export function ColorPicker({
               onPointerDown={(e) => { e.currentTarget.setPointerCapture?.(e.pointerId); handleAlphaPointer(e); }}
               onPointerMove={(e) => { if (e.buttons === 1) handleAlphaPointer(e); }}
               onPointerUp={fireCommitted}
+              className={colorPickerClasses.alphaSlider}
               sx={{
                 position: "relative",
                 width: "100%",
@@ -365,7 +372,7 @@ export function ColorPicker({
       )}
 
       {showInputSection && (
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75 }}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75 }} className={colorPickerClasses.inputSection}>
         {/* Row 1: format selector, hex field (HEX format only), and alpha — RGB/HSL's three
             fields get their own full-width row below instead of squeezing in here, so none
             of these fields are narrow enough to clip their own content (e.g. "100", "255"). */}
@@ -433,11 +440,11 @@ export function ColorPicker({
       )}
 
       {savedColors && savedColors.length > 0 && (
-        <Box>
+        <Box className={colorPickerClasses.savedColors}>
           <Typography variant="caption" sx={{ color: "text.secondary", display: "block", mb: 0.5 }}>
             {t.savedColorsLabel}
           </Typography>
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.75 }}>
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.75 }} className={colorPickerClasses.swatchList}>
             {savedColors.map((color, i) => (
               <Box
                 key={`${color}-${i}`}
@@ -449,6 +456,7 @@ export function ColorPicker({
                   const parsed = parseColorString(color);
                   if (parsed) commitHsva(rgbaToHsva(parsed));
                 }}
+                className={colorPickerClasses.swatch}
                 sx={{
                   width: swatchSize,
                   height: swatchSize,

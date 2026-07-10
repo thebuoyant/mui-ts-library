@@ -452,4 +452,102 @@ const [submitting, setSubmitting] = useState(false);
 | **Sortierung der ausgewählten Tags** | Ausgewählte Tags werden im Chip-Bereich immer **alphabetisch aufsteigend** sortiert angezeigt — unabhängig von der Reihenfolge im `tags`-Array oder der Reihenfolge in der sie ausgewählt wurden. |
 | **Sortierung der verfügbaren Tags** | Die Autocomplete-Dropdown-Liste zeigt verfügbare Tags ebenfalls **alphabetisch aufsteigend** sortiert — unabhängig von der Reihenfolge im `tags`-Array. |
 | **Suchergebnis-Highlighting** | Während der Nutzer tippt, wird der übereinstimmende Teil jedes Tag-Labels im Dropdown **fett** dargestellt. Die Übereinstimmung ist case-insensitiv; nur das erste Vorkommen pro Label wird hervorgehoben. |
+
+---
+
+## CSS-Klassen-API
+
+Jedes bedeutende DOM-Element in `TagSelection` trägt einen stabilen, dokumentierten CSS-Klassennamen. Diese können verwendet werden, um einzelne Slots über Plain CSS, CSS Modules, Tailwind oder andere CSS-Ansätze zu stylen — ohne sich auf MUIs interne Klassennamen verlassen zu müssen, die sich zwischen MUI-Versionen ändern können.
+
+### Klassen-Konstanten importieren
+
+Statt Magic-Strings zu verwenden, das typisierte Objekt `tagSelectionClasses` und die geteilten `muiTsStateClasses` importieren:
+
+```ts
+import { tagSelectionClasses, muiTsStateClasses } from '@thebuoyant-tsdev/mui-ts-library';
+```
+
+### Slot-Referenz
+
+| Klassenname | Konstanten-Key | DOM-Element | Hinweise |
+|---|---|---|---|
+| `.MuiTsTagSelection-root` | `tagSelectionClasses.root` | Äußerstes `<div>` der gesamten Komponente | Erhält zusätzlich `.MuiTs-disabled` wenn `disabled={true}` |
+| `.MuiTsTagSelection-selectedTags` | `tagSelectionClasses.selectedTags` | Wrapper-`<div>` um Label und Chip-Zeile | |
+| `.MuiTsTagSelection-selectedTagsLabel` | `tagSelectionClasses.selectedTagsLabel` | `<p>` / Typography für das "Ausgewählte Tags"-Label | Nur vorhanden wenn `showSelectedTagsLabel={true}` (Standard) |
+| `.MuiTsTagSelection-chipsStack` | `tagSelectionClasses.chipsStack` | Flex-Zeile mit allen sichtbaren ausgewählten Chips | |
+| `.MuiTsTagSelection-chip` | `tagSelectionClasses.chip` | Jeder ausgewählte Tag-`<div role="button">` (MUI Chip) | Erhält zusätzlich `.MuiTs-disabled` wenn der Chip deaktiviert ist |
+| `.MuiTsTagSelection-overflowChip` | `tagSelectionClasses.overflowChip` | Der "+N"-Overflow-Chip bei Überschreitung von `maxVisibleChips` | Nur vorhanden wenn Overflow existiert |
+| `.MuiTsTagSelection-overflowPopover` | `tagSelectionClasses.overflowPopover` | Inhalts-`<div>` im Overflow-Popover | |
+| `.MuiTsTagSelection-autocomplete` | `tagSelectionClasses.autocomplete` | Wrapper-`<div>` um Sucheingabe und Dropdown | Nur vorhanden wenn `showAutoComplete={true}` (Standard) |
+| `.MuiTsTagSelection-option` | `tagSelectionClasses.option` | Jeder Options-Chip `<div role="button">` in der Dropdown-Liste | |
+| `.MuiTsTagSelection-createPanel` | `tagSelectionClasses.createPanel` | Panel mit Farbauswahl-Zeile bei `allowCreate={true}` und neuem Suchbegriff | Nur im Create-Modus vorhanden |
+
+### Geteilte State-Klassen
+
+| Klassenname | Konstanten-Key | Wann vergeben |
+|---|---|---|
+| `.MuiTs-disabled` | `muiTsStateClasses.disabled` | Auf `.MuiTsTagSelection-root` wenn `disabled={true}`. Zusätzlich auf jedem `.MuiTsTagSelection-chip` wenn dieser deaktiviert ist. |
+
+### Beispiele
+
+**Benutzerdefinierter Chip-Stil:**
+```css
+/* Alle ausgewählten Chips mit eckigeren Ecken */
+.MuiTsTagSelection-chip {
+  border-radius: 4px !important;
+}
+```
+
+**Nur deaktivierte Chips targeten:**
+```css
+.MuiTsTagSelection-chip.MuiTs-disabled {
+  opacity: 0.4;
+  text-decoration: line-through;
+}
+```
+
+**Chip-Zeile auf zwei Zeilen begrenzen:**
+```css
+.MuiTsTagSelection-chipsStack {
+  max-height: 72px;
+  overflow-y: auto;
+}
+```
+
+**Autocomplete-Bereich vom Chip-Bereich trennen:**
+```css
+.MuiTsTagSelection-autocomplete {
+  border-top: 1px solid var(--divider);
+  padding-top: 8px;
+}
+```
+
+**Konstanten in einem `sx`-Prop verwenden (fortgeschritten):**
+```tsx
+import { tagSelectionClasses, muiTsStateClasses } from '@thebuoyant-tsdev/mui-ts-library';
+
+<Box
+  sx={{
+    [`& .${tagSelectionClasses.chip}`]: { borderRadius: '4px' },
+    [`& .${tagSelectionClasses.chip}.${muiTsStateClasses.disabled}`]: { opacity: 0.4 },
+  }}
+>
+  <TagSelection tags={tags} onChange={setTags} />
+</Box>
+```
+
+**CSS Modules:**
+```css
+/* tagSelection.module.css */
+.wrapper :global(.MuiTsTagSelection-chip) {
+  border-radius: 4px;
+}
+```
+
+### Zukünftige Komponenten
+
+Alle zukünftigen Komponenten in dieser Bibliothek folgen derselben Konvention:
+- Slot-Klassen: `.MuiTs<KomponentenName>-<SlotName>` (z.B. `.MuiTsNeueKomponente-header`)
+- Geteilte State-Klassen: `.MuiTs-disabled`, `.MuiTs-selected`, `.MuiTs-focused`, `.MuiTs-error`
+- Ein typisiertes `neueKomponenteClasses`-Export mit allen Slot-Namen als Keys
 | **Overflow-Popover und `disabled`** | Im `disabled`-Zustand werden Chips im Overflow-Popover ohne Lösch-Icon angezeigt. Der `+N`-Chip selbst bleibt klickbar (nur Ansicht, kein Löschen möglich). |

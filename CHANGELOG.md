@@ -13,6 +13,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.24.0] — 2026-07-10
+
+### Added
+
+#### CSS Classes API (Slot Classes) — `TagSelection`, `PasswordStrengthMeter`, `ColorPicker`
+
+Every significant DOM node in all three components now carries a stable, documented CSS class name. Consumers can style individual slots via plain CSS, CSS Modules, Tailwind, or any other CSS approach without relying on MUI's internal class names.
+
+**Convention**
+- Slot classes: `.MuiTs<Component>-<slot>` (e.g. `.MuiTsTagSelection-chip`)
+- Shared state classes: `.MuiTs-disabled`, `.MuiTs-selected`, `.MuiTs-focused`, `.MuiTs-error`
+- Strength-state classes (PasswordStrengthMeter): `.MuiTsPasswordStrengthMeter-strengthBarWeak/Ok/Good/VeryGood`
+
+**New exports**
+
+Three typed constants objects are now exported from the library — import them to reference class names safely without magic strings:
+
+```ts
+import { tagSelectionClasses, passwordStrengthMeterClasses, colorPickerClasses, muiTsStateClasses } from '@thebuoyant-tsdev/mui-ts-library';
+```
+
+- **`tagSelectionClasses`** — `root`, `selectedTags`, `selectedTagsLabel`, `chipsStack`, `chip`, `overflowChip`, `overflowPopover`, `autocomplete`, `option`, `createPanel`
+- **`passwordStrengthMeterClasses`** — `root`, `input`, `generatorButton`, `confirmInput`, `strengthBar`, `strengthBarWeak`, `strengthBarOk`, `strengthBarGood`, `strengthBarVeryGood`, `summary`, `requirementItem`
+- **`colorPickerClasses`** — `root`, `gradientArea`, `gradientThumb`, `sliderSection`, `hueSlider`, `alphaSlider`, `inputSection`, `savedColors`, `swatchList`, `swatch`
+- **`muiTsStateClasses`** — `disabled`, `selected`, `focused`, `error`
+
+**Fully backwards-compatible** — no existing props or behaviour changed. All classes are purely additive.
+
+---
+
 ## [3.23.0] — 2026-07-10
 
 ### Added

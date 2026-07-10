@@ -555,4 +555,91 @@ type CustomRequirement = {
 | **`value` ohne `onPasswordChange`** | Im kontrollierten Modus (`value` gesetzt) ohne `onPasswordChange` ist das Feld read-only — der Nutzer kann keine Eingabe machen. Immer `onPasswordChange` setzen wenn `value` verwendet wird. |
 | **Malus-Regeln kumulieren nicht** | Nur einer der beiden Malus-Faktoren (wiederholte Zeichen **oder** bekannte Muster) kann pro Passwort angewendet werden — nicht beide gleichzeitig. Der Algorithmus erkennt das erste zutreffende Muster. |
 | **`checkColors` ist kein Partial** | Im Gegensatz zu `meterColors` und `translation` muss `checkColors` als vollständiges Objekt übergeben werden (beide Felder `failure` und `success` sind Pflicht). |
+
+---
+
+## CSS-Klassen-API
+
+Jedes bedeutende DOM-Element in `PasswordStrengthMeter` trägt einen stabilen, dokumentierten CSS-Klassennamen. Diese können verwendet werden, um einzelne Slots über Plain CSS, CSS Modules, Tailwind oder andere CSS-Ansätze zu stylen — ohne sich auf MUIs interne Klassennamen verlassen zu müssen, die sich zwischen MUI-Versionen ändern können.
+
+### Klassen-Konstanten importieren
+
+```ts
+import { passwordStrengthMeterClasses, muiTsStateClasses } from '@thebuoyant-tsdev/mui-ts-library';
+```
+
+### Slot-Referenz
+
+| Klassenname | Konstanten-Key | DOM-Element | Hinweise |
+|---|---|---|---|
+| `.MuiTsPasswordStrengthMeter-root` | `passwordStrengthMeterClasses.root` | Äußerstes `<div>` der Komponente | Erhält zusätzlich `.MuiTs-disabled` und `.MuiTs-error` |
+| `.MuiTsPasswordStrengthMeter-input` | `passwordStrengthMeterClasses.input` | `<div>` (MUI FormControl) mit dem Passwort-Eingabefeld | |
+| `.MuiTsPasswordStrengthMeter-generatorButton` | `passwordStrengthMeterClasses.generatorButton` | Der "Passwort generieren"-`<button>` | Nur vorhanden wenn `showPasswordGenerator={true}` |
+| `.MuiTsPasswordStrengthMeter-confirmInput` | `passwordStrengthMeterClasses.confirmInput` | `<div>` (MUI FormControl) mit dem Bestätigungsfeld | Nur vorhanden wenn `showConfirmField={true}` |
+| `.MuiTsPasswordStrengthMeter-strengthBar` | `passwordStrengthMeterClasses.strengthBar` | Die Stärken-Fortschrittsleiste | Erhält zusätzlich eine der vier Stärken-State-Klassen (siehe unten). Nur vorhanden wenn `showMeter={true}` |
+| `.MuiTsPasswordStrengthMeter-strengthBarWeak` | `passwordStrengthMeterClasses.strengthBarWeak` | Wird zur `.strengthBar` hinzugefügt | Score 0–25 % |
+| `.MuiTsPasswordStrengthMeter-strengthBarOk` | `passwordStrengthMeterClasses.strengthBarOk` | Wird zur `.strengthBar` hinzugefügt | Score ~50 % |
+| `.MuiTsPasswordStrengthMeter-strengthBarGood` | `passwordStrengthMeterClasses.strengthBarGood` | Wird zur `.strengthBar` hinzugefügt | Score ~75 % |
+| `.MuiTsPasswordStrengthMeter-strengthBarVeryGood` | `passwordStrengthMeterClasses.strengthBarVeryGood` | Wird zur `.strengthBar` hinzugefügt | Score 100 % |
+| `.MuiTsPasswordStrengthMeter-summary` | `passwordStrengthMeterClasses.summary` | Die Anforderungs-Checkliste `<div>` | Nur vorhanden wenn `showSummary={true}` (Standard) |
+| `.MuiTsPasswordStrengthMeter-requirementItem` | `passwordStrengthMeterClasses.requirementItem` | Jede einzelne Anforderungs-Zeile `<div>` (Label + Icon) | |
+
+### Geteilte State-Klassen
+
+| Klassenname | Konstanten-Key | Wann vergeben |
+|---|---|---|
+| `.MuiTs-disabled` | `muiTsStateClasses.disabled` | Auf `.MuiTsPasswordStrengthMeter-root` wenn `disabled={true}` |
+| `.MuiTs-error` | `muiTsStateClasses.error` | Auf `.MuiTsPasswordStrengthMeter-root` wenn `error={true}` |
+
+### Beispiele
+
+**Benutzerdefinierte Stärkenfarben per CSS (überschreibt `meterColors`):**
+```css
+.MuiTsPasswordStrengthMeter-strengthBar.MuiTsPasswordStrengthMeter-strengthBarWeak     { background: #d32f2f; }
+.MuiTsPasswordStrengthMeter-strengthBar.MuiTsPasswordStrengthMeter-strengthBarOk       { background: #f57c00; }
+.MuiTsPasswordStrengthMeter-strengthBar.MuiTsPasswordStrengthMeter-strengthBarGood     { background: #1976d2; }
+.MuiTsPasswordStrengthMeter-strengthBar.MuiTsPasswordStrengthMeter-strengthBarVeryGood { background: #388e3c; }
+```
+
+**Gesamte Komponente im Fehlerzustand highlighten:**
+```css
+.MuiTsPasswordStrengthMeter-root.MuiTs-error .MuiTsPasswordStrengthMeter-strengthBar {
+  opacity: 0.5;
+}
+```
+
+**Benutzerdefiniertes Anforderungslisten-Layout:**
+```css
+/* Zweispaltiges Layout für die Anforderungs-Checkliste */
+.MuiTsPasswordStrengthMeter-summary > * {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+```
+
+**Konstanten in einem `sx`-Prop verwenden:**
+```tsx
+import { passwordStrengthMeterClasses, muiTsStateClasses } from '@thebuoyant-tsdev/mui-ts-library';
+
+<Box
+  sx={{
+    [`& .${passwordStrengthMeterClasses.strengthBar}.${passwordStrengthMeterClasses.strengthBarVeryGood}`]: {
+      boxShadow: '0 0 8px rgba(56, 142, 60, 0.5)',
+    },
+    [`& .${passwordStrengthMeterClasses.root}.${muiTsStateClasses.disabled}`]: {
+      filter: 'grayscale(1)',
+    },
+  }}
+>
+  <PasswordStrengthMeter value={pwd} onPasswordChange={setPwd} />
+</Box>
+```
+
+**CSS Modules:**
+```css
+/* passwordMeter.module.css */
+.container :global(.MuiTsPasswordStrengthMeter-strengthBarVeryGood) {
+  box-shadow: 0 0 8px rgba(56, 142, 60, 0.5);
+}
+```
 | **Keine serverseitige Validierung** | Der Scoring-Algorithmus läuft vollständig clientseitig. Er ersetzt keine serverseitige Passwortrichtlinien-Prüfung. Er dient als UX-Hilfe für den Nutzer. |
