@@ -297,6 +297,36 @@ describe("ColorPicker", () => {
     });
   });
 
+  describe("controlled format prop", () => {
+    it("Should display the format specified by the format prop, ignoring defaultFormat", () => {
+      render(<ColorPicker value="#ff0000" onChange={vi.fn()} format="rgb" defaultFormat="hex" />);
+      expect(screen.getByLabelText("Red")).toBeInTheDocument();
+      expect(screen.queryByLabelText("Hex value")).not.toBeInTheDocument();
+    });
+
+    it("Should switch the displayed format when the format prop changes", () => {
+      const { rerender } = render(<ColorPicker value="#ff0000" onChange={vi.fn()} format="hex" />);
+      expect(screen.getByLabelText("Hex value")).toBeInTheDocument();
+
+      rerender(<ColorPicker value="#ff0000" onChange={vi.fn()} format="rgb" />);
+      expect(screen.getByLabelText("Red")).toBeInTheDocument();
+      expect(screen.queryByLabelText("Hex value")).not.toBeInTheDocument();
+    });
+
+    it("Should call onFormatChange when the dropdown changes but not override the controlled format", () => {
+      const handleFormatChange = vi.fn();
+      render(
+        <ColorPicker value="#ff0000" onChange={vi.fn()} format="hex" onFormatChange={handleFormatChange} />,
+      );
+      fireEvent.mouseDown(screen.getByLabelText("Color format"));
+      fireEvent.click(screen.getByRole("option", { name: "RGB" }));
+
+      expect(handleFormatChange).toHaveBeenCalledWith("rgb");
+      // format prop is still "hex" — picker stays on HEX until parent updates it
+      expect(screen.getByLabelText("Hex value")).toBeInTheDocument();
+    });
+  });
+
   describe("onChangeCommitted", () => {
     it("Should not fire while dragging the gradient area, only on pointer-up", () => {
       const handleCommitted = vi.fn();

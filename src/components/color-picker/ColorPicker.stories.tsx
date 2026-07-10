@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { fn } from "storybook/test";
-import { Box, Paper, Typography } from "@mui/material";
+import { Box, Button, ButtonGroup, Paper, Typography } from "@mui/material";
 import { useState, type ComponentProps } from "react";
 import { ColorPicker } from "./ColorPicker";
-import type { ColorPickerColorInfo } from "./ColorPicker.types";
+import type { ColorPickerColorInfo, ColorPickerFormat } from "./ColorPicker.types";
 
 const meta: Meta<typeof ColorPicker> = {
   title: "Components/ColorPicker",
@@ -27,6 +27,7 @@ const meta: Meta<typeof ColorPicker> = {
     colorGradientSize:  { control: "radio", options: ["small", "medium"] },
     defaultFormat:      { control: "radio", options: ["hex", "rgb", "hsl"] },
     disabled:           { control: "boolean" },
+    format:             { control: false },
     inputSize:          { control: "radio", options: ["small", "medium"] },
     name:               { control: false },
     savedColors:        { control: false },
@@ -306,4 +307,53 @@ export const BrandColorTheming: Story = {
     },
   },
   render: (args) => <BrandColorThemeStory {...args} />,
+};
+
+function ControlledFormatStory(args: ComponentProps<typeof ColorPicker>) {
+  const [value, setValue] = useState("#1976d2");
+  const [format, setFormat] = useState<ColorPickerFormat>("hex");
+
+  return (
+    <Box sx={{ display: "flex", gap: 3, alignItems: "flex-start" }}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+        <Typography variant="caption" sx={{ color: "text.secondary" }}>
+          Active format (controlled from outside):
+        </Typography>
+        <ButtonGroup size="small">
+          {(["hex", "rgb", "hsl"] as ColorPickerFormat[]).map((f) => (
+            <Button
+              key={f}
+              variant={format === f ? "contained" : "outlined"}
+              onClick={() => setFormat(f)}
+            >
+              {f.toUpperCase()}
+            </Button>
+          ))}
+        </ButtonGroup>
+        <ColorPicker
+          {...args}
+          value={value}
+          format={format}
+          onFormatChange={setFormat}
+          onChange={(hex) => setValue(hex)}
+        />
+      </Box>
+    </Box>
+  );
+}
+
+export const WithControlledFormat: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '**Controlled `format` prop** — the parent owns the active display format (HEX / RGB / HSL). ' +
+          'Switch the format via the buttons above the picker, or via the dropdown inside it — both routes ' +
+          'call `onFormatChange` and update the same state. ' +
+          'Use this when a form reset needs to programmatically restore a specific format, or when an external ' +
+          'toolbar controls the view. Omitting `format` falls back to uncontrolled behaviour via `defaultFormat`.',
+      },
+    },
+  },
+  render: (args) => <ControlledFormatStory {...args} />,
 };

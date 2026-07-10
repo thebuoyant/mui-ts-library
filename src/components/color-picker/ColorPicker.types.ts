@@ -46,8 +46,10 @@ export type ColorPickerProps = {
   onChange:             (hex: string, info: ColorPickerColorInfo) => void;
   /** Fires once per "gesture" instead of continuously: on pointer-up after a drag, on blur after typing, or immediately for atomic actions (swatch click, eyedropper). Same dual-callback pattern as MUI's own `Slider` — use this instead of debouncing `onChange` yourself for expensive side effects (persisting to a backend, etc.). */
   onChangeCommitted?:   (hex: string, info: ColorPickerColorInfo) => void;
-  /** Initial display format for the value field — uncontrolled after mount (default: 'hex'). */
+  /** Initial display format — uncontrolled after mount (default: `'hex'`). Ignored when `format` is set. */
   defaultFormat?:       ColorPickerFormat;
+  /** Controlled display format. When set, the parent owns the active format — combine with `onFormatChange` to update it. When omitted, falls back to `defaultFormat` (uncontrolled). @since 3.23.0 */
+  format?:              ColorPickerFormat;
   /** Fires when the user switches the display format via the dropdown. */
   onFormatChange?:      (format: ColorPickerFormat) => void;
   /** Shows the alpha slider and opacity field (default: true). */

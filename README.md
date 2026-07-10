@@ -160,6 +160,10 @@ function BrandColorPicker() {
 }
 ```
 
+| New in v3.23.0 | |
+|---|---|
+| **`format` prop** | Controlled display format (`'hex' \| 'rgb' \| 'hsl'`) — lets the parent own the active format, e.g. to reset the picker programmatically from a form reset button. Combine with `onFormatChange` to update it. Omit to use `defaultFormat` (uncontrolled, existing behavior). |
+
 → [Full documentation](user-manuals/ColorPicker.md)
 
 ---

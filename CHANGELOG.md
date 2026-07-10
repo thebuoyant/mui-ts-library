@@ -13,6 +13,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.23.0] — 2026-07-10
+
+### Added
+
+#### `ColorPicker` — controlled `format` prop
+
+- New prop **`format?: ColorPickerFormat`** (`'hex' | 'rgb' | 'hsl'`) makes the active display format fully controlled from the outside — analogous to MUI's own `value` pattern.
+- When `format` is set, the parent owns the active format. Clicking the format dropdown fires `onFormatChange` (already available) but the picker stays on the format the parent dictates — the parent updates `format` in response.
+- When `format` is omitted, behaviour is unchanged: `defaultFormat` initialises the internal state on mount and the user can switch freely (fully uncontrolled, as before).
+- **Use case:** programmatic format reset in forms — e.g. a "Reset" button can set `format="hex"` alongside resetting the color `value`, snapping both fields back to a known state.
+- Fully backwards-compatible: `format` is optional and defaults to the existing uncontrolled behaviour.
+
+---
+
 ## [3.22.0] — 2026-07-09
 
 ### Added

@@ -13,6 +13,20 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [3.23.0] — 2026-07-10
+
+### Hinzugefügt
+
+#### `ColorPicker` — controlled `format`-Prop
+
+- Neue Prop **`format?: ColorPickerFormat`** (`'hex' | 'rgb' | 'hsl'`) macht das aktive Anzeigeformat vollständig von außen kontrollierbar — analog zu MUIs `value`-Pattern.
+- Wenn `format` gesetzt ist, bestimmt der Parent das Format. Ein Klick auf das Format-Dropdown löst `onFormatChange` aus (bereits vorhanden), aber der Picker bleibt auf dem vom Parent vorgegebenen Format — der Parent reagiert, indem er `format` aktualisiert.
+- Ohne `format` bleibt das Verhalten unverändert: `defaultFormat` initialisiert den internen State beim Mount, der Nutzer kann frei wechseln (uncontrolled, wie bisher).
+- **Anwendungsfall:** programmatisches Format-Reset in Formularen — z.B. kann ein „Zurücksetzen"-Button `format="hex"` zusammen mit dem `value` zurücksetzen und beide Felder in einen definierten Zustand bringen.
+- Vollständig abwärtskompatibel: `format` ist optional und fällt auf das bisherige uncontrolled-Verhalten zurück.
+
+---
+
 ## [3.22.0] — 2026-07-09
 
 ### Hinzugefügt
