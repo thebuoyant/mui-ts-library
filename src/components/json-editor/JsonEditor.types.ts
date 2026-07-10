@@ -2,6 +2,7 @@ export type JsonEditorToolbarConfig = {
   showFormat?:   boolean;
   showCompact?:  boolean;
   showCopy?:     boolean;
+  showDownload?: boolean;
   showClear?:    boolean;
   showUndoRedo?: boolean;
 };
@@ -10,34 +11,39 @@ export const DEFAULT_JSON_EDITOR_TOOLBAR_CONFIG: Required<JsonEditorToolbarConfi
   showFormat:   true,
   showCompact:  true,
   showCopy:     true,
+  showDownload: true,
   showClear:    true,
   showUndoRedo: true,
 };
 
 export type JsonEditorTranslation = {
-  format:      string;
-  compact:     string;
-  copy:        string;
-  copySuccess: string;
-  clear:       string;
-  undo:        string;
-  redo:        string;
-  lineColumn:  string;
-  validJson:   string;
-  invalidJson: string;
+  format:          string;
+  compact:         string;
+  copy:            string;
+  copySuccess:     string;
+  download:        string;
+  downloadSuccess: string;
+  clear:           string;
+  undo:            string;
+  redo:            string;
+  lineColumn:      string;
+  validJson:       string;
+  invalidJson:     string;
 };
 
 export const DEFAULT_JSON_EDITOR_TRANSLATION: JsonEditorTranslation = {
-  format:      "Format JSON",
-  compact:     "Compact JSON",
-  copy:        "Copy",
-  copySuccess: "Copied!",
-  clear:       "Clear",
-  undo:        "Undo",
-  redo:        "Redo",
-  lineColumn:  "Ln {line}, Col {col}",
-  validJson:   "Valid JSON",
-  invalidJson: "Invalid JSON",
+  format:          "Format JSON",
+  compact:         "Compact JSON",
+  copy:            "Copy",
+  copySuccess:     "Copied!",
+  download:        "Download",
+  downloadSuccess: "Downloaded!",
+  clear:           "Clear",
+  undo:            "Undo",
+  redo:            "Redo",
+  lineColumn:      "Ln {line}, Col {col}",
+  validJson:       "Valid JSON",
+  invalidJson:     "Invalid JSON",
 };
 
 export type JsonEditorHighlightColors = {
@@ -96,6 +102,8 @@ export type JsonEditorProps = {
   showFolding?:     boolean;
   /** Shows a Valid / Invalid JSON indicator in the footer. */
   showValidation?:  boolean;
+  /** Filename for the Download button export. Default: "file.json". */
+  downloadFilename?: string;
   toolbarConfig?:   JsonEditorToolbarConfig;
   translation?:     Partial<JsonEditorTranslation>;
   value?:           string;
