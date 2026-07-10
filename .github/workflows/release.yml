@@ -12,7 +12,7 @@ on:
 
 jobs:
   release:
-    name: Build & publish GitHub Release
+    name: Build & publish GitHub Release + npm
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -26,6 +26,7 @@ jobs:
         with:
           node-version: 24
           cache: npm
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Resolve version from package.json
         id: pkg
@@ -60,3 +61,9 @@ jobs:
           name: ${{ inputs.tag_name || steps.pkg.outputs.version }}
           files: releases/*.tgz
           generate_release_notes: true
+
+      - name: Publish to npm
+        if: steps.check.outputs.skip == 'false'
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
