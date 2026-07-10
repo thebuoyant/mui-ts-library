@@ -296,7 +296,7 @@ export const WithValueFormatter: Story = {
     data:           SALES_DATA,
     keys:           QUARTERLY_KEYS,
     size:           480,
-    valueFormatter: (v, _key) => `€ ${v.toLocaleString("de-DE")}`,
+    valueFormatter: (v) => `€ ${v.toLocaleString("de-DE")}`,
     gridValueFormatter: (v) => `€${v}k`,
   },
 };

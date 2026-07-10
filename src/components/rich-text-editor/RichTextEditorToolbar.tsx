@@ -83,12 +83,26 @@ function ColorButton({ label, icon, activeColor, disabled, onClick }: ColorButto
   );
 }
 
-function HeadingIcon({ level }: { level: 1 | 2 | 3 }) {
+function TextIcon({ text }: { text: string }) {
   return (
-    <Box component="span" sx={{ fontWeight: "bold", fontSize: "0.875rem", lineHeight: 1 }}>
-      H{level}
-    </Box>
+    <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" style={{ display: "block" }}>
+      <text
+        x="10" y="10"
+        dominantBaseline="central"
+        textAnchor="middle"
+        fontSize="10"
+        fontWeight="500"
+        fontFamily="inherit"
+        fill="currentColor"
+      >
+        {text}
+      </text>
+    </svg>
   );
+}
+
+function HeadingIcon({ level }: { level: 1 | 2 | 3 }) {
+  return <TextIcon text={`H${level}`} />;
 }
 
 export function RichTextEditorToolbar({
@@ -405,7 +419,7 @@ export function RichTextEditorToolbar({
             {tc.showMarkdownButton && (
               <ToolbarButton
                 label={t.markdown}
-                icon={<Box component="span" sx={{ fontWeight: "bold", fontSize: "0.7rem", lineHeight: 1 }}>MD</Box>}
+                icon={<TextIcon text="MD" />}
                 onClick={() => setMarkdownDialogOpen(true)}
                 disabled={disabled || !editor}
               />

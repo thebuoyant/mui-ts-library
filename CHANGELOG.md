@@ -13,6 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.24.1] — 2026-07-10
+
+### Fixed
+
+- **`RichTextEditor` toolbar:** `H1`/`H2`/`H3` and `MD` buttons are now rendered as `<svg><text>` instead of an HTML `<span>`. This makes them visually consistent with the surrounding Material SVG icons — same rendering engine, same `fill="currentColor"` color behaviour, and `fontWeight="500"` matching the stroke weight of outlined icons. Previously the bold HTML text looked heavier and slightly misaligned compared to the SVG icons.
+- **`RadialStackedBarChart` stories:** removed unused `_key` parameter from the `valueFormatter` story example that caused an ESLint `no-unused-vars` error.
+
+---
+
 ## [3.24.0] — 2026-07-10
 
 ### Added
