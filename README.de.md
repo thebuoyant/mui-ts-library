@@ -160,6 +160,10 @@ function BrandColorPicker() {
 }
 ```
 
+| Neu in v3.23.0 | |
+|---|---|
+| **`format`-Prop** | Kontrolliertes Anzeigeformat (`'hex' \| 'rgb' \| 'hsl'`) — der Parent bestimmt das aktive Format, z.B. um den Picker programmatisch per Formular-Reset zurückzusetzen. Mit `onFormatChange` kombinieren. Weglassen für `defaultFormat` (unkontrolliert, bisheriges Verhalten). |
+
 → [Vollständige Dokumentation](user-manuals/ColorPicker.de.md)
 
 ---

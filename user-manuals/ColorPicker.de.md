@@ -76,7 +76,8 @@ function App() {
 | `value` | `string` | — | **Pflichtfeld.** Aktuelle Farbe. Akzeptiert Hex (`#rgb`, `#rgba`, `#rrggbb`, `#rrggbbaa`), `rgb()`/`rgba()` oder `hsl()`/`hsla()`. |
 | `onChange` | `(hex: string, info: ColorPickerColorInfo) => void` | — | **Pflichtfeld.** Feuert bei jeder Änderung — live während des Ziehens, nicht erst beim Loslassen. Siehe [Callbacks / Events](#callbacks--events). |
 | `onChangeCommitted` | `(hex: string, info: ColorPickerColorInfo) => void` | — | Feuert einmal pro "Geste" statt fortlaufend. Siehe [Callbacks / Events](#callbacks--events). |
-| `defaultFormat` | `'hex' \| 'rgb' \| 'hsl'` | `'hex'` | Initiales Anzeigeformat für das Wertefeld. Nach dem Mount unkontrolliert — das Format-Dropdown verwaltet seinen eigenen State danach selbst. |
+| `defaultFormat` | `'hex' \| 'rgb' \| 'hsl'` | `'hex'` | Initiales Anzeigeformat. Nach dem Mount unkontrolliert — wird ignoriert wenn `format` gesetzt ist. |
+| `format` | `'hex' \| 'rgb' \| 'hsl'` | — | Kontrolliertes Anzeigeformat. Wenn gesetzt, bestimmt der Parent das aktive Format. Mit `onFormatChange` kombinieren um es zu aktualisieren. Weglassen für `defaultFormat` (unkontrolliert). *Ab v3.23.0* |
 | `onFormatChange` | `(format: ColorPickerFormat) => void` | — | Feuert, wenn der Nutzer das Anzeigeformat über das Dropdown wechselt. |
 | `showAlpha` | `boolean` | `true` | Zeigt den Alpha-Slider und das Deckkraft-(%)-Feld an. Auf `false` setzen für reine Vollfarben-Anwendungsfälle. |
 | `showEyeDropper` | `boolean` | `true` | Zeigt das Pipette-Werkzeug an. Wird automatisch ausgeblendet, wenn der Browser die [EyeDropper-API](https://developer.mozilla.org/de/docs/Web/API/EyeDropper) nicht unterstützt (Stand jetzt nur Chromium — nicht Safari/Firefox). |

@@ -76,7 +76,8 @@ function App() {
 | `value` | `string` | — | **Required.** Current color. Accepts hex (`#rgb`, `#rgba`, `#rrggbb`, `#rrggbbaa`), `rgb()`/`rgba()`, or `hsl()`/`hsla()`. |
 | `onChange` | `(hex: string, info: ColorPickerColorInfo) => void` | — | **Required.** Fires on every change — live while dragging, not just on release. See [Callbacks / Events](#callbacks--events). |
 | `onChangeCommitted` | `(hex: string, info: ColorPickerColorInfo) => void` | — | Fires once per "gesture" instead of continuously. See [Callbacks / Events](#callbacks--events). |
-| `defaultFormat` | `'hex' \| 'rgb' \| 'hsl'` | `'hex'` | Initial display format for the value field. Uncontrolled after mount — the format dropdown manages its own state from there. |
+| `defaultFormat` | `'hex' \| 'rgb' \| 'hsl'` | `'hex'` | Initial display format. Uncontrolled after mount — ignored when `format` is set. |
+| `format` | `'hex' \| 'rgb' \| 'hsl'` | — | Controlled display format. When set, the parent owns the active format. Combine with `onFormatChange` to update it. Omit to use `defaultFormat` (uncontrolled). *Since v3.23.0* |
 | `onFormatChange` | `(format: ColorPickerFormat) => void` | — | Fires when the user switches the display format via the dropdown. |
 | `showAlpha` | `boolean` | `true` | Shows the alpha slider and the opacity (%) field. Set `false` for opaque-only use cases. |
 | `showEyeDropper` | `boolean` | `true` | Shows the eyedropper tool. Auto-hidden regardless of this prop when the browser doesn't support the [EyeDropper API](https://developer.mozilla.org/en-US/docs/Web/API/EyeDropper) (Chromium-based browsers only as of writing — not Safari/Firefox). |

@@ -85,6 +85,7 @@ export function ColorPicker({
   onChange,
   onChangeCommitted,
   defaultFormat = "hex",
+  format: formatProp,
   onFormatChange,
   showAlpha = true,
   showEyeDropper = true,
@@ -105,7 +106,8 @@ export function ColorPicker({
     const parsed = parseColorString(value);
     return parsed ? rgbaToHsva(parsed) : { h: 0, s: 0, v: 0, a: 1 };
   });
-  const [format, setFormat] = useState<ColorPickerFormat>(defaultFormat);
+  const [internalFormat, setInternalFormat] = useState<ColorPickerFormat>(defaultFormat);
+  const activeFormat = formatProp ?? internalFormat;
 
   // Re-syncs from `value` only when it actually differs from the string this component itself
   // last produced — so feeding our own onChange output straight back in via a parent's state
@@ -191,7 +193,7 @@ export function ColorPicker({
   };
 
   const handleFormatChange = (next: ColorPickerFormat) => {
-    setFormat(next);
+    if (formatProp === undefined) setInternalFormat(next);
     onFormatChange?.(next);
   };
 
@@ -370,7 +372,7 @@ export function ColorPicker({
         <Box sx={{ display: "flex", gap: 0.75, alignItems: "center" }}>
           <Select
             size={inputSize}
-            value={format}
+            value={activeFormat}
             aria-label={t.formatLabel}
             disabled={disabled}
             onChange={(e) => handleFormatChange(e.target.value as ColorPickerFormat)}
@@ -381,7 +383,7 @@ export function ColorPicker({
             <MenuItem value="hsl">HSL</MenuItem>
           </Select>
 
-          {format === "hex" && (
+          {activeFormat === "hex" && (
             <TextField
               size={inputSize}
               value={hexDraft}
@@ -398,7 +400,7 @@ export function ColorPicker({
             />
           )}
 
-          {format !== "hex" && <Box sx={{ flex: 1 }} />}
+          {activeFormat !== "hex" && <Box sx={{ flex: 1 }} />}
 
           {showAlpha && (
             <NumberField label={t.alphaFieldLabel} value={Math.round(hsva.a * 100)} min={0} max={100} disabled={disabled} size={inputSize} onBlurExtra={fireCommitted}
@@ -406,7 +408,7 @@ export function ColorPicker({
           )}
         </Box>
 
-        {format === "rgb" && (
+        {activeFormat === "rgb" && (
           <Box sx={{ display: "flex", gap: 0.75 }}>
             <NumberField label={t.redLabel} value={rgba.r} min={0} max={255} disabled={disabled} size={inputSize} onBlurExtra={fireCommitted} fullWidth
               onCommit={(r) => updateHsva(rgbaToHsva({ r, g: rgba.g, b: rgba.b, a: hsva.a }))} />
@@ -417,7 +419,7 @@ export function ColorPicker({
           </Box>
         )}
 
-        {format === "hsl" && (
+        {activeFormat === "hsl" && (
           <Box sx={{ display: "flex", gap: 0.75 }}>
             <NumberField label={t.hueFieldLabel} value={hsla.h} min={0} max={360} disabled={disabled} size={inputSize} onBlurExtra={fireCommitted} fullWidth
               onCommit={(h) => updateHsva({ ...hsva, h })} />
