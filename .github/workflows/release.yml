@@ -2,13 +2,12 @@ name: Release
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches: [main]
   workflow_dispatch:
     inputs:
       tag_name:
-        description: 'Tag to release (e.g. v3.24.0) — use to recover a failed automatic release'
-        required: true
+        description: 'Tag to (re-)release, e.g. v3.24.0 — leave empty to use current package.json version'
+        required: false
         type: string
 
 jobs:
@@ -21,8 +20,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # For workflow_dispatch: explicitly resolve as a tag ref, not a branch.
-          # For tag push: github.ref is already refs/tags/vX.Y.Z.
           ref: ${{ inputs.tag_name && format('refs/tags/{0}', inputs.tag_name) || github.ref }}
 
       - uses: actions/setup-node@v4
@@ -30,16 +27,36 @@ jobs:
           node-version: 24
           cache: npm
 
+      - name: Resolve version from package.json
+        id: pkg
+        run: echo "version=v$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+      - name: Skip if release already exists
+        id: check
+        run: |
+          TAG="${{ inputs.tag_name || steps.pkg.outputs.version }}"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" &>/dev/null 2>&1; then
+            echo "skip=true"  >> $GITHUB_OUTPUT
+            echo "Release $TAG already exists — skipping."
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+
       - name: Install dependencies
+        if: steps.check.outputs.skip == 'false'
         run: npm ci
 
       - name: Test → Build → Pack
+        if: steps.check.outputs.skip == 'false'
         run: npm run pack-release
 
       - name: Publish GitHub Release
+        if: steps.check.outputs.skip == 'false'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ inputs.tag_name || github.ref_name }}
-          name: ${{ inputs.tag_name || github.ref_name }}
+          tag_name: ${{ inputs.tag_name || steps.pkg.outputs.version }}
+          name: ${{ inputs.tag_name || steps.pkg.outputs.version }}
           files: releases/*.tgz
           generate_release_notes: true
