@@ -30,6 +30,15 @@ Der Nutzer sieht **zwei Bereiche nebeneinander**:
 
 Rechtsklick auf einen Balken öffnet ein **Kontextmenü** zum direkten Ändern des Status — ohne Dialog.
 
+**Tastaturnavigation** (immer aktiv, kein Prop nötig):
+
+| Taste | Aktion |
+|---|---|
+| `Tab` | Task-Panel fokussieren |
+| `↑` / `↓` | Auswahl zur vorherigen / nächsten sichtbaren Zeile bewegen |
+| `Enter` | Bearbeiten-Dialog für die ausgewählte Zeile öffnen |
+| `Escape` | Auswahl aufheben |
+
 **Typische Einsatzgebiete:**
 
 - Projektmanagement-Anwendungen (Sprint-Planung, Release-Roadmaps)
@@ -38,6 +47,12 @@ Rechtsklick auf einen Balken öffnet ein **Kontextmenü** zum direkten Ändern d
 - Dashboards mit zeitlicher Übersicht über laufende Aufgaben
 
 ---
+
+> ### Neu in v3.25.0
+>
+> | Feature | Beschreibung | Springe zu |
+> |---|---|---|
+> | **Tastaturnavigation** | Das Task-Panel ist jetzt vollständig per Tastatur bedienbar. `Tab` zum Fokussieren, `↑`/`↓` zur Zeilenauswahl, `Enter` öffnet den Bearbeiten-Dialog, `Escape` hebt die Auswahl auf. Kein Prop nötig — immer aktiv. | [→ Tastaturnavigation](#tastaturnavigation) |
 
 > ### Neu in v3.17.0
 >
@@ -742,7 +757,25 @@ Bei `zoomable={true}` kann der Nutzer direkt in der Timeline durch die Zoom-Stuf
 - Alle Aktions-Icons (Hinzufügen, Bearbeiten, Löschen) sind mit Tooltips versehen, die als `aria-label` dienen.
 - Status-Chips verwenden semantische MUI-Farbzuweisungen, die in Dark-Mode-Themes automatisch angepasst werden.
 - Die Texte der Toolbar-Buttons und Dialog-Labels sind vollständig über `translations` lokalisierbar, inklusive der `aria`-relevanten Beschriftungen.
-- Tastaturnavigation: Dialoge folgen dem MUI-Standard (Fokus-Trap, Escape zum Schließen).
+- Dialoge folgen dem MUI-Standard (Fokus-Trap, Escape zum Schließen).
+
+### Tastaturnavigation
+
+Das Task-Panel unterstützt vollständige Tastaturnavigation ohne jegliche Konfiguration:
+
+| Taste | Aktion |
+|---|---|
+| `Tab` | Task-Panel fokussieren |
+| `↑` | Auswahl zur vorherigen sichtbaren Zeile bewegen |
+| `↓` | Auswahl zur nächsten sichtbaren Zeile bewegen |
+| `Enter` | Bearbeiten-Dialog für die ausgewählte Zeile öffnen |
+| `Escape` | Auswahl der aktuellen Zeile aufheben |
+
+- **Klick setzt ebenfalls die Auswahl**: Ein Mausklick auf eine Zeile setzt sie als Tastatur-Anker — die Navigation mit `↑`/`↓` kann direkt von dort weitergehen.
+- **Respektiert Sichtbarkeit**: Nur Zeilen, die aktuell im Panel sichtbar sind (nach Auf-/Zuklappen und Assignee-Filter), sind navigierbar.
+- **Auto-Scroll**: Das Panel scrollt automatisch, damit die ausgewählte Zeile immer sichtbar bleibt.
+- **Input-Guard**: Im Inline-Edit-Modus (`inlineEdit`) werden Tasten innerhalb eines Eingabefelds nicht abgefangen — das Panel reagiert nur, wenn es direkt fokussiert ist.
+- **`aria-selected`** ist auf jeder Zeile gesetzt, damit Screenreader die aktuelle Auswahl ansagen können.
 
 ---
 

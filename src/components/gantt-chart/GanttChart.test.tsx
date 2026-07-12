@@ -1736,3 +1736,97 @@ describe("GanttChart — assignee filter", () => {
     expect(screen.getByTestId("gantt-reset-view")).toBeDisabled();
   });
 });
+
+// ---------------------------------------------------------------------------
+// Keyboard Navigation
+// ---------------------------------------------------------------------------
+
+describe("GanttChart — keyboard navigation", () => {
+  function getPanel() {
+    return screen.getByTestId("gantt-task-panel");
+  }
+
+  it("Should render the task panel with tabIndex=0 so it is keyboard-focusable", () => {
+    render(<GanttChart tasks={tasks} />);
+    expect(getPanel()).toHaveAttribute("tabindex", "0");
+  });
+
+  it("Should select the first row on ArrowDown when nothing is selected", () => {
+    render(<GanttChart tasks={tasks} />);
+    fireEvent.keyDown(getPanel(), { key: "ArrowDown" });
+    expect(screen.getByTestId("gantt-task-row-root")).toHaveAttribute("aria-selected", "true");
+  });
+
+  it("Should move selection to the next row on a second ArrowDown", () => {
+    render(<GanttChart tasks={tasks} />);
+    fireEvent.keyDown(getPanel(), { key: "ArrowDown" });
+    fireEvent.keyDown(getPanel(), { key: "ArrowDown" });
+    expect(screen.getByTestId("gantt-task-row-root")).toHaveAttribute("aria-selected", "false");
+    expect(screen.getByTestId("gantt-task-row-child")).toHaveAttribute("aria-selected", "true");
+  });
+
+  it("Should move selection back to the previous row on ArrowUp", () => {
+    render(<GanttChart tasks={tasks} />);
+    fireEvent.keyDown(getPanel(), { key: "ArrowDown" });
+    fireEvent.keyDown(getPanel(), { key: "ArrowDown" });
+    fireEvent.keyDown(getPanel(), { key: "ArrowUp" });
+    expect(screen.getByTestId("gantt-task-row-root")).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByTestId("gantt-task-row-child")).toHaveAttribute("aria-selected", "false");
+  });
+
+  it("Should not move above the first row on repeated ArrowUp", () => {
+    render(<GanttChart tasks={tasks} />);
+    fireEvent.keyDown(getPanel(), { key: "ArrowDown" });
+    fireEvent.keyDown(getPanel(), { key: "ArrowUp" });
+    fireEvent.keyDown(getPanel(), { key: "ArrowUp" });
+    expect(screen.getByTestId("gantt-task-row-root")).toHaveAttribute("aria-selected", "true");
+  });
+
+  it("Should not move past the last visible row on repeated ArrowDown", () => {
+    render(<GanttChart tasks={tasks} initialExpandAll />);
+    // 3 visible rows: root, child, milestone — navigate to the end
+    fireEvent.keyDown(getPanel(), { key: "ArrowDown" });
+    fireEvent.keyDown(getPanel(), { key: "ArrowDown" });
+    fireEvent.keyDown(getPanel(), { key: "ArrowDown" });
+    fireEvent.keyDown(getPanel(), { key: "ArrowDown" });
+    expect(screen.getByTestId("gantt-task-row-milestone")).toHaveAttribute("aria-selected", "true");
+  });
+
+  it("Should deselect on Escape", () => {
+    render(<GanttChart tasks={tasks} />);
+    fireEvent.keyDown(getPanel(), { key: "ArrowDown" });
+    expect(screen.getByTestId("gantt-task-row-root")).toHaveAttribute("aria-selected", "true");
+    fireEvent.keyDown(getPanel(), { key: "Escape" });
+    expect(screen.getByTestId("gantt-task-row-root")).toHaveAttribute("aria-selected", "false");
+  });
+
+  it("Should open the edit dialog on Enter when a row is selected (enableBuiltinDialogs)", () => {
+    render(<GanttChart tasks={tasks} enableBuiltinDialogs />);
+    fireEvent.keyDown(getPanel(), { key: "ArrowDown" });
+    fireEvent.keyDown(getPanel(), { key: "Enter" });
+    expect(screen.getByTestId("gantt-task-dialog")).toBeInTheDocument();
+    expect(screen.getByText("Aufgabe bearbeiten")).toBeInTheDocument();
+  });
+
+  it("Should call onEditTask on Enter when a row is selected (direct callback mode)", () => {
+    const onEditTask = vi.fn();
+    render(<GanttChart tasks={tasks} enableBuiltinDialogs={false} onEditTask={onEditTask} />);
+    fireEvent.keyDown(getPanel(), { key: "ArrowDown" });
+    fireEvent.keyDown(getPanel(), { key: "Enter" });
+    expect(onEditTask).toHaveBeenCalledOnce();
+    expect(onEditTask).toHaveBeenCalledWith(expect.objectContaining({ id: "root" }));
+  });
+
+  it("Should not fire Enter when no row is selected", () => {
+    const onEditTask = vi.fn();
+    render(<GanttChart tasks={tasks} enableBuiltinDialogs={false} onEditTask={onEditTask} />);
+    fireEvent.keyDown(getPanel(), { key: "Enter" });
+    expect(onEditTask).not.toHaveBeenCalled();
+  });
+
+  it("Should select a row on click (enabling keyboard continuation from that point)", () => {
+    render(<GanttChart tasks={tasks} />);
+    fireEvent.click(screen.getByTestId("gantt-task-row-child"));
+    expect(screen.getByTestId("gantt-task-row-child")).toHaveAttribute("aria-selected", "true");
+  });
+});

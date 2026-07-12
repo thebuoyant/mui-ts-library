@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **`JsonEditor` — Download button:** New toolbar button that exports the current editor content as a `.json` file via `<a download>`. Shown by default (`showDownload: true` in `JsonEditorToolbarConfig`). Set `downloadFilename` on `JsonEditorProps` to control the exported filename (default `"file.json"`). Two new translation keys with defaults: `download: "Download"` / `downloadSuccess: "Downloaded!"`. The button shows a brief success checkmark (same timed-flag pattern as Copy). Fully backwards-compatible — `showDownload` defaults to `true`, so existing consumers will see the new button without any code change; add `toolbarConfig={{ showDownload: false }}` to opt out.
+- **`GanttChart` — Keyboard Navigation:** The task panel is now keyboard-accessible. `Tab` to focus the panel, then `↑`/`↓` to move row selection, `Enter` to open the edit dialog for the selected row (works with both `enableBuiltinDialogs` and the `onEditTask` callback), `Escape` to deselect. Clicking a row also sets it as the selection anchor so keyboard navigation can continue from there. The selected row is highlighted with `action.selected` background and a primary-color left border (3 px inset box-shadow). The panel auto-scrolls to keep the selected row visible. `aria-selected` is set on each row. No new props required — the feature is always on.
 
 ---
 

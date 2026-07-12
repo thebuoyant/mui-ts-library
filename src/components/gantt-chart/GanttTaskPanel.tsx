@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { type RefObject, type UIEventHandler } from "react";
 import { Box, Chip, IconButton, Menu, MenuItem, TextField, Tooltip, Typography } from "@mui/material";
@@ -39,6 +39,8 @@ type GanttTaskRowProps = {
   onStatusChange?: (task: GanttTask, status: GanttTaskStatus) => void;
   inlineEdit?: boolean;
   onInlineRename?: (task: GanttTask, newName: string) => void;
+  isSelected?: boolean;
+  onSelect?: () => void;
 };
 
 function GanttTaskRow({
@@ -54,6 +56,8 @@ function GanttTaskRow({
   onStatusChange,
   inlineEdit,
   onInlineRename,
+  isSelected,
+  onSelect,
 }: GanttTaskRowProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [editingName, setEditingName] = useState<string | null>(null);
@@ -72,6 +76,7 @@ function GanttTaskRow({
     <Box
       className="gantt-task-row"
       data-testid={`gantt-task-row-${task.id}`}
+      aria-selected={isSelected ?? false}
       sx={{
         height: ROW_HEIGHT,
         display: "flex",
@@ -80,9 +85,14 @@ function GanttTaskRow({
         borderRight: "1px solid",
         borderColor: "divider",
         cursor: onTaskClick ? "pointer" : "default",
-        "&:hover": onTaskClick ? { bgcolor: "action.hover" } : undefined,
+        bgcolor: isSelected ? "action.selected" : undefined,
+        boxShadow: isSelected ? (t) => `inset 3px 0 0 ${t.palette.primary.main}` : undefined,
+        "&:hover": { bgcolor: isSelected ? "action.selected" : onTaskClick ? "action.hover" : undefined },
       }}
-      onClick={() => onTaskClick?.(task)}
+      onClick={() => {
+        onSelect?.();
+        onTaskClick?.(task);
+      }}
     >
       {/* Name-Spalte — flex, enthält Einzug + Expand-Icon + Status-Dot + Text */}
       <Box
@@ -415,15 +425,54 @@ export function GanttTaskPanel({
   // Tages-Skala hat einen zweizeiligen Header (Monat + Tag) → Panel-Header muss gleich hoch sein.
   const headerHeight = timeScale === "days" ? HEADER_HEIGHT * 2 : HEADER_HEIGHT;
 
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const selectedIndex = selectedTaskId
+    ? visibleTasks.findIndex((t) => t.id === selectedTaskId)
+    : -1;
+
+  useEffect(() => {
+    if (selectedIndex < 0 || !scrollRef.current) return;
+    const el = scrollRef.current;
+    const rowTop    = headerHeight + selectedIndex * ROW_HEIGHT;
+    const rowBottom = rowTop + ROW_HEIGHT;
+    if (rowTop < el.scrollTop) {
+      el.scrollTop = rowTop;
+    } else if (rowBottom > el.scrollTop + el.clientHeight) {
+      el.scrollTop = rowBottom - el.clientHeight;
+    }
+  }, [selectedIndex, headerHeight, scrollRef]);
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+    const n = visibleTasks.length;
+    if (n === 0) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setSelectedTaskId(visibleTasks[Math.min(selectedIndex < 0 ? 0 : selectedIndex + 1, n - 1)].id);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setSelectedTaskId(visibleTasks[Math.max(selectedIndex <= 0 ? 0 : selectedIndex - 1, 0)].id);
+    } else if (e.key === "Enter" && selectedIndex >= 0) {
+      e.preventDefault();
+      rowOnEdit?.(visibleTasks[selectedIndex]);
+    } else if (e.key === "Escape") {
+      setSelectedTaskId(null);
+    }
+  }
+
   return (
     <Box
       ref={scrollRef}
       onScroll={onScroll}
+      tabIndex={0}
+      data-testid="gantt-task-panel"
+      onKeyDown={handleKeyDown}
       sx={{
         width: panelWidth,
         flexShrink: 0,
         overflowY: "auto",
         overflowX: "hidden",
+        outline: "none",
       }}
     >
       <Box
@@ -518,6 +567,8 @@ export function GanttTaskPanel({
                 onStatusChange={onStatusChange}
                 inlineEdit={inlineEdit}
                 onInlineRename={inlineEdit ? handleInlineRename : undefined}
+                isSelected={visibleTasks[vRow.index].id === selectedTaskId}
+                onSelect={() => setSelectedTaskId(visibleTasks[vRow.index].id)}
               />
             </Box>
           ))}
@@ -538,6 +589,8 @@ export function GanttTaskPanel({
             onStatusChange={onStatusChange}
             inlineEdit={inlineEdit}
             onInlineRename={inlineEdit ? handleInlineRename : undefined}
+            isSelected={task.id === selectedTaskId}
+            onSelect={() => setSelectedTaskId(task.id)}
           />
         ))
       )}

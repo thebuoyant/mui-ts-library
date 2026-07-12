@@ -594,6 +594,38 @@ export const ZoomAndToday: Story = {
   ),
 };
 
+export const KeyboardNavigation: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '**Keyboard-accessible task panel** — no prop needed, always on.\n\n' +
+          'Click anywhere in the task panel (left pane) to focus it, then:\n\n' +
+          '- `↑` / `↓` — move row selection\n' +
+          '- `Enter` — open the edit dialog for the selected row\n' +
+          '- `Escape` — deselect\n\n' +
+          'The selected row is highlighted with the theme\'s `action.selected` background and a ' +
+          '3 px primary-colour left border. The panel auto-scrolls to keep the selection in view. ' +
+          'Clicking a row with the mouse also sets it as the keyboard anchor. ' +
+          '`aria-selected` is reflected on every row for assistive technologies.',
+      },
+    },
+  },
+  args: {
+    tasks:                sampleTasks,
+    timeScale:            "months",
+    enableBuiltinDialogs: true,
+    initialExpandAll:     true,
+    height:               420,
+    translations:         EN_TRANSLATIONS,
+  },
+  render: (args) => (
+    <Box sx={{ width: "100%", maxWidth: 900, height: args.height }}>
+      <GanttChart {...args} />
+    </Box>
+  ),
+};
+
 export const DragAndResize: Story = {
   parameters: {
     docs: {

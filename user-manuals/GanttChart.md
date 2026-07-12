@@ -30,6 +30,15 @@ The user sees **two panes side by side**:
 
 Right-clicking a task bar opens a **context menu** to change its status without opening a dialog.
 
+**Keyboard navigation** (always on, no prop needed):
+
+| Key | Action |
+|---|---|
+| `Tab` | Focus the task panel |
+| `↑` / `↓` | Move selection to the previous / next visible row |
+| `Enter` | Open the edit dialog for the selected row |
+| `Escape` | Deselect |
+
 **Typical use cases:**
 
 - Project management applications (sprint planning, release roadmaps)
@@ -38,6 +47,12 @@ Right-clicking a task bar opens a **context menu** to change its status without 
 - Dashboards with a temporal overview of ongoing tasks
 
 ---
+
+> ### New in v3.25.0
+>
+> | Feature | Description | Jump to |
+> |---|---|---|
+> | **Keyboard Navigation** | The task panel is now keyboard-accessible. `Tab` to focus, `↑`/`↓` to move row selection, `Enter` to open the edit dialog, `Escape` to deselect. No prop needed — always on. | [→ Keyboard navigation](#keyboard-navigation) |
 
 > ### New in v3.17.0
 >
@@ -742,7 +757,25 @@ When `zoomable={true}`, the user can cycle through zoom levels directly in the t
 - All action icons (Add, Edit, Delete) are equipped with tooltips that serve as `aria-label`.
 - Status chips use semantic MUI color assignments that are automatically adapted in dark mode themes.
 - All toolbar button texts and dialog labels are fully localizable via `translations`, including accessibility-relevant labels.
-- Keyboard navigation: dialogs follow the MUI standard (focus trap, Escape to close).
+- Dialogs follow the MUI standard (focus trap, Escape to close).
+
+### Keyboard Navigation
+
+The task panel supports full keyboard navigation without any configuration:
+
+| Key | Action |
+|---|---|
+| `Tab` | Focus the task panel |
+| `↑` | Move selection to the previous visible row |
+| `↓` | Move selection to the next visible row |
+| `Enter` | Open the edit dialog for the selected row |
+| `Escape` | Deselect the current row |
+
+- **Click also selects**: clicking a row with the mouse sets it as the keyboard anchor, so you can continue navigating from there with `↑`/`↓`.
+- **Respects visibility**: only rows currently visible in the panel (after expand/collapse and assignee filter) are navigable.
+- **Auto-scrolls**: the panel scrolls automatically to keep the selected row in view.
+- **Input guard**: keys typed inside an inline-edit field (`inlineEdit` mode) are not intercepted — the panel only handles keys when it has direct focus.
+- **`aria-selected`** is set on each row so assistive technologies can announce the current selection.
 
 ---
 
