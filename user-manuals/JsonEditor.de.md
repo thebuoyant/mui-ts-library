@@ -12,7 +12,7 @@ Der `JsonEditor` ist ein vollständiger JSON-Code-Editor auf Basis von [CodeMirr
 
 Der Nutzer sieht eine MUI-Paper-Karte mit zwei Bereichen:
 
-- **Toolbar** (oben): JSON formatieren (Pretty-Print), Komprimieren (Minify), Kopieren, Leeren, Rückgängig/Wiederholen.
+- **Toolbar** (oben): JSON formatieren (Pretty-Print), Komprimieren (Minify), Kopieren, **Download** (speichert den aktuellen Inhalt als `.json`-Datei), Leeren, Rückgängig/Wiederholen.
 - **Editor-Bereich**: ein CodeMirror-JSON-Editor mit:
   - **Syntax-Highlighting**: Property-Namen in der Primärfarbe (fett), Strings in Grün, Zahlen in Gelb, Booleans in Blau, `null` in Grau — alles aus dem MUI-Theme.
   - **Zeilennummern** und optionale **Falten-Arrows** (▾/▸) neben `{` und `[` zum Ein-/Ausklappen von Objects und Arrays.
@@ -31,6 +31,12 @@ Der Nutzer sieht eine MUI-Paper-Karte mit zwei Bereichen:
 - Debug-Ansichten mit direkter JSON-Bearbeitung
 
 ---
+
+> ### Neu in v3.25.0
+>
+> | Feature | Beschreibung | Springe zu |
+> |---|---|---|
+> | **Download-Button** | Neuer Toolbar-Button, der den aktuellen Editor-Inhalt als `.json`-Datei speichert. Standardmäßig an (`showDownload: true`). Dateiname konfigurierbar über `downloadFilename` (Standard `"file.json"`). Zwei neue Translation-Keys: `download` / `downloadSuccess`. | [→ Toolbar konfigurieren](#toolbar-konfigurieren) · [→ TypeScript-Typen](#typescript-typen) |
 
 > ### Neu in v3.7.0
 >
@@ -117,6 +123,7 @@ function App() {
 | `showLineNumbers` | `boolean` | `true` | Zeilennummern-Gutter anzeigen |
 | `showMinimap` | `boolean` | `false` | Zeigt eine verkleinerte Dokumentenübersicht (Minimap) auf der rechten Seite des Editors an. Nützlich für die Navigation in großen JSON-Dateien. |
 | `showValidation` | `boolean` | `false` | „Gültiges JSON" / „Ungültiges JSON"-Anzeige im Footer |
+| `downloadFilename` | `string` | `"file.json"` | Dateiname für den Download-Button-Export |
 | `toolbarConfig` | `JsonEditorToolbarConfig` | alle `true` | Einzelne Toolbar-Buttons ein-/ausblenden |
 | `translation` | `Partial<JsonEditorTranslation>` | — | Abweichende Texte für Tooltips und Footer |
 | `value` | `string` | — | Kontrollierter Wert — der im Editor angezeigte JSON-String |
@@ -138,6 +145,7 @@ type JsonEditorToolbarConfig = {
   showFormat?:   boolean;
   showCompact?:  boolean;
   showCopy?:     boolean;
+  showDownload?: boolean;  // Standard: true
   showClear?:    boolean;
   showUndoRedo?: boolean;
 };
@@ -153,14 +161,16 @@ import { DEFAULT_JSON_EDITOR_TOOLBAR_CONFIG } from '@thebuoyant-tsdev/mui-ts-lib
 
 ```ts
 type JsonEditorTranslation = {
-  format:      string;   // "Format JSON"
-  compact:     string;   // "Compact JSON"
-  copy:        string;   // "Copy"
-  copySuccess: string;   // "Copied!"
-  clear:       string;   // "Clear"
-  undo:        string;   // "Undo"
-  redo:        string;   // "Redo"
-  lineColumn:  string;   // "Ln {line}, Col {col}"
+  format:          string;   // "Format JSON"
+  compact:         string;   // "Compact JSON"
+  copy:            string;   // "Copy"
+  copySuccess:     string;   // "Copied!"
+  download:        string;   // "Download"
+  downloadSuccess: string;   // "Downloaded!"
+  clear:           string;   // "Clear"
+  undo:            string;   // "Undo"
+  redo:            string;   // "Redo"
+  lineColumn:      string;   // "Ln {line}, Col {col}"
   validJson:   string;   // "Valid JSON"
   invalidJson: string;   // "Invalid JSON"
 };
@@ -366,7 +376,7 @@ Externe `value`-Änderungen synchronisieren sich in den Editor, ohne die Cursor-
 
 ## Toolbar konfigurieren
 
-Nur Format und Kopieren, ohne Komprimieren, Leeren und Rückgängig/Wiederholen:
+Alle Buttons sind standardmäßig sichtbar. Einzelne Buttons lassen sich über `toolbarConfig` ausblenden:
 
 ```tsx
 <JsonEditor
@@ -374,10 +384,23 @@ Nur Format und Kopieren, ohne Komprimieren, Leeren und Rückgängig/Wiederholen:
     showFormat:   true,
     showCompact:  false,
     showCopy:     true,
+    showDownload: true,   // neu in v3.25.0 — exportiert Inhalt als .json-Datei
     showClear:    false,
     showUndoRedo: false,
   }}
 />
+```
+
+Der **Download**-Button verwendet `<a download>` um einen Browser-Datei-Download auszulösen. Der Dateiname ist standardmäßig `"file.json"` und kann überschrieben werden:
+
+```tsx
+<JsonEditor downloadFilename="meine-konfiguration.json" />
+```
+
+Download-Button ausblenden:
+
+```tsx
+<JsonEditor toolbarConfig={{ showDownload: false }} />
 ```
 
 ---

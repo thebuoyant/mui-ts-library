@@ -12,7 +12,7 @@
 
 The user sees an MUI Paper card with two zones:
 
-- **Toolbar** (top): Format JSON (pretty-print), Compact (minify), Copy, Clear, Undo/Redo.
+- **Toolbar** (top): Format JSON (pretty-print), Compact (minify), Copy, **Download** (saves the current content as a `.json` file), Clear, Undo/Redo.
 - **Editor area**: a CodeMirror JSON editor with:
   - **Syntax highlighting**: property names in the primary color (bold), strings in green, numbers in yellow, booleans in info-blue, `null` in gray — all from your MUI theme.
   - **Line numbers** and optional **fold arrows** (▾/▸) next to `{` and `[` to collapse/expand objects and arrays.
@@ -31,6 +31,12 @@ The user sees an MUI Paper card with two zones:
 - Debug views that allow in-place JSON editing
 
 ---
+
+> ### New in v3.25.0
+>
+> | Feature | Description | Jump to |
+> |---|---|---|
+> | **Download button** | New toolbar button that exports the current editor content as a `.json` file. On by default (`showDownload: true`). Filename configurable via `downloadFilename` prop (default `"file.json"`). Two new translation keys: `download` / `downloadSuccess`. | [→ Toolbar Configuration](#toolbar-configuration) · [→ TypeScript Types](#typescript-types) |
 
 > ### New in v3.7.0
 >
@@ -117,6 +123,7 @@ function App() {
 | `showLineNumbers` | `boolean` | `true` | Show line number gutter |
 | `showMinimap` | `boolean` | `false` | Shows a scaled-down document overview (minimap) on the right side of the editor. Useful for navigating large JSON files. |
 | `showValidation` | `boolean` | `false` | Show "Valid JSON" / "Invalid JSON" indicator in footer |
+| `downloadFilename` | `string` | `"file.json"` | Filename used by the Download button export |
 | `toolbarConfig` | `JsonEditorToolbarConfig` | all `true` | Show/hide individual toolbar buttons |
 | `translation` | `Partial<JsonEditorTranslation>` | — | Override toolbar tooltips and footer labels |
 | `value` | `string` | — | Controlled value — the JSON string displayed in the editor |
@@ -138,6 +145,7 @@ type JsonEditorToolbarConfig = {
   showFormat?:   boolean;
   showCompact?:  boolean;
   showCopy?:     boolean;
+  showDownload?: boolean;  // default: true
   showClear?:    boolean;
   showUndoRedo?: boolean;
 };
@@ -153,16 +161,18 @@ import { DEFAULT_JSON_EDITOR_TOOLBAR_CONFIG } from '@thebuoyant-tsdev/mui-ts-lib
 
 ```ts
 type JsonEditorTranslation = {
-  format:      string;   // "Format JSON"
-  compact:     string;   // "Compact JSON"
-  copy:        string;   // "Copy"
-  copySuccess: string;   // "Copied!"
-  clear:       string;   // "Clear"
-  undo:        string;   // "Undo"
-  redo:        string;   // "Redo"
-  lineColumn:  string;   // "Ln {line}, Col {col}"
-  validJson:   string;   // "Valid JSON"
-  invalidJson: string;   // "Invalid JSON"
+  format:          string;   // "Format JSON"
+  compact:         string;   // "Compact JSON"
+  copy:            string;   // "Copy"
+  copySuccess:     string;   // "Copied!"
+  download:        string;   // "Download"
+  downloadSuccess: string;   // "Downloaded!"
+  clear:           string;   // "Clear"
+  undo:            string;   // "Undo"
+  redo:            string;   // "Redo"
+  lineColumn:      string;   // "Ln {line}, Col {col}"
+  validJson:       string;   // "Valid JSON"
+  invalidJson:     string;   // "Invalid JSON"
 };
 ```
 
@@ -366,7 +376,7 @@ External `value` changes sync into the editor without resetting the cursor posit
 
 ## Toolbar Configuration
 
-Only Format and Copy, no Compact, Clear, or UndoRedo:
+All buttons are shown by default. Hide individual buttons via `toolbarConfig`:
 
 ```tsx
 <JsonEditor
@@ -374,10 +384,23 @@ Only Format and Copy, no Compact, Clear, or UndoRedo:
     showFormat:   true,
     showCompact:  false,
     showCopy:     true,
+    showDownload: true,   // new in v3.25.0 — exports content as a .json file
     showClear:    false,
     showUndoRedo: false,
   }}
 />
+```
+
+The **Download** button uses `<a download>` to trigger a browser file save. The filename defaults to `"file.json"` and can be overridden:
+
+```tsx
+<JsonEditor downloadFilename="my-config.json" />
+```
+
+To hide the Download button:
+
+```tsx
+<JsonEditor toolbarConfig={{ showDownload: false }} />
 ```
 
 ---
