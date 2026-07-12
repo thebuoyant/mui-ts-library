@@ -32,29 +32,40 @@ jobs:
         id: pkg
         run: echo "version=v$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
-      - name: Skip if release already exists
-        id: check
+      - name: Check if GitHub Release already exists
+        id: gh_check
         run: |
           TAG="${{ inputs.tag_name || steps.pkg.outputs.version }}"
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" &>/dev/null 2>&1; then
             echo "skip=true"  >> $GITHUB_OUTPUT
-            echo "Release $TAG already exists — skipping."
+            echo "GitHub Release $TAG already exists — skipping release creation."
           else
             echo "skip=false" >> $GITHUB_OUTPUT
           fi
         env:
           GH_TOKEN: ${{ github.token }}
 
+      - name: Check if npm version already published
+        id: npm_check
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          if npm view "@thebuoyant-tsdev/mui-ts-library@${VERSION}" version &>/dev/null 2>&1; then
+            echo "skip=true"  >> $GITHUB_OUTPUT
+            echo "npm version ${VERSION} already published — skipping npm publish."
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Install dependencies
-        if: steps.check.outputs.skip == 'false'
+        if: steps.gh_check.outputs.skip == 'false' || steps.npm_check.outputs.skip == 'false'
         run: npm ci
 
       - name: Test → Build → Pack
-        if: steps.check.outputs.skip == 'false'
+        if: steps.gh_check.outputs.skip == 'false' || steps.npm_check.outputs.skip == 'false'
         run: npm run pack-release
 
       - name: Publish GitHub Release
-        if: steps.check.outputs.skip == 'false'
+        if: steps.gh_check.outputs.skip == 'false'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ inputs.tag_name || steps.pkg.outputs.version }}
@@ -63,7 +74,7 @@ jobs:
           generate_release_notes: true
 
       - name: Publish to npm
-        if: steps.check.outputs.skip == 'false'
+        if: steps.npm_check.outputs.skip == 'false'
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
