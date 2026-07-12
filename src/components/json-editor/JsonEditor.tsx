@@ -36,6 +36,7 @@ export function JsonEditor({
   showFolding       = true,
   showValidation    = false,
   enablePathFinder  = true,
+  downloadFilename  = "file.json",
   toolbarConfig,
   translation,
   highlightColors,
@@ -102,6 +103,7 @@ export function JsonEditor({
               toolbarConfig={tc}
               translation={t}
               indent={indent}
+              downloadFilename={downloadFilename}
               disabled={disabled}
             />
             <Divider />

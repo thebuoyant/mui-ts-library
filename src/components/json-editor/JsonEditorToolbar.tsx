@@ -1,5 +1,6 @@
 import { Box, Divider } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import DownloadIcon    from "@mui/icons-material/Download";
 import CheckIcon       from "@mui/icons-material/Check";
 import DeleteIcon      from "@mui/icons-material/Delete";
 import UndoIcon        from "@mui/icons-material/Undo";
@@ -13,11 +14,12 @@ import { ToolbarButton } from "../shared/ToolbarButton";
 import { useTimedFlag } from "../shared/useTimedFlag";
 
 type JsonEditorToolbarProps = {
-  editorView:    EditorView | null;
-  toolbarConfig: Required<JsonEditorToolbarConfig>;
-  translation:   JsonEditorTranslation;
-  indent:        number;
-  disabled?:     boolean;
+  editorView:       EditorView | null;
+  toolbarConfig:    Required<JsonEditorToolbarConfig>;
+  translation:      JsonEditorTranslation;
+  indent:           number;
+  downloadFilename: string;
+  disabled?:        boolean;
 };
 
 export function JsonEditorToolbar({
@@ -25,9 +27,11 @@ export function JsonEditorToolbar({
   toolbarConfig: tc,
   translation: t,
   indent,
+  downloadFilename,
   disabled,
 }: JsonEditorToolbarProps) {
-  const [copied, triggerCopied] = useTimedFlag();
+  const [copied,     triggerCopied]     = useTimedFlag();
+  const [downloaded, triggerDownloaded] = useTimedFlag();
   const isDisabled = disabled || !editorView;
 
   function handleFormat() {
@@ -63,6 +67,18 @@ export function JsonEditorToolbar({
     });
   }
 
+  function handleDownload() {
+    const text = editorView?.state.doc.toString() ?? "";
+    const blob = new Blob([text], { type: "application/json" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = downloadFilename;
+    a.click();
+    URL.revokeObjectURL(url);
+    triggerDownloaded();
+  }
+
   function handleClear() {
     const view = editorView;
     if (!view) return;
@@ -85,7 +101,7 @@ export function JsonEditorToolbar({
   }
 
   const hasFormatGroup  = tc.showFormat || tc.showCompact;
-  const hasActionGroup  = tc.showCopy || tc.showClear;
+  const hasActionGroup  = tc.showCopy || tc.showDownload || tc.showClear;
   const hasHistoryGroup = tc.showUndoRedo;
 
   return (
@@ -126,6 +142,14 @@ export function JsonEditorToolbar({
               label={copied ? t.copySuccess : t.copy}
               icon={copied ? <CheckIcon fontSize="small" color="success" /> : <ContentCopyIcon fontSize="small" />}
               onClick={handleCopy}
+              disabled={isDisabled}
+            />
+          )}
+          {tc.showDownload && (
+            <ToolbarButton
+              label={downloaded ? t.downloadSuccess : t.download}
+              icon={downloaded ? <CheckIcon fontSize="small" color="success" /> : <DownloadIcon fontSize="small" />}
+              onClick={handleDownload}
               disabled={isDisabled}
             />
           )}
