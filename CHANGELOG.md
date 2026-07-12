@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`GanttChart` — Keyboard Navigation:** The task panel is now keyboard-accessible. `Tab` to focus the panel, then `↑`/`↓` to move row selection, `Enter` to open the edit dialog for the selected row (works with both `enableBuiltinDialogs` and the `onEditTask` callback), `Escape` to deselect. Clicking a row also sets it as the selection anchor so keyboard navigation can continue from there. The selected row is highlighted with `action.selected` background and a primary-color left border (3 px inset box-shadow). The panel auto-scrolls to keep the selected row visible. `aria-selected` is set on each row. No new props required — the feature is always on.
+
 ---
 
 ## [3.24.1] — 2026-07-10

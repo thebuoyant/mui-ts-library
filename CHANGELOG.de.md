@@ -11,6 +11,10 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unveröffentlicht]
 
+### Hinzugefügt
+
+- **`GanttChart` — Tastaturnavigation:** Das Task-Panel ist jetzt per Tastatur bedienbar. `Tab` fokussiert das Panel, dann wählen `↑`/`↓` die vorherige/nächste Zeile, `Enter` öffnet den Bearbeiten-Dialog für die ausgewählte Zeile (funktioniert sowohl mit `enableBuiltinDialogs` als auch mit dem `onEditTask`-Callback), `Escape` hebt die Auswahl auf. Auch ein Mausklick auf eine Zeile setzt die Auswahl, sodass die Tastaturnavigation von dort weitergeführt werden kann. Die ausgewählte Zeile wird mit `action.selected`-Hintergrund und einem 3 px linken Rahmen in der Primärfarbe hervorgehoben. Das Panel scrollt automatisch, damit die ausgewählte Zeile sichtbar bleibt. `aria-selected` ist auf jeder Zeile gesetzt. Keine neuen Props erforderlich — das Feature ist immer aktiv.
+
 ---
 
 ## [3.24.1] — 2026-07-10
