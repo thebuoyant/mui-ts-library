@@ -11,6 +11,10 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unveröffentlicht]
 
+---
+
+## [3.25.0] — 2026-07-12
+
 ### Hinzugefügt
 
 - **`JsonEditor` — Download-Button:** Neuer Toolbar-Button, der den aktuellen Editor-Inhalt per `<a download>` als `.json`-Datei exportiert. Standardmäßig sichtbar (`showDownload: true` in `JsonEditorToolbarConfig`). Der Dateiname ist über `downloadFilename` in `JsonEditorProps` konfigurierbar (Standard: `"file.json"`). Zwei neue Translation-Keys mit Defaults: `download: "Download"` / `downloadSuccess: "Downloaded!"`. Der Button zeigt kurz ein Häkchen an (gleiches Timed-Flag-Muster wie beim Copy-Button). Vollständig rückwärtskompatibel — `showDownload` ist standardmäßig `true`, bestehende Consumer sehen den neuen Button ohne Codeänderung; mit `toolbarConfig={{ showDownload: false }}` ausblendbar.
