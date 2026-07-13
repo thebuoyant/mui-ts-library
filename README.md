@@ -483,6 +483,21 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 ## Changelog
 
+### [3.26.0] — 2026-07-13
+
+**Added**
+- **`PopoverColorPicker`** — a convenience wrapper that combines a colored swatch trigger button with a MUI Popover containing the full `ColorPicker`. No `Popover`, `anchorEl`, or open/close state needed — just `value` + `onChange`. All `ColorPicker` props pass through directly. New props: `swatchSize` (default `28`) and `swatchShape` (`"square"` | `"circle"`). Fully accessible (aria-expanded, aria-haspopup, keyboard support). New exports: `popoverColorPickerClasses`. Fully backwards-compatible. See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.
+
+---
+
+### [3.25.0] — 2026-07-12
+
+**Added**
+- **`JsonEditor` — Download button:** New toolbar button that exports the current editor content as a `.json` file. Shown by default (`showDownload: true`). Control the filename via `downloadFilename` (default `"file.json"`). Add `toolbarConfig={{ showDownload: false }}` to opt out. Fully backwards-compatible. See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.
+- **`GanttChart` — Keyboard Navigation:** The task panel is now keyboard-accessible — `Tab` to focus, `↑`/`↓` to move selection, `Enter` to open the edit dialog, `Escape` to deselect. No new props required. See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.
+
+---
+
 ### [3.24.1] — 2026-07-10
 
 **Fixed**
