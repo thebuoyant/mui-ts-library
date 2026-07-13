@@ -1,9 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { fn } from "storybook/test";
-import { Box, Button, ButtonGroup, Paper, Typography, Stack, Divider } from "@mui/material";
+import { Box, Button, ButtonGroup, Paper, Typography } from "@mui/material";
 import { useState, type ComponentProps } from "react";
 import { ColorPicker } from "./ColorPicker";
-import { PopoverColorPicker } from "./PopoverColorPicker";
 import type { ColorPickerColorInfo, ColorPickerFormat } from "./ColorPicker.types";
 
 const meta: Meta<typeof ColorPicker> = {
@@ -342,87 +341,6 @@ function ControlledFormatStory(args: ComponentProps<typeof ColorPicker>) {
     </Box>
   );
 }
-
-// ── PopoverColorPicker ───────────────────────────────────────────────────────
-
-function PopoverColorPickerStory() {
-  const [bg, setBg] = useState("#1976d2");
-  const [text, setText] = useState("#ffffff");
-  const [accent, setAccent] = useState("#f57c00");
-
-  return (
-    <Stack spacing={3} sx={{ maxWidth: 480 }}>
-      <Typography variant="body2" color="text.secondary">
-        Click any swatch to open the picker in a popover. The swatch updates live while you drag.
-      </Typography>
-
-      <Stack direction="row" spacing={2} alignItems="center">
-        <PopoverColorPicker value={bg} onChange={setBg} />
-        <Typography variant="body2">Background color</Typography>
-      </Stack>
-
-      <Stack direction="row" spacing={2} alignItems="center">
-        <PopoverColorPicker value={text} onChange={setText} />
-        <Typography variant="body2">Text color</Typography>
-      </Stack>
-
-      <Stack direction="row" spacing={2} alignItems="center">
-        <PopoverColorPicker value={accent} onChange={setAccent} swatchShape="circle" swatchSize={32} />
-        <Typography variant="body2">Accent color (circle swatch, size 32)</Typography>
-      </Stack>
-
-      <Divider />
-
-      <Box
-        sx={{
-          p: 3,
-          borderRadius: 2,
-          backgroundColor: bg,
-          color: text,
-          border: "1px solid",
-          borderColor: "divider",
-        }}
-      >
-        <Typography variant="subtitle1" sx={{ color: text, fontWeight: 600 }}>
-          Live preview
-        </Typography>
-        <Typography variant="body2" sx={{ color: text, mt: 0.5 }}>
-          Adjust the colors above to see this box update in real time.
-        </Typography>
-        <Box
-          sx={{
-            mt: 1.5,
-            display: "inline-block",
-            px: 2,
-            py: 0.5,
-            borderRadius: 1,
-            backgroundColor: accent,
-            color: "#fff",
-            fontSize: 12,
-            fontWeight: 600,
-          }}
-        >
-          Accent button
-        </Box>
-      </Box>
-    </Stack>
-  );
-}
-
-export const PopoverPicker: Story = {
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '**`PopoverColorPicker`** — a convenience wrapper that combines a swatch trigger button with a ' +
-          'popover containing the full `ColorPicker`. No Popover wiring needed — just `value` + `onChange`. ' +
-          'Use `swatchShape="circle"` and `swatchSize` to match your UI.',
-      },
-    },
-    controls: { disable: true },
-  },
-  render: () => <PopoverColorPickerStory />,
-};
 
 export const WithControlledFormat: Story = {
   parameters: {
