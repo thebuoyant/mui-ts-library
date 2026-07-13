@@ -12,7 +12,7 @@ Der Nutzer sieht ein Panel mit einer farbigen Gradientfläche. Er zieht einen kl
 
 Optional dazu: ein Pipette-Werkzeug zum Aufnehmen beliebiger Farben vom Bildschirm, und eine Reihe gespeicherter Farb-Swatches für den schnellen Zugriff.
 
-**Was die Komponente nicht enthält:** einen Auslöser-Button oder ein Popup/Popover. Sie rendert das Picker-Panel direkt — du entscheidest, wo es erscheint (inline auf der Seite, in einem MUI-`Popover`, in einem `Menu` usw.). Das ist der gleiche Ansatz, den MUI bei seinen eigenen Date-Pickern verfolgt, die das Eingabefeld ebenfalls vom Kalender-Panel trennen. Siehe [In ein Popover einbetten](#in-ein-popover-einbetten) für das häufigste Muster.
+**Was die Komponente nicht enthält:** einen Auslöser-Button oder ein Popup/Popover. Sie rendert das Picker-Panel direkt — du entscheidest, wo es erscheint (inline auf der Seite, in einem MUI-`Popover`, in einem `Menu` usw.). Wenn du das klassische "Swatch-Button öffnet Popover"-Muster ohne Boilerplate möchtest, nutze [`PopoverColorPicker`](#popovercolorpicker) — einen fertig mitgelieferten Convenience-Wrapper. Das ist der gleiche Ansatz, den MUI bei seinen eigenen Date-Pickern verfolgt, die das Eingabefeld ebenfalls vom Kalender-Panel trennen. Siehe [In ein Popover einbetten](#in-ein-popover-einbetten) für das manuelle Muster.
 
 **Typische Anwendungsfälle:**
 
@@ -35,12 +35,14 @@ Optional dazu: ein Pipette-Werkzeug zum Aufnehmen beliebiger Farben vom Bildschi
 ## Import
 
 ```tsx
-import { ColorPicker } from '@thebuoyant-tsdev/mui-ts-library';
+import { ColorPicker, PopoverColorPicker } from '@thebuoyant-tsdev/mui-ts-library';
 import type {
   ColorPickerProps,
   ColorPickerTranslation,
   ColorPickerColorInfo,
   ColorPickerFormat,
+  PopoverColorPickerProps,
+  PopoverColorPickerTranslation,
 } from '@thebuoyant-tsdev/mui-ts-library';
 ```
 
@@ -199,6 +201,101 @@ Du kannst das Panel auch direkt auf der Seite rendern, ohne jegliches Popover �
 
 ---
 
+## PopoverColorPicker
+
+`PopoverColorPicker` ist ein fertig mitgelieferter Convenience-Wrapper, der Swatch-Button und MUI-Popover für dich übernimmt — das manuelle [In ein Popover einbetten](#in-ein-popover-einbetten)-Muster oben reduziert sich damit auf zwei Pflicht-Props.
+
+### Quick Start
+
+```tsx
+import { useState } from 'react';
+import { PopoverColorPicker } from '@thebuoyant-tsdev/mui-ts-library';
+
+function App() {
+  const [color, setColor] = useState('#1976d2');
+
+  return (
+    <PopoverColorPicker
+      value={color}
+      onChange={(hex) => setColor(hex)}
+    />
+  );
+}
+```
+
+Das war's — Swatch-Button, Open/Close-State, Anchor-Element und Popover werden intern verwaltet.
+
+### Props-Referenz
+
+`PopoverColorPicker` akzeptiert alle `ColorPicker`-Props (siehe [Props-Referenz](#props-referenz) oben) plus zwei Extras, die den Trigger-Button steuern:
+
+| Prop | Typ | Default | Beschreibung |
+|---|---|---|---|
+| `value` | `string` | — | **Pflichtfeld.** Aktuelle Farbe — wie bei `ColorPicker`. |
+| `onChange` | `(hex: string, info: ColorPickerColorInfo) => void` | — | **Pflichtfeld.** Feuert bei jeder Änderung — wie bei `ColorPicker`. |
+| `swatchSize` | `number` | `28` | Breite und Höhe des Swatch-Trigger-Buttons in px. |
+| `swatchShape` | `'square' \| 'circle'` | `'square'` | Form des Swatch-Trigger-Buttons. `"circle"` für Toolbar-/Icon-Grid-Kontexte. |
+| `translation` | `Partial<ColorPickerTranslation & PopoverColorPickerTranslation>` | Englische Defaults | Führt beide Translation-Maps zusammen. Der Extra-Key ist `openLabel` — das `aria-label` des Swatch-Buttons (Standard: `"Open color picker"`). |
+| *(alle anderen `ColorPicker`-Props)* | — | wie bei `ColorPicker` | Jeder `ColorPicker`-Prop funktioniert direkt — `savedColors`, `showAlpha`, `width`, `onChangeCommitted`, `format` usw. |
+
+### Formen
+
+```tsx
+{/* Quadratischer Swatch (Standard) — häufig in Einstellungs-Panels */}
+<PopoverColorPicker value={color} onChange={setColor} />
+
+{/* Runder Swatch — häufig in Toolbars und Design-Tools */}
+<PopoverColorPicker value={color} onChange={setColor} swatchShape="circle" swatchSize={32} />
+```
+
+### ColorPicker-Props durchreichen
+
+Jeder `ColorPicker`-Prop funktioniert direkt auf `PopoverColorPicker`:
+
+```tsx
+<PopoverColorPicker
+  value={color}
+  onChange={setColor}
+  savedColors={['#f44336', '#2196f3', '#4caf50']}
+  showAlpha={false}
+  width={320}
+/>
+```
+
+### CSS-Klassen
+
+```ts
+import { popoverColorPickerClasses, muiTsStateClasses } from '@thebuoyant-tsdev/mui-ts-library';
+```
+
+| Klassenname | Konstanten-Key | DOM-Element | Hinweise |
+|---|---|---|---|
+| `.MuiTsPopoverColorPicker-root` | `popoverColorPickerClasses.root` | Der `<button>`-Swatch-Trigger | Erhält zusätzlich `.MuiTs-disabled` wenn `disabled={true}` |
+| `.MuiTsPopoverColorPicker-swatch` | `popoverColorPickerClasses.swatch` | Das innere `<div>`, das die aktuelle Farbe zeigt | |
+
+```tsx
+// Beispiel: Größerer Trigger-Button mit Hover-Rahmen
+<Box sx={{
+  [`& .${popoverColorPickerClasses.root}:hover`]: {
+    borderColor: 'primary.main',
+    boxShadow: '0 0 0 2px',
+  },
+}}>
+  <PopoverColorPicker value={color} onChange={setColor} />
+</Box>
+```
+
+### Barrierefreiheit
+
+Der Swatch-Button ist ein nativer `<button>` mit:
+- `aria-expanded` — `"true"` wenn das Popover offen ist, `"false"` wenn geschlossen
+- `aria-haspopup="dialog"` — signalisiert Screenreadern ein Popup
+- `aria-label` — aus `translation.openLabel` (Standard: `"Open color picker"`)
+- Volle Tastatursteuerung: `Enter`/`Leertaste` zum Öffnen, `Escape` zum Schließen
+- Sichtbarer Focus-Ring bei Tastaturnavigation
+
+---
+
 ## Gespeicherte Farben
 
 ```tsx
@@ -331,6 +428,18 @@ type ColorPickerProps = {
   name?:              string;
   translation?:       Partial<ColorPickerTranslation>;
 };
+
+// PopoverColorPicker
+
+type PopoverColorPickerTranslation = {
+  openLabel: string; // aria-label des Swatch-Trigger-Buttons; Standard: "Open color picker"
+};
+
+type PopoverColorPickerProps = Omit<ColorPickerProps, 'translation'> & {
+  swatchSize?:   number;                     // Standard: 28
+  swatchShape?:  'square' | 'circle';        // Standard: 'square'
+  translation?:  Partial<ColorPickerTranslation & PopoverColorPickerTranslation>;
+};
 ```
 
 ---
@@ -349,7 +458,7 @@ type ColorPickerProps = {
 | Thema | Hinweis |
 |---|---|
 | **Browser-Unterstützung der Pipette** | Die [EyeDropper-API](https://developer.mozilla.org/de/docs/Web/API/EyeDropper) ist Stand jetzt nur in Chromium-basierten Browsern verfügbar (Chrome, Edge, Opera) — nicht in Safari oder Firefox. Der Button wird bei fehlender Unterstützung automatisch ausgeblendet, unabhängig von `showEyeDropper`. |
-| **Kein eingebautes Popover/Auslöser** | `ColorPicker` ist nur das Panel — siehe [In ein Popover einbetten](#in-ein-popover-einbetten) für das empfohlene Einbindungsmuster. |
+| **Kein eingebautes Popover/Auslöser in `ColorPicker`** | `ColorPicker` ist nur das Panel. Nutze [`PopoverColorPicker`](#popovercolorpicker) für das Zero-Boilerplate-Swatch-öffnet-Popover-Erlebnis, oder siehe [In ein Popover einbetten](#in-ein-popover-einbetten) für das manuelle Muster. |
 
 ---
 

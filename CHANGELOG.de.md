@@ -11,6 +11,10 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unveröffentlicht]
 
+### Hinzugefügt
+
+- **`PopoverColorPicker` — Convenience-Popover-Wrapper:** Neue Komponente, die einen farbigen Swatch-Trigger-Button mit einem MUI-Popover kombiniert, das den vollständigen `ColorPicker` enthält. Eliminiert die ~15 Zeilen `Popover`-, `anchorEl`- und Open/Close-State-Boilerplate, die jeder Consumer bisher selbst schreiben musste. Alle `ColorPicker`-Props werden direkt durchgereicht. Zwei zusätzliche Props steuern den Trigger: `swatchSize` (Standard: `28` px) und `swatchShape` (`"square"` (Standard) oder `"circle"`). Der Swatch rendert ein Schachbrettmuster-Hintergrund, damit transparente/halbtransparente Farben auf einen Blick sichtbar sind. Der Button ist vollständig barrierefrei — `aria-expanded`, `aria-haspopup="dialog"`, Tastatursteuerung, Focus-Ring und ein übersetzbares `openLabel`-aria-label (Standard: `"Open color picker"`). Zwei neue Exports: `PopoverColorPicker`-Komponente und `popoverColorPickerClasses`-Konstantenobjekt (`root`, `swatch`). Vollständig rückwärtskompatibel — `ColorPicker` ist unverändert; `PopoverColorPicker` ist ein rein additiver neuer Export.
+
 ---
 
 ## [3.25.0] — 2026-07-12

@@ -145,17 +145,17 @@ function LiveThemingStory() {
         Click any swatch to open the picker. The swatch and preview update live while you drag.
       </Typography>
 
-      <Stack direction="row" spacing={2} alignItems="center">
+      <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
         <PopoverColorPicker value={bg}     onChange={setBg}     />
         <Typography variant="body2">Background color</Typography>
       </Stack>
 
-      <Stack direction="row" spacing={2} alignItems="center">
+      <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
         <PopoverColorPicker value={text}   onChange={setText}   />
         <Typography variant="body2">Text color</Typography>
       </Stack>
 
-      <Stack direction="row" spacing={2} alignItems="center">
+      <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
         <PopoverColorPicker value={accent} onChange={setAccent} swatchShape="circle" swatchSize={32} />
         <Typography variant="body2">Accent color (circle, size 32)</Typography>
       </Stack>
