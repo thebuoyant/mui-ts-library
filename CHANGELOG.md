@@ -11,6 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [3.26.1] — 2026-07-13
+
+### Fixed
+
+- **README changelog sections (EN + DE):** The embedded changelog in `README.md` and `README.de.md` (what npmjs.com displays) was missing the `[3.25.0]` and `[3.26.0]` entries — they were added after the publish. No code changes.
+
+---
+
+## [3.26.0] — 2026-07-13
+
 ### Added
 
 - **`PopoverColorPicker` — convenience Popover wrapper:** New component that combines a colored swatch trigger button with a MUI Popover containing the full `ColorPicker`. Eliminates the ~15 lines of `Popover`, `anchorEl`, and open/close state boilerplate that every consumer previously had to write manually. All `ColorPicker` props pass through directly. Two additional props control the trigger: `swatchSize` (default `28` px) and `swatchShape` (`"square"` (default) or `"circle"`). The swatch renders a checkered background pattern so transparent/semi-transparent colors are visible at a glance. The button is fully accessible — `aria-expanded`, `aria-haspopup="dialog"`, keyboard-operable, focus ring, and a translatable `openLabel` aria-label (default: `"Open color picker"`). Two new exports: `PopoverColorPicker` component and `popoverColorPickerClasses` constants object (`root`, `swatch`). Fully backwards-compatible — `ColorPicker` is unchanged; `PopoverColorPicker` is a purely additive new export.

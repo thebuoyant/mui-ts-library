@@ -483,6 +483,13 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/):
 
 ## Changelog
 
+### [3.26.1] — 2026-07-13
+
+**Behoben**
+- README-Changelog-Abschnitte (EN + DE) fehlten auf npmjs.com die Einträge für `[3.25.0]` und `[3.26.0]`. Keine Code-Änderungen.
+
+---
+
 ### [3.26.0] — 2026-07-13
 
 **Hinzugefügt**
