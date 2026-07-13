@@ -39,6 +39,24 @@ export const DEFAULT_COLOR_PICKER_TRANSLATION: Required<ColorPickerTranslation> 
   hueSliderLabel:         "Hue",
 };
 
+export type PopoverColorPickerTranslation = {
+  /** aria-label for the swatch trigger button. */
+  openLabel: string;
+};
+
+export const DEFAULT_POPOVER_COLOR_PICKER_TRANSLATION: Required<PopoverColorPickerTranslation> = {
+  openLabel: "Open color picker",
+};
+
+export type PopoverColorPickerProps = Omit<ColorPickerProps, "translation"> & {
+  /** Size of the swatch trigger button in px (default: 28). */
+  swatchSize?: number;
+  /** Shape of the swatch button (default: `'square'`). */
+  swatchShape?: "square" | "circle";
+  /** i18n strings — merged with the inner ColorPicker translation. */
+  translation?: Partial<ColorPickerTranslation & PopoverColorPickerTranslation>;
+};
+
 export type ColorPickerProps = {
   /** Current color — accepts hex (#rgb, #rgba, #rrggbb, #rrggbbaa), rgb()/rgba(), or hsl()/hsla(). */
   value:                string;
