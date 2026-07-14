@@ -483,6 +483,16 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/):
 
 ## Changelog
 
+### [3.27.0] — 2026-07-14
+
+**Hinzugefügt**
+- Hover-Callbacks für alle 6 D3-Charts (`onSegmentHover`, `onGroupHover`, `onChordHover`, `onNodeHover`, `onCircleHover`, `onBarHover`) — feuern mit typisiertem Info-Objekt bei `mouseenter`, `null` bei `mouseleave`. Ermöglicht Linked-View-Muster. Alle Props optional, vollständig abwärtskompatibel.
+
+**Behoben**
+- `GanttChart`: `showAssigneeColumn={true}` lässt die Name-Spalte nicht mehr auf ~24 px zusammenfallen. Die initiale Panel-Breite addiert nun automatisch `ASSIGNEE_COL_WIDTH` (110 px) wenn die Spalte aktiviert ist.
+
+---
+
 ### [3.26.1] — 2026-07-13
 
 **Behoben**
