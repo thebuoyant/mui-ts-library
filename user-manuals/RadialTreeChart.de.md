@@ -130,6 +130,7 @@ function App() {
 | `showNodePopover` | `boolean` | `false` | Eingebautes MUI-Popover bei Knotenklick öffnen |
 | `renderNodePopoverContent` | `(info) => ReactNode` | — | Custom Popover-Inhalt (ersetzt Standard) |
 | `onNodeClick` | `(info, event) => void` | — | Wird bei normalem Klick ausgelöst |
+| `onNodeHover` | `(info \| null, event) => void` | — | Maus betritt/verlässt Knoten — `null` beim Verlassen. *Seit v3.27.0* |
 | `disabled` | `boolean` | `false` | Deaktiviert alle Interaktionen, reduziert Opacity |
 | `translation` | `Partial<RadialTreeChartTranslation>` | EN-Standard | Translation-Strings überschreiben |
 
@@ -267,7 +268,8 @@ type RadialTreeChartTranslation = {
 
 | Geste | Aktion | Benötigt |
 |---|---|---|
-| **Hover** über Knoten | MUI-Tooltip am Mauszeiger — zeigt Name, Subname, Datenwerte | immer |
+| **Hover** über Knoten | MUI-Tooltip + löst `onNodeHover(info, event)` aus | immer |
+| **Mouse leave** Knoten | Löst `onNodeHover(null, event)` aus | immer |
 | **Klick** auf Knoten | Löst `onNodeClick` aus + öffnet Popover wenn `showNodePopover` | immer |
 | **Ctrl / Cmd ⌘ + Klick** auf Branch-Knoten | Drill-Down in Teilbaum (250 ms Timer für DblClick-Unterscheidung) | `drillable` |
 | **Ctrl / Cmd ⌘ + Doppelklick** | Zoom out eine Ebene | `drillable` |
@@ -338,6 +340,8 @@ Das Standard-Popover zeigt Avatar mit Namenskürzel, Namen, Subname und beide So
 >
 > | Aktion | Ausgelöste Callbacks |
 > |---|---|
+> | Hover über Knoten | `onNodeHover(info, event)` |
+> | Mouse leave Knoten | `onNodeHover(null, event)` |
 > | Normaler Klick auf einen Knoten | `onNodeClick` |
 > | Strg / Cmd ⌘+Klick zum Drill-in eines Branch-Knotens | `onFocusChange` |
 > | Strg / Cmd ⌘+Doppelklick zum Drill-out | `onFocusChange` |
@@ -345,6 +349,7 @@ Das Standard-Popover zeigt Avatar mit Namenskürzel, Namen, Subname und beide So
 
 | Callback | Signatur | Wann ausgelöst | Verwenden wenn... |
 |---|---|---|---|
+| `onNodeHover` | `(info: RadialTreeNodeInfo \| null, event: React.MouseEvent) => void` | Maus betritt/verlässt Knoten — `null` beim Verlassen | Verknüpfte Ansichten: gleichen Knoten in einem anderen Chart hervorheben |
 | `onNodeClick` | `(info: RadialTreeNodeInfo, event: React.MouseEvent) => void` | Normaler Klick auf einen Knoten (ohne Strg/Cmd) | Detail-Panel oder Popover für den geklickten Knoten anzeigen |
 | `onFocusChange` | `(info: RadialTreeNodeInfo \| null) => void` | Drill-Down-Fokus wechselt via Strg/Cmd+Klick oder Escape. `null` bei Reset auf Root | Drill-Down-Tiefe verfolgen, Breadcrumb-Navigation |
 

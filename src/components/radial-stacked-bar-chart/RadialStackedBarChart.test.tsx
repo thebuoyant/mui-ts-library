@@ -203,4 +203,30 @@ describe("RadialStackedBarChart", () => {
     const formatted = screen.queryAllByText(/^€\d/);
     expect(formatted.length).toBeGreaterThanOrEqual(1);
   });
+
+  // ── onBarHover ─────────────────────────────────────────────────────────────
+
+  describe("onBarHover", () => {
+    it("calls onBarHover with bar info on mouse enter", () => {
+      const onBarHover = vi.fn();
+      render(<RadialStackedBarChart data={DATA} keys={KEYS} onBarHover={onBarHover} />);
+      const paths = document.querySelectorAll<SVGPathElement>("path[d]");
+      const barPath = Array.from(paths).find((p) => p.getAttribute("d") && p.getAttribute("d")!.length > 5);
+      fireEvent.mouseEnter(barPath!);
+      expect(onBarHover).toHaveBeenCalledOnce();
+      expect(onBarHover.mock.calls[0][0]).not.toBeNull();
+      expect(onBarHover.mock.calls[0][0]).toMatchObject({ id: expect.any(String), seriesKey: expect.any(String) });
+    });
+
+    it("calls onBarHover with null on mouse leave", () => {
+      const onBarHover = vi.fn();
+      render(<RadialStackedBarChart data={DATA} keys={KEYS} onBarHover={onBarHover} />);
+      const paths = document.querySelectorAll<SVGPathElement>("path[d]");
+      const barPath = Array.from(paths).find((p) => p.getAttribute("d") && p.getAttribute("d")!.length > 5);
+      fireEvent.mouseEnter(barPath!);
+      fireEvent.mouseLeave(barPath!);
+      expect(onBarHover).toHaveBeenCalledTimes(2);
+      expect(onBarHover.mock.calls[1][0]).toBeNull();
+    });
+  });
 });

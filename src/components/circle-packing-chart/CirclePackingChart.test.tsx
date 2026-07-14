@@ -183,4 +183,28 @@ describe("CirclePackingChart", () => {
       expect(document.querySelector("svg")?.textContent).not.toContain("No data");
     });
   });
+
+  // ── onCircleHover ──────────────────────────────────────────────────────────
+
+  describe("onCircleHover", () => {
+    it("calls onCircleHover with node info on mouse enter", () => {
+      const onCircleHover = vi.fn();
+      render(<CirclePackingChart data={SIMPLE_DATA} onCircleHover={onCircleHover} />);
+      const circles = document.querySelectorAll<SVGCircleElement>("circle");
+      fireEvent.mouseEnter(circles[1]!);
+      expect(onCircleHover).toHaveBeenCalledOnce();
+      expect(onCircleHover.mock.calls[0][0]).not.toBeNull();
+      expect(onCircleHover.mock.calls[0][0]).toMatchObject({ name: expect.any(String) });
+    });
+
+    it("calls onCircleHover with null on mouse leave", () => {
+      const onCircleHover = vi.fn();
+      render(<CirclePackingChart data={SIMPLE_DATA} onCircleHover={onCircleHover} />);
+      const circles = document.querySelectorAll<SVGCircleElement>("circle");
+      fireEvent.mouseEnter(circles[1]!);
+      fireEvent.mouseLeave(circles[1]!);
+      expect(onCircleHover).toHaveBeenCalledTimes(2);
+      expect(onCircleHover.mock.calls[1][0]).toBeNull();
+    });
+  });
 });

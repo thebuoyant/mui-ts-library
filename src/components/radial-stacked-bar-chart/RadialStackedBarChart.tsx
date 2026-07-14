@@ -91,6 +91,7 @@ export function RadialStackedBarChart({
   gridValueFormatter,
   zoomable = false,
   onBarClick,
+  onBarHover,
   disabled = false,
   translation,
 }: RadialStackedBarChartProps) {
@@ -414,10 +415,22 @@ export function RadialStackedBarChart({
                           transition: "opacity 0.15s",
                         }}
                         onMouseEnter={(e) => {
-                          if (!disabled) (e.currentTarget as SVGPathElement).style.opacity = "0.75";
+                          if (disabled) return;
+                          (e.currentTarget as SVGPathElement).style.opacity = "0.75";
+                          const total = d3.sum(seriesKeys, (k) => barDatum.values[k] ?? 0);
+                          const info: RadialStackedBarBarInfo = {
+                            id:        barDatum.id,
+                            label:     barDatum.label,
+                            seriesKey,
+                            value:     barDatum.values[seriesKey] ?? 0,
+                            total,
+                            values:    barDatum.values,
+                          };
+                          onBarHover?.(info, e);
                         }}
                         onMouseLeave={(e) => {
                           (e.currentTarget as SVGPathElement).style.opacity = "1";
+                          onBarHover?.(null, e);
                         }}
                         onClick={(e) => {
                           if (disabled) return;

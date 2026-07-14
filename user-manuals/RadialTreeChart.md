@@ -131,6 +131,7 @@ function App() {
 | `showNodePopover` | `boolean` | `false` | Open built-in MUI Popover on node click |
 | `renderNodePopoverContent` | `(info) => ReactNode` | — | Custom popover content (replaces default) |
 | `onNodeClick` | `(info, event) => void` | — | Fires on every regular click |
+| `onNodeHover` | `(info \| null, event) => void` | — | Fires on mouse enter/leave of a node — `null` on leave. *Since v3.27.0* |
 | `disabled` | `boolean` | `false` | Mutes all interactions, reduces opacity |
 | `translation` | `Partial<RadialTreeChartTranslation>` | EN defaults | Override translation strings |
 
@@ -274,7 +275,8 @@ type RadialTreeChartTranslation = {
 
 | Gesture | Action | Requires |
 |---|---|---|
-| **Hover** any node | MUI tooltip near cursor — shows name, subname, data values | always |
+| **Hover** any node | MUI tooltip near cursor — fires `onNodeHover(info, event)` | always |
+| **Mouse leave** node | Fires `onNodeHover(null, event)` | always |
 | **Click** any node | Fires `onNodeClick` + opens popover if `showNodePopover` | always |
 | **Ctrl / Cmd ⌘ + Click** on branch node | Drill-down into subtree (250 ms to distinguish from DblClick) | `drillable` |
 | **Ctrl / Cmd ⌘ + DblClick** | Zoom out one level | `drillable` |
@@ -345,6 +347,8 @@ The default popover shows an Avatar with the name initial, the node name and sub
 >
 > | Action | Callbacks fired |
 > |---|---|
+> | Hover over a node | `onNodeHover(info, event)` |
+> | Mouse leave a node | `onNodeHover(null, event)` |
 > | Regular click on a node | `onNodeClick` |
 > | Ctrl / Cmd ⌘+Click to drill into a branch node | `onFocusChange` |
 > | Ctrl / Cmd ⌘+DblClick to drill out | `onFocusChange` |
@@ -352,6 +356,7 @@ The default popover shows an Avatar with the name initial, the node name and sub
 
 | Callback | Signature | When it fires | Use it when... |
 |---|---|---|---|
+| `onNodeHover` | `(info: RadialTreeNodeInfo \| null, event: React.MouseEvent) => void` | Mouse enter/leave a node — `null` on leave | Linked views: highlight the same node in another chart or list |
 | `onNodeClick` | `(info: RadialTreeNodeInfo, event: React.MouseEvent) => void` | Regular click on any node (not Ctrl/Cmd) | Showing a detail panel or popover for the clicked node |
 | `onFocusChange` | `(info: RadialTreeNodeInfo \| null) => void` | Drill-down focus changes via Ctrl/Cmd+Click or Escape. `null` when reset to root | Tracking drill-down depth, breadcrumb navigation |
 

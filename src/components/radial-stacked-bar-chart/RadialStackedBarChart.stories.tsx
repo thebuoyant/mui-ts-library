@@ -46,6 +46,7 @@ const meta: Meta<typeof RadialStackedBarChart> = {
     valueThousandsSeparator: ",",
     zoomable:                false,
     onBarClick:              fn(),
+    onBarHover:              fn(),
   },
   parameters: {
     controls: { sort: "alpha" },

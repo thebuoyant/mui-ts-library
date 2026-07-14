@@ -92,8 +92,12 @@ export type ChordChartProps = {
   valueFormatter?:          (value: number) => string;
   /** Fired on click of a group arc */
   onGroupClick?:            (info: ChordGroupInfo, event: React.MouseEvent<SVGGElement>) => void;
+  /** Fired on mouse enter/leave a group arc — `null` on leave. Use for linked-view highlighting. */
+  onGroupHover?:            (info: ChordGroupInfo | null, event: React.MouseEvent<SVGGElement> | null) => void;
   /** Fired on click of a ribbon */
   onChordClick?:            (info: ChordInfo, event: React.MouseEvent<SVGPathElement>) => void;
+  /** Fired on mouse enter/leave a ribbon — `null` on leave. Use for linked-view highlighting. */
+  onChordHover?:            (info: ChordInfo | null, event: React.MouseEvent<SVGPathElement> | null) => void;
   /** Enable Ctrl / Cmd ⌘ + Scroll visual zoom — clips content at `size` boundary (default: false) */
   zoomable?:                boolean;
   /** Disables all interactions (default: false) */

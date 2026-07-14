@@ -117,6 +117,7 @@ export function RadialTreeChart({
   showNodePopover = false,
   renderNodePopoverContent,
   onNodeClick,
+  onNodeHover,
   disabled = false,
   translation,
 }: RadialTreeChartProps) {
@@ -583,8 +584,16 @@ export function RadialTreeChart({
                     transform={`rotate(${(node.x * 180) / Math.PI - 90}) translate(${node.y},0)`}
                     onClick={handleNodeClick}
                     onDoubleClick={handleNodeDblClick}
-                    onMouseEnter={() => !disabled && setHoverIdx(i)}
-                    onMouseLeave={() => setHoverIdx(null)}
+                    onMouseEnter={(e) => {
+                      if (!disabled) {
+                        setHoverIdx(i);
+                        onNodeHover?.(info, e);
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      setHoverIdx(null);
+                      onNodeHover?.(null, e);
+                    }}
                     style={{ cursor: disabled ? "not-allowed" : "pointer" }}
                   >
                     {/* Large invisible hit area — ensures hover detection on small nodes */}

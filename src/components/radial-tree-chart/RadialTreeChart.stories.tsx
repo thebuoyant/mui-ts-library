@@ -58,6 +58,7 @@ const meta: Meta<typeof RadialTreeChart> = {
     sortBy:            "name",
     zoomable:          false,
     onNodeClick:       fn(),
+    onNodeHover:       fn(),
   },
   parameters: {
     controls: { sort: 'alpha' },

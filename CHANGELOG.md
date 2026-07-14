@@ -11,6 +11,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Hover callbacks for all 6 D3 charts** — each chart now supports a hover callback that fires on `mouseenter` (with a typed info object) and `mouseLeave` (with `null`), enabling linked-view patterns where hovering in one chart highlights the corresponding entry in another:
+  - `SunburstChart`: `onSegmentHover?(info: SunburstSegmentInfo | null, event) => void`
+  - `ChordChart`: `onGroupHover?(info: ChordGroupInfo | null, event) => void` + `onChordHover?(info: ChordInfo | null, event) => void`
+  - `RadialTreeChart`: `onNodeHover?(info: RadialTreeNodeInfo | null, event) => void`
+  - `CirclePackingChart`: `onCircleHover?(info: CirclePackingNodeInfo | null, event) => void`
+  - `HorizontalTreeChart`: `onNodeHover?(info: HorizontalTreeNodeInfo | null, event) => void`
+  - `RadialStackedBarChart`: `onBarHover?(info: RadialStackedBarBarInfo | null, event) => void`
+
+### Fixed
+
+- **GanttChart — Assignee column panel width:** When `showAssigneeColumn={true}` was set, the task name column shrank to ~24 px (Assignee 110 + Actions 96 + Status 90 = 296 of the default 320 px), causing the status dot to visually overlap the first character of task names. The initial panel width now automatically adds `ASSIGNEE_COL_WIDTH` (110 px) when the column is enabled. No API change.
+
 ---
 
 ## [3.26.1] — 2026-07-13

@@ -123,6 +123,7 @@ function App() {
 | `chartColors` | `string[]` | MUI-Palette | Eigene Farbpalette für Top-Level-Segmente |
 | `showRootLabel` | `boolean` | `true` | Aktuellen Fokus-Knotennamen im Zentrum anzeigen |
 | `onSegmentClick` | `(info, event) => void` | — | Wird bei jedem normalen Klick ausgelöst |
+| `onSegmentHover` | `(info \| null, event) => void` | — | Maus betritt/verlässt Segment — `null` beim Verlassen. *Seit v3.27.0* |
 | `onZoomChange` | `(zoom: SunburstZoomInfo) => void` | — | Wird bei Drill-Down-Wechsel ausgelöst (Ctrl / Cmd ⌘+Click, Ctrl / Cmd ⌘+DblClick, Escape) |
 | `zoomable` | `boolean` | `false` | `Ctrl / Cmd ⌘ + Scroll` visueller Zoom — clippt am `size`-Rand |
 | `duration` | `number` | `750` | Dauer des Drill-in/out-Übergangs in ms. `0` deaktiviert die Animation (sofortiger Sprung). |
@@ -174,6 +175,8 @@ type SunburstChartTranslation = {
 
 | Geste | Aktion |
 |---|---|
+| **Hover** Segment | Löst `onSegmentHover(info, event)` aus |
+| **Mouse leave** Segment | Löst `onSegmentHover(null, event)` aus |
 | **Klick** | Löst `onSegmentClick` sofort aus — kein Delay |
 | **Ctrl+Klick** / **Cmd ⌘+Klick** auf Elternsegment | Drill-Down — dieses Segment wird zum neuen Zentrum |
 | **Ctrl+Doppelklick** / **Cmd ⌘+Doppelklick** | Zoom out eine Ebene |
@@ -304,6 +307,8 @@ const data: SunburstChartData = {
 >
 > | Aktion | Ausgelöste Callbacks |
 > |---|---|
+> | Hover über Segment | `onSegmentHover(info, event)` |
+> | Mouse leave Segment | `onSegmentHover(null, event)` |
 > | Klick auf ein Segment | `onSegmentClick` |
 > | Strg / Cmd ⌘+Klick zum Zoom in ein Segment | `onZoomChange` |
 > | Klick auf Mittelpunkt-Label / Donut-Loch zum Herauszoomen | `onZoomChange` |
@@ -311,6 +316,7 @@ const data: SunburstChartData = {
 
 | Callback | Signatur | Wann ausgelöst | Verwenden wenn... |
 |---|---|---|---|
+| `onSegmentHover` | `(info: SunburstSegmentInfo \| null, event: React.MouseEvent) => void` | Maus betritt/verlässt Segment — `null` beim Verlassen | Verknüpfte Ansichten: gleichen Knoten in einem anderen Chart hervorheben |
 | `onSegmentClick` | `(info: SunburstSegmentInfo, event: React.MouseEvent) => void` | Normaler Klick auf einen Segment-Bogen oder das Mittelpunkt-Label | Detail-Panel anzeigen, zu einer gefilterten Ansicht navigieren |
 | `onZoomChange` | `(zoom: SunburstZoomInfo) => void` | Fokus wechselt: Strg/Cmd+Klick Zoom-in, Mittelpunkt-Klick Zoom-out oder Escape-Reset | Drill-Down-State verfolgen, Breadcrumb-Navigation |
 

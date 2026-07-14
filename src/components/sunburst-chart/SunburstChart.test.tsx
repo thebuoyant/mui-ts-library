@@ -213,4 +213,36 @@ describe("SunburstChart", () => {
       vi.useRealTimers();
     });
   });
+
+  // ── onSegmentHover ────────────────────────────────────────────────────────
+
+  describe("onSegmentHover", () => {
+    it("calls onSegmentHover with segment info on mouse enter", () => {
+      const onSegmentHover = vi.fn();
+      render(<SunburstChart data={SIMPLE_DATA} onSegmentHover={onSegmentHover} />);
+      const path = document.querySelector<SVGPathElement>("path[data-idx='0']");
+      fireEvent.mouseEnter(path!);
+      expect(onSegmentHover).toHaveBeenCalledOnce();
+      expect(onSegmentHover.mock.calls[0][0]).not.toBeNull();
+      expect(onSegmentHover.mock.calls[0][0]).toMatchObject({ depth: expect.any(Number) });
+    });
+
+    it("calls onSegmentHover with null on mouse leave", () => {
+      const onSegmentHover = vi.fn();
+      render(<SunburstChart data={SIMPLE_DATA} onSegmentHover={onSegmentHover} />);
+      const path = document.querySelector<SVGPathElement>("path[data-idx='0']");
+      fireEvent.mouseEnter(path!);
+      fireEvent.mouseLeave(path!);
+      expect(onSegmentHover).toHaveBeenCalledTimes(2);
+      expect(onSegmentHover.mock.calls[1][0]).toBeNull();
+    });
+
+    it("does not call onSegmentHover when disabled", () => {
+      const onSegmentHover = vi.fn();
+      render(<SunburstChart data={SIMPLE_DATA} onSegmentHover={onSegmentHover} disabled />);
+      const path = document.querySelector<SVGPathElement>("path[data-idx='0']");
+      fireEvent.mouseEnter(path!);
+      expect(onSegmentHover).not.toHaveBeenCalled();
+    });
+  });
 });

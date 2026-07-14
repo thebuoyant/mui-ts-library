@@ -11,6 +11,20 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unveröffentlicht]
 
+### Hinzugefügt
+
+- **Hover-Callbacks für alle 6 D3-Charts** — jeder Chart unterstützt jetzt einen Hover-Callback, der bei `mouseenter` (mit typisiertem Info-Objekt) und `mouseLeave` (mit `null`) feuert. Damit lassen sich Linked-View-Muster umsetzen, bei denen ein Hover in einem Chart den entsprechenden Eintrag in einem anderen hervorhebt:
+  - `SunburstChart`: `onSegmentHover?(info: SunburstSegmentInfo | null, event) => void`
+  - `ChordChart`: `onGroupHover?(info: ChordGroupInfo | null, event) => void` + `onChordHover?(info: ChordInfo | null, event) => void`
+  - `RadialTreeChart`: `onNodeHover?(info: RadialTreeNodeInfo | null, event) => void`
+  - `CirclePackingChart`: `onCircleHover?(info: CirclePackingNodeInfo | null, event) => void`
+  - `HorizontalTreeChart`: `onNodeHover?(info: HorizontalTreeNodeInfo | null, event) => void`
+  - `RadialStackedBarChart`: `onBarHover?(info: RadialStackedBarBarInfo | null, event) => void`
+
+### Behoben
+
+- **GanttChart — Assignee-Spalten-Panelbreite:** Wenn `showAssigneeColumn={true}` gesetzt war, schrumpfte die Name-Spalte auf ~24 px (Assignee 110 + Aktionen 96 + Status 90 = 296 von den Standard-320 px). Dadurch überlagerte der Status-Punkt visuell den ersten Buchstaben von Aufgabennamen. Die initiale Panel-Breite addiert nun automatisch `ASSIGNEE_COL_WIDTH` (110 px), wenn die Spalte aktiviert ist. Keine API-Änderung.
+
 ---
 
 ## [3.26.1] — 2026-07-13

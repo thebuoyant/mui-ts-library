@@ -123,6 +123,7 @@ function App() {
 | `chartColors` | `string[]` | MUI palette | Custom top-level color palette |
 | `showRootLabel` | `boolean` | `true` | Show current focus node name in center |
 | `onSegmentClick` | `(info, event) => void` | — | Fires on every regular click |
+| `onSegmentHover` | `(info \| null, event) => void` | — | Fires on mouse enter/leave of a segment — `null` on leave. *Since v3.27.0* |
 | `onZoomChange` | `(zoom: SunburstZoomInfo) => void` | — | Fires when drill-down focus changes (Ctrl / Cmd ⌘+Click, Ctrl / Cmd ⌘+DblClick, Escape) |
 | `zoomable` | `boolean` | `false` | Enable `Ctrl / Cmd ⌘ + Scroll` visual zoom — clips content at `size` boundary |
 | `duration` | `number` | `750` | Drill-in/out transition duration in ms. `0` disables the animation (instant jump). |
@@ -174,6 +175,8 @@ type SunburstChartTranslation = {
 
 | Gesture | Action |
 |---|---|
+| **Hover** segment | Fires `onSegmentHover(info, event)` |
+| **Mouse leave** segment | Fires `onSegmentHover(null, event)` |
 | **Click** | Fires `onSegmentClick` immediately — no delay |
 | **Ctrl+Click** / **Cmd ⌘+Click** on a parent segment | Drill-down — that segment becomes the new center |
 | **Ctrl+Double-click** / **Cmd ⌘+Double-click** | Zoom out one level |
@@ -311,6 +314,8 @@ const data: SunburstChartData = {
 >
 > | Action | Callbacks fired |
 > |---|---|
+> | Hover over a segment | `onSegmentHover(info, event)` |
+> | Mouse leave a segment | `onSegmentHover(null, event)` |
 > | Click on a segment | `onSegmentClick` |
 > | Ctrl / Cmd ⌘+Click to zoom into a segment | `onZoomChange` |
 > | Click center label / donut hole to zoom out | `onZoomChange` |
@@ -318,12 +323,18 @@ const data: SunburstChartData = {
 
 | Callback | Signature | When it fires | Use it when... |
 |---|---|---|---|
+| `onSegmentHover` | `(info: SunburstSegmentInfo \| null, event: React.MouseEvent) => void` | Mouse enter/leave a segment — `null` on leave | Linked views: highlight the same segment in another chart or table |
 | `onSegmentClick` | `(info: SunburstSegmentInfo, event: React.MouseEvent) => void` | Regular click on a segment arc or center label | Showing a detail panel, navigating to a filtered view |
 | `onZoomChange` | `(zoom: SunburstZoomInfo) => void` | Focus changes: Ctrl/Cmd+Click zoom-in, center click zoom-out, or Escape reset | Tracking drill-down state, breadcrumb navigation |
 
 ```tsx
 <SunburstChart
   data={data}
+  onSegmentHover={(info, event) => {
+    // info is null on mouse leave — use to clear linked-view highlighting
+    if (info) setHighlightedId(info.id);
+    else setHighlightedId(null);
+  }}
   onSegmentClick={(info, event) => {
     console.log(info.id);            // "frontend"
     console.log(info.name);          // "Frontend"

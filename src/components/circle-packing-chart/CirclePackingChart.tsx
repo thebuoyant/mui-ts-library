@@ -39,6 +39,7 @@ export function CirclePackingChart({
   zoomable = false,
   disabled = false,
   onCircleClick,
+  onCircleHover,
   onZoomChange,
   valueFormatter,
   translation,
@@ -400,8 +401,16 @@ export function CirclePackingChart({
                       stroke={d.data.colorConfig?.stroke ?? theme.palette.background.paper}
                       strokeWidth={0.75}
                       style={{ cursor: disabled ? "not-allowed" : d.children ? "pointer" : "default", transition: "stroke-width 0.1s" }}
-                      onMouseEnter={(e) => { if (!disabled) e.currentTarget.style.strokeWidth = "2"; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.strokeWidth = "0.75"; }}
+                      onMouseEnter={(e) => {
+                        if (!disabled) {
+                          e.currentTarget.style.strokeWidth = "2";
+                          onCircleHover?.(info, e);
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.strokeWidth = "0.75";
+                        onCircleHover?.(null, e);
+                      }}
                       onClick={(e) => {
                         if (disabled) return;
                         if (e.ctrlKey || e.metaKey) {

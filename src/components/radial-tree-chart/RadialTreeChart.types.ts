@@ -87,6 +87,8 @@ export type RadialTreeChartProps = {
   renderNodePopoverContent?: (info: RadialTreeNodeInfo) => React.ReactNode;
   /** Fired on every node click */
   onNodeClick?:              (info: RadialTreeNodeInfo, event: React.MouseEvent<SVGGElement>) => void;
+  /** Fired on mouse enter/leave a node — `null` on leave. Use for linked-view highlighting. */
+  onNodeHover?:              (info: RadialTreeNodeInfo | null, event: React.MouseEvent<SVGGElement> | null) => void;
   /** Enable Ctrl+Scroll zoom — Ctrl+Wheel zooms in/out, Escape resets (default: false) */
   zoomable?:                 boolean;
   /** Enable Ctrl+Click drill-down into subtrees, Ctrl+DblClick zoom out (default: false) */

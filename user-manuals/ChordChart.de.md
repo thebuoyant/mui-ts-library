@@ -113,7 +113,9 @@ function App() {
 | `valueThousandsSeparator` | `string` | `','` | Tausendertrennzeichen |
 | `valueFormatter` | `(value: number) => string` | — | Eigene Formatierungsfunktion für alle Tooltip-Werte. Überschreibt `valueDecimalCount` / `valueDecimalSeparator` / `valueThousandsSeparator`. *Ab v3.22.0* |
 | `onGroupClick` | `(info, event) => void` | — | Klick auf einen Arc |
+| `onGroupHover` | `(info \| null, event) => void` | — | Maus betritt/verlässt Arc — `null` beim Verlassen. *Seit v3.27.0* |
 | `onChordClick` | `(info, event) => void` | — | Klick auf ein Band |
+| `onChordHover` | `(info \| null, event) => void` | — | Maus betritt/verlässt Band — `null` beim Verlassen. *Seit v3.27.0* |
 | `zoomable` | `boolean` | `false` | `Ctrl / Cmd ⌘ + Scroll` visueller Zoom — clippt am `size`-Rand |
 | `disabled` | `boolean` | `false` | Deaktiviert alle Interaktionen, reduziert Opacity |
 | `translation` | `Partial<ChordChartTranslation>` | EN-Standard | Translation-Strings überschreiben |
@@ -154,8 +156,10 @@ type ChordChartTranslation = {
 
 | Geste | Aktion |
 |---|---|
-| **Hover** Arc-Gruppe | Hebt die Bänder der Gruppe hervor, dimmt alle anderen |
-| **Mouse leave** | Stellt alle Band-Opacities wieder her |
+| **Hover** Arc-Gruppe | Hebt Bänder hervor, dimmt andere — löst `onGroupHover(info, event)` aus |
+| **Mouse leave** Arc-Gruppe | Stellt Band-Opacities wieder her — löst `onGroupHover(null, event)` aus |
+| **Hover** Band | Löst `onChordHover(info, event)` aus |
+| **Mouse leave** Band | Löst `onChordHover(null, event)` aus |
 | **Klick** Arc-Gruppe | Löst `onGroupClick` mit `ChordGroupInfo` aus |
 | **Klick** Band | Löst `onChordClick` mit `ChordInfo` aus |
 
@@ -261,22 +265,37 @@ function MyChart({ data }) {
 >
 > | Aktion | Ausgelöste Callbacks |
 > |---|---|
+> | Hover über Gruppen-Bogen | `onGroupHover(info, event)` |
+> | Mouse leave Gruppen-Bogen | `onGroupHover(null, event)` |
+> | Hover über Ribbon | `onChordHover(info, event)` |
+> | Mouse leave Ribbon | `onChordHover(null, event)` |
 > | Klick auf einen Gruppen-Bogen | `onGroupClick` |
 > | Klick auf ein Ribbon (Chord) | `onChordClick` |
 
 | Callback | Signatur | Wann ausgelöst | Verwenden wenn... |
 |---|---|---|---|
+| `onGroupHover` | `(info: ChordGroupInfo \| null, event: React.MouseEvent) => void` | Maus betritt/verlässt Gruppen-Bogen — `null` beim Verlassen | Verknüpfte Ansichten: gleiche Gruppe in einem anderen Chart hervorheben |
 | `onGroupClick` | `(info: ChordGroupInfo, event: React.MouseEvent) => void` | Klick auf einen Gruppen-Bogen | Ansicht nach geklickter Gruppe filtern, Gruppendetails anzeigen |
+| `onChordHover` | `(info: ChordInfo \| null, event: React.MouseEvent) => void` | Maus betritt/verlässt Ribbon — `null` beim Verlassen | Verknüpfte Ansichten: gleichen Fluss in Tabelle oder zweitem Chart hervorheben |
 | `onChordClick` | `(info: ChordInfo, event: React.MouseEvent) => void` | Klick auf ein Ribbon zwischen zwei Gruppen | Flussdetails zwischen Quelle und Ziel anzeigen |
 
 ```tsx
 <ChordChart
   data={data}
+  onGroupHover={(info, event) => {
+    // info ist null beim Verlassen — zum Zurücksetzen der verknüpften Ansicht
+    if (info) setHighlightedGroup(info.name);
+    else setHighlightedGroup(null);
+  }}
   onGroupClick={(info, event) => {
     console.log(info.name);     // "Frontend"
     console.log(info.valueOut); // Gesamt-Ausgang
     console.log(info.valueIn);  // Gesamt-Eingang
     console.log(info.index);    // Position im sortierten Namen-Array
+  }}
+  onChordHover={(info, event) => {
+    if (info) console.log(info.source.name, '→', info.target.name);
+    else console.log('Hover beendet');
   }}
   onChordClick={(info, event) => {
     console.log(info.source.name, '→', info.target.name); // "Frontend → Backend"

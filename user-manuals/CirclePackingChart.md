@@ -109,6 +109,7 @@ function App() {
 | `zoomable` | `boolean` | `false` | Enable `Ctrl / Cmd ⌘ + Scroll` visual zoom — clips at `size` boundary |
 | `disabled` | `boolean` | `false` | Mutes all interactions |
 | `onCircleClick` | `(info, event) => void` | — | Fires on single click |
+| `onCircleHover` | `(info \| null, event) => void` | — | Fires on mouse enter/leave of a circle — `null` on leave. *Since v3.27.0* |
 | `onZoomChange` | `(zoom) => void` | — | Fires on every zoom transition |
 | `valueFormatter` | `(value: number) => string` | `toLocaleString()` | Custom formatter for the value shown in tooltips. When set, overrides the built-in `toLocaleString()`. *Since v3.22.0* |
 | `translation` | `Partial<CirclePackingTranslation>` | EN defaults | Override strings |
@@ -153,6 +154,8 @@ type CirclePackingSortBy = 'value' | 'name';
 | **Double-click** the background | Animated zoom out one level |
 | **Alt+Double-click** | Same as double-click but 10× slower — great for demos |
 | **Single click** a circle | Fires `onCircleClick` immediately |
+| **Hover** a circle | Fires `onCircleHover(info, event)` |
+| **Mouse leave** circle | Fires `onCircleHover(null, event)` |
 
 The zoom uses D3's `d3.interpolateZoom` — a genuine smooth "wipe" animation that repositions and resizes all circles, not a simple SVG scale. Labels of the newly focused node's direct children fade in; all others fade out. Set `duration={0}` to make the zoom effectively instant.
 
@@ -254,6 +257,8 @@ This is consistent with `SunburstChart`, `RadialTreeChart`, and `ChordChart` —
 >
 > | Action | Callbacks fired |
 > |---|---|
+> | Hover over a circle | `onCircleHover(info, event)` |
+> | Mouse leave a circle | `onCircleHover(null, event)` |
 > | Regular click on a circle | `onCircleClick` |
 > | Ctrl / Cmd ⌘+Click to zoom in | `onZoomChange` |
 > | Ctrl / Cmd ⌘+DblClick to zoom out | `onZoomChange` |
@@ -261,6 +266,7 @@ This is consistent with `SunburstChart`, `RadialTreeChart`, and `ChordChart` —
 
 | Callback | Signature | When it fires | Use it when... |
 |---|---|---|---|
+| `onCircleHover` | `(info: CirclePackingNodeInfo \| null, event: React.MouseEvent) => void` | Mouse enter/leave a circle — `null` on leave | Linked views: highlight the same node in another chart or table |
 | `onCircleClick` | `(info: CirclePackingNodeInfo, event: React.MouseEvent) => void` | Regular click on a circle (not Ctrl/Cmd) | Showing node details, filtering a dashboard |
 | `onZoomChange` | `(zoom: CirclePackingZoomInfo) => void` | Focus changes: Ctrl/Cmd+Click zoom-in, Ctrl/Cmd+DblClick zoom-out, Escape reset | Tracking drill-down state, breadcrumb navigation |
 

@@ -94,6 +94,7 @@ export function HorizontalTreeChart({
   showNodePopover = false,
   renderNodePopoverContent,
   onNodeClick,
+  onNodeHover,
   duration = 750,
   disabled = false,
   translation,
@@ -486,6 +487,8 @@ export function HorizontalTreeChart({
                   transform={`translate(${pos.x},${pos.y})`}
                   onClick={(e) => handleNodeClick(node, e)}
                   onDoubleClick={(e) => handleNodeDblClick(node, e)}
+                  onMouseEnter={(e) => { if (!disabled) onNodeHover?.(serialize(node), e); }}
+                  onMouseLeave={(e) => { onNodeHover?.(null, e); }}
                   style={{ cursor: disabled ? "not-allowed" : "pointer" }}
                 >
                   {/* Hit area */}
