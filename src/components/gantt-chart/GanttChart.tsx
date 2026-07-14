@@ -12,7 +12,7 @@ import type { GanttTimeScale } from "./GanttChart.types";
 import { GanttTaskPanel } from "./GanttTaskPanel";
 import { GanttTimeline } from "./GanttTimeline";
 import { GanttToolbar } from "./GanttToolbar";
-import { LEFT_PANEL_WIDTH, ASSIGNEE_COL_WIDTH, DIVIDER_WIDTH } from "./GanttChart.constants";
+import { LEFT_PANEL_WIDTH, ASSIGNEE_COL_WIDTH, ACTIONS_COL_WIDTH, STATUS_COL_WIDTH, DIVIDER_WIDTH } from "./GanttChart.constants";
 
 // ---------------------------------------------------------------------------
 // Store-Kontext
@@ -143,6 +143,13 @@ function GanttChartInner({
   const [panelWidth, setPanelWidth] = useState(
     LEFT_PANEL_WIDTH + (showAssigneeColumn ? ASSIGNEE_COL_WIDTH : 0),
   );
+
+  const hasActionsColumn = enableBuiltinDialogs || !!(onAddTask || onEditTask || onDeleteTask);
+  const effectiveMinPanelWidth = Math.max(
+    minPanelWidth,
+    STATUS_COL_WIDTH + (hasActionsColumn ? ACTIONS_COL_WIDTH : 0) + (showAssigneeColumn ? ASSIGNEE_COL_WIDTH : 0) + 80,
+  );
+
   const rawStore = useRawGanttChartStore();
 
   const handleExportCSV = useCallback(() => {
@@ -230,7 +237,7 @@ function GanttChartInner({
       const startWidth = panelWidth;
       const onMouseMove = (ev: MouseEvent) => {
         const delta = ev.clientX - startX;
-        const newWidth = Math.max(minPanelWidth, Math.min(maxPanelWidth, startWidth + delta));
+        const newWidth = Math.max(effectiveMinPanelWidth, Math.min(maxPanelWidth, startWidth + delta));
         setPanelWidth(newWidth);
       };
       const onMouseUp = () => {
@@ -240,7 +247,7 @@ function GanttChartInner({
       document.addEventListener("mousemove", onMouseMove);
       document.addEventListener("mouseup", onMouseUp);
     },
-    [panelWidth, minPanelWidth, maxPanelWidth],
+    [panelWidth, effectiveMinPanelWidth, maxPanelWidth],
   );
 
   return (

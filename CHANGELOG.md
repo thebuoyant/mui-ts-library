@@ -11,6 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [3.27.1] — 2026-07-14
+
+### Fixed
+
+- **GanttChart — Panel overflow when divider is dragged narrow:** The left task panel could be dragged so narrow that column headers overlapped, status chips were truncated, and the name column disappeared. The divider now enforces a column-aware minimum width (`STATUS_COL_WIDTH + ACTIONS_COL_WIDTH + [ASSIGNEE_COL_WIDTH] + 80 px` for the name), and row/header containers clip content cleanly with `overflow: hidden`. No API change.
+
+---
+
+## [3.27.0] — 2026-07-14
+
 ### Added
 
 - **Hover callbacks for all 6 D3 charts** — each chart now supports a hover callback that fires on `mouseenter` (with a typed info object) and `mouseLeave` (with `null`), enabling linked-view patterns where hovering in one chart highlights the corresponding entry in another:

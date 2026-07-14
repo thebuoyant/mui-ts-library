@@ -483,6 +483,13 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 ## Changelog
 
+### [3.27.1] — 2026-07-14
+
+**Fixed**
+- `GanttChart`: The left task panel can no longer be dragged so narrow that column headers overlap or content overflows. The divider now enforces a column-aware minimum width (Status + Actions + optional Assignee + 80 px for the name). Row and header containers clip cleanly with `overflow: hidden`. No API change.
+
+---
+
 ### [3.27.0] — 2026-07-14
 
 **Added**

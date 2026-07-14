@@ -11,6 +11,18 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unveröffentlicht]
 
+---
+
+## [3.27.1] — 2026-07-14
+
+### Behoben
+
+- **GanttChart — Panel-Overflow beim Schmalziehen des Trenners:** Das linke Task-Panel konnte so schmal gezogen werden, dass Spalten-Header überlappten, Status-Chips abgeschnitten wurden und die Name-Spalte verschwand. Der Trenner erzwingt nun eine spaltenbasierte Mindestbreite (`STATUS_COL_WIDTH + ACTIONS_COL_WIDTH + [ASSIGNEE_COL_WIDTH] + 80 px` für den Namen), und Zeilen-/Header-Container schneiden Inhalte sauber mit `overflow: hidden` ab. Keine API-Änderung.
+
+---
+
+## [3.27.0] — 2026-07-14
+
 ### Hinzugefügt
 
 - **Hover-Callbacks für alle 6 D3-Charts** — jeder Chart unterstützt jetzt einen Hover-Callback, der bei `mouseenter` (mit typisiertem Info-Objekt) und `mouseLeave` (mit `null`) feuert. Damit lassen sich Linked-View-Muster umsetzen, bei denen ein Hover in einem Chart den entsprechenden Eintrag in einem anderen hervorhebt:

@@ -483,6 +483,13 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/):
 
 ## Changelog
 
+### [3.27.1] — 2026-07-14
+
+**Behoben**
+- `GanttChart`: Das linke Task-Panel kann nicht mehr so schmal gezogen werden, dass Spalten-Header überlappen oder Inhalte überlaufen. Der Trenner erzwingt nun eine spaltenbasierte Mindestbreite (Status + Aktionen + optionaler Assignee + 80 px für den Namen). Zeilen- und Header-Container schneiden Inhalte sauber mit `overflow: hidden` ab. Keine API-Änderung.
+
+---
+
 ### [3.27.0] — 2026-07-14
 
 **Hinzugefügt**

@@ -81,6 +81,7 @@ function GanttTaskRow({
         height: ROW_HEIGHT,
         display: "flex",
         alignItems: "center",
+        overflow: "hidden",
         borderBottom: "1px solid",
         borderRight: "1px solid",
         borderColor: "divider",
@@ -495,6 +496,7 @@ export function GanttTaskPanel({
             height: HEADER_HEIGHT,
             display: "flex",
             alignItems: "center",
+            overflow: "hidden",
             borderBottom: timeScale === "days" ? "1px solid" : undefined,
             borderColor: timeScale === "days" ? "divider" : undefined,
           }}
