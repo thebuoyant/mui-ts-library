@@ -106,6 +106,8 @@ export type CirclePackingChartProps = {
   disabled?:         boolean;
   /** Fires on regular click — immediately, no delay */
   onCircleClick?:    (info: CirclePackingNodeInfo, event: React.MouseEvent<SVGCircleElement>) => void;
+  /** Fired on mouse enter/leave a circle — `null` on leave. Use for linked-view highlighting. */
+  onCircleHover?:    (info: CirclePackingNodeInfo | null, event: React.MouseEvent<SVGCircleElement> | null) => void;
   /** Fires when the zoom focus changes */
   onZoomChange?:     (zoom: CirclePackingZoomInfo) => void;
   /**

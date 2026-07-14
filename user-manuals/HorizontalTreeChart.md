@@ -134,6 +134,7 @@ Each node in the tree is a `HorizontalTreeData` object. Only `name` is required 
 | `showNodePopover` | `boolean` | `false` | Show a built-in MUI Popover on click |
 | `renderNodePopoverContent` | `(info) => ReactNode` | — | Custom content inside the popover |
 | `onNodeClick` | `(info, event) => void` | — | Fires on regular click (not Ctrl/Cmd+Click) |
+| `onNodeHover` | `(info \| null, event) => void` | — | Fires on mouse enter/leave of a node — `null` on leave. *Since v3.27.0* |
 | `disabled` | `boolean` | `false` | Mutes all interactions |
 | `translation` | `Partial<HorizontalTreeTranslation>` | EN defaults | Override displayed strings |
 
@@ -163,6 +164,8 @@ The four values control which direction the tree grows from its root:
 
 | Gesture | Action | Requires |
 |---|---|---|
+| **Hover** node | Fires `onNodeHover(info, event)` | always |
+| **Mouse leave** node | Fires `onNodeHover(null, event)` | always |
 | **Click** | Fires `onNodeClick` immediately | always |
 | **Ctrl / Cmd ⌘+Click** on a branch node | Drill into that subtree (re-roots the tree) | `drillable` |
 | **Ctrl / Cmd ⌘+Double-click** | Zoom out one level | `drillable` |
@@ -211,6 +214,8 @@ const data: HorizontalTreeData = {
 >
 > | Action | Callbacks fired |
 > |---|---|
+> | Hover over a node | `onNodeHover(info, event)` |
+> | Mouse leave a node | `onNodeHover(null, event)` |
 > | Regular click on a node | `onNodeClick` |
 > | Ctrl / Cmd ⌘+Click to drill into a branch node | `onFocusChange` |
 > | Ctrl / Cmd ⌘+Click on leaf or Ctrl / Cmd ⌘+Double-click to drill out | `onFocusChange` |
@@ -218,6 +223,7 @@ const data: HorizontalTreeData = {
 
 | Callback | Signature | When it fires | Use it when... |
 |---|---|---|---|
+| `onNodeHover` | `(info: HorizontalTreeNodeInfo \| null, event: React.MouseEvent) => void` | Mouse enter/leave a node — `null` on leave | Linked views: highlight the same node in another chart or list |
 | `onNodeClick` | `(info: HorizontalTreeNodeInfo, event: React.MouseEvent) => void` | Regular click on any node (not Ctrl/Cmd) | Showing a detail panel or popover for the clicked node |
 | `onFocusChange` | `(state: { focusedNode: HorizontalTreeNodeInfo; isRoot: boolean }) => void` | Drill-down focus changes via Ctrl/Cmd+Click, Ctrl/Cmd+Double-click or Escape | Tracking drill-down depth, breadcrumb navigation |
 

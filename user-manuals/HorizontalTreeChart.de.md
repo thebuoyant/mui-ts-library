@@ -134,6 +134,7 @@ Jeder Knoten im Baum ist ein `HorizontalTreeData`-Objekt. Nur `name` ist Pflicht
 | `showNodePopover` | `boolean` | `false` | Eingebautes MUI-Popover bei Klick anzeigen |
 | `renderNodePopoverContent` | `(info) => ReactNode` | — | Eigener Inhalt im Popover |
 | `onNodeClick` | `(info, event) => void` | — | Bei normalem Klick ausgelöst (nicht Ctrl/Cmd+Klick) |
+| `onNodeHover` | `(info \| null, event) => void` | — | Maus betritt/verlässt Knoten — `null` beim Verlassen. *Seit v3.27.0* |
 | `disabled` | `boolean` | `false` | Deaktiviert alle Interaktionen |
 | `translation` | `Partial<HorizontalTreeTranslation>` | EN-Standard | Angezeigte Strings überschreiben |
 
@@ -163,6 +164,8 @@ Die vier Werte steuern, in welche Richtung der Baum von seiner Wurzel aus wächs
 
 | Geste | Aktion | Benötigt |
 |---|---|---|
+| **Hover** Knoten | Löst `onNodeHover(info, event)` aus | immer |
+| **Mouse leave** Knoten | Löst `onNodeHover(null, event)` aus | immer |
 | **Klick** | `onNodeClick` sofort ausgelöst | immer |
 | **Ctrl / Cmd ⌘+Klick** auf Ast-Knoten | In den Teilbaum hineinzoomen (neu verwurzeln) | `drillable` |
 | **Ctrl / Cmd ⌘+Doppelklick** | Eine Ebene herauszoomen | `drillable` |
@@ -211,6 +214,8 @@ const data: HorizontalTreeData = {
 >
 > | Aktion | Ausgelöste Callbacks |
 > |---|---|
+> | Hover über Knoten | `onNodeHover(info, event)` |
+> | Mouse leave Knoten | `onNodeHover(null, event)` |
 > | Normaler Klick auf einen Knoten | `onNodeClick` |
 > | Ctrl / Cmd ⌘+Klick zum Drill-in eines Ast-Knotens | `onFocusChange` |
 > | Ctrl / Cmd ⌘+Klick auf Blatt oder Ctrl / Cmd ⌘+Doppelklick zum Drill-out | `onFocusChange` |
@@ -218,6 +223,7 @@ const data: HorizontalTreeData = {
 
 | Callback | Signatur | Wann ausgelöst | Verwenden wenn... |
 |---|---|---|---|
+| `onNodeHover` | `(info: HorizontalTreeNodeInfo \| null, event: React.MouseEvent) => void` | Maus betritt/verlässt Knoten — `null` beim Verlassen | Verknüpfte Ansichten: gleichen Knoten in einem anderen Chart hervorheben |
 | `onNodeClick` | `(info: HorizontalTreeNodeInfo, event: React.MouseEvent) => void` | Normaler Klick auf einen Knoten (ohne Ctrl/Cmd) | Detail-Panel oder Popover für den geklickten Knoten anzeigen |
 | `onFocusChange` | `(state: { focusedNode: HorizontalTreeNodeInfo; isRoot: boolean }) => void` | Drill-Down-Fokus wechselt via Ctrl/Cmd+Klick, Ctrl/Cmd+Doppelklick oder Escape | Drill-Down-Tiefe verfolgen, Breadcrumb-Navigation |
 

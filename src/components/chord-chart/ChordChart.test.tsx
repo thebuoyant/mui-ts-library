@@ -167,4 +167,39 @@ describe("ChordChart", () => {
     const ribbonGroup = document.querySelector<SVGGElement>("g[fill-opacity]");
     expect(ribbonGroup?.style.mixBlendMode).toBe("multiply");
   });
+
+  // ── onGroupHover / onChordHover ────────────────────────────────────────────
+
+  describe("onGroupHover", () => {
+    const findGroupG = () =>
+      Array.from(document.querySelectorAll<SVGGElement>("g")).find(
+        (g) => g.style.cursor === "pointer"
+      );
+
+    it("calls onGroupHover with group info on mouse enter", () => {
+      const onGroupHover = vi.fn();
+      render(
+        <ThemeProvider theme={createTheme()}>
+          <ChordChart data={SIMPLE_DATA} onGroupHover={onGroupHover} />
+        </ThemeProvider>
+      );
+      fireEvent.mouseEnter(findGroupG()!);
+      expect(onGroupHover).toHaveBeenCalledOnce();
+      expect(onGroupHover.mock.calls[0][0]).not.toBeNull();
+    });
+
+    it("calls onGroupHover with null on mouse leave", () => {
+      const onGroupHover = vi.fn();
+      render(
+        <ThemeProvider theme={createTheme()}>
+          <ChordChart data={SIMPLE_DATA} onGroupHover={onGroupHover} />
+        </ThemeProvider>
+      );
+      const g = findGroupG()!;
+      fireEvent.mouseEnter(g);
+      fireEvent.mouseLeave(g);
+      expect(onGroupHover).toHaveBeenCalledTimes(2);
+      expect(onGroupHover.mock.calls[1][0]).toBeNull();
+    });
+  });
 });

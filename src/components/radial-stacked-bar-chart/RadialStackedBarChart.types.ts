@@ -98,6 +98,8 @@ export type RadialStackedBarChartProps = {
   zoomable?:                boolean;
   /** Fired on click of any bar segment */
   onBarClick?:              (info: RadialStackedBarBarInfo, event: React.MouseEvent<SVGPathElement>) => void;
+  /** Fired on mouse enter/leave a bar segment — `null` on leave. Use for linked-view highlighting. */
+  onBarHover?:              (info: RadialStackedBarBarInfo | null, event: React.MouseEvent<SVGPathElement> | null) => void;
   /** Disables all interactions (default: false) */
   disabled?:                boolean;
   /** Override any translation string */

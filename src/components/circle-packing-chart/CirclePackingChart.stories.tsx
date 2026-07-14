@@ -46,6 +46,7 @@ const meta: Meta<typeof CirclePackingChart> = {
     sortBy:             "value",
     zoomable:           false,
     onCircleClick:      fn(),
+    onCircleHover:      fn(),
     onZoomChange:       fn(),
   },
   parameters: {

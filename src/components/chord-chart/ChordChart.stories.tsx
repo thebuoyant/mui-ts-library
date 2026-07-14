@@ -51,7 +51,9 @@ const meta: Meta<typeof ChordChart> = {
     valueThousandsSeparator: ",",
     zoomable:                false,
     onChordClick:            fn(),
+    onChordHover:            fn(),
     onGroupClick:            fn(),
+    onGroupHover:            fn(),
   },
   parameters: {
     controls: { sort: 'alpha' },

@@ -96,7 +96,9 @@ export function ChordChart({
   valueThousandsSeparator = ",",
   valueFormatter,
   onGroupClick,
+  onGroupHover,
   onChordClick,
+  onChordHover,
   zoomable = false,
   disabled = false,
   translation,
@@ -353,8 +355,16 @@ export function ChordChart({
                 >
                   <g
                     style={{ cursor: disabled ? "not-allowed" : "pointer" }}
-                    onMouseEnter={() => !disabled && setHoverGroup(group.index)}
-                    onMouseLeave={() => setHoverGroup(null)}
+                    onMouseEnter={(e) => {
+                      if (!disabled) {
+                        setHoverGroup(group.index);
+                        onGroupHover?.(info, e);
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      setHoverGroup(null);
+                      onGroupHover?.(null, e);
+                    }}
                     onClick={(e) => !disabled && onGroupClick?.(info, e)}
                   >
                     <path
@@ -412,6 +422,12 @@ export function ChordChart({
                     style={{
                       cursor:     disabled ? "not-allowed" : "pointer",
                       transition: "opacity 0.15s",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!disabled) onChordHover?.(info, e);
+                    }}
+                    onMouseLeave={(e) => {
+                      onChordHover?.(null, e);
                     }}
                     onClick={(e) => !disabled && onChordClick?.(info, e)}
                   />

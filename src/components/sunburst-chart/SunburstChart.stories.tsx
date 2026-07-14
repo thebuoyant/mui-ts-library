@@ -40,6 +40,7 @@ const meta: Meta<typeof SunburstChart> = {
     valueDecimalSeparator:   ".",
     valueThousandsSeparator: ",",
     onSegmentClick:          fn(),
+    onSegmentHover:          fn(),
   },
   parameters: {
     controls: { sort: 'alpha' },

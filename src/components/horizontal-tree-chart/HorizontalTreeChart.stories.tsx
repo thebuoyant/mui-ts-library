@@ -55,6 +55,7 @@ const meta: Meta<typeof HorizontalTreeChart> = {
     zoomable:          false,
     onFocusChange:     fn(),
     onNodeClick:       fn(),
+    onNodeHover:       fn(),
   },
   parameters: {
     controls: { sort: 'alpha' },

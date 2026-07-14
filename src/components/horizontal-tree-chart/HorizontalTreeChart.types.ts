@@ -94,6 +94,8 @@ export type HorizontalTreeChartProps = {
   renderNodePopoverContent?: (info: HorizontalTreeNodeInfo) => React.ReactNode;
   /** Fires on every node click */
   onNodeClick?:              (info: HorizontalTreeNodeInfo, event: React.MouseEvent<SVGGElement>) => void;
+  /** Fired on mouse enter/leave a node — `null` on leave. Use for linked-view highlighting. */
+  onNodeHover?:              (info: HorizontalTreeNodeInfo | null, event: React.MouseEvent<SVGGElement> | null) => void;
   /** Drill-down/out crossfade duration in ms — set to 0 to disable (default: 750) */
   duration?:                 number;
   /** Disables all interactions (default: false) */

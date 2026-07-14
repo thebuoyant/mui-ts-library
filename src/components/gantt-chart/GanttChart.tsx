@@ -12,7 +12,7 @@ import type { GanttTimeScale } from "./GanttChart.types";
 import { GanttTaskPanel } from "./GanttTaskPanel";
 import { GanttTimeline } from "./GanttTimeline";
 import { GanttToolbar } from "./GanttToolbar";
-import { LEFT_PANEL_WIDTH, DIVIDER_WIDTH } from "./GanttChart.constants";
+import { LEFT_PANEL_WIDTH, ASSIGNEE_COL_WIDTH, DIVIDER_WIDTH } from "./GanttChart.constants";
 
 // ---------------------------------------------------------------------------
 // Store-Kontext
@@ -140,7 +140,9 @@ function GanttChartInner({
   // Verhindert gegenseitiges Auslösen der Scroll-Handler (Feedback-Loop).
   const isSyncing = useRef(false);
 
-  const [panelWidth, setPanelWidth] = useState(LEFT_PANEL_WIDTH);
+  const [panelWidth, setPanelWidth] = useState(
+    LEFT_PANEL_WIDTH + (showAssigneeColumn ? ASSIGNEE_COL_WIDTH : 0),
+  );
   const rawStore = useRawGanttChartStore();
 
   const handleExportCSV = useCallback(() => {

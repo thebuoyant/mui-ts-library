@@ -244,4 +244,30 @@ describe("HorizontalTreeChart", () => {
       expect(screen.queryByText("No data")).not.toBeInTheDocument();
     });
   });
+
+  // ── onNodeHover ────────────────────────────────────────────────────────────
+
+  describe("onNodeHover", () => {
+    it("calls onNodeHover with node info on mouse enter", () => {
+      const onNodeHover = vi.fn();
+      render(<HorizontalTreeChart data={SIMPLE_DATA} onNodeHover={onNodeHover} />);
+      const nodeGs = document.querySelectorAll<SVGGElement>("g[transform]");
+      const interactiveG = Array.from(nodeGs).find((g) => g.style.cursor !== "");
+      fireEvent.mouseEnter(interactiveG!);
+      expect(onNodeHover).toHaveBeenCalledOnce();
+      expect(onNodeHover.mock.calls[0][0]).not.toBeNull();
+      expect(onNodeHover.mock.calls[0][0]).toMatchObject({ name: expect.any(String) });
+    });
+
+    it("calls onNodeHover with null on mouse leave", () => {
+      const onNodeHover = vi.fn();
+      render(<HorizontalTreeChart data={SIMPLE_DATA} onNodeHover={onNodeHover} />);
+      const nodeGs = document.querySelectorAll<SVGGElement>("g[transform]");
+      const interactiveG = Array.from(nodeGs).find((g) => g.style.cursor !== "");
+      fireEvent.mouseEnter(interactiveG!);
+      fireEvent.mouseLeave(interactiveG!);
+      expect(onNodeHover).toHaveBeenCalledTimes(2);
+      expect(onNodeHover.mock.calls[1][0]).toBeNull();
+    });
+  });
 });

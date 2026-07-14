@@ -109,6 +109,7 @@ function App() {
 | `zoomable` | `boolean` | `false` | `Ctrl / Cmd ⌘ + Scroll` visueller Zoom — clippt am `size`-Rand |
 | `disabled` | `boolean` | `false` | Deaktiviert alle Interaktionen |
 | `onCircleClick` | `(info, event) => void` | — | Einfacher Klick auf Kreis |
+| `onCircleHover` | `(info \| null, event) => void` | — | Maus betritt/verlässt Kreis — `null` beim Verlassen. *Seit v3.27.0* |
 | `onZoomChange` | `(zoom) => void` | — | Bei jedem Zoom-Übergang |
 | `valueFormatter` | `(value: number) => string` | `toLocaleString()` | Eigene Formatierungsfunktion für den Tooltip-Wert. Überschreibt `toLocaleString()`. *Ab v3.22.0* |
 | `translation` | `Partial<CirclePackingTranslation>` | EN-Standard | Strings überschreiben |
@@ -123,6 +124,8 @@ function App() {
 | **Doppelklick** auf Hintergrund | Animierter Zoom eine Ebene zurück |
 | **Alt+Doppelklick** | Zeitlupe (10× Dauer) — ideal für Präsentationen |
 | **Einfacher Klick** auf Kreis | Löst `onCircleClick` sofort aus |
+| **Hover** Kreis | Löst `onCircleHover(info, event)` aus |
+| **Mouse leave** Kreis | Löst `onCircleHover(null, event)` aus |
 
 Der Zoom nutzt `d3.interpolateZoom` — eine echte Wipe-Animation, die alle Kreise neu positioniert und skaliert. Labels der direkten Kinder des neuen Fokus blenden ein; alle anderen blenden aus. `duration={0}` macht den Zoom effektiv sofort.
 
@@ -213,6 +216,8 @@ Konsistent mit `SunburstChart`, `RadialTreeChart` und `ChordChart` — alle D3-C
 >
 > | Aktion | Ausgelöste Callbacks |
 > |---|---|
+> | Hover über Kreis | `onCircleHover(info, event)` |
+> | Mouse leave Kreis | `onCircleHover(null, event)` |
 > | Normaler Klick auf einen Kreis | `onCircleClick` |
 > | Strg / Cmd ⌘+Klick zum Zoom-in | `onZoomChange` |
 > | Strg / Cmd ⌘+Doppelklick zum Zoom-out | `onZoomChange` |
@@ -220,6 +225,7 @@ Konsistent mit `SunburstChart`, `RadialTreeChart` und `ChordChart` — alle D3-C
 
 | Callback | Signatur | Wann ausgelöst | Verwenden wenn... |
 |---|---|---|---|
+| `onCircleHover` | `(info: CirclePackingNodeInfo \| null, event: React.MouseEvent) => void` | Maus betritt/verlässt Kreis — `null` beim Verlassen | Verknüpfte Ansichten: gleichen Knoten in einem anderen Chart hervorheben |
 | `onCircleClick` | `(info: CirclePackingNodeInfo, event: React.MouseEvent) => void` | Normaler Klick auf einen Kreis (ohne Strg/Cmd) | Knoten-Details anzeigen, Dashboard filtern |
 | `onZoomChange` | `(zoom: CirclePackingZoomInfo) => void` | Fokus wechselt: Strg/Cmd+Klick Zoom-in, Strg/Cmd+Doppelklick Zoom-out, Escape-Reset | Drill-Down-State verfolgen, Breadcrumb-Navigation |
 

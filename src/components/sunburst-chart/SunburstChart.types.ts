@@ -60,6 +60,8 @@ export type SunburstChartProps = {
   showRootLabel?:           boolean;
   /** Fired on single-click on any segment */
   onSegmentClick?:          (info: SunburstSegmentInfo, event: React.MouseEvent<SVGPathElement | SVGCircleElement>) => void;
+  /** Fired on mouse enter/leave — `null` on leave. Use for linked-view highlighting. */
+  onSegmentHover?:          (info: SunburstSegmentInfo | null, event: React.MouseEvent<SVGPathElement | SVGCircleElement> | null) => void;
   /** Fired when zoom focus changes (Ctrl+Click in/out, Escape reset) */
   onZoomChange?:            (zoom: SunburstZoomInfo) => void;
   /** Decimal places for value display in tooltips (default: 0) */

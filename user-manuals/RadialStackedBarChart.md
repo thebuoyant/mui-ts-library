@@ -165,6 +165,7 @@ function App() {
 |---|---|---|---|
 | `zoomable` | `boolean` | `false` | Enable `Ctrl / Cmd ⌘ + Scroll` visual zoom — content outside `size` is clipped. Press `Escape` to reset. |
 | `onBarClick` | `(info: RadialStackedBarBarInfo, event: React.MouseEvent) => void` | — | Fires when the user clicks any bar segment. |
+| `onBarHover` | `(info: RadialStackedBarBarInfo \| null, event: React.MouseEvent) => void` | — | Fires on mouse enter/leave of a bar segment — `null` on leave. *Since v3.27.0* |
 | `disabled` | `boolean` | `false` | Mutes all interactions and reduces opacity to `0.5`. |
 
 ### i18n
@@ -315,19 +316,27 @@ When `chartColors` is not set, the chart uses MUI theme tokens in this order:
 
 | Gesture | Action |
 |---|---|
-| **Hover** over a segment | Shows a tooltip: bar label, series name + value, percentage + total |
+| **Hover** over a segment | Shows tooltip + fires `onBarHover(info, event)` |
+| **Mouse leave** segment | Fires `onBarHover(null, event)` |
 | **Click** any segment | Fires `onBarClick(info, event)` — see type `RadialStackedBarBarInfo` |
 | **Ctrl / Cmd ⌘ + Scroll** *(requires `zoomable`)* | Visual zoom in / out — content clipped at `size` boundary |
 | **Escape** *(requires `zoomable`)* | Reset zoom to 1× |
 
 > **macOS:** Use `Cmd ⌘` instead of `Ctrl` for zoom.
 
-### `onBarClick` payload
+### `onBarClick` / `onBarHover` payload
+
+Both callbacks receive the same `RadialStackedBarBarInfo` object. `onBarHover` additionally receives `null` on mouse leave.
 
 ```tsx
 <RadialStackedBarChart
   data={data}
   keys={keys}
+  onBarHover={(info, event) => {
+    // info is null on mouse leave — use to clear linked-view highlighting
+    if (info) setHighlighted(info.id);
+    else setHighlighted(null);
+  }}
   onBarClick={(info, event) => {
     console.log(info.id);        // "berlin"
     console.log(info.label);     // "Berlin"

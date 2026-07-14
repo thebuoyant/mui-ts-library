@@ -251,4 +251,36 @@ describe("RadialTreeChart", () => {
       expect(screen.queryByText("No data")).not.toBeInTheDocument();
     });
   });
+
+  // ── onNodeHover ────────────────────────────────────────────────────────────
+
+  describe("onNodeHover", () => {
+    it("calls onNodeHover with node info on mouse enter", () => {
+      const onNodeHover = vi.fn();
+      render(<RadialTreeChart data={SIMPLE_DATA} onNodeHover={onNodeHover} />);
+      const nodeGs = document.querySelectorAll<SVGGElement>("g[data-idx]");
+      fireEvent.mouseEnter(nodeGs[0]!);
+      expect(onNodeHover).toHaveBeenCalledOnce();
+      expect(onNodeHover.mock.calls[0][0]).not.toBeNull();
+      expect(onNodeHover.mock.calls[0][0]).toMatchObject({ name: expect.any(String) });
+    });
+
+    it("calls onNodeHover with null on mouse leave", () => {
+      const onNodeHover = vi.fn();
+      render(<RadialTreeChart data={SIMPLE_DATA} onNodeHover={onNodeHover} />);
+      const nodeGs = document.querySelectorAll<SVGGElement>("g[data-idx]");
+      fireEvent.mouseEnter(nodeGs[0]!);
+      fireEvent.mouseLeave(nodeGs[0]!);
+      expect(onNodeHover).toHaveBeenCalledTimes(2);
+      expect(onNodeHover.mock.calls[1][0]).toBeNull();
+    });
+
+    it("does not call onNodeHover when disabled", () => {
+      const onNodeHover = vi.fn();
+      render(<RadialTreeChart data={SIMPLE_DATA} onNodeHover={onNodeHover} disabled />);
+      const nodeGs = document.querySelectorAll<SVGGElement>("g[data-idx]");
+      fireEvent.mouseEnter(nodeGs[0]!);
+      expect(onNodeHover).not.toHaveBeenCalled();
+    });
+  });
 });

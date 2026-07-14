@@ -88,6 +88,7 @@ export function SunburstChart({
   chartColors,
   showRootLabel = true,
   onSegmentClick,
+  onSegmentHover,
   onZoomChange,
   valueDecimalCount = 0,
   valueDecimalSeparator = ".",
@@ -441,6 +442,12 @@ export function SunburstChart({
                 pointerEvents={disabled ? "none" : "auto"}
                 onClick={handleCenterClick}
                 style={{ cursor: disabled ? "not-allowed" : "pointer" }}
+                onMouseEnter={(e) => {
+                  if (!disabled) onSegmentHover?.(serialize(focusNode.parent ?? root), e as React.MouseEvent<SVGCircleElement>);
+                }}
+                onMouseLeave={(e) => {
+                  onSegmentHover?.(null, e as React.MouseEvent<SVGCircleElement>);
+                }}
               />
             </Tooltip>
           )}
@@ -480,6 +487,15 @@ export function SunburstChart({
                     }}
                     onClick={handlePathClick}
                     onDoubleClick={handlePathDblClick}
+                    onMouseEnter={(e) => {
+                      if (disabled || !visible) return;
+                      const idx  = Number(e.currentTarget.getAttribute("data-idx"));
+                      const node = renderNodes[idx];
+                      if (node) onSegmentHover?.(serialize(node), e);
+                    }}
+                    onMouseLeave={(e) => {
+                      if (visible) onSegmentHover?.(null, e);
+                    }}
                   />
                 </Tooltip>
               );

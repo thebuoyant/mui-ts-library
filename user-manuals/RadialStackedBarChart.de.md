@@ -165,6 +165,7 @@ function App() {
 |---|---|---|---|
 | `zoomable` | `boolean` | `false` | `Ctrl / Cmd ⌘ + Scroll` visuellen Zoom aktivieren — Inhalt außerhalb von `size` wird abgeschnitten. `Escape` setzt zurück. |
 | `onBarClick` | `(info: RadialStackedBarBarInfo, event: React.MouseEvent) => void` | — | Wird ausgelöst, wenn der Nutzer auf ein Balkensegment klickt. |
+| `onBarHover` | `(info: RadialStackedBarBarInfo \| null, event: React.MouseEvent) => void` | — | Maus betritt/verlässt Segment — `null` beim Verlassen. *Seit v3.27.0* |
 | `disabled` | `boolean` | `false` | Deaktiviert alle Interaktionen und reduziert die Deckkraft auf `0,5`. |
 
 ### Lokalisierung
@@ -315,19 +316,27 @@ Wenn `chartColors` nicht gesetzt ist, verwendet das Diagramm MUI-Theme-Tokens in
 
 | Geste | Aktion |
 |---|---|
-| **Hover** auf ein Segment | Zeigt Tooltip: Balkenname, Reihenname + Wert, Prozentwert + Gesamtwert |
+| **Hover** auf ein Segment | Zeigt Tooltip + löst `onBarHover(info, event)` aus |
+| **Mouse leave** Segment | Löst `onBarHover(null, event)` aus |
 | **Klick** auf beliebiges Segment | Löst `onBarClick(info, event)` aus — siehe Typ `RadialStackedBarBarInfo` |
 | **Ctrl / Cmd ⌘ + Scroll** *(erfordert `zoomable`)* | Visuell rein-/herauszoomen — Inhalt wird am `size`-Rand abgeschnitten |
 | **Escape** *(erfordert `zoomable`)* | Zoom auf 1× zurücksetzen |
 
 > **macOS:** `Cmd ⌘` statt `Ctrl` für den Zoom verwenden.
 
-### `onBarClick`-Payload
+### `onBarClick` / `onBarHover`-Payload
+
+Beide Callbacks erhalten dasselbe `RadialStackedBarBarInfo`-Objekt. `onBarHover` erhält beim Verlassen zusätzlich `null`.
 
 ```tsx
 <RadialStackedBarChart
   data={data}
   keys={keys}
+  onBarHover={(info, event) => {
+    // info ist null beim Verlassen — zum Zurücksetzen der verknüpften Ansicht
+    if (info) setHighlighted(info.id);
+    else setHighlighted(null);
+  }}
   onBarClick={(info, event) => {
     console.log(info.id);        // "berlin"
     console.log(info.label);     // "Berlin"
