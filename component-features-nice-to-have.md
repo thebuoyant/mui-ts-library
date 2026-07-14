@@ -184,7 +184,7 @@ Cross-Cutting-Ideen, die für alle D3-Charts gleich umgesetzt werden würden —
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
 | ⭐ PNG/SVG Export | Diagramm als Bild speichern (SVG → Canvas → PNG) — aktuell kann **keiner** der D3-Charts exportiert werden | Mittel | — |
-| Hover-Callbacks | `onNodeHover` / `onBarHover` / `onSegmentHover` (je nach Chart) — für "linked views": Hover in Chart A hebt den entsprechenden Eintrag in Chart B hervor. Aktuell haben alle Charts nur `onClick`-Callbacks. Technisch: `onMouseEnter`-Handler, der ein Payload-Objekt (analog zu `onNodeClick`) nach oben reicht. | Niedrig pro Chart (1 Tag für alle) | — |
+| ~~Hover-Callbacks~~ | ~~`onNodeHover` / `onBarHover` / `onSegmentHover` (je nach Chart) — für "linked views"~~ | ~~Niedrig pro Chart (1 Tag für alle)~~ | ✅ v3.27.0 |
 | `colorMode` Prop | `colorMode?: 'light' \| 'dark'` — zwingt den Chart zur Light- oder Dark-Palette unabhängig vom App-Theme. Nützlich für Export-Thumbnails, E-Mail-Einbettungen oder wenn der Chart in einem Iframe gerendert wird, der immer hell sein soll. | Mittel | — |
 
 ---
@@ -260,7 +260,7 @@ Neue Komponente seit v3.15.0 — Sektion wächst mit den ersten Erfahrungen aus 
 | Animierte Daten-Übergänge | Wenn `data` sich ändert, animierter Übergang der Balken (D3 `transition()` auf den Arc-Paths) — analog zu `duration`-Prop bei SunburstChart / RadialTreeChart. | Mittel | — |
 | `startAngle` Prop | In Grad ab welchem Winkel der erste Balken startet — Standard ist 12 Uhr (−90° = 0° intern). `startAngle?: number` würde erlauben, den Chart z.B. bei 3 Uhr zu beginnen. | Niedrig | — |
 | `selectedBarId` controlled prop | Von außen einen Balken hervorheben (z.B. wenn eine Tabellenzeile daneben selektiert wird) — linked views. Aktuell nur intern bei Hover via Opacity-Effekt. | Mittel | — |
-| Hover-Callback | `onBarHover?: (info: RadialStackedBarBarInfo | null, event: React.MouseEvent) => void` — feuert bei mouseenter/mouseleave auf einem Segment. Baut auf die bereits vorhandene Hover-Opacity-Logik auf. | Niedrig | — |
+| ~~Hover-Callback~~ | ~~`onBarHover?` — feuert bei mouseenter/mouseleave~~ | ~~Niedrig~~ | ✅ v3.27.0 |
 
 ---
 
