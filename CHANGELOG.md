@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Release script:** `[Unreleased]` sections in `CHANGELOG.md`, `CHANGELOG.de.md`, `README.md`, and `README.de.md` are now automatically renamed to the new version number before committing — so npm always shows the correct changelog heading.
+
 ---
 
 ## [3.28.0] — 2026-07-15

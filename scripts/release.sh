@@ -69,9 +69,32 @@ esac
 if [ -n "$BUMP" ]; then
   npm version "$BUMP" --no-git-tag-version
   NEW_VERSION=$(node -p "require('./package.json').version")
-  git add package.json package-lock.json
+  DATE=$(date +"%Y-%m-%d")
+
+  # Rename [Unreleased] → [NEW_VERSION] in changelogs + READMEs and restore empty [Unreleased]
+  python3 - "$NEW_VERSION" "$DATE" <<'PYEOF'
+import re, sys
+ver, date = sys.argv[1], sys.argv[2]
+files = [
+    ('CHANGELOG.md',    r'## \[Unreleased\]',       '## [Unreleased]',       '##'),
+    ('CHANGELOG.de.md', r'## \[Unveröffentlicht\]', '## [Unveröffentlicht]', '##'),
+    ('README.md',       r'### \[Unreleased\]',       '### [Unreleased]',      '###'),
+    ('README.de.md',    r'### \[Unveröffentlicht\]', '### [Unveröffentlicht]','###'),
+]
+for fname, pattern, label, prefix in files:
+    try:
+        content = open(fname).read()
+        replacement = f'{label}\n\n---\n\n{prefix} [{ver}] — {date}'
+        content = re.sub(pattern, replacement, content, count=1)
+        open(fname, 'w').write(content)
+    except FileNotFoundError:
+        pass
+PYEOF
+
+  git add package.json package-lock.json CHANGELOG.md CHANGELOG.de.md README.md README.de.md
   git commit -m "chore: release v$NEW_VERSION"
   ok "Version:    $CURRENT_VERSION → $NEW_VERSION"
+  ok "Changelog:  [Unreleased] → [$NEW_VERSION] — $DATE"
 else
   NEW_VERSION=$CURRENT_VERSION
   warn "Version bleibt bei $NEW_VERSION (re-release — Tag wird überschrieben)"
