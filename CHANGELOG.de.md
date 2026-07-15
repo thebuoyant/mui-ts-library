@@ -11,6 +11,10 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unveröffentlicht]
 
+---
+
+## [3.28.1] — 2026-07-15
+
 ### Behoben
 
 - **Release-Script:** Die `[Unveröffentlicht]`-Abschnitte in `CHANGELOG.md`, `CHANGELOG.de.md`, `README.md` und `README.de.md` werden jetzt automatisch auf die neue Versionsnummer umbenannt, bevor committet wird — damit npm immer die korrekte Changelog-Überschrift anzeigt.

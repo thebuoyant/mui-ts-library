@@ -485,6 +485,10 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/):
 
 ### [Unveröffentlicht]
 
+---
+
+### [3.28.1] — 2026-07-15
+
 **Behoben**
 - Release-Script: `[Unveröffentlicht]`-Überschriften werden jetzt vor dem Publish automatisch auf die Versionsnummer umbenannt — damit npm immer den korrekten Changelog-Eintrag anzeigt.
 

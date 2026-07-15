@@ -485,6 +485,10 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 ### [Unreleased]
 
+---
+
+### [3.28.1] — 2026-07-15
+
 **Fixed**
 - Release script: `[Unreleased]` headings are now automatically renamed to the version number before publishing — so npm always shows the correct changelog entry.
 
