@@ -483,7 +483,7 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 ## Changelog
 
-### [Unreleased]
+### [3.28.0] — 2026-07-15
 
 **Added**
 - `SqlEditor`: `Shift+Alt+F` keyboard shortcut — triggers the existing SQL Format button directly from the editor (respects `readonly` and `toolbarConfig.showFormat`). No API change.
