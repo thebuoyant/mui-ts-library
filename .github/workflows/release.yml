@@ -75,6 +75,6 @@ jobs:
 
       - name: Publish to npm
         if: steps.npm_check.outputs.skip == 'false'
-        run: npm publish --access public
+        run: npm publish --access public --tag latest
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
