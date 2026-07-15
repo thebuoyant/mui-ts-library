@@ -1,11 +1,21 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, useMemo } from "react";
 import { Box, Divider, Paper } from "@mui/material";
 import type { EditorView } from "@codemirror/view";
+import { format as formatSql, type SqlLanguage } from "sql-formatter";
 import {
   type SqlEditorProps,
   DEFAULT_SQL_EDITOR_TRANSLATION,
   DEFAULT_SQL_EDITOR_TOOLBAR_CONFIG,
+  type SqlEditorDialect,
 } from "./SqlEditor.types";
+
+const FORMAT_DIALECT_MAP: Record<SqlEditorDialect, SqlLanguage> = {
+  standard:   "sql",
+  mysql:      "mysql",
+  postgresql: "postgresql",
+  sqlite:     "sqlite",
+  mssql:      "tsql",
+};
 import { SqlEditorContent } from "./SqlEditorContent";
 import { SqlEditorToolbar } from "./SqlEditorToolbar";
 import { SqlEditorFooter }  from "./SqlEditorFooter";
@@ -70,6 +80,22 @@ export function SqlEditor({
     ? (sql: string) => { addEntry(sql); onExecute(sql); }
     : undefined;
 
+  const handleFormat = useMemo(() => {
+    if (readonly || !tc.showFormat) return undefined;
+    return () => {
+      const view = viewRef.current;
+      if (!view) return;
+      const currentSql = view.state.doc.toString();
+      try {
+        const formatted = formatSql(currentSql, { language: FORMAT_DIALECT_MAP[dialect] });
+        view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: formatted } });
+      } catch {
+        // leave editor unchanged if sql-formatter can't parse the input
+      }
+      view.focus();
+    };
+  }, [dialect, readonly, tc.showFormat]);
+
   const handleSelectHistoryEntry = useCallback((sql: string) => {
     const view = viewRef.current;
     if (view) {
@@ -131,6 +157,7 @@ export function SqlEditor({
           identifierColor={highlightColors?.identifier}
           schema={schema}
           onExecute={handleExecute}
+          onFormat={handleFormat}
           onLint={onLint}
           onDiagnosticsChange={onLint ? handleDiagnosticsChange : undefined}
           onViewReady={handleViewReady}

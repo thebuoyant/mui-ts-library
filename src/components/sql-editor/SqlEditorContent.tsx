@@ -38,6 +38,7 @@ type SqlEditorContentProps = {
   identifierColor?:      string;
   schema?:               SqlSchema;
   onExecute?:            (sql: string) => void;
+  onFormat?:             () => void;
   onLint?:               (sql: string) => Promise<SqlLintError[]> | SqlLintError[];
   onDiagnosticsChange?:  (count: number) => void;
   onViewReady:           (view: EditorView | null) => void;
@@ -59,6 +60,7 @@ export function SqlEditorContent({
   identifierColor,
   schema,
   onExecute,
+  onFormat,
   onLint,
   onDiagnosticsChange,
   onViewReady,
@@ -74,6 +76,7 @@ export function SqlEditorContent({
   const onFocusRef            = useRef(onFocus);
   const onViewReadyRef        = useRef(onViewReady);
   const onExecuteRef          = useRef(onExecute);
+  const onFormatRef           = useRef(onFormat);
   const onLintRef             = useRef(onLint);
   const onDiagnosticsRef      = useRef(onDiagnosticsChange);
 
@@ -91,6 +94,7 @@ export function SqlEditorContent({
   useEffect(() => { onFocusRef.current       = onFocus;             }, [onFocus]);
   useEffect(() => { onViewReadyRef.current   = onViewReady;         }, [onViewReady]);
   useEffect(() => { onExecuteRef.current     = onExecute;           }, [onExecute]);
+  useEffect(() => { onFormatRef.current      = onFormat;            }, [onFormat]);
   useEffect(() => { onLintRef.current        = onLint;              }, [onLint]);
   useEffect(() => { onDiagnosticsRef.current = onDiagnosticsChange; }, [onDiagnosticsChange]);
 
@@ -221,6 +225,14 @@ export function SqlEditorContent({
       },
     }]);
 
+    const formatKeymap = keymap.of([{
+      key: "Shift-Alt-f",
+      run: () => {
+        onFormatRef.current?.();
+        return true;
+      },
+    }]);
+
     const extensions = [
       editorTheme,
       syntaxHighlighting(highlightStyle),
@@ -228,6 +240,7 @@ export function SqlEditorContent({
       history(),
       autocompletion(),
       executeKeymap,
+      formatKeymap,
       keymap.of([...defaultKeymap, ...historyKeymap, ...completionKeymap]),
       editableCompartment.current.of(EditorView.editable.of(!disabled && !readonly)),
       readOnlyCompartment.current.of(EditorState.readOnly.of(readonly)),

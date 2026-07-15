@@ -191,7 +191,7 @@ import { RichTextEditor } from '@thebuoyant-tsdev/mui-ts-library';
 
 ### SqlEditor
 
-SQL code editor with syntax highlighting, dialect-aware autocomplete, and inline linting. Designed for developer tools, database clients, and admin panels where users write and execute SQL queries — with `Cmd+Enter` shortcut, multi-dialect support (MySQL, PostgreSQL, SQLite, MSSQL), and schema-based autocomplete.
+SQL code editor with syntax highlighting, dialect-aware autocomplete, and inline linting. Designed for developer tools, database clients, and admin panels where users write and execute SQL queries — with `Cmd+Enter` (Execute) and `Shift+Alt+F` (Format SQL) shortcuts, multi-dialect support (MySQL, PostgreSQL, SQLite, MSSQL), and schema-based autocomplete.
 
 ```tsx
 import { SqlEditor } from '@thebuoyant-tsdev/mui-ts-library';
@@ -482,6 +482,13 @@ This project follows [Semantic Versioning](https://semver.org/):
 ---
 
 ## Changelog
+
+### [Unreleased]
+
+**Added**
+- `SqlEditor`: `Shift+Alt+F` keyboard shortcut — triggers the existing SQL Format button directly from the editor (respects `readonly` and `toolbarConfig.showFormat`). No API change.
+
+---
 
 ### [3.27.1] — 2026-07-14
 

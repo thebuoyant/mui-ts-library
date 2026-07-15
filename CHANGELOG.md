@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **SqlEditor — `Shift+Alt+F` keyboard shortcut for SQL Formatter:** The Format button (which already existed in the toolbar) can now also be triggered via `Shift+Alt+F` directly in the editor — consistent with the `Cmd/Ctrl+Enter` shortcut for Execute. The shortcut respects `readonly` mode and the `toolbarConfig.showFormat` flag. No API change.
+
 ---
 
 ## [3.27.1] — 2026-07-14

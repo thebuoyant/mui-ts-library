@@ -25,15 +25,14 @@ Innerhalb jeder Sektion stehen offene Items zuerst (⭐ oben), erledigte (durchg
 
 ## Neue Komponenten — mögliche MUI-Lücken
 
-Noch keine Entscheidung, sondern Diskussionsgrundlage: Stellen, an denen MUI-Nutzer typischerweise
-auf eine Wand laufen — entweder gibt's nichts, oder nur in MUI X Pro/Premium gegen Lizenzgebühr.
-
 | Komponente | MUI-Lücke | Warum das zu uns passt |
 |---|---|---|
-| **DataTable** (Sortierung, Filter, Spalten-Resize, CSV-Export, Virtualisierung) | MUI X `DataGrid` Community ist stark eingeschränkt — Sortierung über mehrere Spalten, Filter-UI und Export sind Pro/Premium-Features. Der mit Abstand meistgenannte MUI-Schmerzpunkt. | GanttChart hat bereits eine eigene Virtualisierungs-Lösung (`virtualizeRows`) — die Grundlagen sind im Projekt schon vorhanden. |
+| **DataTable** (Sortierung, Filter, Spalten-Resize, CSV-Export, Virtualisierung) | MUI X `DataGrid` Community ist stark eingeschränkt — Sortierung über mehrere Spalten, Filter-UI und Export sind Pro/Premium-Features. Der mit Abstand meistgenannte MUI-Schmerzpunkt. | GanttChart hat bereits eine eigene Virtualisierungs-Lösung (`virtualizeRows`) — die Grundlagen sind im Projekt vorhanden. |
 | **DateRangePicker** | MUI X `DateRangePicker` ist exklusiv Pro — keine freie MUI-Lösung für "Start- und Enddatum in einem Picker". | GanttChart bringt bereits Datums-Range-Logik (`TimelineRange`, Clamping) mit — direkt wiederverwendbar. |
-| **FileUpload / Dropzone** | MUI hat **gar keine** Lösung — weder Community noch Pro. Drag & Drop, Progress, Vorschau muss jedes Projekt selbst bauen. | Komplementiert RichTextEditor (Bild-Embed nutzt aktuell nur URL/Base64) — ein Dropzone-Baustein würde dort direkt mit andocken. |
-| ~~**ColorPicker**~~ | ~~MUI hat keinen eigenen Farbwähler.~~ | ✅ v3.13.0 — als eigenständige Komponente umgesetzt (Sättigung/Farbton/Alpha, Pipette, HEX/RGB/HSL, Saved Colors). Siehe eigene Sektion unten. |
+| **FileUpload / Dropzone** | MUI hat **gar keine** Lösung — weder Community noch Pro. Drag & Drop, Fortschrittsanzeige, Datei-Vorschau muss jedes Projekt selbst bauen. | Komplementiert RichTextEditor (Bild-Embed nutzt aktuell nur URL/Base64) — ein Dropzone-Baustein würde dort direkt mit andocken. |
+| **OTP / PIN-Input** | MUI hat keinen Verifikations-Code-Input. Jede App mit 2FA, E-Mail-Bestätigung oder Zahlungsverifizierung braucht das: 6 separate Felder, Auto-Fokus-Sprung nach jeder Ziffer, Einfügen von "123456" befüllt alle Felder auf einmal, Backspace springt rückwärts. | Passt zur Linie der auth-nahen Komponenten (PasswordStrengthMeter). Kleiner Scope, sehr hoher Nutzen. |
+| **Kanban Board** | Keine freie MUI-Komponente für spaltenbasiertes Task-Management (To Do / In Progress / Done / Blocked). MUI X hat keins. | Baut auf GanttChart-Konzepten auf (GanttTask, Status, Assignee) — gleiches Datenmodell, andere Ansicht. Konkurriert mit Boards, die Teams heute noch selbst aus MUI-Primitives zusammenbauen. |
+| ~~**ColorPicker**~~ | ~~MUI hat keinen eigenen Farbwähler.~~ | ✅ v3.13.0 — als eigenständige Komponente umgesetzt (Sättigung/Farbton/Alpha, Pipette, HEX/RGB/HSL, Saved Colors). |
 
 ---
 
@@ -41,29 +40,19 @@ auf eine Wand laufen — entweder gibt's nichts, oder nur in MUI X Pro/Premium g
 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
-| ~~⭐ Keyboard Navigation~~ | ~~`↑`/`↓` wählt die nächste/vorherige Task-Zeile, `Enter` öffnet den Bearbeiten-Dialog für die ausgewählte Zeile, `Escape` schließt ihn. Aktuell nur mausbedienbar — fehlende Accessibility-Grundlage.~~ `Tab` fokussiert das Panel, `↑`/`↓` bewegen die Auswahl, `Enter` öffnet den Edit-Dialog, `Escape` hebt die Auswahl auf. Klick auf Zeile setzt ebenfalls die Auswahl. `aria-selected` auf allen Zeilen. Auto-Scroll in View. Kein neuer Prop nötig. | ~~Mittel~~ | ✅ v3.25.0 |
-| ~~⭐ Panel-Splitter per Drag~~ | ~~`minPanelWidth` / `maxPanelWidth` als statische Props.~~ Drag-Handle zwischen Task-Panel und Timeline war bereits von Anfang an implementiert (`handleDividerMouseDown`, `cursor: col-resize`, `minPanelWidth`/`maxPanelWidth` als Constraints). Storybook-Controls vorhanden. | ~~Mittel~~ | ✅ seit v1.x |
-| ~~Assignee-Filter in Toolbar~~ | ~~Dropdown-Filter in der Toolbar zum Einschränken auf einen Assignee — baut auf `showAssigneeColumn` + `GanttTask.assignee` auf, kein neues Datenmodell.~~ `toolbarConfig={{ showAssigneeFilter: true }}` — ancestor-inklusiver Filter, 2 optionale Translation-Keys (`filterAssigneeAll`, `filterAssigneeLabel`), 4 neue Tests, Story `WithAssigneeFilter`. | ~~Mittel~~ | ✅ v3.17.0 |
-| ~~`onDragStart` Callback~~ | ~~Feuert wenn der User beginnt, einen Balken zu verschieben oder zu resizen — für optimistic UI / Shadow-Balken während des Dragens. Aktuell gibt es nur das Endergebnis via `onTaskMoved` / `onTaskResized`.~~ Einmalig bei mousedown (vor 5-px-Schwellwert), `type: "move" | "resize"`, vollständig in `useGanttDrag` via Callback-Ref, 2 neue Tests, Backend-Integration-Doku in GanttChart.md. Debouncing-Abschnitt in allen Editor-Manuals (EN+DE). | ~~Niedrig~~ | ✅ v3.17.0 |
-| Export PNG/PDF | Sichtbarer Ausschnitt der Timeline als Bild — andere Rendering-Basis als die D3-Charts (Mix aus HTML-Panel + SVG-Timeline statt reines SVG), daher eigene Lösung nötig, nicht über die D3-Charts-Export-Utility wiederverwendbar. | Hoch | — |
+| ⭐ Multi-select Tasks | `showCheckboxColumn?: boolean` — Checkbox-Spalte zum Markieren mehrerer Tasks. `selectedTaskIds?: string[]` + `onSelectionChange` für controlled use. Schaltet erst Bulk-Aktionen frei, die bisher sinnlos wären: Status mehrerer Tasks gleichzeitig ändern, mehrere Tasks auf einmal löschen. Ohne Mehrfachauswahl ist Bulk ein Anti-Pattern. | Mittel | — |
+| ⭐ Arbeitstage & Feiertage | `workdays?: number[]` (Default `[1,2,3,4,5]` = Mo–Fr) + `holidays?: Date[]` — Wochenenden werden in der Timeline bereits grau hinterlegt, aber Dauerberechnungen, Auto-Advance und Clamp-Logik ignorieren bisher Nicht-Arbeitstage. Standard in jedem professionellen Gantt-Tool. Ein "5-Tage-Task" soll 5 Arbeitstage dauern, nicht 5 Kalendertage. | Mittel | — |
 | Touch / Mobile Drag | Drag & Drop für Task-Balken auf Touch-Geräten über die Pointer Events API — aktuell nur Maus. | Hoch | — |
-| Baseline-Vergleich | Ursprungsplanung als zweiter, schmalerer Balken hinter dem Ist-Balken — Standardmuster aus MS Project/Jira-Gantt-Plugins, kein Custom-Konzept. | Hoch | — |
-| ~~⭐ Progress-Feld im eingebauten Dialog~~ | ~~`GanttTask.progress` (0–100 %) war nur via `progressDraggable` setzbar — Nicht-Maus-Nutzer und Accessibility-Szenarien ausgeschlossen.~~ MUI-Slider im eingebauten Add/Edit-Dialog, pre-filled aus `initialTask.progress`, Rücksetzen auf 0 bei Milestone-Toggle, `aria-valuenow` testbar. | ~~Niedrig~~ | ✅ v3.16.0 |
-| ~~Dependency-Zyklus-Schutz~~ | ~~Bearbeiten der Task-Daten/Abhängigkeiten über den Task-Dialog konnte ohne Warnung einen Abhängigkeitszyklus erzeugen.~~ Tasks, die bereits (direkt oder transitiv) vom bearbeiteten Task abhängen, werden jetzt aus den Dependency-Optionen ausgeschlossen. | ~~Mittel~~ | ✅ v3.11.3 |
-| ~~Spalte: Assignee~~ | ~~Zusätzliche Spalte im Task-Panel für Verantwortliche~~ | ~~Mittel~~ | ✅ v2.7.0 |
-| ~~CSV / Excel Export~~ | ~~Tasks als Tabelle exportieren~~ | ~~Mittel~~ | ✅ v2.7.0 |
-| ~~Zoom per Scroll~~ | ~~Ctrl / Cmd ⌘+Scroll ändert TimeScale~~ | ~~Mittel~~ | ✅ v1.5.0 |
-| ~~Today-Button~~ | ~~Toolbar-Button scrollt zum heutigen Tag~~ | ~~Niedrig~~ | ✅ implementiert |
-| ~~Heute-Chip~~ | ~~Chip an der gestrichelten Heute-Linie~~ | ~~Niedrig~~ | ✅ v1.5.0 |
-
-**Verworfen** (zu vage oder architektonisch nicht zur Komponente passend): *Schnell-Hinzufügen* und
-*Bulk-Status-Änderung* setzen eine Mehrfachauswahl voraus, die es noch gar nicht gibt — erst dort
-ansetzen, falls Mehrfachauswahl mal kommt. *Undo/Redo* ist für eine komplett controlled Komponente
-(Consumer besitzt `tasks`) unklar verortet — die History müsste der Consumer ohnehin selbst führen.
-*Wiederkehrende Tasks* ist Scheduling-Geschäftslogik, nicht Visualisierung — gehört in die
-Backend-/Datenschicht des Consumers. *Resource View* ist de facto eine andere Komponente
-(Ressourcen-Auslastung), kein Feature von GanttChart. *Mini-Map* ist hier kein echtes Problem —
-die Timeline hat bereits Scroll + Zoom-Controls.
+| Baseline-Vergleich | Ursprungsplanung als zweiter, schmalerer Balken hinter dem Ist-Balken — Standardmuster aus MS Project / Jira-Gantt-Plugins, kein Custom-Konzept. | Hoch | — |
+| ~~⭐ Keyboard Navigation~~ | ~~Tab fokussiert das Panel, ↑/↓ bewegen die Auswahl, Enter öffnet den Edit-Dialog, Escape hebt die Auswahl auf.~~ | ~~Mittel~~ | ✅ v3.25.0 |
+| ~~⭐ Panel-Splitter per Drag~~ | ~~`minPanelWidth` / `maxPanelWidth` als Constraints für den Drag-Handle.~~ | ~~Mittel~~ | ✅ seit v1.x |
+| ~~Assignee-Filter in Toolbar~~ | ~~`toolbarConfig={{ showAssigneeFilter: true }}` — ancestor-inklusiver Filter.~~ | ~~Mittel~~ | ✅ v3.17.0 |
+| ~~`onDragStart` Callback~~ | ~~Feuert bei mousedown, `type: "move" \| "resize"`.~~ | ~~Niedrig~~ | ✅ v3.17.0 |
+| ~~⭐ Progress-Feld im Dialog~~ | ~~MUI-Slider im Add/Edit-Dialog, pre-filled, Rücksetzen bei Milestone.~~ | ~~Niedrig~~ | ✅ v3.16.0 |
+| ~~Dependency-Zyklus-Schutz~~ | ~~Transitiv abhängige Tasks aus Dependency-Optionen ausgeschlossen.~~ | ~~Mittel~~ | ✅ v3.11.3 |
+| ~~Spalte: Assignee~~ | ~~Zusätzliche Spalte im Task-Panel für Verantwortliche.~~ | ~~Mittel~~ | ✅ v2.7.0 |
+| ~~CSV Export~~ | ~~Tasks als Tabelle exportieren.~~ | ~~Mittel~~ | ✅ v2.7.0 |
+| ~~Zoom per Scroll~~ | ~~Ctrl/Cmd+Scroll ändert TimeScale.~~ | ~~Mittel~~ | ✅ v1.5.0 |
 
 ---
 
@@ -71,26 +60,20 @@ die Timeline hat bereits Scroll + Zoom-Controls.
 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
-| ⭐ `onSave` / Ctrl+S | Callback-Prop `onSave?: () => void` — feuert bei Ctrl/Cmd+S. Standardmuster in jedem webbasierten Editor (Notion, Google Docs, Confluence). Die Komponente braucht dafür keinen eigenen Speicher-Layer — der Consumer bestimmt was passiert. | Niedrig | ✅ v3.18.0 |
-| ⭐ `defaultValue` (unkontrollierter Modus) | `value` ist aktuell für kontrolliertes und unkontrolliertes Verhalten zuständig, kein `defaultValue`. Eine unkontrollierte `defaultValue`-Prop — analog zu MUI TextField — würde einfachere Integration ohne externen State ermöglichen. | Niedrig | ✅ v3.19.0 |
-| ⭐ `onMentionInserted` Callback | Wenn ein Mention eingefügt wird (`@Name`), gibt es keinen Callback mit dem eingefügten `MentionItem`. Consumer können nicht wissen, welche Mentions im Text enthalten sind, ohne den HTML zu parsen. `onMentionInserted?: (item: MentionItem) => void` | Niedrig | ✅ v3.20.0 |
-| Toolbar Extensions | `toolbarExtensions?: React.ReactNode` — Consumer können eigene Buttons neben den Standard-Buttons platzieren ohne Fork. Setzt keine neue Interne Struktur voraus, nur ein Render-Slot am Ende der Toolbar. | Mittel | — |
-| Slash Commands (/) | `/`-getriggertes Kontextmenü zum Einfügen von Blöcken (Notion-Pattern), Optionen aus den bereits vorhandenen Toolbar-Features (Tabelle, Bild, Emoji) gespeist — kein neuer Funktionsumfang, nur ein zweiter Zugriffsweg. | Hoch | — |
-| Diff View | Zwei HTML-Versionen readonly nebeneinander, wortweise Differenz hervorgehoben (z.B. via `diff-match-patch`) — Use Case: Edit-Historie in einem CMS-Review-Flow. | Hoch | — |
-| ~~Word Count~~ | ~~Wörter- und Zeichen-Zähler im Footer~~ | ~~Niedrig~~ | ✅ v1.4.0 |
-| ~~Full Screen Mode~~ | ~~Editor nimmt den gesamten Viewport ein~~ | ~~Niedrig~~ | ✅ v1.4.0 |
-| ~~Tabellen~~ | ~~Tiptap Table Extension — Zeilen/Spalten einfügen~~ | ~~Mittel~~ | ✅ v2.1.0 |
-| ~~Bild-Embed~~ | ~~`<img>` per URL oder Base64 einfügen~~ | ~~Mittel~~ | ✅ v2.1.0 |
-| ~~Emoji Picker~~ | ~~😀 Button mit Such-Emoji-Popover~~ | ~~Mittel~~ | ✅ v2.1.0 |
-| ~~Einfügen als Klartext~~ | ~~Toggle: Eingefügter Inhalt wird automatisch von Formatierung befreit~~ | ~~Niedrig~~ | ✅ v3.8.0 |
-| ~~Markdown-Import/Export~~ | ~~Zwischen HTML-Inhalt und Markdown per Klick konvertieren~~ | ~~Mittel~~ | ✅ v3.8.0 |
-
-**Verworfen:** *Custom Content Blocks* ("eigene Block-Typen registrieren") ist zu vage für eine
-Aufwandsschätzung und würde den Editor von einer fokussierten, opinionierten Komponente zu einem
-generischen Tiptap-Wrapper verschieben — käme erst zurück auf die Liste mit einem konkreten
-API-Vorschlag (welche Blocktypen, welche Registrierungs-API). *Mathformel (KaTeX)* ist eine
-Nischenanforderung (wissenschaftliche/akademische Anwendungen) ohne erkennbaren Bezug zu typischen
-Web-App-Use-Cases dieser Komponente.
+| ⭐ Variable Tokens | `tokens?: string[]` — `{{firstName}}`, `{{companyName}}` erscheinen als hervorgehobene, nicht-editierbare Chips im Fließtext. Autocomplete öffnet sich nach `{{`, bestehende Tokens beim Laden automatisch ausgezeichnet. Use Case: E-Mail-Vorlagen, Benachrichtigungs-Templates, Vertrags-Bausteine — jede App mit personalisierten Texten. Kein neues Datenmodell, der Output bleibt gewöhnliches HTML. | Mittel | — |
+| Zeichenlimit — Warn-Phase | `maxCharacters` + `showCharacterCount` + Tiptap-Blocking sind bereits implementiert — der Footer zeigt "{count} / {max} characters" und blockiert Eingabe am Limit. Fehlt noch: visuelle Orange-Warn-Phase bei Annäherung (z.B. ab 90 % des Limits), analog zu Twitter/LinkedIn. | Niedrig | — |
+| Toolbar Extensions | `toolbarExtensions?: React.ReactNode` — Consumer platzieren eigene Buttons direkt neben den Standard-Buttons ohne Fork. Render-Slot am Ende der Toolbar-Reihe. | Mittel | — |
+| Slash Commands (/) | `/`-getriggertes Kontextmenü zum Einfügen von Blöcken (Notion-Pattern) — Tabelle, Bild, Emoji, Variable aus `tokens`. Kein neuer Funktionsumfang, nur ein zweiter, schnellerer Zugriffsweg zu bestehenden Features. | Hoch | — |
+| ~~⭐ `onSave` / Ctrl+S~~ | ~~`onSave?: () => void` feuert bei Ctrl/Cmd+S.~~ | ~~Niedrig~~ | ✅ v3.18.0 |
+| ~~⭐ `defaultValue`~~ | ~~Unkontrollierter Modus analog zu MUI TextField.~~ | ~~Niedrig~~ | ✅ v3.19.0 |
+| ~~⭐ `onMentionInserted`~~ | ~~Callback mit dem eingefügten `MentionItem`.~~ | ~~Niedrig~~ | ✅ v3.20.0 |
+| ~~Word Count~~ | ~~Wörter- und Zeichen-Zähler im Footer.~~ | ~~Niedrig~~ | ✅ v1.4.0 |
+| ~~Full Screen Mode~~ | ~~Editor nimmt den gesamten Viewport ein.~~ | ~~Niedrig~~ | ✅ v1.4.0 |
+| ~~Tabellen~~ | ~~Tiptap Table Extension — Zeilen/Spalten einfügen.~~ | ~~Mittel~~ | ✅ v2.1.0 |
+| ~~Bild-Embed~~ | ~~`<img>` per URL oder Base64 einfügen.~~ | ~~Mittel~~ | ✅ v2.1.0 |
+| ~~Emoji Picker~~ | ~~Button mit Such-Emoji-Popover.~~ | ~~Mittel~~ | ✅ v2.1.0 |
+| ~~Einfügen als Klartext~~ | ~~Toggle: eingefügter Inhalt wird von Formatierung befreit.~~ | ~~Niedrig~~ | ✅ v3.8.0 |
+| ~~Markdown-Import/Export~~ | ~~Zwischen HTML und Markdown per Klick konvertieren.~~ | ~~Mittel~~ | ✅ v3.8.0 |
 
 ---
 
@@ -98,19 +81,12 @@ Web-App-Use-Cases dieser Komponente.
 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
-| ⭐ Hover-Doku | Spalten-/Tabellen-Kommentar aus der bereits vorhandenen `schema`-Prop als Tooltip beim Hover über einen Identifier. | Mittel | — |
-| ⭐ Nur-Selektion ausführen | Wenn Text im Editor markiert ist und der User Execute drückt, wird nur der markierte Abschnitt an `onExecute` geliefert — Standard in pgAdmin, DataGrip, DBeaver. Ermöglicht das Testen eines einzelnen Sub-Statements ohne Aufteilen der Query. Technisch: CodeMirror `editor.state.selection` vs. ganzer Inhalt. | Mittel | — |
-| Schema-Explorer Panel | Collapsible Sidebar mit `schema.tables` als Baumansicht — Klick fügt Tabellen- oder Spaltennamen an der Cursor-Position ein. Baut auf der vorhandenen `schema`-Prop auf, keine neue Datenquelle. | Hoch | — |
-| KI-Vervollständigung (Consumer-gesteuert) | `getSuggestions?: (context) => Promise<string[]>`-Callback-Prop — die Bibliothek ruft **kein** eigenes LLM/keine eigene API auf, sondern rendert nur die Vorschlags-UI (Ghost-Text/Dropdown) und ruft den vom Consumer bereitgestellten Callback auf. Kein Vendor-Lock-in, keine Kosten/Datenschutzfragen auf Bibliotheksseite. | Hoch | — |
-| Ergebnis-Metadaten-Footer | Nach `onExecute`: Zeilenanzahl + Ausführungszeit im Footer — Werte kommen vom `onExecute`-Resultat, keine neue Datenquelle. | Mittel | — |
-| Snippet-Bibliothek | Gespeicherte SQL-Bausteine mit Namen einfügen — gleiches Formprinzip wie die bestehende Query-History (`localStorage`, Key-Prop, Max-Entries). | Mittel | — |
-| ~~Keyboard Shortcut Execute~~ | ~~Cmd / Ctrl+Enter für `onExecute`~~ | ~~Niedrig~~ | ✅ v1.5.0 |
-| ~~Zeilennummern-Gutter anpassen~~ | ~~Breite auto an max. Zeilenzahl~~ | ~~Niedrig~~ | ✅ v1.5.0 |
-| ~~⭐ Query-Verlauf~~ | ~~Letzte N Abfragen speichern/laden (localStorage)~~ — `toolbarConfig.showHistory` + `queryHistoryKey`/`queryHistoryMaxEntries`, History-Menu zum Nachladen, "Clear history". | ~~Mittel~~ | ✅ v3.5.0 |
-
-**Verworfen:** *Multi-Tab Queries* würde die Komponente von einem fokussierten Single-Query-Editor zu
-einem Tab-Manager umbauen — das lässt sich schon heute durch mehrere `SqlEditor`-Instanzen im
-eigenen Tab-Layout des Consumers erreichen, ohne dass die Bibliothek selbst Tabs verwalten muss.
+| ~~SQL Formatter — `Shift+Alt+F`~~ | ~~Format-Button in der Toolbar + `Shift+Alt+F` KeyBinding in CodeMirror. Via `sql-formatter` (MIT), dialektspezifisch.~~ | ~~Niedrig~~ | ✅ v3.28.0 |
+| ⭐ Hover-Doku | Spalten- und Tabellen-Kommentar aus der vorhandenen `schema`-Prop als Tooltip beim Hover über einen Identifier — kein neues Datenmodell. | Mittel | — |
+| ⭐ Nur-Selektion ausführen | Wenn Text markiert ist und Execute gedrückt wird, liefert `onExecute` nur den markierten Abschnitt — Standard in pgAdmin, DataGrip, DBeaver. Ermöglicht das Testen eines Sub-Statements ohne Aufteilen der Query. | Mittel | — |
+| KI-Vervollständigung (Consumer-gesteuert) | `getSuggestions?: (context) => Promise<string[]>` — Bibliothek rendert Ghost-Text/Dropdown, Consumer liefert die Vorschläge (eigenes LLM, OpenAI, Copilot-API). Kein Vendor-Lock-in, keine API-Keys in der Bibliothek. | Hoch | — |
+| ~~⭐ Query-Verlauf~~ | ~~Letzte N Abfragen speichern/laden (localStorage), History-Menü, "Clear history".~~ | ~~Mittel~~ | ✅ v3.5.0 |
+| ~~Keyboard Shortcut Execute~~ | ~~Cmd/Ctrl+Enter für `onExecute`.~~ | ~~Niedrig~~ | ✅ v1.5.0 |
 
 ---
 
@@ -118,15 +94,12 @@ eigenen Tab-Layout des Consumers erreichen, ohne dass die Bibliothek selbst Tabs
 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
-| ⭐ JSON5 / JSONC Modus | `mode?: 'json' | 'json5' | 'jsonc'` — JSON5 erlaubt Kommentare, Trailing Commas, unquotierte Keys; JSONC ist das Format von VS Code (`settings.json`, `tsconfig.json`). Konkreter Use Case: Config-Dateien bearbeiten. CodeMirror-Erweiterung für JSON5 ist verfügbar. | Mittel | — |
-| Beispiel-JSON Generator | Nur sinnvoll mit gesetzter `schema`-Prop: Button generiert ein minimales, zum Schema passendes Placeholder-JSON (ein Wert pro Required-Feld, korrekter Typ). Ohne Schema kein Mehrwert gegenüber leerem Editor — daher kein generischer Fallback. | Niedrig | — |
-| Download-Button | Toolbar-Button exportiert den Inhalt als `file.json` — kein neues Feature außer einem `<a download>`-Trigger. Analog zum Copy-Button. | Niedrig | — |
-| Diff Mode | Zwei JSON-Strings readonly nebeneinander, strukturell verglichen (nicht nur Text-Diff) — gleiches Bedürfnis wie RichTextEditors Diff View. | Hoch | — |
-| Tree View | Toggle zwischen Text- und Baumansicht — Standardmuster bekannter JSON-Tools (z.B. zum Durchsuchen großer API-Responses). | Hoch | — |
-| ~~Minimap~~ | ~~Vertikale Übersicht für große JSON-Dokumente~~ | ~~Niedrig~~ | ✅ v1.5.0 |
-| ~~⭐ JSON Path Finder~~ | ~~Klick auf Wert kopiert vollständigen JSON-Path~~ — `Ctrl/Cmd+Click` kopiert Pfad (z.B. `$.items[0].id`) via Lezer-Syntaxbaum, mit visuellem Feedback. `enablePathFinder`, `onPathCopy`. | ~~Niedrig~~ | ✅ v3.7.0 |
-| ~~⭐ Folding / Collapsible~~ | ~~Objekte und Arrays inline ein-/aufklappen~~ — `@codemirror/lang-json` hatte Folding schon eingebaut, nur Gutter + Keymap fehlten. `showFolding` (Default `true`). | ~~Mittel → Niedrig~~ | ✅ v3.7.0 |
-| ~~JSON Schema Validierung~~ | ~~Schema-Prop für strukturelle Validierung (Typ, Required-Felder, Enum)~~ — `schema`-Prop mit Typ/Required/Enum/verschachtelten properties+items, Fehler als Inline-Diagnostics wie der Parse-Linter. | ~~Hoch~~ | ✅ v3.7.0 |
+| ⭐ JSON5 / JSONC Modus | `mode?: 'json' \| 'json5' \| 'jsonc'` — JSON5 erlaubt Kommentare, Trailing Commas, unquotierte Keys; JSONC ist das Format von VS Code (`settings.json`, `tsconfig.json`). Konkreter Use Case: App-Config-Dateien direkt im Browser bearbeiten lassen. CodeMirror-Erweiterung für JSON5 ist verfügbar. | Mittel | — |
+| ~~⭐ Download-Button~~ | ~~Toolbar-Button exportiert den Inhalt als `.json`-Datei (`showDownload`, `downloadFilename`).~~ | ~~Niedrig~~ | ✅ v3.25.0 |
+| ~~⭐ JSON Path Finder~~ | ~~`Ctrl/Cmd+Click` kopiert vollständigen JSON-Path (z.B. `$.items[0].id`).~~ | ~~Niedrig~~ | ✅ v3.7.0 |
+| ~~⭐ Folding / Collapsible~~ | ~~Objekte und Arrays inline ein-/aufklappen, `showFolding` (Default `true`).~~ | ~~Mittel~~ | ✅ v3.7.0 |
+| ~~JSON Schema Validierung~~ | ~~`schema`-Prop mit Typ/Required/Enum/verschachtelten properties+items als Inline-Diagnostics.~~ | ~~Hoch~~ | ✅ v3.7.0 |
+| ~~Minimap~~ | ~~Vertikale Übersicht für große JSON-Dokumente.~~ | ~~Niedrig~~ | ✅ v1.5.0 |
 
 ---
 
@@ -134,15 +107,15 @@ eigenen Tab-Layout des Consumers erreichen, ohne dass die Bibliothek selbst Tabs
 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
-| ~~⭐ `chipVariant` Prop~~ | ~~`chipVariant?: 'filled' | 'outlined'`~~ — `chipVariant="filled"` (Default) oder `"outlined"`, wird an alle Tag-Chips weitergereicht (Auswahl-Bereich + Autocomplete-Dropdown). Interne Farb-Selector-Chips der Create-UI sind bewusst ausgenommen. | ~~Niedrig~~ | ✅ v3.21.0 |
-| Tag Groups | Tags in Kategorien einteilen (Group-Header im Dropdown) — reine Darstellungsfrage, keine neue Datenstruktur (Gruppierung über ein optionales `group`-Feld pro Tag). | Mittel | — |
+| Tag Groups | Tags in Kategorien einteilen — Group-Header im Dropdown über ein optionales `group`-Feld pro Tag. Reine Darstellungsfrage, kein neues Datenmodell. | Mittel | — |
 | `showSelectAll` | Checkbox "Alle auswählen / Alle abwählen" im Dropdown-Footer — für Bulk-Workflows wo viele Tags auf einmal selektiert werden. | Mittel | — |
-| Drag to Reorder | Ausgewählte Tags per Drag neu sortieren. | Mittel | — |
-| ~~⭐ Async Search~~ | ~~`onSearchChange` feuerte ungebremst bei jedem Tastenanschlag, und Server-Ergebnisse wurden zusätzlich clientseitig per Substring re-gefiltert.~~ `searchDebounceMs` (debounced den Callback) + `serverSideFilter` (deaktiviert die eigene und MUIs interne Substring-Filterung, vertraut `tags` wie geliefert — nötig für Fuzzy-/Alias-Server-Suche). Beim Umsetzen zusätzlich einen Bug gefunden und gefixt: MUI feuert `onInputChange` mit `reason="reset"` und leerem Wert direkt nach jedem `"input"`-Event — wurde ungefiltert weitergereicht. | ~~Mittel~~ | ✅ v3.12.0 |
-| ~~Tag Colors~~ | ~~`color`-Prop pro Tag für farbige Chips~~ | ~~Niedrig~~ | ✅ implementiert |
-| ~~Max-Tags-Limit~~ | ~~Verhindert Auswahl über n Tags hinaus~~ | ~~Niedrig~~ | ✅ implementiert |
-| ~~Farbe bei Tag-Erstellung~~ | ~~Custom Color Picker beim Anlegen neuer Tags~~ | ~~Niedrig~~ | ✅ v2.8.0 |
-| ~~Suchergebnis-Highlighting~~ | ~~Matching-Text im Dropdown fett hervorheben~~ | ~~Niedrig~~ | ✅ v3.1.0 |
+| Drag to Reorder | Ausgewählte Tags in der Auswahl-Zeile per Drag neu sortieren — `onTagsChange` feuert mit neuer Reihenfolge. | Mittel | — |
+| ~~⭐ `chipVariant` Prop~~ | ~~`chipVariant?: 'filled' \| 'outlined'` für alle Tag-Chips.~~ | ~~Niedrig~~ | ✅ v3.21.0 |
+| ~~⭐ Async Search~~ | ~~`searchDebounceMs` + `serverSideFilter` — deaktiviert Client-seitige Re-Filterung für Fuzzy-/Alias-Server-Suche.~~ | ~~Mittel~~ | ✅ v3.12.0 |
+| ~~Tag Colors~~ | ~~`color`-Prop pro Tag für farbige Chips.~~ | ~~Niedrig~~ | ✅ implementiert |
+| ~~Max-Tags-Limit~~ | ~~Verhindert Auswahl über n Tags hinaus.~~ | ~~Niedrig~~ | ✅ implementiert |
+| ~~Farbe bei Tag-Erstellung~~ | ~~Custom Color Picker beim Anlegen neuer Tags.~~ | ~~Niedrig~~ | ✅ v2.8.0 |
+| ~~Suchergebnis-Highlighting~~ | ~~Matching-Text im Dropdown fett hervorheben.~~ | ~~Niedrig~~ | ✅ v3.1.0 |
 
 ---
 
@@ -150,19 +123,13 @@ eigenen Tab-Layout des Consumers erreichen, ohne dass die Bibliothek selbst Tabs
 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
-| HaveIBeenPwned-Prüfung (Consumer-gesteuert) | `onCheckLeaked?: (password) => Promise<boolean>`-Callback — die Bibliothek ruft selbst keine externe API auf (Datenschutz: Passwort verlässt sonst die Kontrolle des Consumers ungefragt). Consumer implementiert den k-Anonymity-Range-Query gegen die HIBP-API oder einen eigenen Dienst. | Hoch | — |
 | `showGeneratorOptions` | Wenn `showPasswordGenerator=true`, optionale Inline-UI mit Slider für Passwortlänge + Toggles für Zeichenklassen (Groß, Klein, Ziffern, Sonderzeichen). Baut auf `generatorOptions`-Prop auf — kein neues Datenmodell. | Mittel | — |
-| Accessibility: `aria-describedby` für Anforderungsliste | Das Passwort-Input-Feld sollte via `aria-describedby` mit der Anforderungsliste verknüpft sein, damit Screen-Reader die Regeln vorlesen wenn das Feld fokussiert wird. Aktuell sind Input und Checkliste visuell aber nicht semantisch verbunden. | Niedrig | — |
-| Requirements einklappen | Anforderungs-Checkliste auf- und zuklappen. | Niedrig | — |
-| ~~Passwort-Generator~~ | ~~Button generiert ein sicheres Passwort~~ | ~~Mittel~~ | ✅ v2.7.0 |
-| ~~Passwort in Zwischenablage~~ | ~~Copy-Button neben generiertem Passwort~~ | ~~Niedrig~~ | ✅ v3.9.0 |
-| ~~Confirm-Feld~~ | ~~Zweites Eingabefeld mit Match-Validierung~~ | ~~Mittel~~ | ✅ v2.7.0 |
-| ~~Custom Requirements~~ | ~~Eigene Anforderungen als Array-Prop~~ | ~~Niedrig~~ | ✅ v1.5.0 |
-| ~~Animated Segments~~ | ~~Strength-Bar als 4 separate Segmente~~ | ~~Niedrig~~ | ✅ v1.5.0 |
-
-**Verworfen:** *Sichtbarkeit nach Stärke* (Anzeigen-Button erst ab Mindeststärke freischalten) bringt
-keinen Sicherheitsgewinn — der Nutzer tippt das Passwort ohnehin selbst in sein eigenes Browserfenster
-— und wäre nur eine zusätzliche, verwirrende Hürde ohne Nutzen.
+| Accessibility: `aria-describedby` | Das Passwort-Input-Feld semantisch mit der Anforderungsliste verknüpfen — Screen-Reader lesen die Regeln vor wenn das Feld fokussiert wird. Aktuell visuell aber nicht semantisch verbunden. | Niedrig | — |
+| ~~Passwort-Generator~~ | ~~Button generiert ein sicheres Passwort.~~ | ~~Mittel~~ | ✅ v2.7.0 |
+| ~~Passwort in Zwischenablage~~ | ~~Copy-Button neben generiertem Passwort.~~ | ~~Niedrig~~ | ✅ v3.9.0 |
+| ~~Confirm-Feld~~ | ~~Zweites Eingabefeld mit Match-Validierung.~~ | ~~Mittel~~ | ✅ v2.7.0 |
+| ~~Custom Requirements~~ | ~~Eigene Anforderungen als Array-Prop.~~ | ~~Niedrig~~ | ✅ v1.5.0 |
+| ~~Animated Segments~~ | ~~Strength-Bar als 4 separate Segmente.~~ | ~~Niedrig~~ | ✅ v1.5.0 |
 
 ---
 
@@ -170,22 +137,21 @@ keinen Sicherheitsgewinn — der Nutzer tippt das Passwort ohnehin selbst in sei
 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
-| ~~PopoverColorPicker-Wrapper~~ | ~~Vorgefertigte Swatch-Button-+-Popover-Kombination als Convenience-Komponente — aktuell muss jeder Consumer das Popover selbst bauen (im Manual dokumentiert).~~ — `PopoverColorPicker` implementiert: Swatch-Button + MUI-Popover + `ColorPicker`, alle Props durchgereicht, CSS-Klassen-API, vollständig barrierefrei. | ~~Niedrig~~ | ✅ v3.26.0 |
-| "Aktuelle Farbe speichern"-Button | `savedColors` ist aktuell reine Anzeige/Auswahl — ein optionaler "+"-Button würde die aktuelle Farbe anhängen, bräuchte aber einen `onSavedColorsChange`-Callback (state bleibt beim Consumer). | Niedrig | — |
-| ~~Controlled `format` Prop~~ | ~~`defaultFormat` ist uncontrolled — nach dem Mount kann der Consumer das aktive Format (HEX / RGB / HSL) nicht mehr von außen steuern. Ein `format`-Prop (controlled, analog zu MUIs `value`) würde das ermöglichen, z.B. wenn der Picker in einem Formular resettet werden soll. `onFormatChange` ist bereits vorhanden.~~ — `format`-Prop hinzugefügt; parent-controlled, analog zu MUIs `value`. | ~~Niedrig~~ | ✅ v3.23.0 |
-| ~~ColorPicker als eigenständige Komponente~~ | ~~Existierte nur ad-hoc in TagSelection (Custom-Color-Picker bei Tag-Erstellung)~~ — als volle, eigenständige Komponente extrahiert: Sättigung/Farbton-Fläche, Hue-/Alpha-Slider, Pipette (EyeDropper-API), HEX/RGB/HSL-Format-Umschaltung, Saved-Colors-Raster, Formular-Integration via `name`. | ~~Mittel~~ | ✅ v3.13.0 |
+| "Aktuelle Farbe speichern"-Button | `savedColors` ist aktuell reine Anzeige/Auswahl — ein optionaler "+"-Button würde die aktuelle Farbe anhängen. Braucht `onSavedColorsChange`-Callback, State bleibt beim Consumer. | Niedrig | — |
+| ~~PopoverColorPicker-Wrapper~~ | ~~Swatch-Button + MUI-Popover + `ColorPicker`, alle Props durchgereicht, CSS-Klassen-API, vollständig barrierefrei.~~ | ~~Niedrig~~ | ✅ v3.26.0 |
+| ~~Controlled `format` Prop~~ | ~~`format`-Prop (controlled), analog zu MUIs `value`.~~ | ~~Niedrig~~ | ✅ v3.23.0 |
+| ~~ColorPicker als eigenständige Komponente~~ | ~~Aus TagSelection extrahiert — Sättigung/Farbton-Fläche, Hue-/Alpha-Slider, Pipette, HEX/RGB/HSL, Saved Colors.~~ | ~~Mittel~~ | ✅ v3.13.0 |
 
 ---
 
 ## D3-Charts (gemeinsam)
 
-Cross-Cutting-Ideen, die für alle D3-Charts gleich umgesetzt werden würden — eine gemeinsame Utility statt N× derselbe Code.
+Cross-Cutting-Ideen, die für alle D3-Charts gleich umgesetzt werden würden.
 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
-| ⭐ PNG/SVG Export | Diagramm als Bild speichern (SVG → Canvas → PNG) — aktuell kann **keiner** der D3-Charts exportiert werden | Mittel | — |
-| ~~Hover-Callbacks~~ | ~~`onNodeHover` / `onBarHover` / `onSegmentHover` (je nach Chart) — für "linked views"~~ | ~~Niedrig pro Chart (1 Tag für alle)~~ | ✅ v3.27.0 |
-| `colorMode` Prop | `colorMode?: 'light' \| 'dark'` — zwingt den Chart zur Light- oder Dark-Palette unabhängig vom App-Theme. Nützlich für Export-Thumbnails, E-Mail-Einbettungen oder wenn der Chart in einem Iframe gerendert wird, der immer hell sein soll. | Mittel | — |
+| ⭐ `selectedId` controlled prop | Von außen einen Knoten / Balken / Segment hervorheben — `selectedId?: string` + `onSelectedIdChange` pro Chart. Vervollständigt Linked-View-Muster: Hover-Callbacks (✅ v3.27.0) zeigen was unter der Maus ist, `selectedId` hält die persistente Auswahl. Use Case: Tabellenzeile klicken → das zugehörige Chart-Segment leuchtet auf. Identisches Pattern wie GanttChart `selectedTaskIds`. | Niedrig pro Chart | — |
+| ~~Hover-Callbacks~~ | ~~`onNodeHover` / `onBarHover` / `onSegmentHover` (je nach Chart) — für "linked views", null bei mouseleave.~~ | ~~Niedrig pro Chart~~ | ✅ v3.27.0 |
 
 ---
 
@@ -193,12 +159,10 @@ Cross-Cutting-Ideen, die für alle D3-Charts gleich umgesetzt werden würden —
 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
-| ⭐ Eingebautes Breadcrumb | `CirclePackingChart` zeigt beim Reinzoomen automatisch ein Breadcrumb — Sunburst hat trotz Drill-down keins | Niedrig | — |
-| Legende | Farbzuordnung Kategorie ↔ Farbe als eigene Komponente — bei vielen Segmenten schwer zuordenbar | Mittel | — |
-| `focusedNodeId` controlled prop | Von außen programmatisch einen Knoten als Drill-down-Fokus setzen (z.B. wenn ein Breadcrumb außerhalb des Charts geklickt wird). Aktuell nur interaktiv per Ctrl+Click steuerbar. | Mittel | — |
-| `maxDepth` | Rendert nur N Ebenen tief — für sehr tiefe Hierarchien, wo die inneren Ringe unlesbar klein werden. | Mittel | — |
-| ~~Animierte Drill-Down-Übergänge~~ | ~~Zoom passierte als Hard-Cut (kein `.transition()`)~~ — Als React-State+rAF-Tween umgesetzt (kein D3-Imperativ-Umbau nötig), `duration`-Prop, Default 750ms. | ~~Mittel~~ | ✅ v3.10.0 |
-| ~~`valueFormatter` Prop~~ | ~~Aktuell gibt es `valueDecimalCount` / `valueDecimalSeparator` / `valueThousandsSeparator` für Tooltips — aber kein `valueFormatter`~~ — alle Tooltip-Werte formatierbar. | ~~Niedrig~~ | ✅ v3.22.0 |
+| ⭐ Eingebautes Breadcrumb | Alle anderen Drill-down-Charts haben es (HorizontalTree ✅ v2.4.0, RadialTree ✅, CirclePacking ✅) — Sunburst hat trotz Drill-down keins. | Niedrig | — |
+| Legende | Farbzuordnung Kategorie ↔ Farbe als Komponente unterhalb des Charts — bei vielen Segmenten schwer zuordenbar ohne sie. | Mittel | — |
+| ~~Animierte Drill-Down-Übergänge~~ | ~~React-State+rAF-Tween, `duration`-Prop, Default 750ms.~~ | ~~Mittel~~ | ✅ v3.10.0 |
+| ~~`valueFormatter` Prop~~ | ~~Alle Tooltip-Werte über eigene Funktion formatierbar.~~ | ~~Niedrig~~ | ✅ v3.22.0 |
 
 ---
 
@@ -206,10 +170,10 @@ Cross-Cutting-Ideen, die für alle D3-Charts gleich umgesetzt werden würden —
 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
-| ⭐ Legende | Bei vielen Gruppen schwer erkennbar, welche Farbe zu welcher Gruppe gehört | Niedrig | — |
-| Gruppen-Filter | Klick auf Legenden-Eintrag blendet die Gruppe + ihre Ribbons ein/aus — baut auf der Legende oben auf, macht ohne sie keinen Sinn | Mittel | — |
-| Such-Highlighting | Gruppenname eingeben → hervorheben, Rest abdunkeln | Niedrig | — |
-| ~~`valueFormatter` Prop~~ | ~~Aktuell gibt es `valueDecimalCount` / `valueDecimalSeparator` / `valueThousandsSeparator` für Tooltips — aber kein `valueFormatter`~~ — alle numerischen Werte in Gruppen- und Chord-Tooltips. | ~~Niedrig~~ | ✅ v3.22.0 |
+| ⭐ Legende | Bei vielen Gruppen schwer erkennbar, welche Farbe zu welcher Gruppe gehört — ein häufiges erstes Feedback beim Einbetten in Dashboards. | Niedrig | — |
+| Gruppen-Filter | Klick auf Legenden-Eintrag blendet die Gruppe + ihre Ribbons ein/aus — baut auf der Legende auf, macht ohne sie keinen Sinn. | Mittel | — |
+| Such-Highlighting | Gruppenname eingeben → Gruppe hervorheben, Rest abdunkeln. Nützlich bei Diagrammen mit 15+ Gruppen. | Niedrig | — |
+| ~~`valueFormatter` Prop~~ | ~~Numerische Werte in Gruppen- und Chord-Tooltips formatierbar.~~ | ~~Niedrig~~ | ✅ v3.22.0 |
 
 ---
 
@@ -217,11 +181,9 @@ Cross-Cutting-Ideen, die für alle D3-Charts gleich umgesetzt werden würden —
 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
-| ⭐ Eingebautes Breadcrumb | Fehlt trotz vorhandenem `onFocusChange`/Drill-down — Storybook-Demo baut sich aktuell ein eigenes | Niedrig | — |
-| Mini-Map | Kleine Ecken-Übersicht mit Viewport-Rechteck bei sehr tiefen/breiten Bäumen — konkretes, bekanntes Muster (analog zur Minimap, die JsonEditor bereits hat), kein generisches "wäre nett". Sinnvoll, weil Drill-down + Zoom bei tiefen Bäumen den Überblick tatsächlich verlieren lässt. | Hoch | — |
-| Node-Suche / Highlight | `searchHighlightIds?: string[]` — Consumer übergibt IDs die hervorgehoben werden sollen, eigene Suche bleibt außerhalb der Komponente. Standardmuster für Such-Features in Baumvisualisierungen. | Mittel | — |
-| `maxDepth` | Rendert nur N Ebenen tief — für sehr große Bäume, wo Leaf-Ebenen zu klein zum Klicken werden. | Mittel | — |
-| ~~Animierte Fokus-Übergänge~~ | ~~Fokus-Wechsel beim Drill-down passierte als Hard-Cut~~ — Als Crossfade umgesetzt (alter Layout-Zustand blendet aus, neuer darunter) statt Positions-Tweening, da Drill-down die Hierarchie komplett neu verwurzelt. `duration`-Prop, Default 750ms. | ~~Mittel~~ | ✅ v3.11.0 |
+| Node-Suche / Highlight | `searchHighlightIds?: string[]` — Consumer übergibt IDs die hervorgehoben werden sollen, eigene Suche bleibt außerhalb der Komponente. Standardmuster für Suchfeatures in Baumvisualisierungen. | Mittel | — |
+| ~~Eingebautes Breadcrumb~~ | ~~`focusStack.length > 1` → Breadcrumb über dem Chart, analog zu HorizontalTreeChart.~~ | ~~Niedrig~~ | ✅ |
+| ~~Animierte Fokus-Übergänge~~ | ~~Crossfade beim Drill-down, `duration`-Prop, Default 750ms.~~ | ~~Mittel~~ | ✅ v3.11.0 |
 
 ---
 
@@ -229,10 +191,10 @@ Cross-Cutting-Ideen, die für alle D3-Charts gleich umgesetzt werden würden —
 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
-| ⭐ Eingebautes Breadcrumb | HorizontalTreeChart hat es, RadialTreeChart hat es noch nicht (separate Sektion), CirclePackingChart auch nicht — obwohl alle drei Drill-down-fähig sind. Konsistenz über alle Tree-Charts hinweg. | Niedrig | — |
-| Legende | Farbzuordnung Kategorie ↔ Farbe als eigene Komponente | Mittel | — |
-| Such-Highlighting | Knoten per Name finden, Pfad zur Wurzel hervorheben | Mittel | — |
-| ~~`valueFormatter` Prop~~ | ~~Tooltip-Wert wird mit `toLocaleString()` formatiert — kein `valueFormatter` für eigene Einheit oder Währungsformat~~ — Tooltip-Wert über eigene Funktion formatierbar. | ~~Niedrig~~ | ✅ v3.22.0 |
+| Legende | Farbzuordnung Kategorie ↔ Farbe. | Mittel | — |
+| Such-Highlighting | Knoten per Name finden, Pfad zur Wurzel hervorheben. | Mittel | — |
+| ~~Eingebautes Breadcrumb~~ | ~~`focus !== root` → Breadcrumb über dem Chart, analog zu HorizontalTreeChart.~~ | ~~Niedrig~~ | ✅ |
+| ~~`valueFormatter` Prop~~ | ~~Tooltip-Wert über eigene Funktion formatierbar.~~ | ~~Niedrig~~ | ✅ v3.22.0 |
 
 ---
 
@@ -240,60 +202,35 @@ Cross-Cutting-Ideen, die für alle D3-Charts gleich umgesetzt werden würden —
 
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
-| 🟡 Ghost-Layer bei Orientation-Wechsel | Wechselt `orientation` während einer laufenden Drill-Transition, springt die ausblendende Ghost-Ebene auf die neue Orientierung statt eingefroren zu bleiben. Rein kosmetisch, kein Crash/falsche Daten. Gefunden im Bug-Audit v3.11.2. | Niedrig | — |
-| Teilbaum Ein-/Ausklappen | Aktuell nur globaler Fokus-Wechsel — kein unabhängiges Collapse pro Knoten | Mittel | — |
-| `showValueBadge` | Wenn `HorizontalTreeData.value` gesetzt ist, zeige einen kleinen Badge am Knoten-Rand mit dem formatierten Wert — Standardmuster in Org-Chart-Tools. Baut auf vorhandene `value`-Prop auf, kein neues Datenmodell. | Niedrig | — |
-| `renderNodeLabel` Prop | `renderNodeLabel?: (info: HorizontalTreeNodeInfo) => React.ReactNode` — Custom-Render für die Node-Labels, z.B. Status-Chips, Avatar, Icon neben dem Namen. | Mittel | — |
-| ~~Eingebautes Breadcrumb~~ | ~~Fehlte trotz `focusedNode`/`onFocusChange`~~ | ~~Niedrig~~ | ✅ v2.4.0 |
-| ~~Animierte Fokus-Übergänge~~ | ~~Fokus-Wechsel passierte als Hard-Cut~~ — Als Crossfade umgesetzt, gleiches Muster wie RadialTreeChart. `duration`-Prop, Default 750ms. | ~~Mittel~~ | ✅ v3.11.0 |
+| Teilbaum Ein-/Ausklappen | Aktuell nur globaler Fokus-Wechsel — kein unabhängiges Collapse pro Knoten. Standard in Org-Chart-Tools: ein Klick klappt den Ast ein, ein zweiter klappt ihn wieder auf. | Mittel | — |
+| ~~Eingebautes Breadcrumb~~ | ~~Fehlte trotz `focusedNode` / `onFocusChange`.~~ | ~~Niedrig~~ | ✅ v2.4.0 |
+| ~~Animierte Fokus-Übergänge~~ | ~~Crossfade, `duration`-Prop, Default 750ms.~~ | ~~Mittel~~ | ✅ v3.11.0 |
 
 ---
 
 ## RadialStackedBarChart
 
-Neue Komponente seit v3.15.0 — Sektion wächst mit den ersten Erfahrungen aus dem Einsatz.
-
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
-| ⭐ PNG/SVG Export | Via die geplante D3-Charts-Shared-Export-Utility — identisches Pattern wie alle anderen D3-Charts. | Mittel | — |
-| ~~⭐ `valueFormatter` Prop~~ | ~~`valueFormatter?: (value: number, seriesKey: string) => string`~~ — `seriesKey` ermöglicht serienabhängige Formatierung (z.B. `€` für Umsatz, `kg` für Gewicht). Unabhängig von `gridValueFormatter`. | ~~Niedrig~~ | ✅ v3.22.0 |
 | Animierte Daten-Übergänge | Wenn `data` sich ändert, animierter Übergang der Balken (D3 `transition()` auf den Arc-Paths) — analog zu `duration`-Prop bei SunburstChart / RadialTreeChart. | Mittel | — |
-| `startAngle` Prop | In Grad ab welchem Winkel der erste Balken startet — Standard ist 12 Uhr (−90° = 0° intern). `startAngle?: number` würde erlauben, den Chart z.B. bei 3 Uhr zu beginnen. | Niedrig | — |
-| `selectedBarId` controlled prop | Von außen einen Balken hervorheben (z.B. wenn eine Tabellenzeile daneben selektiert wird) — linked views. Aktuell nur intern bei Hover via Opacity-Effekt. | Mittel | — |
-| ~~Hover-Callback~~ | ~~`onBarHover?` — feuert bei mouseenter/mouseleave~~ | ~~Niedrig~~ | ✅ v3.27.0 |
-
----
-
-## Developer Experience
-
-| Feature | Beschreibung | Aufwand | Status |
-|---|---|---|---|
-| ⭐ GitHub Releases anlegen | Für alle historischen Tags (v1.x–v3.20.0) — GitHub zeigt Releases prominent in der Sidebar; aktuell nur nackte Tags ohne Beschreibung | Niedrig | ⚡ offen |
-| ~~CSS-Klassen-API (Slot-Klassen)~~ | ~~Dokumentierte, stabile CSS-Klassen für Komponenten-Slots — analog zu MUIs CSS Classes API. Ermöglicht Styling via CSS Modules, Tailwind oder Plain CSS ohne JS-only-Hooks. **Konvention (beschlossen):** Präfix `MuiTs` — Slot-Klassen `.MuiTs<Component>-<slot>` (z.B. `.MuiTsTagSelection-chip`), State-Varianten inline camelCase (`.MuiTsPasswordStrengthMeter-strengthBarWeak`), shared State-Klassen `.MuiTs-disabled` / `.MuiTs-selected` / `.MuiTs-focused` / `.MuiTs-error`. **Scope:** TagSelection, PasswordStrengthMeter, ColorPicker — je 3 Exporte: `tagSelectionClasses`, `passwordStrengthMeterClasses`, `colorPickerClasses` + `muiTsStateClasses` geteilt. GanttChart, RichTextEditor und D3-Charts erst später.~~ | ~~Mittel~~ | ✅ v3.24.0 |
-| Playwright Visual Tests | Screenshot-Vergleiche für Chart-Rendering — Qualitätsinvestition, kein User-Feature | Hoch | — |
-| ~~Live Storybook~~ | ~~`https://thebuoyant.github.io/mui-ts-library/`~~ | ~~Mittel~~ | ✅ aktiv — auto-deploy |
-| ~~npm-app Showcase/Playground~~ | ~~Eigenständige Vite-React-App~~ — ~~ersetzt durch stackblitz-demo~~ | ~~Hoch~~ | ✅ entfernt v3.2.0 |
-| ~~Changelog in README sichtbar~~ | ~~Letzte 2 Versionen direkt in README.md eingebettet (EN+DE) — auf npm ohne Link-Klick lesbar~~ | ~~Niedrig~~ | ✅ v3.1.1 |
-| ~~⭐ npm-app Demo für Highlighting~~ | ~~npm-app entfernt — stackblitz-demo zeigt Highlighting~~ | ~~Niedrig~~ | ✅ v3.2.0 |
-| ~~⭐ Storybook — diverse Use-Case-Stories~~ | ~~Alle Stories liefen auf eine generische Default-Fixture pro Komponente hinaus — fühlte sich wie Controls-Spielerei statt Produktpräsentation an.~~ 17 neue Stories mit komplett unterschiedlichen, realistischen Datensätzen (z.B. Disk-Usage, Handelsbeziehungen, Bauprojekt, Blog-Editor, Skill-Selector) über alle 11 Komponenten. | ~~Hoch~~ | ✅ v3.6.0 |
-| ~~⭐ StackBlitz — Use-Case-Einordnung~~ | ~~Demo-Karten zeigten nur Feature-Liste, keine Einordnung wofür man die Komponente einsetzt.~~ Use-Case-Chip pro Karte (z.B. "Database & Analytics Tooling") + geschärfter Hero-Text mit konkreten Wertversprechen. | ~~Niedrig~~ | ✅ v3.6.0 |
-
-**Verworfen:** *VS Code Snippets* — geringer Mehrwert gegenüber Copy-Paste aus den Storybook-Beispielen,
-kein echter Schmerzpunkt.
+| `selectedBarId` controlled prop | Von außen einen Balken hervorheben (z.B. wenn eine Tabellenzeile daneben selektiert wird) — Linked-View-Pattern. Ergänzt `selectedId` aus den D3-Charts-Shared-Plänen. | Mittel | — |
+| ~~⭐ `valueFormatter` Prop~~ | ~~`seriesKey`-Argument für serienabhängige Formatierung (z.B. `€` für Umsatz, `kg` für Gewicht).~~ | ~~Niedrig~~ | ✅ v3.22.0 |
+| ~~Hover-Callback~~ | ~~`onBarHover?` — feuert bei mouseenter / mouseleave.~~ | ~~Niedrig~~ | ✅ v3.27.0 |
 
 ---
 
 ## Historie: Bereits gelöste Adoption-Blocker
 
-Cross-Cutting-Probleme (nicht an eine einzelne Komponente gebunden), die die Adoption des Pakets behindert haben — alle erledigt, hier nur noch als Nachweis/Referenz.
+Cross-Cutting-Probleme die die Adoption des Pakets behindert haben — alle erledigt.
 
-| Feature | Beschreibung | Aufwand | Status |
-|---|---|---|---|
-| ~~**🔴 StackBlitz / CodeSandbox Template**~~ | ~~"Try it now"-Link in README — Entwickler entscheiden in 30 Sek. ohne Installation.~~ | ~~Niedrig~~ | ✅ v3.2.0 |
-| ~~**🔴 Bundle-Bloat / Tree-Shaking**~~ | ~~D3 + CodeMirror + Tiptap landen im Bundle auch wenn nur `TagSelection` genutzt wird.~~ Gelöst via Rollup `preserveModules` — ESM-Build liefert ein File pro Komponente statt einer Bundle-Datei. Kein API-Change, gemessen: 1.1 MB → 22 KB für Single-Component-Import. | ~~Hoch~~ | ✅ v3.3.0 |
-| ~~**🟡 ChordChart Dark-Mode**~~ | ~~`mixBlendMode: "multiply"` → theme-aware: `normal` im dark mode, `multiply` im light mode.~~ | ~~Niedrig~~ | ✅ v3.2.1 |
-| ~~**🟡 HorizontalTreeChart Link-Opacity**~~ | ~~`linkStrokeOpacity`-Default `0.4` → `1.0`, konsistent mit RadialTreeChart.~~ | ~~Niedrig~~ | ✅ v3.2.1 |
-| ~~**🟡 Storybook Charts — play-Funktionen**~~ | ~~D3-Charts zeigten Interaktionsfeatures nur statisch in der Beschreibung.~~ `play`-Funktionen demonstrieren jetzt automatisch: Ctrl+Click Drill-down (Sunburst, RadialTree, HorizontalTree), Ctrl+Click Zoom (CirclePacking), Hover-Highlight (Chord). | ~~Mittel~~ | ✅ v3.5.0 |
-| ~~**🔴 SqlEditor — keine Tests**~~ | ~~`sql-editor/*.test.tsx` existiert nicht.~~ 21 Tests ergänzt (Toolbar-Interaktionen, Dialekte, Schema, Disabled-State). 0% → 82% Lines. | ~~Mittel~~ | ✅ v3.4.0 |
-| ~~**🟡 Test-Coverage-Lücken**~~ | ~~`RichTextEditorImageDialog` (17%), `RichTextEditorTableMenu` (20%), `gantt-chart.util.ts` (0%, Artefakt-Messung) ungetestet.~~ ImageDialog → 94%, TableMenu → 96%, gantt-chart.util → 99% (cascadeDateUpdate + computeCriticalPath ergänzt). Gesamt 68%→74% Lines. | ~~Mittel~~ | ✅ v3.4.0 |
-| ~~**🟡 Accessibility-Audit**~~ | ~~`aria-*` nur in 23 von ~60 Source-Dateien.~~ 13 fehlende `aria-label` ergänzt (GanttTaskPanel, GanttToolbar, TagSelectionAutocomplete Confirm/Cancel, RichTextEditor Color-Swatches + Emoji-Picker). 2 neue TagSelection-Translation-Keys (`confirmCreateLabel`, `cancelCreateLabel`). | ~~Mittel~~ | ✅ v3.4.0 |
+| Feature | Beschreibung | Status |
+|---|---|---|
+| ~~**🔴 StackBlitz / CodeSandbox Template**~~ | ~~"Try it now"-Link in README — Entwickler entscheiden in 30 Sek. ohne Installation.~~ | ✅ v3.2.0 |
+| ~~**🔴 Bundle-Bloat / Tree-Shaking**~~ | ~~`preserveModules` — 1.1 MB → 22 KB für Single-Component-Import.~~ | ✅ v3.3.0 |
+| ~~**🟡 CSS-Klassen-API (Slot-Klassen)**~~ | ~~Stabile `.MuiTs<Component>-<slot>`-Klassen für TagSelection, PasswordStrengthMeter, ColorPicker.~~ | ✅ v3.24.0 |
+| ~~**🟡 ChordChart Dark-Mode**~~ | ~~`mixBlendMode` theme-aware.~~ | ✅ v3.2.1 |
+| ~~**🟡 HorizontalTreeChart Link-Opacity**~~ | ~~`linkStrokeOpacity`-Default auf `1.0`.~~ | ✅ v3.2.1 |
+| ~~**🟡 Storybook Charts — play-Funktionen**~~ | ~~Interaktionsfeatures automatisch demonstriert.~~ | ✅ v3.5.0 |
+| ~~**🔴 SqlEditor — keine Tests**~~ | ~~21 Tests ergänzt, 0 % → 82 % Lines.~~ | ✅ v3.4.0 |
+| ~~**🟡 Test-Coverage-Lücken**~~ | ~~ImageDialog → 94 %, TableMenu → 96 %.~~ | ✅ v3.4.0 |
+| ~~**🟡 Accessibility-Audit**~~ | ~~13 fehlende `aria-label` ergänzt.~~ | ✅ v3.4.0 |
