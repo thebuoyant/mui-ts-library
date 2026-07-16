@@ -511,7 +511,7 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 ## Changelog
 
-### [Unreleased]
+### [3.29.1] — 2026-07-16
 
 **Fixed**
 - Release script and README files: the empty `[Unreleased]` section that appeared above `[3.29.0]` on npm has been removed; `release.sh` now correctly replaces `[Unreleased]` in README files with the version number only (no empty placeholder section preserved). See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.

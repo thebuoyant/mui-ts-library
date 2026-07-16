@@ -11,6 +11,10 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unveröffentlicht]
 
+---
+
+## [3.29.1] — 2026-07-16
+
 ### Behoben
 
 - `release.sh`: Das Python-Skript ersetzt `[Unveröffentlicht]` in README-Dateien jetzt direkt durch die Versionsnummer — kein leerer Platzhalter-Abschnitt wird mehr auf npm angezeigt.

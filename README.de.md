@@ -511,7 +511,7 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/):
 
 ## Changelog
 
-### [Unveröffentlicht]
+### [3.29.1] — 2026-07-16
 
 **Behoben**
 - Release-Script und README-Dateien: Der leere `[Unveröffentlicht]`-Abschnitt, der über `[3.29.0]` auf npm angezeigt wurde, wurde entfernt; `release.sh` ersetzt `[Unveröffentlicht]` in README-Dateien jetzt direkt durch die Versionsnummer (kein leerer Platzhalter-Abschnitt mehr). Siehe [Vollständiger Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.de.md) für Details.

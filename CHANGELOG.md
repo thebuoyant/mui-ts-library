@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [3.29.1] — 2026-07-16
+
 ### Fixed
 
 - `release.sh`: Python script now replaces `[Unreleased]` in README files directly with the version number — no empty placeholder section is preserved on npm.
