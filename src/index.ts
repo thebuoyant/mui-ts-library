@@ -1,4 +1,7 @@
 export * from "./utils/muiTsClasses";
+export * from "./components/date-range-picker/dateRangePickerClasses";
+export * from "./components/date-range-picker/DateRangePicker";
+export * from "./components/date-range-picker/DateRangePicker.types";
 export * from "./components/tag-selection/tagSelectionClasses";
 export * from "./components/password-strength-meter/passwordStrengthMeterClasses";
 export * from "./components/color-picker/colorPickerClasses";

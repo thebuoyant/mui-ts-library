@@ -22,6 +22,7 @@ import {
   HorizontalTreeChart,
   ColorPicker,
   RadialStackedBarChart,
+  DateRangePicker,
 } from "@thebuoyant-tsdev/mui-ts-library";
 import type {
   TagSelectionItem,
@@ -33,6 +34,7 @@ import type {
   HorizontalTreeData,
   RadialStackedBarData,
   RadialStackedBarSeries,
+  DateRangeInput,
 } from "@thebuoyant-tsdev/mui-ts-library";
 
 // ── TagSelection ─────────────────────────────────────────────────────────────
@@ -264,6 +266,7 @@ export default function App() {
   const [mode, setMode]         = useState<"light" | "dark">("light");
   const [showTopBtn, setShowTopBtn] = useState(false);
   const [tags, setTags]         = useState<TagSelectionItem[]>(INITIAL_TAGS);
+  const [dateRange, setDateRange] = useState<DateRangeInput>({ start: null, end: null });
 
   useEffect(() => {
     const onScroll = () => setShowTopBtn(window.scrollY > 300);
@@ -315,14 +318,14 @@ export default function App() {
           Production-ready components, not toy widgets
         </Typography>
         <Typography variant="h6" sx={{ opacity: 0.85, fontWeight: 400, mb: 1.5, maxWidth: 720, mx: "auto" }}>
-          Project planning, content editing, SQL &amp; JSON tooling, D3 data visualization, and theme tooling —
-          13 fully-typed React 19 + MUI v9 components, each built for a real use case below.
+          Project planning, content editing, SQL &amp; JSON tooling, date interval selection, D3 data visualization, and theme tooling —
+          14 fully-typed React 19 + MUI v9 components, each built for a real use case below.
         </Typography>
         <Typography variant="body2" sx={{ opacity: 0.7, mb: 3 }}>
           Edit any file on the left — changes hot-reload instantly. No setup, no install.
         </Typography>
         <Box sx={{ display: "flex", flexDirection: "row", gap: 1, justifyContent: "center", flexWrap: "wrap" }}>
-          {["ChordChart", "CirclePackingChart", "ColorPicker", "GanttChart", "HorizontalTreeChart", "JsonEditor",
+          {["ChordChart", "CirclePackingChart", "ColorPicker", "DateRangePicker", "GanttChart", "HorizontalTreeChart", "JsonEditor",
             "PasswordStrengthMeter", "RadialStackedBarChart", "RadialTreeChart", "RichTextEditor", "SqlEditor", "SunburstChart", "TagSelection"]
             .map(name => (
               <Chip
@@ -394,6 +397,27 @@ export default function App() {
             subtitle="Project timeline with drag & drop, resize handles, progress dragging, milestones, and Ctrl+Scroll zoom."
           >
             <GanttChart tasks={TASKS} draggable resizable progressDraggable height={320} />
+          </DemoCard>
+
+          {/* DateRangePicker */}
+          <DemoCard
+            title="DateRangePicker"
+            useCase="Date Interval Selection"
+            subtitle="Start and end date in a single inline picker — no MUI X Pro license required. Includes end-before-start validation and ISO string output."
+          >
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <DateRangePicker
+                value={dateRange}
+                onChange={(r) => setDateRange({ start: r.start?.date ?? null, end: r.end?.date ?? null })}
+                minDate={new Date("2025-01-01")}
+                maxDate={new Date("2027-12-31")}
+              />
+              {dateRange.start && dateRange.end && (
+                <Typography variant="body2" color="text.secondary">
+                  Selected: {dateRange.start.toLocaleDateString()} → {dateRange.end.toLocaleDateString()}
+                </Typography>
+              )}
+            </Box>
           </DemoCard>
 
           {/* HorizontalTreeChart */}

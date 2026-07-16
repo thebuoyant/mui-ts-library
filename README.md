@@ -16,13 +16,14 @@ A type-safe React component library built on **TypeScript** and **MUI (Material 
 
 ## Components
 
-12 production-ready components across three categories. Each links to a live, interactive demo and a full manual covering every prop, type, and pattern.
+13 production-ready components across three categories. Each links to a live, interactive demo and a full manual covering every prop, type, and pattern.
 
 ### Interactive UI
 
 | Component | What it's for | Try it |
 |---|---|---|
 | [`GanttChart`](#ganttchart) | Drag-and-drop project timelines with milestones, dependencies, and CSV export | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-ganttchart--default) · [Docs](user-manuals/GanttChart.md) |
+| [`DateRangePicker`](#daterangepicker) | Start + end date in one inline picker — fills the MUI X Pro gap, free and dependency-free | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-daterangepicker--default) · [Docs](user-manuals/DateRangePicker.md) |
 | [`TagSelection`](#tagselection) | Multi-tag autocomplete with free-form tag creation and search highlighting | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-tagselection--default) · [Docs](user-manuals/TagSelection.md) |
 | [`PasswordStrengthMeter`](#passwordstrengthmeter) | Real-time strength feedback with a built-in secure password generator | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-passwordstrengthmeter--default) · [Docs](user-manuals/PasswordStrengthMeter.md) |
 | [`ColorPicker`](#colorpicker) | Saturation/hue/alpha color picker panel with an eyedropper tool — MUI ships none | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-colorpicker--default) · [Docs](user-manuals/ColorPicker.md) |
@@ -97,6 +98,33 @@ const tasks: GanttTask[] = [
 ```
 
 → [Full documentation](user-manuals/GanttChart.md)
+
+---
+
+### DateRangePicker
+
+Start and end date in a single inline picker — no MUI X Pro license required. Built for forms, filters, and booking flows. Supports controlled/uncontrolled mode, `minDate`/`maxDate`, `required`, inline validation, and full i18n. `onChange` returns both a `Date` object and an ISO string for each date.
+
+```tsx
+import { DateRangePicker } from '@thebuoyant-tsdev/mui-ts-library';
+import type { DateRange, DateRangeInput } from '@thebuoyant-tsdev/mui-ts-library';
+import { useState } from 'react';
+
+function App() {
+  const [range, setRange] = useState<DateRangeInput>({ start: null, end: null });
+
+  return (
+    <DateRangePicker
+      value={range}
+      onChange={(r) => setRange({ start: r.start?.date ?? null, end: r.end?.date ?? null })}
+      required
+      translation={{ fromLabel: 'From', toLabel: 'To' }}
+    />
+  );
+}
+```
+
+→ [Full documentation](user-manuals/DateRangePicker.md)
 
 ---
 
