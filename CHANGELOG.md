@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `release.sh`: Python script now replaces `[Unreleased]` in README files directly with the version number — no empty placeholder section is preserved on npm.
+- `README.md` / `README.de.md`: Removed the empty `[Unreleased]` section that was incorrectly showing above `[3.29.0]` on npm; added the missing DateRangePicker entry to the `[3.29.0]` section.
+
 ---
 
 ## [3.29.0] — 2026-07-16

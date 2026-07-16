@@ -513,9 +513,15 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 ### [Unreleased]
 
+**Fixed**
+- Release script and README files: the empty `[Unreleased]` section that appeared above `[3.29.0]` on npm has been removed; `release.sh` now correctly replaces `[Unreleased]` in README files with the version number only (no empty placeholder section preserved). See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.
+
 ---
 
 ### [3.29.0] — 2026-07-16
+
+**Added**
+- **DateRangePicker** — new inline start + end date picker component — no MUI X Pro license required. Controlled and uncontrolled modes, `minDate`/`maxDate`, `required` validation with touched-state handling, full i18n via `translation` prop, CSS classes API (`dateRangePickerClasses` + shared `MuiTs-disabled`/`MuiTs-error` state classes on the root), `inputSize`, and `inputMinWidth` to prevent layout shift on validation messages. `onChange` returns `DateRangeEntry` with both a `Date` object and an ISO string. See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.
 
 ---
 

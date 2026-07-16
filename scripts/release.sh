@@ -71,20 +71,29 @@ if [ -n "$BUMP" ]; then
   NEW_VERSION=$(node -p "require('./package.json').version")
   DATE=$(date +"%Y-%m-%d")
 
-  # Rename [Unreleased] → [NEW_VERSION] in changelogs + READMEs and restore empty [Unreleased]
+  # Rename [Unreleased] → [NEW_VERSION] in changelogs + READMEs.
+  # CHANGELOG: keep empty [Unreleased] above the new version (Keep-a-Changelog convention).
+  # README:    replace [Unreleased] directly with the version — no empty section shown on npm.
   python3 - "$NEW_VERSION" "$DATE" <<'PYEOF'
 import re, sys
 ver, date = sys.argv[1], sys.argv[2]
+# (filename, pattern, keep_unreleased_label_or_None, prefix)
 files = [
     ('CHANGELOG.md',    r'## \[Unreleased\]',       '## [Unreleased]',       '##'),
     ('CHANGELOG.de.md', r'## \[Unveröffentlicht\]', '## [Unveröffentlicht]', '##'),
-    ('README.md',       r'### \[Unreleased\]',       '### [Unreleased]',      '###'),
-    ('README.de.md',    r'### \[Unveröffentlicht\]', '### [Unveröffentlicht]','###'),
+    ('README.md',       r'### \[Unreleased\]',       None,                    '###'),
+    ('README.de.md',    r'### \[Unveröffentlicht\]', None,                    '###'),
 ]
 for fname, pattern, label, prefix in files:
     try:
         content = open(fname).read()
-        replacement = f'{label}\n\n---\n\n{prefix} [{ver}] — {date}'
+        version_heading = f'{prefix} [{ver}] — {date}'
+        if label:
+            # CHANGELOG: preserve empty [Unreleased] + insert version below
+            replacement = f'{label}\n\n---\n\n{version_heading}'
+        else:
+            # README: replace [Unreleased] directly with version (no empty section on npm)
+            replacement = version_heading
         content = re.sub(pattern, replacement, content, count=1)
         open(fname, 'w').write(content)
     except FileNotFoundError:

@@ -11,6 +11,11 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unveröffentlicht]
 
+### Behoben
+
+- `release.sh`: Das Python-Skript ersetzt `[Unveröffentlicht]` in README-Dateien jetzt direkt durch die Versionsnummer — kein leerer Platzhalter-Abschnitt wird mehr auf npm angezeigt.
+- `README.md` / `README.de.md`: Den leeren `[Unveröffentlicht]`-Abschnitt entfernt, der fälschlicherweise über `[3.29.0]` auf npm angezeigt wurde; fehlenden DateRangePicker-Eintrag im `[3.29.0]`-Abschnitt nachgetragen.
+
 ---
 
 ## [3.29.0] — 2026-07-16
