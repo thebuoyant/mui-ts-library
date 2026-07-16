@@ -514,7 +514,7 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 ## Changelog
 
-### [Unreleased]
+### [3.29.2] — 2026-07-16
 
 **Fixed**
 - `README.md` / `README.de.md`: added missing `DateRangePicker` types to the TypeScript import block. See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.

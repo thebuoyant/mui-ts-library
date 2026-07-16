@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [3.29.2] — 2026-07-16
+
 ### Fixed
 
 - `README.md` / `README.de.md`: added missing `DateRangePicker` types (`DateRange`, `DateRangeEntry`, `DateRangeInput`, `DateRangePickerProps`, `DateRangePickerTranslation`) to the TypeScript import block in the documentation.

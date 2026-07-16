@@ -514,7 +514,7 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/):
 
 ## Changelog
 
-### [Unveröffentlicht]
+### [3.29.2] — 2026-07-16
 
 **Behoben**
 - `README.md` / `README.de.md`: fehlende `DateRangePicker`-Typen im TypeScript-Import-Block nachgetragen. Siehe [Vollständiger Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.de.md) für Details.
