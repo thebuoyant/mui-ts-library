@@ -458,6 +458,9 @@ import type {
   // GanttChart
   GanttTask, GanttTranslations, GanttTheme, GanttToolbarConfig,
 
+  // DateRangePicker
+  DateRange, DateRangeEntry, DateRangeInput, DateRangePickerProps, DateRangePickerTranslation,
+
   // TagSelection
   TagSelectionItem,
 
@@ -510,6 +513,13 @@ This project follows [Semantic Versioning](https://semver.org/):
 ---
 
 ## Changelog
+
+### [Unreleased]
+
+**Fixed**
+- `README.md` / `README.de.md`: added missing `DateRangePicker` types to the TypeScript import block. See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.
+
+---
 
 ### [3.29.1] — 2026-07-16
 
