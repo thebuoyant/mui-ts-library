@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [3.29.0] — 2026-07-16
+
 ### Added
 
 - **DateRangePicker** — new component filling the MUI X Pro gap: start + end date in a single inline picker. Supports controlled and uncontrolled mode, `minDate`/`maxDate` clamping, `required`, external `error`/`helperText`, full i18n via `translation` prop, and a complete CSS class API (`MuiTsDateRangePicker-root/inputs/startInput/separator/endInput/helperText`). `onChange` returns both `Date` object and ISO string (`YYYY-MM-DD`) per date via `DateRangeEntry`. Validation: end-before-start error shown immediately; required-field errors shown only after the user has interacted with the respective field. Props: `inputSize` (`"small"` | `"medium"`, default `"small"`) for MUI TextField density; `inputMinWidth` (default `170`) fixes each field's width so layout never shifts when a validation message appears. Root element receives `MuiTs-disabled` and `MuiTs-error` state classes for CSS targeting.

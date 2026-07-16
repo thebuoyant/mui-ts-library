@@ -515,6 +515,10 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 ---
 
+### [3.29.0] — 2026-07-16
+
+---
+
 ### [3.28.1] — 2026-07-15
 
 **Fixed**
