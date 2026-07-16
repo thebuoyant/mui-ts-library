@@ -18,13 +18,19 @@ export type DateRangeInput = {
 };
 
 export type DateRangePickerTranslation = {
-  fromLabel: string;
-  toLabel:   string;
+  fromLabel:           string;
+  toLabel:             string;
+  endBeforeStartError: string;
+  startRequiredError:  string;
+  endRequiredError:    string;
 };
 
 export const DEFAULT_DATE_RANGE_PICKER_TRANSLATION: Required<DateRangePickerTranslation> = {
-  fromLabel: "From",
-  toLabel:   "To",
+  fromLabel:           "From",
+  toLabel:             "To",
+  endBeforeStartError: "End date must be after start date",
+  startRequiredError:  "Start date is required",
+  endRequiredError:    "End date is required",
 };
 
 export type DateRangePickerProps = {
@@ -39,6 +45,12 @@ export type DateRangePickerProps = {
   /** Latest selectable date (inclusive). */
   maxDate?: Date;
   disabled?: boolean;
+  /** Marks both inputs as required — shows error after the user has interacted with a field. */
+  required?: boolean;
+  /** External error state — turns the helper text red. */
+  error?: boolean;
+  /** General hint or error message displayed below the picker. */
+  helperText?: string;
   size?: "small" | "medium";
   /** Override any translation key — rest falls back to English defaults. */
   translation?: Partial<DateRangePickerTranslation>;

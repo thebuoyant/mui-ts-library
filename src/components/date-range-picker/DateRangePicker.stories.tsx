@@ -91,3 +91,51 @@ export const EmptyRange: Story = {
     defaultValue: { start: null, end: null },
   },
 };
+
+export const EndBeforeStart: Story = {
+  name: "Validation — End before Start",
+  args: {
+    value: {
+      start: new Date("2026-06-01T00:00:00"),
+      end:   new Date("2026-03-01T00:00:00"),
+    },
+  },
+};
+
+export const Required: Story = {
+  name: "Validation — Required (blur to trigger)",
+  args: {
+    required: true,
+    defaultValue: { start: null, end: null },
+  },
+};
+
+export const ExternalError: Story = {
+  name: "External error + helperText",
+  args: {
+    error:      true,
+    helperText: "The selected range overlaps with an existing booking.",
+    defaultValue: {
+      start: new Date("2026-03-01T00:00:00"),
+      end:   new Date("2026-03-15T00:00:00"),
+    },
+  },
+};
+
+export const GermanValidation: Story = {
+  name: "German — validation messages",
+  args: {
+    translation: {
+      fromLabel:           "Von",
+      toLabel:             "Bis",
+      endBeforeStartError: "Enddatum muss nach dem Startdatum liegen",
+      startRequiredError:  "Startdatum ist erforderlich",
+      endRequiredError:    "Enddatum ist erforderlich",
+    },
+    required: true,
+    value: {
+      start: new Date("2026-06-01T00:00:00"),
+      end:   new Date("2026-03-01T00:00:00"),
+    },
+  },
+};
