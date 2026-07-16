@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { Box, TextField } from "@mui/material";
-import type { DateRange, DateRangePickerProps } from "./DateRangePicker.types";
+import type { DateRangeEntry, DateRangeInput, DateRangePickerProps } from "./DateRangePicker.types";
 import { DEFAULT_DATE_RANGE_PICKER_TRANSLATION } from "./DateRangePicker.types";
 import { dateRangePickerClasses } from "./dateRangePickerClasses";
 
 /** Formats a Date to YYYY-MM-DD in local time (avoids UTC offset issues). */
-function toInputValue(date: Date | null): string {
-  if (!date) return "";
+function toIso(date: Date): string {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
   const d = String(date.getDate()).padStart(2, "0");
@@ -20,7 +19,12 @@ function fromInputValue(value: string): Date | null {
   return isNaN(d.getTime()) ? null : d;
 }
 
-const EMPTY_RANGE: DateRange = { start: null, end: null };
+function toEntry(date: Date | null): DateRangeEntry | null {
+  if (!date) return null;
+  return { date, iso: toIso(date) };
+}
+
+const EMPTY: DateRangeInput = { start: null, end: null };
 
 export function DateRangePicker({
   value,
@@ -35,30 +39,31 @@ export function DateRangePicker({
   const t = { ...DEFAULT_DATE_RANGE_PICKER_TRANSLATION, ...translation };
 
   const isControlled = value !== undefined;
-  const [internal, setInternal] = useState<DateRange>(defaultValue ?? EMPTY_RANGE);
+  // Internal state always stores simple Date | null (same as DateRangeInput)
+  const [internal, setInternal] = useState<DateRangeInput>(defaultValue ?? EMPTY);
 
-  const range = isControlled ? value! : internal;
+  const range: DateRangeInput = isControlled ? value! : internal;
 
-  function emit(next: DateRange) {
-    if (!isControlled) setInternal(next);
-    onChange?.(next);
+  function emit(start: Date | null, end: Date | null) {
+    if (!isControlled) setInternal({ start, end });
+    onChange?.({ start: toEntry(start), end: toEntry(end) });
   }
 
   function handleStartChange(e: React.ChangeEvent<HTMLInputElement>) {
     const start = fromInputValue(e.target.value);
     // If new start is after current end, clear end
     const end = start && range.end && start > range.end ? null : range.end;
-    emit({ start, end });
+    emit(start, end);
   }
 
   function handleEndChange(e: React.ChangeEvent<HTMLInputElement>) {
-    emit({ start: range.start, end: fromInputValue(e.target.value) });
+    emit(range.start, fromInputValue(e.target.value));
   }
 
-  const minStr   = minDate ? toInputValue(minDate) : undefined;
-  const maxStr   = maxDate ? toInputValue(maxDate) : undefined;
+  const minStr = minDate ? toIso(minDate) : undefined;
+  const maxStr = maxDate ? toIso(maxDate) : undefined;
   // End input's min is either the selected start date or the global minDate
-  const endMin   = range.start ? toInputValue(range.start) : minStr;
+  const endMin = range.start ? toIso(range.start) : minStr;
 
   return (
     <Box
@@ -69,7 +74,7 @@ export function DateRangePicker({
         className={dateRangePickerClasses.startInput}
         type="date"
         label={t.fromLabel}
-        value={toInputValue(range.start)}
+        value={range.start ? toIso(range.start) : ""}
         onChange={handleStartChange}
         disabled={disabled}
         size={size}
@@ -96,7 +101,7 @@ export function DateRangePicker({
         className={dateRangePickerClasses.endInput}
         type="date"
         label={t.toLabel}
-        value={toInputValue(range.end)}
+        value={range.end ? toIso(range.end) : ""}
         onChange={handleEndChange}
         disabled={disabled}
         size={size}

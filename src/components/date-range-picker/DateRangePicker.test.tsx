@@ -21,34 +21,37 @@ describe("DateRangePicker", () => {
     expect(getEnd().value).toBe("2026-03-31");
   });
 
-  it("calls onChange when start date changes", () => {
+  it("calls onChange with DateRangeEntry objects when start date changes", () => {
     const onChange = vi.fn();
     render(<DateRangePicker value={{ start: null, end: END }} onChange={onChange} />);
     fireEvent.change(getStart(), { target: { value: "2026-01-10" } });
-    expect(onChange).toHaveBeenCalledWith(
-      expect.objectContaining({ start: new Date("2026-01-10T00:00:00"), end: END }),
-    );
+    expect(onChange).toHaveBeenCalledWith({
+      start: { date: new Date("2026-01-10T00:00:00"), iso: "2026-01-10" },
+      end:   { date: END, iso: "2026-03-31" },
+    });
   });
 
-  it("calls onChange when end date changes", () => {
+  it("calls onChange with DateRangeEntry objects when end date changes", () => {
     const onChange = vi.fn();
     render(<DateRangePicker value={{ start: START, end: null }} onChange={onChange} />);
     fireEvent.change(getEnd(), { target: { value: "2026-06-30" } });
-    expect(onChange).toHaveBeenCalledWith(
-      expect.objectContaining({ start: START, end: new Date("2026-06-30T00:00:00") }),
-    );
+    expect(onChange).toHaveBeenCalledWith({
+      start: { date: START, iso: "2026-01-15" },
+      end:   { date: new Date("2026-06-30T00:00:00"), iso: "2026-06-30" },
+    });
   });
 
-  it("clears end when new start is after current end", () => {
+  it("clears end and returns null entry when new start is after current end", () => {
     const onChange = vi.fn();
     render(<DateRangePicker value={{ start: START, end: END }} onChange={onChange} />);
-    fireEvent.change(getStart(), { target: { value: "2026-04-01" } }); // after END
-    expect(onChange).toHaveBeenCalledWith(
-      expect.objectContaining({ start: new Date("2026-04-01T00:00:00"), end: null }),
-    );
+    fireEvent.change(getStart(), { target: { value: "2026-04-01" } });
+    expect(onChange).toHaveBeenCalledWith({
+      start: { date: new Date("2026-04-01T00:00:00"), iso: "2026-04-01" },
+      end:   null,
+    });
   });
 
-  it("end input min is set to start value", () => {
+  it("end input min is set to the selected start value", () => {
     render(<DateRangePicker value={{ start: START, end: END }} />);
     expect(getEnd().min).toBe("2026-01-15");
   });
@@ -74,10 +77,19 @@ describe("DateRangePicker", () => {
     expect(getEnd()).toBeDisabled();
   });
 
-  it("works in uncontrolled mode", () => {
+  it("works in uncontrolled mode and reflects local state changes", () => {
     render(<DateRangePicker defaultValue={{ start: START, end: END }} />);
     expect(getStart().value).toBe("2026-01-15");
     fireEvent.change(getStart(), { target: { value: "2026-02-01" } });
     expect(getStart().value).toBe("2026-02-01");
+  });
+
+  it("iso field matches YYYY-MM-DD format", () => {
+    const onChange = vi.fn();
+    render(<DateRangePicker value={{ start: null, end: null }} onChange={onChange} />);
+    fireEvent.change(getStart(), { target: { value: "2026-07-04" } });
+    const call = onChange.mock.calls[0][0];
+    expect(call.start.iso).toBe("2026-07-04");
+    expect(call.start.iso).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 });

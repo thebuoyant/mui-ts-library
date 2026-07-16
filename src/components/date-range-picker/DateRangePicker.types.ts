@@ -1,4 +1,18 @@
+/** One date within the range — returned by `onChange` with both representations. */
+export type DateRangeEntry = {
+  date: Date;
+  /** ISO date string in local time: "YYYY-MM-DD" */
+  iso:  string;
+};
+
+/** Rich output type returned by `onChange`. */
 export type DateRange = {
+  start: DateRangeEntry | null;
+  end:   DateRangeEntry | null;
+};
+
+/** Simple input type for the `value` and `defaultValue` props. */
+export type DateRangeInput = {
   start: Date | null;
   end:   Date | null;
 };
@@ -14,10 +28,11 @@ export const DEFAULT_DATE_RANGE_PICKER_TRANSLATION: Required<DateRangePickerTran
 };
 
 export type DateRangePickerProps = {
-  /** Controlled value. Omit to use uncontrolled mode via `defaultValue`. */
-  value?: DateRange;
+  /** Controlled value — pass simple `Date` objects. Omit to use uncontrolled mode via `defaultValue`. */
+  value?: DateRangeInput;
   /** Initial value for uncontrolled mode. */
-  defaultValue?: DateRange;
+  defaultValue?: DateRangeInput;
+  /** Called on every change — receives both `Date` and ISO string per date. */
   onChange?: (range: DateRange) => void;
   /** Earliest selectable date (inclusive). */
   minDate?: Date;

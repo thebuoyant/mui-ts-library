@@ -1,8 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
 import { Box, Typography } from "@mui/material";
 import { useState } from "react";
 import { DateRangePicker } from "./DateRangePicker";
-import type { DateRange } from "./DateRangePicker.types";
+import type { DateRange, DateRangeInput } from "./DateRangePicker.types";
 
 const meta: Meta<typeof DateRangePicker> = {
   title: "Components/DateRangePicker",
@@ -10,6 +11,7 @@ const meta: Meta<typeof DateRangePicker> = {
   args: {
     disabled: false,
     size:     "small",
+    onChange: fn(),
   },
 };
 
@@ -29,13 +31,18 @@ export const Default: Story = {
 export const Controlled: Story = {
   name: "Controlled",
   render: (args) => {
-    const [range, setRange] = useState<DateRange>({
+    const [range, setRange] = useState<DateRangeInput>({
       start: new Date("2026-06-01T00:00:00"),
       end:   new Date("2026-08-31T00:00:00"),
     });
+    function handleChange(r: DateRange) {
+      // value prop accepts DateRangeInput (Date | null), onChange returns DateRange (with .date + .iso)
+      setRange({ start: r.start?.date ?? null, end: r.end?.date ?? null });
+      args.onChange?.(r);
+    }
     return (
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        <DateRangePicker {...args} value={range} onChange={setRange} />
+        <DateRangePicker {...args} value={range} onChange={handleChange} />
         <Typography variant="body2" color="text.secondary">
           Start: {range.start?.toLocaleDateString() ?? "—"}&nbsp;&nbsp;·&nbsp;&nbsp;
           End: {range.end?.toLocaleDateString() ?? "—"}
