@@ -3,6 +3,7 @@ import { Box, FormHelperText, TextField } from "@mui/material";
 import type { DateRangeEntry, DateRangeInput, DateRangePickerProps } from "./DateRangePicker.types";
 import { DEFAULT_DATE_RANGE_PICKER_TRANSLATION } from "./DateRangePicker.types";
 import { dateRangePickerClasses } from "./dateRangePickerClasses";
+import { muiTsStateClasses } from "../../utils/muiTsClasses";
 
 /** Formats a Date to YYYY-MM-DD in local time (avoids UTC offset issues). */
 function toIso(date: Date): string {
@@ -57,11 +58,12 @@ export function DateRangePicker({
   onChange,
   minDate,
   maxDate,
-  disabled  = false,
-  required  = false,
-  error     = false,
+  disabled      = false,
+  required      = false,
+  error         = false,
   helperText,
-  size      = "small",
+  inputSize     = "small",
+  inputMinWidth = 170,
   translation,
 }: DateRangePickerProps) {
   const t = { ...DEFAULT_DATE_RANGE_PICKER_TRANSLATION, ...translation };
@@ -97,9 +99,15 @@ export function DateRangePicker({
   // Native min on end input: browser prevents picking end < start in the date picker UI
   const endMin = range.start ? toIso(range.start) : minStr;
 
+  const hasError = error || !!startError || !!endError;
+
   return (
     <Box
-      className={dateRangePickerClasses.root}
+      className={[
+        dateRangePickerClasses.root,
+        disabled && muiTsStateClasses.disabled,
+        hasError  && muiTsStateClasses.error,
+      ].filter(Boolean).join(" ")}
       sx={{ display: "inline-flex", flexDirection: "column", gap: 0.25 }}
     >
       <Box
@@ -116,8 +124,9 @@ export function DateRangePicker({
           disabled={disabled}
           required={required}
           error={!!startError || error}
-          helperText={startError || undefined}
-          size={size}
+          helperText={startError || " "}
+          size={inputSize}
+          sx={{ width: inputMinWidth }}
           slotProps={{
             inputLabel: { shrink: true },
             htmlInput: {
@@ -136,8 +145,11 @@ export function DateRangePicker({
             color:      "text.disabled",
             userSelect: "none",
             flexShrink: 0,
-            // align with input center — offset for label + potential helperText
-            mt: size === "small" ? "18px" : "22px",
+            lineHeight: 1,
+            // Skip past the floating label area and center in the input box body.
+            // small: OutlinedInput = 40px → center at 20px → mt = 20 - 8 = 12px
+            // medium: OutlinedInput = 56px → center at 28px → mt = 28 - 8 = 20px
+            mt: inputSize === "small" ? "12px" : "20px",
           }}
         >
           –
@@ -153,8 +165,9 @@ export function DateRangePicker({
           disabled={disabled}
           required={required}
           error={!!endError || error}
-          helperText={endError || undefined}
-          size={size}
+          helperText={endError || " "}
+          size={inputSize}
+          sx={{ width: inputMinWidth }}
           slotProps={{
             inputLabel: { shrink: true },
             htmlInput: {

@@ -16,13 +16,14 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 
 ## Komponenten
 
-12 produktionsreife Komponenten in drei Kategorien. Jede verlinkt zu einer interaktiven Live-Demo und einem vollständigen Manual mit allen Props, Typen und Mustern.
+13 produktionsreife Komponenten in drei Kategorien. Jede verlinkt zu einer interaktiven Live-Demo und einem vollständigen Manual mit allen Props, Typen und Mustern.
 
 ### Interaktive UI
 
 | Komponente | Wofür | Ausprobieren |
 |---|---|---|
 | [`GanttChart`](#ganttchart) | Drag-and-Drop-Projekt-Timelines mit Meilensteinen, Abhängigkeiten und CSV-Export | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-ganttchart--default) · [Docs](user-manuals/GanttChart.de.md) |
+| [`DateRangePicker`](#daterangepicker) | Start- und Enddatum in einem Inline-Picker — schließt die MUI X Pro-Lücke, kostenlos und ohne zusätzliche Abhängigkeiten | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-daterangepicker--default) · [Docs](user-manuals/DateRangePicker.de.md) |
 | [`TagSelection`](#tagselection) | Multi-Tag-Autocomplete mit freier Tag-Erstellung und Suchergebnis-Highlighting | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-tagselection--default) · [Docs](user-manuals/TagSelection.de.md) |
 | [`PasswordStrengthMeter`](#passwordstrengthmeter) | Echtzeit-Stärke-Feedback mit eingebautem sicheren Passwort-Generator | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-passwordstrengthmeter--default) · [Docs](user-manuals/PasswordStrengthMeter.de.md) |
 | [`ColorPicker`](#colorpicker) | Sättigung/Farbton/Alpha-Farbwähler-Panel mit Pipette-Werkzeug — MUI bringt keinen mit | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-colorpicker--default) · [Docs](user-manuals/ColorPicker.de.md) |
@@ -97,6 +98,33 @@ const tasks: GanttTask[] = [
 ```
 
 → [Vollständige Dokumentation](user-manuals/GanttChart.de.md)
+
+---
+
+### DateRangePicker
+
+Start- und Enddatum in einem einzigen Inline-Picker — kein MUI X Pro-Lizenz erforderlich. Entwickelt für Formulare, Filter und Buchungsflows. Unterstützt Controlled/Uncontrolled-Modus, `minDate`/`maxDate`, `required`, Inline-Validierung und vollständige i18n. `onChange` gibt für jedes Datum sowohl ein `Date`-Objekt als auch einen ISO-String zurück.
+
+```tsx
+import { DateRangePicker } from '@thebuoyant-tsdev/mui-ts-library';
+import type { DateRange, DateRangeInput } from '@thebuoyant-tsdev/mui-ts-library';
+import { useState } from 'react';
+
+function App() {
+  const [range, setRange] = useState<DateRangeInput>({ start: null, end: null });
+
+  return (
+    <DateRangePicker
+      value={range}
+      onChange={(r) => setRange({ start: r.start?.date ?? null, end: r.end?.date ?? null })}
+      required
+      translation={{ fromLabel: 'Von', toLabel: 'Bis' }}
+    />
+  );
+}
+```
+
+→ [Vollständige Dokumentation](user-manuals/DateRangePicker.de.md)
 
 ---
 

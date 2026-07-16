@@ -51,7 +51,9 @@ export type DateRangePickerProps = {
   error?: boolean;
   /** General hint or error message displayed below the picker. */
   helperText?: string;
-  size?: "small" | "medium";
+  inputSize?: "small" | "medium";
+  /** Minimum (and fixed) width of each date input in pixels. Prevents the field from stretching when a helperText or error message appears. Default: 170. */
+  inputMinWidth?: number;
   /** Override any translation key — rest falls back to English defaults. */
   translation?: Partial<DateRangePickerTranslation>;
 };
