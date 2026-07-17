@@ -1,4 +1,7 @@
 export * from "./utils/muiTsClasses";
+export * from "./components/kanban-board/kanbanBoardClasses";
+export * from "./components/kanban-board/KanbanBoard";
+export * from "./components/kanban-board/KanbanBoard.types";
 export * from "./components/date-range-picker/dateRangePickerClasses";
 export * from "./components/date-range-picker/DateRangePicker";
 export * from "./components/date-range-picker/DateRangePicker.types";
