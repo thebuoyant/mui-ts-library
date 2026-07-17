@@ -555,7 +555,7 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/):
 
 ## Changelog
 
-### [Unveröffentlicht]
+### [3.30.0] — 2026-07-17
 
 **Hinzugefügt**
 - **KanbanBoard** — neue Drag-and-Drop-Kanban-Board-Komponente mit eingebauten CRUD-Dialogen, WIP-Limits, Kartenfarben, Zuständige-Person- und Fälligkeitsdatum-Chips, `chipVariant`-Prop, vollständiger i18n und CSS-Klassen-API (`kanbanBoardClasses`). Siehe [Vollständiger Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.de.md) für Details.

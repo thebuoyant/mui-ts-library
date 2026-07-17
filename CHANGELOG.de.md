@@ -11,6 +11,10 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unveröffentlicht]
 
+---
+
+## [3.30.0] — 2026-07-17
+
 ### Hinzugefügt
 
 - **KanbanBoard** — neue Drag-and-Drop-Kanban-Board-Komponente auf Basis von `@dnd-kit`.
