@@ -11,6 +11,23 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unveröffentlicht]
 
+### Hinzugefügt
+
+- **KanbanBoard** — neue Drag-and-Drop-Kanban-Board-Komponente auf Basis von `@dnd-kit`.
+  - Spalten mit konfigurierbaren Akzentfarben und optionalen WIP-Limits (Anzahl-Chip wird rot wenn überschritten).
+  - Karten mit Titel, optionalem Zuständige-Person-Chip, optionalem Fälligkeitsdatum-Chip, optionalem farbigem linken Rahmen und `color`-Prop für individuelle Kartenakzente.
+  - Karten zwischen Spalten ziehen und innerhalb einer Spalte neu sortieren; Pointer-Sensor (8 px Aktivierungsdistanz) + Tastatur-Sensor.
+  - Eingebaute Hinzufügen-/Bearbeiten-/Löschen-Dialoge (`enableBuiltinDialogs`, Standard `true`); auf `false` setzen um Klicks selbst über `onCardClick` zu behandeln.
+  - `chipVariant`-Prop (`"outlined"` | `"filled"`, Standard `"outlined"`) steuert die MUI-Chip-Variante für Meta-Chips auf Karten.
+  - Vollständige i18n über `translation`-Prop (`Partial<KanbanBoardTranslation>`); fällt auf englische Standardwerte zurück.
+  - CSS-Klassen-API: `kanbanBoardClasses` (alle `MuiTsKanbanBoard-*`-Slots); die gezogene Karte erhält die gemeinsame Zustandsklasse `MuiTs-selected`.
+  - Callbacks: `onTasksChange`, `onTaskCreated`, `onTaskUpdated`, `onTaskDeleted`, `onCardClick`.
+  - Props: `showAssignee`, `showDueDate`, `chipVariant`, `height`.
+  - Neue Exports: `KanbanBoard`, `kanbanBoardClasses`, `KanbanTask`, `KanbanColumn`, `KanbanBoardProps`, `KanbanBoardTranslation`.
+  - `onTaskMoved(task, fromColumnId, toColumnId)`: feuert ausschließlich wenn eine Karte per DnD eine Spaltengrenze überschreitet — nicht bei Neuordnung innerhalb der Spalte oder dialog-basierter Status-Änderung. Ermöglicht gezielte Backend-Calls (z.B. `PATCH /tasks/:id { status }`) und Undo-Stacks ohne Full-List-Diff.
+  - Benutzerhandbücher: [EN](user-manuals/KanbanBoard.md) · [DE](user-manuals/KanbanBoard.de.md) — inkl. GanttChart-Adapter-Abschnitt (Muster „Gleiche Daten, zwei Ansichten").
+  - 8 Storybook-Stories, 26 Unit-Tests.
+
 ---
 
 ## [3.29.2] — 2026-07-16

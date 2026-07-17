@@ -16,13 +16,14 @@ A type-safe React component library built on **TypeScript** and **MUI (Material 
 
 ## Components
 
-13 production-ready components across three categories. Each links to a live, interactive demo and a full manual covering every prop, type, and pattern.
+15 production-ready components across three categories. Each links to a live, interactive demo and a full manual covering every prop, type, and pattern.
 
 ### Interactive UI
 
 | Component | What it's for | Try it |
 |---|---|---|
 | [`GanttChart`](#ganttchart) | Drag-and-drop project timelines with milestones, dependencies, and CSV export | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-ganttchart--default) · [Docs](user-manuals/GanttChart.md) |
+| [`KanbanBoard`](#kanbanboard) | Drag-and-drop Kanban board with built-in CRUD dialogs, WIP limits, and i18n | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-kanbanboard--default) · [Docs](user-manuals/KanbanBoard.md) |
 | [`DateRangePicker`](#daterangepicker) | Start + end date in one inline picker — fills the MUI X Pro gap, free and dependency-free | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-daterangepicker--default) · [Docs](user-manuals/DateRangePicker.md) |
 | [`TagSelection`](#tagselection) | Multi-tag autocomplete with free-form tag creation and search highlighting | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-tagselection--default) · [Docs](user-manuals/TagSelection.md) |
 | [`PasswordStrengthMeter`](#passwordstrengthmeter) | Real-time strength feedback with a built-in secure password generator | [Live demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-passwordstrengthmeter--default) · [Docs](user-manuals/PasswordStrengthMeter.md) |
@@ -98,6 +99,43 @@ const tasks: GanttTask[] = [
 ```
 
 → [Full documentation](user-manuals/GanttChart.md)
+
+---
+
+### KanbanBoard
+
+A drag-and-drop Kanban board with built-in Add / Edit / Delete dialogs, WIP limits, and full i18n. Use it for task management dashboards, sprint boards, or any workflow where users move work items between status columns — with card colors, assignee chips, due-date chips, and a configurable chip style.
+
+```tsx
+import { KanbanBoard } from '@thebuoyant-tsdev/mui-ts-library';
+import type { KanbanColumn, KanbanTask } from '@thebuoyant-tsdev/mui-ts-library';
+import { useState } from 'react';
+
+const columns: KanbanColumn[] = [
+  { id: 'todo',        label: 'To Do',       color: '#9e9e9e' },
+  { id: 'in-progress', label: 'In Progress', color: '#2196f3' },
+  { id: 'done',        label: 'Done',        color: '#4caf50' },
+];
+
+function App() {
+  const [tasks, setTasks] = useState<KanbanTask[]>([
+    { id: '1', title: 'Set up project',    status: 'todo',        assignee: 'Alice' },
+    { id: '2', title: 'Implement feature', status: 'in-progress', assignee: 'Bob', dueDate: new Date('2026-08-01') },
+    { id: '3', title: 'Write tests',       status: 'done' },
+  ]);
+
+  return (
+    <KanbanBoard
+      columns={columns}
+      tasks={tasks}
+      onTasksChange={setTasks}
+      height={500}
+    />
+  );
+}
+```
+
+→ [Full documentation](user-manuals/KanbanBoard.md)
 
 ---
 
@@ -458,6 +496,9 @@ import type {
   // GanttChart
   GanttTask, GanttTranslations, GanttTheme, GanttToolbarConfig,
 
+  // KanbanBoard
+  KanbanTask, KanbanColumn, KanbanBoardProps, KanbanBoardTranslation,
+
   // DateRangePicker
   DateRange, DateRangeEntry, DateRangeInput, DateRangePickerProps, DateRangePickerTranslation,
 
@@ -513,6 +554,13 @@ This project follows [Semantic Versioning](https://semver.org/):
 ---
 
 ## Changelog
+
+### [Unreleased]
+
+**Added**
+- **KanbanBoard** — new drag-and-drop Kanban board component with built-in Add / Edit / Delete dialogs, WIP limits, card colors, assignee and due-date chips, `chipVariant` prop, full i18n, and a CSS classes API (`kanbanBoardClasses`). See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.
+
+---
 
 ### [3.29.2] — 2026-07-16
 
