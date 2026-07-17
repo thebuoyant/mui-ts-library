@@ -38,17 +38,20 @@ const meta: Meta<typeof KanbanBoard> = {
     enableBuiltinDialogs: true,
     showAssignee:         true,
     showDueDate:          true,
+    chipVariant:          "outlined",
     height:               500,
     onTasksChange:        fn(),
     onTaskCreated:        fn(),
     onTaskUpdated:        fn(),
     onTaskDeleted:        fn(),
+    onTaskMoved:          fn(),
     onCardClick:          fn(),
   },
   argTypes: {
     enableBuiltinDialogs: { control: "boolean" },
     showAssignee:         { control: "boolean" },
     showDueDate:          { control: "boolean" },
+    chipVariant:          { control: "radio", options: ["outlined", "filled"] },
     height:               { control: "number" },
     // Complex objects — use dedicated stories instead.
     columns:              { control: false },
@@ -59,6 +62,7 @@ const meta: Meta<typeof KanbanBoard> = {
     onTaskCreated:        { control: false },
     onTaskUpdated:        { control: false },
     onTaskDeleted:        { control: false },
+    onTaskMoved:          { control: false },
     onCardClick:          { control: false },
   },
   parameters: {

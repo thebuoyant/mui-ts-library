@@ -16,13 +16,14 @@ Eine typsichere React-Komponentenbibliothek auf Basis von **TypeScript** und **M
 
 ## Komponenten
 
-13 produktionsreife Komponenten in drei Kategorien. Jede verlinkt zu einer interaktiven Live-Demo und einem vollständigen Manual mit allen Props, Typen und Mustern.
+15 produktionsreife Komponenten in drei Kategorien. Jede verlinkt zu einer interaktiven Live-Demo und einem vollständigen Manual mit allen Props, Typen und Mustern.
 
 ### Interaktive UI
 
 | Komponente | Wofür | Ausprobieren |
 |---|---|---|
 | [`GanttChart`](#ganttchart) | Drag-and-Drop-Projekt-Timelines mit Meilensteinen, Abhängigkeiten und CSV-Export | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-ganttchart--default) · [Docs](user-manuals/GanttChart.de.md) |
+| [`KanbanBoard`](#kanbanboard) | Drag-and-Drop-Kanban-Board mit eingebauten CRUD-Dialogen, WIP-Limits und i18n | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-kanbanboard--default) · [Docs](user-manuals/KanbanBoard.de.md) |
 | [`DateRangePicker`](#daterangepicker) | Start- und Enddatum in einem Inline-Picker — schließt die MUI X Pro-Lücke, kostenlos und ohne zusätzliche Abhängigkeiten | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-daterangepicker--default) · [Docs](user-manuals/DateRangePicker.de.md) |
 | [`TagSelection`](#tagselection) | Multi-Tag-Autocomplete mit freier Tag-Erstellung und Suchergebnis-Highlighting | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-tagselection--default) · [Docs](user-manuals/TagSelection.de.md) |
 | [`PasswordStrengthMeter`](#passwordstrengthmeter) | Echtzeit-Stärke-Feedback mit eingebautem sicheren Passwort-Generator | [Live-Demo](https://thebuoyant.github.io/mui-ts-library/?path=/story/components-passwordstrengthmeter--default) · [Docs](user-manuals/PasswordStrengthMeter.de.md) |
@@ -98,6 +99,43 @@ const tasks: GanttTask[] = [
 ```
 
 → [Vollständige Dokumentation](user-manuals/GanttChart.de.md)
+
+---
+
+### KanbanBoard
+
+Ein Drag-and-Drop-Kanban-Board mit eingebauten Hinzufügen-/Bearbeiten-/Löschen-Dialogen, WIP-Limits und vollständiger i18n. Ideal für Task-Management-Dashboards, Sprint-Boards oder jeden Workflow, bei dem Nutzer Aufgaben zwischen Statusspalten verschieben sollen — mit Kartenfarben, Zuständige-Person-Chips, Fälligkeitsdatum-Chips und konfigurierbarer Chip-Darstellung.
+
+```tsx
+import { KanbanBoard } from '@thebuoyant-tsdev/mui-ts-library';
+import type { KanbanColumn, KanbanTask } from '@thebuoyant-tsdev/mui-ts-library';
+import { useState } from 'react';
+
+const columns: KanbanColumn[] = [
+  { id: 'todo',        label: 'Zu erledigen', color: '#9e9e9e' },
+  { id: 'in-progress', label: 'In Arbeit',    color: '#2196f3' },
+  { id: 'done',        label: 'Erledigt',     color: '#4caf50' },
+];
+
+function App() {
+  const [tasks, setTasks] = useState<KanbanTask[]>([
+    { id: '1', title: 'Projekt aufsetzen',  status: 'todo',        assignee: 'Alice' },
+    { id: '2', title: 'Feature umsetzen',   status: 'in-progress', assignee: 'Bob', dueDate: new Date('2026-08-01') },
+    { id: '3', title: 'Tests schreiben',    status: 'done' },
+  ]);
+
+  return (
+    <KanbanBoard
+      columns={columns}
+      tasks={tasks}
+      onTasksChange={setTasks}
+      height={500}
+    />
+  );
+}
+```
+
+→ [Vollständige Dokumentation](user-manuals/KanbanBoard.de.md)
 
 ---
 
@@ -458,6 +496,9 @@ import type {
   // GanttChart
   GanttTask, GanttTranslations, GanttTheme, GanttToolbarConfig,
 
+  // KanbanBoard
+  KanbanTask, KanbanColumn, KanbanBoardProps, KanbanBoardTranslation,
+
   // DateRangePicker
   DateRange, DateRangeEntry, DateRangeInput, DateRangePickerProps, DateRangePickerTranslation,
 
@@ -513,6 +554,13 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/):
 ---
 
 ## Changelog
+
+### [Unveröffentlicht]
+
+**Hinzugefügt**
+- **KanbanBoard** — neue Drag-and-Drop-Kanban-Board-Komponente mit eingebauten CRUD-Dialogen, WIP-Limits, Kartenfarben, Zuständige-Person- und Fälligkeitsdatum-Chips, `chipVariant`-Prop, vollständiger i18n und CSS-Klassen-API (`kanbanBoardClasses`). Siehe [Vollständiger Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.de.md) für Details.
+
+---
 
 ### [3.29.2] — 2026-07-16
 

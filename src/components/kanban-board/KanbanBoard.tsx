@@ -30,9 +30,11 @@ export function KanbanBoard({
   onTaskCreated,
   onTaskUpdated,
   onTaskDeleted,
-  showAssignee = true,
-  showDueDate  = true,
-  height       = "100%",
+  onTaskMoved,
+  showAssignee  = true,
+  showDueDate   = true,
+  chipVariant   = "outlined",
+  height        = "100%",
   translation,
 }: KanbanBoardProps) {
   const t = { ...DEFAULT_KANBAN_BOARD_TRANSLATION, ...translation };
@@ -78,6 +80,9 @@ export function KanbanBoard({
   }
 
   function handleDragEnd({ active, over }: DragEndEvent) {
+    // Capture the original column before clearing activeTask — it's the source
+    // of truth for fromColumnId since handleDragOver may have already mutated status.
+    const fromColumnId = activeTask?.status;
     setActiveTask(null);
 
     if (!over) {
@@ -100,6 +105,14 @@ export function KanbanBoard({
 
     setInternalTasks(finalTasks);
     onTasksChange?.(finalTasks);
+
+    // Fire only when the card crossed a column boundary (not for in-column reorder).
+    if (fromColumnId) {
+      const movedTask = finalTasks.find((t) => t.id === activeId);
+      if (movedTask && movedTask.status !== fromColumnId) {
+        onTaskMoved?.(movedTask, fromColumnId, movedTask.status);
+      }
+    }
   }
 
   // ── Dialog handlers ───────────────────────────────────────────────────────────
@@ -174,6 +187,7 @@ export function KanbanBoard({
               tasks={internalTasks.filter((t) => t.status === column.id)}
               showAssignee={showAssignee}
               showDueDate={showDueDate}
+              chipVariant={chipVariant}
               t={t}
               enableBuiltinDialogs={enableBuiltinDialogs}
               onCardClick={handleCardClick}
@@ -188,6 +202,7 @@ export function KanbanBoard({
               task={activeTask}
               showAssignee={showAssignee}
               showDueDate={showDueDate}
+              chipVariant={chipVariant}
               t={t}
               onCardClick={() => {}}
               isOverlay

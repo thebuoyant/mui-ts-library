@@ -277,6 +277,37 @@ describe("KanbanBoard", () => {
     expect(screen.queryByText("Add card")).not.toBeInTheDocument();
   });
 
+  // ── onTaskMoved ───────────────────────────────────────────────────────────────
+
+  it("accepts onTaskMoved prop without errors", () => {
+    const onTaskMoved = vi.fn();
+    render(<KanbanBoard columns={COLUMNS} tasks={TASKS} onTaskMoved={onTaskMoved} />);
+    expect(screen.getByText("Task Alpha")).toBeInTheDocument();
+    expect(onTaskMoved).not.toHaveBeenCalled();
+  });
+
+  it("does not call onTaskMoved when card is saved via Edit dialog", () => {
+    // onTaskMoved is DnD-only — any dialog save must NOT trigger it,
+    // only onTaskUpdated fires for that path.
+    const onTaskMoved   = vi.fn();
+    const onTaskUpdated = vi.fn();
+    render(
+      <KanbanBoard
+        columns={COLUMNS}
+        tasks={TASKS}
+        onTaskMoved={onTaskMoved}
+        onTaskUpdated={onTaskUpdated}
+      />,
+    );
+    fireEvent.click(screen.getByText("Task Alpha"));
+    const dialog    = screen.getByRole("dialog");
+    const titleInput = within(dialog).getByLabelText(/Title/i);
+    fireEvent.change(titleInput, { target: { value: "Task Alpha (edited)" } });
+    fireEvent.click(screen.getByText("Save"));
+    expect(onTaskUpdated).toHaveBeenCalled();
+    expect(onTaskMoved).not.toHaveBeenCalled();
+  });
+
   // ── CSS classes ───────────────────────────────────────────────────────────────
 
   it("applies kanbanBoardClasses.root to the outermost element", () => {

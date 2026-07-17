@@ -11,6 +11,7 @@ type KanbanBoardColumnProps = {
   tasks: KanbanTask[];
   showAssignee: boolean;
   showDueDate: boolean;
+  chipVariant: "outlined" | "filled";
   t: Required<KanbanBoardTranslation>;
   enableBuiltinDialogs: boolean;
   onCardClick: (task: KanbanTask) => void;
@@ -22,6 +23,7 @@ export function KanbanBoardColumn({
   tasks,
   showAssignee,
   showDueDate,
+  chipVariant,
   t,
   enableBuiltinDialogs,
   onCardClick,
@@ -33,6 +35,9 @@ export function KanbanBoardColumn({
   const countLabel = column.wipLimit !== undefined
     ? `${tasks.length} / ${column.wipLimit}`
     : `${tasks.length}`;
+
+  // Accent color: use column.color, fall back to MUI primary.
+  const accentColor = column.color ?? "primary.main";
 
   return (
     <Box
@@ -61,7 +66,8 @@ export function KanbanBoardColumn({
           gap: 1,
           borderBottom: "1px solid",
           borderColor: "divider",
-          borderTop: column.color ? `3px solid ${column.color}` : "3px solid transparent",
+          borderTop: `3px solid ${column.color ?? "transparent"}`,
+          bgcolor: (theme) => theme.palette.mode === "dark" ? "grey.800" : "grey.300",
         }}
       >
         <Typography
@@ -76,12 +82,19 @@ export function KanbanBoardColumn({
           label={countLabel}
           size="small"
           color={isOverLimit ? "error" : "default"}
-          sx={{ height: 20, fontSize: "0.7rem" }}
+          sx={{
+            height: 20,
+            fontSize: "0.7rem",
+            ...(!isOverLimit && column.color && {
+              bgcolor: column.color,
+              color: "#fff",
+            }),
+          }}
           aria-label={`${tasks.length} cards${column.wipLimit ? ` of ${column.wipLimit} limit` : ""}`}
         />
       </Box>
 
-      {/* Card list */}
+      {/* Card list — background slightly lighter than cards to create contrast */}
       <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
         <Box
           ref={setNodeRef}
@@ -91,7 +104,10 @@ export function KanbanBoardColumn({
             overflowY: "auto",
             p: 1,
             minHeight: 80,
-            bgcolor: isOver ? "action.hover" : undefined,
+            bgcolor: (theme) => {
+              if (isOver) return theme.palette.action.selected;
+              return theme.palette.mode === "dark" ? theme.palette.grey[900] : theme.palette.grey[100];
+            },
             transition: "background-color 0.15s",
           }}
         >
@@ -110,6 +126,7 @@ export function KanbanBoardColumn({
               task={task}
               showAssignee={showAssignee}
               showDueDate={showDueDate}
+              chipVariant={chipVariant}
               t={t}
               onCardClick={onCardClick}
             />
@@ -117,7 +134,7 @@ export function KanbanBoardColumn({
         </Box>
       </SortableContext>
 
-      {/* Add button */}
+      {/* Add card button — visually prominent via dashed border in column accent color */}
       {enableBuiltinDialogs && (
         <Box sx={{ p: 1, borderTop: "1px solid", borderColor: "divider" }}>
           <Button
@@ -125,9 +142,21 @@ export function KanbanBoardColumn({
             startIcon={<AddIcon />}
             size="small"
             fullWidth
-            variant="text"
             onClick={() => onAddClick(column.id)}
-            sx={{ justifyContent: "flex-start", color: "text.secondary" }}
+            sx={{
+              justifyContent: "flex-start",
+              color: accentColor,
+              border: "1px dashed",
+              borderColor: accentColor,
+              borderRadius: 1,
+              py: 0.75,
+              fontWeight: 600,
+              letterSpacing: 0.5,
+              "&:hover": {
+                bgcolor: "action.hover",
+                borderStyle: "dashed",
+              },
+            }}
           >
             {t.addCardLabel}
           </Button>

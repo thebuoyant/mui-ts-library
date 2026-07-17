@@ -2,7 +2,7 @@
   "name": "@thebuoyant-tsdev/mui-ts-library",
   "version": "3.29.2",
   "private": false,
-  "description": "Type-safe React component library for MUI v9. Gantt chart with drag & drop, WYSIWYG rich text editor (TipTap), SQL & JSON code editors (CodeMirror 6), D3 data visualizations (Sunburst, Chord, RadialTree, CirclePacking, HorizontalTree, RadialStackedBar), tag selector, password strength meter, and a color picker. Full TypeScript, dark mode, i18n.",
+  "description": "Type-safe React component library for MUI v9. Kanban board with drag & drop, Gantt chart, WYSIWYG rich text editor (TipTap), SQL & JSON code editors (CodeMirror 6), D3 data visualizations (Sunburst, Chord, RadialTree, CirclePacking, HorizontalTree, RadialStackedBar), date range picker, tag selector, password strength meter, and a color picker. Full TypeScript, dark mode, i18n.",
   "author": {
     "name": "Thomas Schlender",
     "email": "thebuoyant@gmail.com"
@@ -58,6 +58,10 @@
     "i18n",
     "a11y",
     "storybook",
+    "kanban",
+    "kanban-board",
+    "sprint-board",
+    "task-board",
     "gantt",
     "gantt-chart",
     "react-gantt",

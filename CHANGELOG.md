@@ -11,6 +11,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **KanbanBoard** — new drag-and-drop Kanban board component built on `@dnd-kit`.
+  - Columns with configurable accent colors and optional WIP limits (count chip turns red when exceeded).
+  - Cards with title, optional assignee chip, optional due-date chip, optional colored left border, and `color` prop for individual card accent.
+  - Drag cards between columns and reorder within a column; pointer sensor (8 px activation distance) + keyboard sensor.
+  - Built-in Add / Edit / Delete dialogs (`enableBuiltinDialogs`, default `true`); set to `false` to handle clicks yourself via `onCardClick`.
+  - `chipVariant` prop (`"outlined"` | `"filled"`, default `"outlined"`) controls MUI Chip variant for meta chips on cards.
+  - Full i18n via `translation` prop (`Partial<KanbanBoardTranslation>`); falls back to English defaults.
+  - CSS classes API: `kanbanBoardClasses` (all `MuiTsKanbanBoard-*` slots); dragged card receives shared state class `MuiTs-selected`.
+  - Callbacks: `onTasksChange`, `onTaskCreated`, `onTaskUpdated`, `onTaskDeleted`, `onCardClick`.
+  - Props: `showAssignee`, `showDueDate`, `chipVariant`, `height`.
+  - New exports: `KanbanBoard`, `kanbanBoardClasses`, `KanbanTask`, `KanbanColumn`, `KanbanBoardProps`, `KanbanBoardTranslation`.
+  - `onTaskMoved(task, fromColumnId, toColumnId)`: fires exclusively when a card crosses a column boundary via DnD — not for in-column reordering or dialog-based status changes. Enables targeted backend calls (e.g. `PATCH /tasks/:id { status }`) and undo stacks without diffing the full list.
+  - User manuals: [EN](user-manuals/KanbanBoard.md) · [DE](user-manuals/KanbanBoard.de.md) — including GanttChart adapter section ("same data, two views" pattern).
+  - 8 Storybook stories, 26 unit tests.
+
 ---
 
 ## [3.29.2] — 2026-07-16

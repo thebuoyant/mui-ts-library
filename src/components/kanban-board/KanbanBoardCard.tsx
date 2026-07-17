@@ -7,17 +7,44 @@ import type { KanbanBoardTranslation, KanbanTask } from "./KanbanBoard.types";
 import { kanbanBoardClasses } from "./kanbanBoardClasses";
 import { muiTsStateClasses } from "../../utils/muiTsClasses";
 
+// Shared sx for meta chips — explicit width/height on the icon so the SVG can never
+// override the container's font-size (MuiSvgIcon-fontSizeMedium sets 1.5rem by default).
+const CHIP_SX = {
+  fontSize: "0.7rem",
+  height: 22,
+  "& .MuiChip-icon": {
+    fontSize: "0.75rem",
+    width:    "0.75rem",
+    height:   "0.75rem",
+    ml: "8px",   // left edge → icon: 8px (was 5px default)
+    mr: "4px",   // icon → text: 4px (was −6px default — which crushed them together)
+  },
+  "& .MuiChip-label": {
+    pl: "2px",   // small — icon mr already provides the gap
+    pr: "10px",  // generous right side
+  },
+} as const;
+
 type KanbanBoardCardProps = {
   task: KanbanTask;
   showAssignee: boolean;
   showDueDate: boolean;
+  chipVariant: "outlined" | "filled";
   t: Required<KanbanBoardTranslation>;
   onCardClick: (task: KanbanTask) => void;
   /** True when this card is the drag overlay ghost — rendered without transform/listeners. */
   isOverlay?: boolean;
 };
 
-export function KanbanBoardCard({ task, showAssignee, showDueDate, t, onCardClick, isOverlay = false }: KanbanBoardCardProps) {
+export function KanbanBoardCard({
+  task,
+  showAssignee,
+  showDueDate,
+  chipVariant,
+  t,
+  onCardClick,
+  isOverlay = false,
+}: KanbanBoardCardProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: task.id,
     disabled: isOverlay,
@@ -49,6 +76,9 @@ export function KanbanBoardCard({ task, showAssignee, showDueDate, t, onCardClic
         mb: 1,
         borderLeft: task.color ? `4px solid ${task.color}` : undefined,
         userSelect: "none",
+        // Subtle tinted background so cards read as slightly off-white —
+        // creates contrast against the lighter column body.
+        bgcolor: (theme) => theme.palette.mode === "dark" ? "grey.800" : "background.paper",
         "&:active": { cursor: "grabbing" },
       }}
       {...(isOverlay ? {} : { ...attributes, ...listeners })}
@@ -76,9 +106,9 @@ export function KanbanBoardCard({ task, showAssignee, showDueDate, t, onCardClic
                   icon={<PersonIcon />}
                   label={task.assignee}
                   size="small"
-                  variant="outlined"
+                  variant={chipVariant}
                   aria-label={`${t.dialogFieldAssignee}: ${task.assignee}`}
-                  sx={{ fontSize: "0.7rem", height: 22 }}
+                  sx={CHIP_SX}
                 />
               )}
               {showDueDate && dueDateStr && (
@@ -87,9 +117,9 @@ export function KanbanBoardCard({ task, showAssignee, showDueDate, t, onCardClic
                   icon={<CalendarTodayIcon />}
                   label={dueDateStr}
                   size="small"
-                  variant="outlined"
+                  variant={chipVariant}
                   aria-label={`${t.dialogFieldDueDate}: ${dueDateStr}`}
-                  sx={{ fontSize: "0.7rem", height: 22 }}
+                  sx={CHIP_SX}
                 />
               )}
             </Box>

@@ -79,10 +79,23 @@ export type KanbanBoardProps = {
   onTaskUpdated?: (task: KanbanTask) => void;
   /** Called after a card is deleted via the built-in Delete confirmation. */
   onTaskDeleted?: (taskId: string) => void;
+  /**
+   * Called when a card is moved to a different column via drag and drop.
+   * NOT fired for in-column reordering or dialog-based status changes — use
+   * `onTaskUpdated` for those. Carries the full updated task plus both column ids
+   * so consumers can issue a targeted API call without diffing the full list.
+   */
+  onTaskMoved?: (task: KanbanTask, fromColumnId: string, toColumnId: string) => void;
   /** Show the assignee label on cards (default: true). */
   showAssignee?: boolean;
   /** Show the due date on cards (default: true). */
   showDueDate?: boolean;
+  /**
+   * MUI Chip variant for assignee and due-date chips on cards.
+   * `"outlined"` (default) — subtle border, transparent background.
+   * `"filled"` — solid background, more prominent.
+   */
+  chipVariant?: "outlined" | "filled";
   /** Height of the board. Default: "100%". */
   height?: number | string;
   /** Override any label or message — unset keys fall back to English defaults. */

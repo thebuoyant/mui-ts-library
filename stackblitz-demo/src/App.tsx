@@ -12,6 +12,7 @@ import {
   TagSelection,
   PasswordStrengthMeter,
   GanttChart,
+  KanbanBoard,
   RichTextEditor,
   SqlEditor,
   JsonEditor,
@@ -27,6 +28,8 @@ import {
 import type {
   TagSelectionItem,
   GanttTask,
+  KanbanColumn,
+  KanbanTask,
   SunburstChartData,
   ChordChartData,
   RadialTreeChartData,
@@ -46,6 +49,24 @@ const INITIAL_TAGS: TagSelectionItem[] = [
   { id: "vite",       label: "Vite",       color: "success"                   },
   { id: "nodejs",     label: "Node.js",    color: "warning"                   },
   { id: "graphql",    label: "GraphQL",    color: "error"                     },
+];
+
+// ── KanbanBoard ──────────────────────────────────────────────────────────────
+
+const KANBAN_COLUMNS: KanbanColumn[] = [
+  { id: "todo",        label: "To Do",       color: "#9e9e9e" },
+  { id: "in-progress", label: "In Progress", color: "#2196f3" },
+  { id: "review",      label: "In Review",   color: "#ff9800" },
+  { id: "done",        label: "Done",        color: "#4caf50" },
+];
+
+const INITIAL_KANBAN_TASKS: KanbanTask[] = [
+  { id: "k1", title: "Design component API",     status: "done",        assignee: "Alice" },
+  { id: "k2", title: "Implement drag and drop",  status: "in-progress", assignee: "Bob",   dueDate: new Date(Date.now() + 3 * 86400000) },
+  { id: "k3", title: "Write unit tests",         status: "in-progress", assignee: "Alice" },
+  { id: "k4", title: "Add Storybook stories",    status: "review",      assignee: "Bob",   dueDate: new Date(Date.now() + 5 * 86400000) },
+  { id: "k5", title: "Write user documentation", status: "todo",        assignee: "Alice", dueDate: new Date(Date.now() + 8 * 86400000) },
+  { id: "k6", title: "Publish npm release",      status: "todo",        dueDate: new Date(Date.now() + 14 * 86400000) },
 ];
 
 // ── GanttChart ───────────────────────────────────────────────────────────────
@@ -82,8 +103,8 @@ const INITIAL_JSON = JSON.stringify(
   {
     library: "@thebuoyant-tsdev/mui-ts-library",
     version: "3.x",
-    components: ["GanttChart", "TagSelection", "PasswordStrengthMeter", "ColorPicker", "RichTextEditor", "SqlEditor", "JsonEditor"],
-    charts: ["SunburstChart", "ChordChart", "RadialTreeChart", "CirclePackingChart", "HorizontalTreeChart"],
+    components: ["GanttChart", "KanbanBoard", "DateRangePicker", "TagSelection", "PasswordStrengthMeter", "ColorPicker", "RichTextEditor", "SqlEditor", "JsonEditor"],
+    charts: ["SunburstChart", "ChordChart", "RadialTreeChart", "CirclePackingChart", "HorizontalTreeChart", "RadialStackedBarChart"],
     peerDependencies: { react: "^19", "@mui/material": "^9" },
   },
   null,
@@ -273,6 +294,7 @@ export default function App() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+  const [kanbanTasks, setKanbanTasks] = useState<KanbanTask[]>(INITIAL_KANBAN_TASKS);
   const [password, setPassword] = useState("");
   const [sql, setSql]         = useState(INITIAL_SQL);
   const [json, setJson]       = useState(INITIAL_JSON);
@@ -318,15 +340,15 @@ export default function App() {
           Production-ready components, not toy widgets
         </Typography>
         <Typography variant="h6" sx={{ opacity: 0.85, fontWeight: 400, mb: 1.5, maxWidth: 720, mx: "auto" }}>
-          Project planning, content editing, SQL &amp; JSON tooling, date interval selection, D3 data visualization, and theme tooling —
-          14 fully-typed React 19 + MUI v9 components, each built for a real use case below.
+          Project planning, Kanban task management, content editing, SQL &amp; JSON tooling, date interval selection, D3 data visualization, and theme tooling —
+          15 fully-typed React 19 + MUI v9 components, each built for a real use case below.
         </Typography>
         <Typography variant="body2" sx={{ opacity: 0.7, mb: 3 }}>
           Edit any file on the left — changes hot-reload instantly. No setup, no install.
         </Typography>
         <Box sx={{ display: "flex", flexDirection: "row", gap: 1, justifyContent: "center", flexWrap: "wrap" }}>
           {["ChordChart", "CirclePackingChart", "ColorPicker", "DateRangePicker", "GanttChart", "HorizontalTreeChart", "JsonEditor",
-            "PasswordStrengthMeter", "RadialStackedBarChart", "RadialTreeChart", "RichTextEditor", "SqlEditor", "SunburstChart", "TagSelection"]
+            "KanbanBoard", "PasswordStrengthMeter", "RadialStackedBarChart", "RadialTreeChart", "RichTextEditor", "SqlEditor", "SunburstChart", "TagSelection"]
             .map(name => (
               <Chip
                 key={name}
@@ -397,6 +419,20 @@ export default function App() {
             subtitle="Project timeline with drag & drop, resize handles, progress dragging, milestones, and Ctrl+Scroll zoom."
           >
             <GanttChart tasks={TASKS} draggable resizable progressDraggable height={320} />
+          </DemoCard>
+
+          {/* KanbanBoard */}
+          <DemoCard
+            title="KanbanBoard"
+            useCase="Task & Sprint Management"
+            subtitle="Drag cards between columns, add/edit/delete via built-in dialogs. Try dragging a card or clicking '+ Add card'."
+          >
+            <KanbanBoard
+              columns={KANBAN_COLUMNS}
+              tasks={kanbanTasks}
+              onTasksChange={setKanbanTasks}
+              height={420}
+            />
           </DemoCard>
 
           {/* DateRangePicker */}
