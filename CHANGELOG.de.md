@@ -11,6 +11,12 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unveröffentlicht]
 
+### Hinzugefügt
+
+- **KanbanBoard — `showSearchField`**: Neues Boolean-Prop (Standard `false`), das ein `size="small"`-Suchfeld mit Lupen-Icon über dem Board rendert. Das Board verwaltet den Suchzustand intern — kein zusätzliches Wiring nötig. Der Placeholder-Text ist über `translation.searchFieldPlaceholder` anpassbar.
+- **KanbanBoard — `translation.searchFieldPlaceholder`**: Neuer Translation-Key (Standard `"Search by title or assignee…"`) für den Placeholder des eingebauten Suchfelds.
+- **KanbanBoard — CSS-Klassen**: `MuiTsKanbanBoard-searchFieldWrapper` und `MuiTsKanbanBoard-searchField` zur CSS-Klassen-API hinzugefügt, um den Bereich des eingebauten Suchfelds individuell zu gestalten.
+
 ---
 
 ## [3.33.1] — 2026-07-18

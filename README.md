@@ -555,6 +555,15 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 ## Changelog
 
+### [Unreleased]
+
+**Added**
+- **KanbanBoard — `showSearchField`**: New boolean prop that renders a built-in `size="small"` search field with a magnifier icon above the board. The board manages the filter state internally — no extra wiring needed. Placeholder text customizable via `translation.searchFieldPlaceholder`. The existing `filterText` prop still works for consumers who build their own search UI.
+- **KanbanBoard — `translation.searchFieldPlaceholder`**: New translation key (default `"Search by title or assignee…"`).
+- **KanbanBoard — CSS classes**: `MuiTsKanbanBoard-searchFieldWrapper` and `MuiTsKanbanBoard-searchField`. See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.
+
+---
+
 ### [3.33.1] — 2026-07-18
 
 **Changed**

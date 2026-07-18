@@ -3,6 +3,8 @@ import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { fn } from "storybook/test";
 import { Box, TextField, Typography } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import { InputAdornment } from "@mui/material";
 import { KanbanBoard } from "./KanbanBoard";
 import type { KanbanColumn, KanbanTask } from "./KanbanBoard.types";
 
@@ -37,6 +39,7 @@ const meta: Meta<typeof KanbanBoard> = {
     tasks:                DEFAULT_TASKS,
     enableBuiltinDialogs: true,
     filterText:           "",
+    showSearchField:      false,
     showPriority:         true,
     showAssignee:         true,
     showDueDate:          true,
@@ -55,6 +58,7 @@ const meta: Meta<typeof KanbanBoard> = {
     chipVariant:          { control: "radio", options: ["outlined", "filled"] },
     enableBuiltinDialogs: { control: "boolean" },
     filterText:           { control: "text" },
+    showSearchField:      { control: "boolean" },
     height:               { control: "number" },
     showAssignee:         { control: "boolean" },
     showDueDate:          { control: "boolean" },
@@ -201,9 +205,17 @@ export const OverdueWarning: Story = {
   },
 };
 
-function FilterStory(args: ComponentProps<typeof KanbanBoard>) {
-  const [tasks, setTasks]         = useState<KanbanTask[]>(DEFAULT_TASKS);
-  const [filterText, setFilter]   = useState("");
+export const FilterSearch: Story = {
+  name: "Filter / Suche — built-in field (showSearchField)",
+  args: {
+    showSearchField: true,
+    height: 520,
+  },
+};
+
+function ExternalFilterStory(args: ComponentProps<typeof KanbanBoard>) {
+  const [tasks, setTasks]       = useState<KanbanTask[]>(DEFAULT_TASKS);
+  const [filterText, setFilter] = useState("");
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100vh", gap: 0 }}>
       <Box sx={{ px: 2, pt: 2, pb: 1 }}>
@@ -211,9 +223,17 @@ function FilterStory(args: ComponentProps<typeof KanbanBoard>) {
           size="small"
           placeholder="Search by title or assignee…"
           value={filterText}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilter(e.target.value)}
+          onChange={(e) => setFilter((e.target as HTMLInputElement).value)}
           sx={{ width: 280 }}
-          aria-label="Filter cards"
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" sx={{ color: "text.disabled" }} />
+                </InputAdornment>
+              ),
+            },
+          }}
         />
       </Box>
       <KanbanBoard
@@ -227,9 +247,9 @@ function FilterStory(args: ComponentProps<typeof KanbanBoard>) {
   );
 }
 
-export const FilterSearch: Story = {
-  name: "Filter / Suche",
-  render: (args) => <FilterStory {...args} />,
+export const FilterSearchExternal: Story = {
+  name: "Filter / Suche — external field (filterText)",
+  render: (args) => <ExternalFilterStory {...args} />,
 };
 
 export const GermanLabels: Story = {

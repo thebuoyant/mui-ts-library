@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **KanbanBoard — `showSearchField`**: New boolean prop (default `false`) that renders a `size="small"` search field with a magnifier icon above the board. The board manages the search state internally — no extra wiring needed. The placeholder text is customizable via `translation.searchFieldPlaceholder`.
+- **KanbanBoard — `translation.searchFieldPlaceholder`**: New translation key (default `"Search by title or assignee…"`) for the built-in search field placeholder.
+- **KanbanBoard — CSS classes**: `MuiTsKanbanBoard-searchFieldWrapper` and `MuiTsKanbanBoard-searchField` added to the CSS classes API for styling the built-in search field area.
+
 ---
 
 ## [3.33.1] — 2026-07-18

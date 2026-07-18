@@ -14,7 +14,7 @@
 - **Karten** zeigen den Aufgabentitel und optionale Meta-Chips (Zuständige Person, Fälligkeitsdatum). Pro Karte kann ein farbiger linker Rahmen gesetzt werden.
 - **Prioritäts-Punkte**: `priority` an einer Aufgabe setzen — ein farbiger Punkt erscheint neben dem Titel (`"low"` → grün, `"medium"` → orange, `"high"` → rot, `"critical"` → lila).
 - **Überfälligkeits-Warnung**: Karten mit einem `dueDate` in der Vergangenheit erhalten automatisch einen roten Chip, Hintergrundton und linken Rahmen — steuerbar über `showDueDateWarning`.
-- **Filter / Suche**: `filterText`-String übergeben, um sichtbare Karten nach Titel oder Zuständiger Person einzuschränken — das Suchfeld liegt beim Consumer.
+- **Filter / Suche**: `showSearchField={true}` für ein eingebautes Suchfeld, oder `filterText` übergeben für eigenes Suchfeld (eigene Platzierung, Debouncing, etc.).
 - **Drag & Drop** (via `@dnd-kit`): Karte greifen und in eine beliebige Spalte ziehen. Neuordnung innerhalb einer Spalte wird ebenfalls unterstützt.
 - **Eingebaute Dialoge**: Klick auf eine Karte öffnet den Bearbeiten-Dialog; Klick auf „+ Karte hinzufügen" in einer Spalte öffnet den Hinzufügen-Dialog. Ein Lösch-Bestätigungsdialog ist über den Bearbeiten-Dialog erreichbar.
 - **WIP-Limits**: `wipLimit` an einer Spalte setzen — der Anzahl-Chip wird rot, wenn das Limit überschritten wird.
@@ -65,7 +65,8 @@ Jede Drag-and-Drop-Aktion sowie jedes Hinzufügen, Bearbeiten und Löschen ruft 
 | `onTaskUpdated` | `(task: KanbanTask) => void` | — | Wird aufgerufen, nachdem eine vorhandene Karte über den Bearbeiten-Dialog gespeichert wurde. |
 | `onTaskDeleted` | `(taskId: string) => void` | — | Wird aufgerufen, nachdem eine Karte über die Löschbestätigung gelöscht wurde. |
 | `onTaskMoved` | `(task: KanbanTask, fromColumnId: string, toColumnId: string) => void` | — | Wird aufgerufen, wenn eine Karte per Drag & Drop in eine **andere Spalte** verschoben wird. Feuert nicht bei Neuordnung innerhalb derselben Spalte oder bei dialog-basierter Status-Änderung — dafür ist `onTaskUpdated` zuständig. |
-| `filterText` | `string` | `""` | Filtert sichtbare Karten nach Titel und Zuständiger Person (Groß-/Kleinschreibung egal, Substring-Suche). Der Consumer rendert das Suchfeld selbst und übergibt den String. Spalten-Counter zeigen die gefilterte Anzahl; WIP-Limit-Prüfungen nutzen immer die ungefilterte Gesamtanzahl. |
+| `showSearchField` | `boolean` | `false` | Rendert ein eingebautes `size="small"`-Suchfeld über dem Board. Das Board verwaltet den Suchzustand intern — kein zusätzliches Wiring nötig. Placeholder via `translation.searchFieldPlaceholder` anpassbar. |
+| `filterText` | `string` | `""` | Filtert sichtbare Karten nach Titel und Zuständiger Person (Groß-/Kleinschreibung egal, Substring-Suche). Der Consumer rendert und verwaltet das Suchfeld selbst. Hat Vorrang vor dem eingebauten Feld wenn beide genutzt werden. Spalten-Counter zeigen die gefilterte Anzahl; WIP-Limit-Prüfungen nutzen immer die ungefilterte Gesamtanzahl. |
 | `showPriority` | `boolean` | `true` | Prioritäts-Punkt auf Karten anzeigen. Keine Wirkung wenn eine Karte kein `priority`-Feld hat. |
 | `showAssignee` | `boolean` | `true` | Zuständige-Person-Chip auf Karten anzeigen. |
 | `showDueDate` | `boolean` | `true` | Fälligkeitsdatum-Chip auf Karten anzeigen. |
@@ -225,11 +226,36 @@ Wenn `showDueDateWarning` den Wert `true` hat (Standard), wird jede Karte deren 
 
 ---
 
-## Karten filtern (`filterText`)
+## Karten filtern (`showSearchField` / `filterText`)
 
-Einen Suchstring via `filterText` übergeben, um die sichtbaren Karten einzuschränken. Das Board gleicht Groß-/Kleinschreibungsunabhängig gegen `task.title` und `task.assignee` ab. Ein leerer String (der Standard) zeigt alle Karten.
+Es gibt zwei Wege zum Filtern — je nach Anwendungsfall:
 
-Der Consumer ist verantwortlich für das Rendern des Suchfelds und die Zustandsverwaltung:
+### Option A — Eingebautes Suchfeld (kein Wiring nötig)
+
+`showSearchField={true}` setzen — das Board rendert selbst ein `size="small"`-TextField über den Spalten. Der Suchzustand wird intern verwaltet.
+
+```tsx
+<KanbanBoard
+  columns={columns}
+  tasks={tasks}
+  showSearchField
+  onTasksChange={setTasks}
+/>
+```
+
+Placeholder über `translation` anpassen:
+
+```tsx
+<KanbanBoard
+  showSearchField
+  translation={{ searchFieldPlaceholder: "Nach Titel oder Person suchen…" }}
+  ...
+/>
+```
+
+### Option B — Externes Suchfeld (volle Kontrolle)
+
+Eigenes Input-Element bauen und den aktuellen Wert via `filterText` übergeben. Das Board filtert, rendert aber kein Eingabeelement. Ideal für eigene Platzierung, Styling, Debouncing oder wenn das Suchfeld Teil einer größeren Toolbar ist.
 
 ```tsx
 import { useState } from 'react';
@@ -259,10 +285,12 @@ function App() {
 }
 ```
 
-**Hinweise:**
+**Hinweise (beide Optionen):**
+- Abgleich Groß-/Kleinschreibungsunabhängig als Substring auf `task.title` und `task.assignee`.
 - Spalten-Counter zeigen die gefilterte Anzahl (z. B. `2` statt `5` wenn 2 Karten passen).
-- WIP-Limit-Prüfungen verwenden immer die **ungefilterte** Gesamtanzahl — die Überlimit-Warnung bleibt also sichtbar, auch wenn der Filter die angezeigte Anzahl unter das Limit senkt.
-- Ausgefilterte Karten werden aus dem Drag-and-Drop-Kontext entfernt. Wenn der Filter zurückgesetzt wird, erscheint die vollständige Liste wieder.
+- WIP-Limit-Prüfungen verwenden immer die **ungefilterte** Gesamtanzahl — die Überlimit-Warnung bleibt sichtbar, auch wenn der Filter die angezeigte Anzahl unter das Limit senkt.
+- Alle Callbacks (`onTasksChange`, `onTaskCreated`, `onTaskUpdated`, `onTaskDeleted`, `onTaskMoved`) arbeiten immer auf der vollständigen ungefilterten Aufgabenliste — der Filter ist rein visuell.
+- Ausgefilterte Karten werden aus dem DnD-Sortierkontext entfernt. Wenn der Filter zurückgesetzt wird, erscheint die vollständige Liste wieder.
 
 ---
 
@@ -326,6 +354,7 @@ Der `dialogDeleteConfirm`-String unterstützt den Platzhalter `{title}` — er w
 | `dialogFieldDueDate` | `"Due date"` | Beschriftung des Fälligkeitsdatum-Felds und Chip-aria-label |
 | `dialogFieldStatus` | `"Status"` | Beschriftung des Status-Dropdowns im Hinzufügen-/Bearbeiten-Dialog |
 | `noCardsLabel` | `"No cards"` | Platzhaltertext in leeren Spalten |
+| `searchFieldPlaceholder` | `"Search by title or assignee…"` | Placeholder des eingebauten Suchfelds (`showSearchField={true}`) |
 
 ---
 
