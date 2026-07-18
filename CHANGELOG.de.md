@@ -11,6 +11,10 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unveröffentlicht]
 
+---
+
+## [3.34.0] — 2026-07-18
+
 ### Hinzugefügt
 
 - **KanbanBoard — `showSearchField`**: Neues Boolean-Prop (Standard `false`), das ein `size="small"`-Suchfeld mit Lupen-Icon über dem Board rendert. Das Board verwaltet den Suchzustand intern — kein zusätzliches Wiring nötig. Der Placeholder-Text ist über `translation.searchFieldPlaceholder` anpassbar.

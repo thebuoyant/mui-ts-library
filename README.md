@@ -555,7 +555,7 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 ## Changelog
 
-### [Unreleased]
+### [3.34.0] — 2026-07-18
 
 **Added**
 - **KanbanBoard — `showSearchField`**: New boolean prop that renders a built-in `size="small"` search field with a magnifier icon above the board. The board manages the filter state internally — no extra wiring needed. Placeholder text customizable via `translation.searchFieldPlaceholder`. The existing `filterText` prop still works for consumers who build their own search UI.
