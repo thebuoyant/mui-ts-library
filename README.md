@@ -555,7 +555,7 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 ## Changelog
 
-### [Unreleased]
+### [3.32.0] — 2026-07-18
 
 **Added**
 - **KanbanBoard — `priority` field + `showPriority` prop**: `priority?: "low" | "medium" | "high" | "critical"` on `KanbanTask` — shown as a colored dot next to the card title. `showPriority={false}` to hide all dots. New type export: `KanbanTaskPriority`. See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.

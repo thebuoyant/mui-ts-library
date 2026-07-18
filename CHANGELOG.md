@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [3.32.0] — 2026-07-18
+
 ### Added
 
 - **KanbanBoard — `priority` field on `KanbanTask`**: `priority?: "low" | "medium" | "high" | "critical"` — shown as a small colored dot to the left of the card title. Colors: low=green (`#4caf50`), medium=orange (`#ff9800`), high=red (`#f44336`), critical=purple (`#9c27b0`). New type export: `KanbanTaskPriority`.
