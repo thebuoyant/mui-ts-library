@@ -12,6 +12,9 @@
 
 - **Spalten** zeigen einen Header mit Farbbalken, einem Anzahl-Chip und einem optionalen WIP-Limit-Indikator.
 - **Karten** zeigen den Aufgabentitel und optionale Meta-Chips (Zuständige Person, Fälligkeitsdatum). Pro Karte kann ein farbiger linker Rahmen gesetzt werden.
+- **Prioritäts-Punkte**: `priority` an einer Aufgabe setzen — ein farbiger Punkt erscheint neben dem Titel (`"low"` → grün, `"medium"` → orange, `"high"` → rot, `"critical"` → lila).
+- **Überfälligkeits-Warnung**: Karten mit einem `dueDate` in der Vergangenheit erhalten automatisch einen roten Chip, Hintergrundton und linken Rahmen — steuerbar über `showDueDateWarning`.
+- **Filter / Suche**: `filterText`-String übergeben, um sichtbare Karten nach Titel oder Zuständiger Person einzuschränken — das Suchfeld liegt beim Consumer.
 - **Drag & Drop** (via `@dnd-kit`): Karte greifen und in eine beliebige Spalte ziehen. Neuordnung innerhalb einer Spalte wird ebenfalls unterstützt.
 - **Eingebaute Dialoge**: Klick auf eine Karte öffnet den Bearbeiten-Dialog; Klick auf „+ Karte hinzufügen" in einer Spalte öffnet den Hinzufügen-Dialog. Ein Lösch-Bestätigungsdialog ist über den Bearbeiten-Dialog erreichbar.
 - **WIP-Limits**: `wipLimit` an einer Spalte setzen — der Anzahl-Chip wird rot, wenn das Limit überschritten wird.

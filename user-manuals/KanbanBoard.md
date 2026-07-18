@@ -12,6 +12,9 @@ The `KanbanBoard` renders a horizontal row of columns, each containing a list of
 
 - **Columns** display a header with a color accent bar, a task count chip, and an optional WIP limit indicator.
 - **Cards** show the task title and optional meta chips (assignee, due date). A colored left border can be added per card.
+- **Priority dots**: set `priority` on any task to show a small colored dot next to its title (`"low"` → green, `"medium"` → orange, `"high"` → red, `"critical"` → purple).
+- **Overdue warning**: cards whose `dueDate` is in the past automatically receive a red chip, background tint, and left border — toggle with `showDueDateWarning`.
+- **Filter / search**: pass a `filterText` string to narrow visible cards by title or assignee — the consumer owns the search input.
 - **Drag and drop** (powered by `@dnd-kit`): grab a card and drop it into any column. In-column reordering is also supported.
 - **Built-in dialogs**: click a card to open the Edit dialog; click "+ Add card" in a column to open the Add dialog. A Delete confirmation is reachable from the Edit dialog.
 - **WIP limits**: set `wipLimit` on a column — the count chip turns red when the limit is exceeded.
