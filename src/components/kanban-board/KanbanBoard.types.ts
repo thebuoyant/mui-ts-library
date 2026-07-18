@@ -91,11 +91,20 @@ export type KanbanBoardProps = {
   /** Show the due date on cards (default: true). */
   showDueDate?: boolean;
   /**
+   * Highlight cards whose `dueDate` is in the past (default: true).
+   * When true, the due-date chip turns red (`color="error"`) and the card
+   * receives a subtle red background tint and left border stripe.
+   * Has no effect when `showDueDate` is false or when the card has no `dueDate`.
+   */
+  showDueDateWarning?: boolean;
+  /**
    * MUI Chip variant for assignee and due-date chips on cards.
    * `"outlined"` (default) — subtle border, transparent background.
    * `"filled"` — solid background, more prominent.
    */
   chipVariant?: "outlined" | "filled";
+  /** Width of the board. Default: "100%". */
+  width?: number | string;
   /** Height of the board. Default: "100%". */
   height?: number | string;
   /** Override any label or message — unset keys fall back to English defaults. */

@@ -11,6 +11,19 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unveröffentlicht]
 
+### Hinzugefügt
+
+- **KanbanBoard — `showDueDateWarning`-Prop**: Wenn `true` (Standard), werden Karten deren `dueDate` in der Vergangenheit liegt automatisch hervorgehoben: Der Fälligkeitsdatum-Chip wird rot (`color="error"`), die Karte erhält einen subtilen roten Hintergrundton und einen 4 px roten linken Rahmen. Auf `false` setzen zum Deaktivieren. Keine Wirkung wenn `showDueDate` den Wert `false` hat oder die Karte kein `dueDate` besitzt. Neue Storybook-Story: „Overdue due-date warning".
+- **KanbanBoard — `width`-Prop**: `width?: number | string` (Standard `"100%"`) — spiegelt das bestehende `height`-Prop für vollständige Layout-Kontrolle.
+
+### Behoben
+
+- **KanbanBoard — Spalten-Scroll fehlerhaft**: Karten in einer hohen Spalte wurden still abgeschnitten statt zu scrollen. Ursache: `alignItems: "flex-start"` am Spalten-Container ließ Spalten in der Höhe unbegrenzt wachsen, sodass der innere `overflowY: "auto"`-Bereich keine fixe Höhe als Referenz hatte. Behoben durch Wechsel auf `alignItems: "stretch"`, damit Spalten die Board-Höhe ausfüllen und jeder Spalten-Body unabhängig scrollt.
+
+### Geändert
+
+- **KanbanBoard — Kartenoptik poliert**: Karten verwenden jetzt `elevation={0}` mit einem expliziten `1px solid divider`-Rahmen an allen Seiten (4 px Akzent links wenn `task.color` oder überfällig aktiv). Ein kontrollierter `box-shadow` ersetzt den MUI-Standard-Elevationsschatten: dezent im Ruhezustand, angehoben beim Hover (`0 4px 14px rgba(0,0,0,0.12)`) mit `translateY(-1px)`-Animation. Hover-Effekt wird während des Ziehens unterdrückt. Scrollbalken im Spalten-Body ausgeblendet (`scrollbar-width: none` / `::-webkit-scrollbar { display: none }`) — Mausrad und Trackpad-Scroll funktionieren weiterhin. Kartentitel-Gewicht auf `fontWeight: 700` erhöht.
+
 ---
 
 ## [3.30.0] — 2026-07-17

@@ -38,7 +38,9 @@ const meta: Meta<typeof KanbanBoard> = {
     enableBuiltinDialogs: true,
     showAssignee:         true,
     showDueDate:          true,
+    showDueDateWarning:   true,
     chipVariant:          "outlined",
+    width:                "100%",
     height:               500,
     onTasksChange:        fn(),
     onTaskCreated:        fn(),
@@ -51,7 +53,9 @@ const meta: Meta<typeof KanbanBoard> = {
     enableBuiltinDialogs: { control: "boolean" },
     showAssignee:         { control: "boolean" },
     showDueDate:          { control: "boolean" },
+    showDueDateWarning:   { control: "boolean" },
     chipVariant:          { control: "radio", options: ["outlined", "filled"] },
+    width:                { control: "text" },
     height:               { control: "number" },
     // Complex objects — use dedicated stories instead.
     columns:              { control: false },
@@ -148,6 +152,27 @@ export const SingleColumn: Story = {
   args: {
     columns: [{ id: "backlog", label: "Backlog", color: "#607d8b" }],
     tasks: DEFAULT_TASKS.map((t) => ({ ...t, status: "backlog" })),
+  },
+};
+
+export const OverdueWarning: Story = {
+  name: "Overdue due-date warning",
+  args: {
+    columns: [
+      { id: "todo",        label: "To Do",       color: "#9e9e9e" },
+      { id: "in-progress", label: "In Progress",  color: "#2196f3" },
+      { id: "done",        label: "Done",         color: "#4caf50" },
+    ],
+    tasks: [
+      { id: "a", title: "Overdue — 2 weeks ago",  status: "todo",        assignee: "Alice",   dueDate: new Date(Date.now() - 14 * 86_400_000) },
+      { id: "b", title: "Overdue — yesterday",    status: "in-progress", assignee: "Bob",     dueDate: new Date(Date.now() -      86_400_000) },
+      { id: "c", title: "Due tomorrow (on time)", status: "todo",        assignee: "Charlie", dueDate: new Date(Date.now() +      86_400_000) },
+      { id: "d", title: "Due in 7 days",          status: "in-progress",                      dueDate: new Date(Date.now() +  7 * 86_400_000) },
+      { id: "e", title: "No due date",            status: "todo" },
+      { id: "f", title: "Completed on time",      status: "done",        assignee: "Alice",   dueDate: new Date(Date.now() +  3 * 86_400_000) },
+    ],
+    // Toggle showDueDateWarning in Controls panel to compare on/off.
+    showDueDateWarning: true,
   },
 };
 

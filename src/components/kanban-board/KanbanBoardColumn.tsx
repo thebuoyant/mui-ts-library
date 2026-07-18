@@ -11,6 +11,7 @@ type KanbanBoardColumnProps = {
   tasks: KanbanTask[];
   showAssignee: boolean;
   showDueDate: boolean;
+  showDueDateWarning: boolean;
   chipVariant: "outlined" | "filled";
   t: Required<KanbanBoardTranslation>;
   enableBuiltinDialogs: boolean;
@@ -23,6 +24,7 @@ export function KanbanBoardColumn({
   tasks,
   showAssignee,
   showDueDate,
+  showDueDateWarning,
   chipVariant,
   t,
   enableBuiltinDialogs,
@@ -102,6 +104,8 @@ export function KanbanBoardColumn({
           sx={{
             flex: 1,
             overflowY: "auto",
+            scrollbarWidth: "none",
+            "&::-webkit-scrollbar": { display: "none" },
             p: 1,
             minHeight: 80,
             bgcolor: (theme) => {
@@ -126,6 +130,7 @@ export function KanbanBoardColumn({
               task={task}
               showAssignee={showAssignee}
               showDueDate={showDueDate}
+              showDueDateWarning={showDueDateWarning}
               chipVariant={chipVariant}
               t={t}
               onCardClick={onCardClick}

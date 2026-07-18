@@ -64,7 +64,9 @@ Every drag-and-drop, Add, Edit, and Delete action calls `onTasksChange` with the
 | `onTaskMoved` | `(task: KanbanTask, fromColumnId: string, toColumnId: string) => void` | — | Called when a card is moved to a **different column** via drag and drop. Not fired for in-column reordering or dialog-based status changes — use `onTaskUpdated` for those. |
 | `showAssignee` | `boolean` | `true` | Show the assignee chip on cards. |
 | `showDueDate` | `boolean` | `true` | Show the due-date chip on cards. |
+| `showDueDateWarning` | `boolean` | `true` | When `true`, cards with a `dueDate` in the past are highlighted: the date chip turns red and the card gets a red background tint + left border. Set to `false` to disable. Has no effect when `showDueDate` is `false`. |
 | `chipVariant` | `"outlined" \| "filled"` | `"outlined"` | MUI Chip variant for the assignee and due-date chips. `"outlined"` = subtle border; `"filled"` = solid background. |
+| `width` | `number \| string` | `"100%"` | Width of the board. Use a fixed pixel value or any CSS length. |
 | `height` | `number \| string` | `"100%"` | Height of the board. Use a fixed pixel value or any CSS length. |
 | `translation` | `Partial<KanbanBoardTranslation>` | — | Override any label or message. Unset keys fall back to English defaults. |
 
@@ -150,6 +152,30 @@ When you want to implement your own dialogs, set `enableBuiltinDialogs={false}`.
 | Card status changed via Edit dialog dropdown | ✓ | ✓ | — |
 | New card added | ✓ | — | — |
 | Card deleted | ✓ | — | — |
+
+---
+
+## Overdue due-date warning (`showDueDateWarning`)
+
+When `showDueDateWarning` is `true` (the default), any card whose `dueDate` is before today is automatically highlighted:
+
+- The due-date chip turns red (`color="error"` — works with both `"outlined"` and `"filled"` chip variants).
+- The card gets a subtle red background tint.
+- A 4 px red left-border accent is added (unless `task.color` is set, in which case that color takes priority for the left border).
+
+```tsx
+// Opt out of the warning — date chips always show in their default color
+<KanbanBoard
+  columns={columns}
+  tasks={tasks}
+  showDueDateWarning={false}
+/>
+```
+
+**Notes:**
+- Has no visual effect when `showDueDate` is `false` or a card has no `dueDate`.
+- "Overdue" means `dueDate < start of today` — cards due today are not highlighted.
+- The highlight applies to cards in any column, including "Done". If you want to suppress it for completed tasks, omit `dueDate` on done cards or set `showDueDateWarning={false}` for the whole board.
 
 ---
 

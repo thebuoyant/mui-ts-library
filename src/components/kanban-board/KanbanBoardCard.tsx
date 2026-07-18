@@ -3,6 +3,7 @@ import { CSS } from "@dnd-kit/utilities";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import PersonIcon from "@mui/icons-material/Person";
 import { Box, Card, CardActionArea, CardContent, Chip, Typography } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import type { KanbanBoardTranslation, KanbanTask } from "./KanbanBoard.types";
 import { kanbanBoardClasses } from "./kanbanBoardClasses";
 import { muiTsStateClasses } from "../../utils/muiTsClasses";
@@ -16,12 +17,12 @@ const CHIP_SX = {
     fontSize: "0.75rem",
     width:    "0.75rem",
     height:   "0.75rem",
-    ml: "8px",   // left edge → icon: 8px (was 5px default)
-    mr: "4px",   // icon → text: 4px (was −6px default — which crushed them together)
+    ml: "8px",
+    mr: "4px",
   },
   "& .MuiChip-label": {
-    pl: "2px",   // small — icon mr already provides the gap
-    pr: "10px",  // generous right side
+    pl: "2px",
+    pr: "10px",
   },
 } as const;
 
@@ -29,6 +30,7 @@ type KanbanBoardCardProps = {
   task: KanbanTask;
   showAssignee: boolean;
   showDueDate: boolean;
+  showDueDateWarning: boolean;
   chipVariant: "outlined" | "filled";
   t: Required<KanbanBoardTranslation>;
   onCardClick: (task: KanbanTask) => void;
@@ -40,6 +42,7 @@ export function KanbanBoardCard({
   task,
   showAssignee,
   showDueDate,
+  showDueDateWarning,
   chipVariant,
   t,
   onCardClick,
@@ -51,12 +54,11 @@ export function KanbanBoardCard({
   });
 
   const style = isOverlay
-    ? { cursor: "grabbing" }
+    ? undefined
     : {
         transform: CSS.Transform.toString(transform),
         transition,
         opacity: isDragging ? 0 : 1,
-        cursor: "grab",
       };
 
   const hasMeta = (showAssignee && !!task.assignee) || (showDueDate && !!task.dueDate);
@@ -64,21 +66,52 @@ export function KanbanBoardCard({
     ? task.dueDate.toLocaleDateString(undefined, { day: "2-digit", month: "short", year: "numeric" })
     : null;
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const isOverdue = showDueDateWarning && !!task.dueDate && task.dueDate < today;
+
   return (
     <Card
       ref={isOverlay ? undefined : setNodeRef}
       style={style}
+      elevation={0}
       className={[
         kanbanBoardClasses.card,
         isDragging && muiTsStateClasses.selected,
       ].filter(Boolean).join(" ")}
       sx={{
         mb: 1,
-        borderLeft: task.color ? `4px solid ${task.color}` : undefined,
+        // Border — 1px on all sides, 4px accent on left when applicable
+        border: "1px solid",
+        borderColor: (isOverdue && !task.color) ? "error.light" : "divider",
+        borderLeft: task.color
+          ? `4px solid ${task.color}`
+          : isOverdue
+            ? (theme) => `4px solid ${theme.palette.error.main}`
+            : undefined,
         userSelect: "none",
-        // Subtle tinted background so cards read as slightly off-white —
-        // creates contrast against the lighter column body.
-        bgcolor: (theme) => theme.palette.mode === "dark" ? "grey.800" : "background.paper",
+        cursor: isOverlay ? "grabbing" : "grab",
+        bgcolor: (theme) => {
+          if (isOverdue) {
+            return theme.palette.mode === "dark"
+              ? alpha(theme.palette.error.main, 0.12)
+              : alpha(theme.palette.error.main, 0.04);
+          }
+          return theme.palette.mode === "dark" ? theme.palette.grey[800] : theme.palette.background.paper;
+        },
+        // Controlled shadow — subtle always, lifted on hover
+        boxShadow: (theme) => theme.palette.mode === "dark"
+          ? "0 1px 3px rgba(0,0,0,0.4)"
+          : "0 1px 3px rgba(0,0,0,0.08)",
+        transition: "box-shadow 0.15s ease, transform 0.15s ease",
+        ...(!isDragging && !isOverlay && {
+          "&:hover": {
+            boxShadow: (theme) => theme.palette.mode === "dark"
+              ? "0 4px 14px rgba(0,0,0,0.5)"
+              : "0 4px 14px rgba(0,0,0,0.12)",
+            transform: "translateY(-1px)",
+          },
+        }),
         "&:active": { cursor: "grabbing" },
       }}
       {...(isOverlay ? {} : { ...attributes, ...listeners })}
@@ -90,7 +123,7 @@ export function KanbanBoardCard({
           <Typography
             className={kanbanBoardClasses.cardTitle}
             variant="body2"
-            sx={{ mb: hasMeta ? 1 : 0, lineHeight: 1.4, fontWeight: 600 }}
+            sx={{ mb: hasMeta ? 1 : 0, lineHeight: 1.4, fontWeight: 700, letterSpacing: "-0.01em" }}
           >
             {task.title}
           </Typography>
@@ -98,7 +131,7 @@ export function KanbanBoardCard({
           {hasMeta && (
             <Box
               className={kanbanBoardClasses.cardMeta}
-              sx={{ display: "flex", gap: 0.75, flexWrap: "wrap", alignItems: "center" }}
+              sx={{ display: "flex", gap: 1, flexWrap: "wrap", alignItems: "center" }}
             >
               {showAssignee && task.assignee && (
                 <Chip
@@ -118,6 +151,7 @@ export function KanbanBoardCard({
                   label={dueDateStr}
                   size="small"
                   variant={chipVariant}
+                  color={isOverdue ? "error" : "default"}
                   aria-label={`${t.dialogFieldDueDate}: ${dueDateStr}`}
                   sx={CHIP_SX}
                 />

@@ -308,6 +308,35 @@ describe("KanbanBoard", () => {
     expect(onTaskMoved).not.toHaveBeenCalled();
   });
 
+  // ── showDueDateWarning ────────────────────────────────────────────────────────
+
+  const OVERDUE_TASKS: KanbanTask[] = [
+    { id: "o1", title: "Overdue Task", status: "todo", dueDate: new Date("2020-01-01") },
+  ];
+
+  it("applies error color to due date chip when dueDate is in the past", () => {
+    const { container } = render(<KanbanBoard columns={COLUMNS} tasks={OVERDUE_TASKS} />);
+    const dueDateChip = container.querySelector(".MuiTsKanbanBoard-cardDueDate");
+    expect(dueDateChip).toHaveClass("MuiChip-colorError");
+  });
+
+  it("does not apply error color when showDueDateWarning=false", () => {
+    const { container } = render(
+      <KanbanBoard columns={COLUMNS} tasks={OVERDUE_TASKS} showDueDateWarning={false} />,
+    );
+    const dueDateChip = container.querySelector(".MuiTsKanbanBoard-cardDueDate");
+    expect(dueDateChip).not.toHaveClass("MuiChip-colorError");
+  });
+
+  it("does not apply error color for a future due date", () => {
+    const futureTasks: KanbanTask[] = [
+      { id: "f1", title: "Future Task", status: "todo", dueDate: new Date("2099-12-31") },
+    ];
+    const { container } = render(<KanbanBoard columns={COLUMNS} tasks={futureTasks} />);
+    const dueDateChip = container.querySelector(".MuiTsKanbanBoard-cardDueDate");
+    expect(dueDateChip).not.toHaveClass("MuiChip-colorError");
+  });
+
   // ── CSS classes ───────────────────────────────────────────────────────────────
 
   it("applies kanbanBoardClasses.root to the outermost element", () => {

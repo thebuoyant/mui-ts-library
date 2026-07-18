@@ -11,6 +11,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **KanbanBoard — `showDueDateWarning` prop**: When `true` (default), cards whose `dueDate` is in the past automatically highlight: the due-date chip turns red (`color="error"`) and the card receives a subtle red background tint plus a 4 px red left-border accent. Set to `false` to opt out. Has no effect when `showDueDate` is `false` or the card has no `dueDate`. New Storybook story: "Overdue due-date warning".
+- **KanbanBoard — `width` prop**: `width?: number | string` (default `"100%"`) — mirrors the existing `height` prop for full layout control.
+
+### Fixed
+
+- **KanbanBoard — column scroll broken**: Cards in a tall column were silently clipped instead of scrolling. Root cause: `alignItems: "flex-start"` on the column container let columns grow unbounded in height, so the inner `overflowY: "auto"` body had no constrained height to scroll against. Fixed by switching to `alignItems: "stretch"` so columns fill the board height and each column body scrolls independently.
+
+### Changed
+
+- **KanbanBoard — card visual polish**: Cards now use `elevation={0}` with an explicit `1px solid divider` border on all sides (4 px accent on the left when `task.color` or overdue is active). A controlled `box-shadow` replaces the MUI default elevation shadow: subtle at rest, lifted on hover (`0 4px 14px rgba(0,0,0,0.12)`) with a `translateY(-1px)` animation. Hover effect is suppressed during drag. Column body scrollbar hidden via `scrollbar-width: none` / `::-webkit-scrollbar { display: none }` — mouse-wheel and trackpad scrolling still works. Card title weight increased to `fontWeight: 700`.
+
 ---
 
 ## [3.30.0] — 2026-07-17
