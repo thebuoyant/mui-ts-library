@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [3.33.1] — 2026-07-18
+
 ### Changed
 
 - **KanbanBoard — docs**: Updated overview ("What does this component do?") in the user manual and the README description to list priority dots, overdue warning, and `filterText` — all features were shipped in v3.31–v3.33 but missing from the intro sections.

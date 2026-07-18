@@ -555,7 +555,7 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 ## Changelog
 
-### [Unreleased]
+### [3.33.1] — 2026-07-18
 
 **Changed**
 - **KanbanBoard — docs**: Updated component overview and README description to mention priority dots, overdue warning, and `filterText`. See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.
