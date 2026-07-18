@@ -555,7 +555,7 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/):
 
 ## Changelog
 
-### [Unveröffentlicht]
+### [3.33.0] — 2026-07-18
 
 **Hinzugefügt**
 - **KanbanBoard — `filterText`-Prop**: `filterText?: string` filtert sichtbare Karten nach Titel und Zuständiger Person. Der Consumer rendert das Suchfeld selbst und übergibt den String. Spalten-Counter passen sich an; WIP-Limit-Prüfungen nutzen die ungefilterte Gesamtanzahl. Siehe [Vollständiger Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.de.md) für Details.

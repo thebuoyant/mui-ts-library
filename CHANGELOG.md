@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [3.33.0] — 2026-07-18
+
 ### Added
 
 - **KanbanBoard — `filterText` prop**: `filterText?: string` filters visible cards by title and assignee (case-insensitive substring match). The consumer renders the search input and passes the string — the board is a pure controlled consumer. Column counters reflect the filtered count; WIP-limit checks always use the unfiltered total so the over-limit warning is never hidden by a filter.
