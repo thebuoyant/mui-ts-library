@@ -555,6 +555,13 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 ## Changelog
 
+### [Unreleased]
+
+**Added**
+- **KanbanBoard — `filterText` prop**: `filterText?: string` filters visible cards by title and assignee. The consumer renders the search field and passes the string. Column counters adjust; WIP-limit checks use the unfiltered total. See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.
+
+---
+
 ### [3.32.0] — 2026-07-18
 
 **Added**

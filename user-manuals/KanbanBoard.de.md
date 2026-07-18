@@ -62,6 +62,7 @@ Jede Drag-and-Drop-Aktion sowie jedes Hinzufügen, Bearbeiten und Löschen ruft 
 | `onTaskUpdated` | `(task: KanbanTask) => void` | — | Wird aufgerufen, nachdem eine vorhandene Karte über den Bearbeiten-Dialog gespeichert wurde. |
 | `onTaskDeleted` | `(taskId: string) => void` | — | Wird aufgerufen, nachdem eine Karte über die Löschbestätigung gelöscht wurde. |
 | `onTaskMoved` | `(task: KanbanTask, fromColumnId: string, toColumnId: string) => void` | — | Wird aufgerufen, wenn eine Karte per Drag & Drop in eine **andere Spalte** verschoben wird. Feuert nicht bei Neuordnung innerhalb derselben Spalte oder bei dialog-basierter Status-Änderung — dafür ist `onTaskUpdated` zuständig. |
+| `filterText` | `string` | `""` | Filtert sichtbare Karten nach Titel und Zuständiger Person (Groß-/Kleinschreibung egal, Substring-Suche). Der Consumer rendert das Suchfeld selbst und übergibt den String. Spalten-Counter zeigen die gefilterte Anzahl; WIP-Limit-Prüfungen nutzen immer die ungefilterte Gesamtanzahl. |
 | `showPriority` | `boolean` | `true` | Prioritäts-Punkt auf Karten anzeigen. Keine Wirkung wenn eine Karte kein `priority`-Feld hat. |
 | `showAssignee` | `boolean` | `true` | Zuständige-Person-Chip auf Karten anzeigen. |
 | `showDueDate` | `boolean` | `true` | Fälligkeitsdatum-Chip auf Karten anzeigen. |
@@ -218,6 +219,47 @@ Wenn `showDueDateWarning` den Wert `true` hat (Standard), wird jede Karte deren 
 - Keine visuelle Wirkung wenn `showDueDate` den Wert `false` hat oder eine Karte kein `dueDate` besitzt.
 - „Überfällig" bedeutet `dueDate < Beginn des heutigen Tages` — Karten die heute fällig sind, werden nicht hervorgehoben.
 - Die Hervorhebung gilt für Karten in allen Spalten, auch in „Erledigt"-Spalten. Um dies für abgeschlossene Aufgaben zu unterdrücken, `dueDate` bei erledigten Karten weglassen oder `showDueDateWarning={false}` für das gesamte Board setzen.
+
+---
+
+## Karten filtern (`filterText`)
+
+Einen Suchstring via `filterText` übergeben, um die sichtbaren Karten einzuschränken. Das Board gleicht Groß-/Kleinschreibungsunabhängig gegen `task.title` und `task.assignee` ab. Ein leerer String (der Standard) zeigt alle Karten.
+
+Der Consumer ist verantwortlich für das Rendern des Suchfelds und die Zustandsverwaltung:
+
+```tsx
+import { useState } from 'react';
+import { TextField } from '@mui/material';
+import { KanbanBoard } from '@thebuoyant-tsdev/mui-ts-library';
+
+function App() {
+  const [tasks, setTasks]   = useState(initialTasks);
+  const [filter, setFilter] = useState('');
+
+  return (
+    <>
+      <TextField
+        size="small"
+        placeholder="Nach Titel oder Person suchen…"
+        value={filter}
+        onChange={(e) => setFilter(e.target.value)}
+      />
+      <KanbanBoard
+        columns={columns}
+        tasks={tasks}
+        filterText={filter}
+        onTasksChange={setTasks}
+      />
+    </>
+  );
+}
+```
+
+**Hinweise:**
+- Spalten-Counter zeigen die gefilterte Anzahl (z. B. `2` statt `5` wenn 2 Karten passen).
+- WIP-Limit-Prüfungen verwenden immer die **ungefilterte** Gesamtanzahl — die Überlimit-Warnung bleibt also sichtbar, auch wenn der Filter die angezeigte Anzahl unter das Limit senkt.
+- Ausgefilterte Karten werden aus dem Drag-and-Drop-Kontext entfernt. Wenn der Filter zurückgesetzt wird, erscheint die vollständige Liste wieder.
 
 ---
 

@@ -9,6 +9,8 @@ import { kanbanBoardClasses } from "./kanbanBoardClasses";
 type KanbanBoardColumnProps = {
   column: KanbanColumn;
   tasks: KanbanTask[];
+  /** Total tasks in this column before any filter — used for WIP-limit checking. */
+  totalCount: number;
   showPriority: boolean;
   showAssignee: boolean;
   showDueDate: boolean;
@@ -23,6 +25,7 @@ type KanbanBoardColumnProps = {
 export function KanbanBoardColumn({
   column,
   tasks,
+  totalCount,
   showPriority,
   showAssignee,
   showDueDate,
@@ -35,7 +38,7 @@ export function KanbanBoardColumn({
 }: KanbanBoardColumnProps) {
   const { setNodeRef, isOver } = useDroppable({ id: column.id });
 
-  const isOverLimit = column.wipLimit !== undefined && tasks.length > column.wipLimit;
+  const isOverLimit = column.wipLimit !== undefined && totalCount > column.wipLimit;
   const countLabel = column.wipLimit !== undefined
     ? `${tasks.length} / ${column.wipLimit}`
     : `${tasks.length}`;
@@ -94,7 +97,7 @@ export function KanbanBoardColumn({
               color: "#fff",
             }),
           }}
-          aria-label={`${tasks.length} cards${column.wipLimit ? ` of ${column.wipLimit} limit` : ""}`}
+          aria-label={`${tasks.length} cards${column.wipLimit ? ` of ${column.wipLimit} limit` : ""}${tasks.length !== totalCount ? ` (${totalCount} total)` : ""}`}
         />
       </Box>
 

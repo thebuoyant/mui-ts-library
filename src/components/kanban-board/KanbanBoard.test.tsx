@@ -368,6 +368,63 @@ describe("KanbanBoard", () => {
     expect(dueDateChip).not.toHaveClass("MuiChip-colorError");
   });
 
+  // ── filterText ───────────────────────────────────────────────────────────────
+
+  it("shows all cards when filterText is empty", () => {
+    render(<KanbanBoard columns={COLUMNS} tasks={TASKS} filterText="" />);
+    expect(screen.getByText("Task Alpha")).toBeInTheDocument();
+    expect(screen.getByText("Task Beta")).toBeInTheDocument();
+    expect(screen.getByText("Task Gamma")).toBeInTheDocument();
+    expect(screen.getByText("Task Delta")).toBeInTheDocument();
+  });
+
+  it("filters cards by title (case-insensitive)", () => {
+    render(<KanbanBoard columns={COLUMNS} tasks={TASKS} filterText="alpha" />);
+    expect(screen.getByText("Task Alpha")).toBeInTheDocument();
+    expect(screen.queryByText("Task Beta")).not.toBeInTheDocument();
+    expect(screen.queryByText("Task Gamma")).not.toBeInTheDocument();
+  });
+
+  it("filters cards by assignee (case-insensitive)", () => {
+    render(<KanbanBoard columns={COLUMNS} tasks={TASKS} filterText="alice" />);
+    expect(screen.getByText("Task Alpha")).toBeInTheDocument();
+    // Task Beta is Bob's, Task Gamma has no assignee, Task Delta has no assignee
+    expect(screen.queryByText("Task Beta")).not.toBeInTheDocument();
+    expect(screen.queryByText("Task Gamma")).not.toBeInTheDocument();
+  });
+
+  it("shows no cards and noCardsLabel when no cards match filter", () => {
+    render(<KanbanBoard columns={COLUMNS} tasks={TASKS} filterText="zzznomatch" />);
+    expect(screen.queryByText("Task Alpha")).not.toBeInTheDocument();
+    expect(screen.getAllByText("No cards").length).toBeGreaterThan(0);
+  });
+
+  it("column counter reflects filtered count", () => {
+    // TASKS: todo has Task Alpha (Alice) + Task Delta (no assignee) → only Alpha matches "alice"
+    render(<KanbanBoard columns={COLUMNS} tasks={TASKS} filterText="alice" />);
+    const todoCol = getColumn("To Do");
+    expect(within(todoCol).getByText("1")).toBeInTheDocument();
+  });
+
+  it("WIP-limit warning stays visible even when filter hides cards", () => {
+    const columns: KanbanColumn[] = [
+      { id: "todo", label: "To Do", wipLimit: 1 },
+      { id: "done", label: "Done" },
+    ];
+    // TASKS has 2 todo items (Alpha + Delta) → over wipLimit of 1.
+    // With filterText="alice", only Alpha is visible → counter shows "1 / 1",
+    // but totalCount is still 2 so isOverLimit remains true.
+    const { container } = render(
+      <KanbanBoard columns={columns} tasks={TASKS.filter((t) => t.status !== "in-progress")} filterText="alice" />,
+    );
+    // The count chip in the To Do column header must carry the error color class.
+    const todoCol = getColumn("To Do");
+    const countChip = within(todoCol).getByLabelText(/cards.*limit/i);
+    expect(countChip.className).toContain("colorError");
+    // Sanity: the chip is still in the container
+    expect(container).toContainElement(countChip);
+  });
+
   // ── CSS classes ───────────────────────────────────────────────────────────────
 
   it("applies kanbanBoardClasses.root to the outermost element", () => {

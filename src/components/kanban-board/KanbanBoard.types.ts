@@ -112,6 +112,14 @@ export type KanbanBoardProps = {
    * `"filled"` — solid background, more prominent.
    */
   chipVariant?: "outlined" | "filled";
+  /**
+   * Filters visible cards by title and assignee (case-insensitive substring match).
+   * The consumer is responsible for rendering the search input and passing the string.
+   * An empty string or `undefined` shows all cards.
+   * Column counters reflect the filtered count; WIP-limit checks always use the
+   * unfiltered column total so the over-limit warning is never hidden by a filter.
+   */
+  filterText?: string;
   /** Width of the board. Default: "100%". */
   width?: number | string;
   /** Height of the board. Default: "100%". */

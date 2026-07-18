@@ -11,6 +11,10 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unveröffentlicht]
 
+### Hinzugefügt
+
+- **KanbanBoard — `filterText`-Prop**: `filterText?: string` filtert sichtbare Karten nach Titel und Zuständiger Person (Groß-/Kleinschreibung egal, Substring-Suche). Der Consumer rendert das Suchfeld selbst und übergibt den String — das Board ist ein reiner controlled Consumer. Spalten-Counter zeigen die gefilterte Anzahl; WIP-Limit-Prüfungen verwenden immer die ungefilterte Gesamtanzahl, damit die Überlimit-Warnung durch einen Filter nie ausgeblendet wird.
+
 ---
 
 ## [3.32.0] — 2026-07-18
