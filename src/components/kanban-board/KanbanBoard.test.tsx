@@ -423,6 +423,38 @@ describe("KanbanBoard", () => {
     expect(countChip.className).toContain("colorError");
   });
 
+  // ── showSearchField ───────────────────────────────────────────────────────────
+
+  it("renders a search input when showSearchField=true", () => {
+    render(<KanbanBoard columns={COLUMNS} tasks={TASKS} showSearchField />);
+    expect(screen.getByPlaceholderText("Search by title or assignee…")).toBeInTheDocument();
+  });
+
+  it("does not render a search input by default", () => {
+    render(<KanbanBoard columns={COLUMNS} tasks={TASKS} />);
+    expect(screen.queryByPlaceholderText("Search by title or assignee…")).not.toBeInTheDocument();
+  });
+
+  it("filters cards via the built-in search field", async () => {
+    render(<KanbanBoard columns={COLUMNS} tasks={TASKS} showSearchField />);
+    const input = screen.getByPlaceholderText("Search by title or assignee…");
+    fireEvent.change(input, { target: { value: "alpha" } });
+    expect(screen.getByText("Task Alpha")).toBeInTheDocument();
+    expect(screen.queryByText("Task Beta")).not.toBeInTheDocument();
+  });
+
+  it("uses custom placeholder from translation", () => {
+    render(
+      <KanbanBoard
+        columns={COLUMNS}
+        tasks={TASKS}
+        showSearchField
+        translation={{ searchFieldPlaceholder: "Suchen…" }}
+      />,
+    );
+    expect(screen.getByPlaceholderText("Suchen…")).toBeInTheDocument();
+  });
+
   // ── CSS classes ───────────────────────────────────────────────────────────────
 
   it("applies kanbanBoardClasses.root to the outermost element", () => {

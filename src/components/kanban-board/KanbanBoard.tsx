@@ -11,7 +11,8 @@ import {
   type DragStartEvent,
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import { Box } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import { Box, InputAdornment, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import type { KanbanTask } from "./KanbanBoard.types";
 import { DEFAULT_KANBAN_BOARD_TRANSLATION, type KanbanBoardProps } from "./KanbanBoard.types";
@@ -36,6 +37,7 @@ export function KanbanBoard({
   showDueDate        = true,
   showDueDateWarning = true,
   chipVariant        = "outlined",
+  showSearchField    = false,
   filterText         = "",
   width         = "100%",
   height        = "100%",
@@ -47,8 +49,9 @@ export function KanbanBoard({
   const [internalTasks, setInternalTasks] = useState<KanbanTask[]>(tasks);
   useEffect(() => { setInternalTasks(tasks); }, [tasks]);
 
-  const [activeTask, setActiveTask]     = useState<KanbanTask | null>(null);
-  const [dialogState, setDialogState]   = useState<KanbanDialogState | null>(null);
+  const [activeTask, setActiveTask]       = useState<KanbanTask | null>(null);
+  const [dialogState, setDialogState]     = useState<KanbanDialogState | null>(null);
+  const [internalFilter, setInternalFilter] = useState("");
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -160,7 +163,8 @@ export function KanbanBoard({
 
   // ── Filter ────────────────────────────────────────────────────────────────────
 
-  const needle = filterText.trim().toLowerCase();
+  // External filterText takes priority; internal field is used when showSearchField=true.
+  const needle = (filterText || internalFilter).trim().toLowerCase();
   function matchesFilter(task: KanbanTask) {
     if (!needle) return true;
     return (
@@ -176,6 +180,32 @@ export function KanbanBoard({
       className={kanbanBoardClasses.root}
       sx={{ width, height, display: "flex", flexDirection: "column", overflow: "hidden" }}
     >
+      {showSearchField && (
+        <Box
+          className={kanbanBoardClasses.searchFieldWrapper}
+          sx={{ px: 2, pt: 1.5, pb: 0.5 }}
+        >
+          <TextField
+            className={kanbanBoardClasses.searchField}
+            size="small"
+            placeholder={t.searchFieldPlaceholder}
+            value={internalFilter}
+            onChange={(e) => setInternalFilter((e.target as HTMLInputElement).value)}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon fontSize="small" sx={{ color: "text.disabled" }} />
+                  </InputAdornment>
+                ),
+              },
+              htmlInput: { "aria-label": t.searchFieldPlaceholder },
+            }}
+            sx={{ width: 280 }}
+          />
+        </Box>
+      )}
+
       <DndContext
         sensors={sensors}
         collisionDetection={closestCorners}

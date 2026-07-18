@@ -43,7 +43,11 @@ export const kanbanBoardClasses = {
   /** The due date label on a card. */
   cardDueDate:      "MuiTsKanbanBoard-cardDueDate",
   /** The priority indicator dot on a card. */
-  cardPriorityDot:  "MuiTsKanbanBoard-cardPriorityDot",
+  cardPriorityDot:      "MuiTsKanbanBoard-cardPriorityDot",
   /** The "+ Add card" button at the bottom of each column. */
-  addButton:        "MuiTsKanbanBoard-addButton",
+  addButton:            "MuiTsKanbanBoard-addButton",
+  /** The wrapper Box around the built-in search field (`showSearchField={true}`). */
+  searchFieldWrapper:   "MuiTsKanbanBoard-searchFieldWrapper",
+  /** The built-in search TextField (`showSearchField={true}`). */
+  searchField:          "MuiTsKanbanBoard-searchField",
 } as const;

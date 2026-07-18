@@ -14,7 +14,7 @@ The `KanbanBoard` renders a horizontal row of columns, each containing a list of
 - **Cards** show the task title and optional meta chips (assignee, due date). A colored left border can be added per card.
 - **Priority dots**: set `priority` on any task to show a small colored dot next to its title (`"low"` → green, `"medium"` → orange, `"high"` → red, `"critical"` → purple).
 - **Overdue warning**: cards whose `dueDate` is in the past automatically receive a red chip, background tint, and left border — toggle with `showDueDateWarning`.
-- **Filter / search**: pass a `filterText` string to narrow visible cards by title or assignee — the consumer owns the search input.
+- **Filter / search**: set `showSearchField={true}` for a built-in search bar, or pass `filterText` to supply the string yourself (custom placement, debouncing, etc.).
 - **Drag and drop** (powered by `@dnd-kit`): grab a card and drop it into any column. In-column reordering is also supported.
 - **Built-in dialogs**: click a card to open the Edit dialog; click "+ Add card" in a column to open the Add dialog. A Delete confirmation is reachable from the Edit dialog.
 - **WIP limits**: set `wipLimit` on a column — the count chip turns red when the limit is exceeded.
@@ -65,7 +65,8 @@ Every drag-and-drop, Add, Edit, and Delete action calls `onTasksChange` with the
 | `onTaskUpdated` | `(task: KanbanTask) => void` | — | Called after an existing card is saved via the Edit dialog. |
 | `onTaskDeleted` | `(taskId: string) => void` | — | Called after a card is deleted via the Delete confirmation. |
 | `onTaskMoved` | `(task: KanbanTask, fromColumnId: string, toColumnId: string) => void` | — | Called when a card is moved to a **different column** via drag and drop. Not fired for in-column reordering or dialog-based status changes — use `onTaskUpdated` for those. |
-| `filterText` | `string` | `""` | Filters visible cards by title and assignee (case-insensitive substring match). The consumer renders the search input and passes the string. Column counters reflect the filtered count; WIP-limit checks always use the unfiltered total. |
+| `showSearchField` | `boolean` | `false` | Renders a built-in `size="small"` search field above the board. The board manages the search state internally — no extra wiring needed. Customize the placeholder via `translation.searchFieldPlaceholder`. |
+| `filterText` | `string` | `""` | Filters visible cards by title and assignee (case-insensitive substring match). The consumer renders and manages the search input. Takes priority over the built-in field when both are used. Column counters reflect the filtered count; WIP-limit checks always use the unfiltered total. |
 | `showPriority` | `boolean` | `true` | Show the priority dot on cards. Has no visual effect when a card has no `priority` field. |
 | `showAssignee` | `boolean` | `true` | Show the assignee chip on cards. |
 | `showDueDate` | `boolean` | `true` | Show the due-date chip on cards. |
@@ -225,11 +226,36 @@ When `showDueDateWarning` is `true` (the default), any card whose `dueDate` is b
 
 ---
 
-## Filtering cards (`filterText`)
+## Filtering cards (`showSearchField` / `filterText`)
 
-Pass a search string via `filterText` to narrow the visible cards. The board matches case-insensitively against `task.title` and `task.assignee`. An empty string (the default) shows all cards.
+There are two ways to filter cards — pick the one that fits your use case:
 
-The consumer is responsible for rendering the search input and managing its state:
+### Option A — Built-in search field (zero wiring)
+
+Set `showSearchField={true}` and the board renders its own `size="small"` TextField above the columns. The board manages the search state internally.
+
+```tsx
+<KanbanBoard
+  columns={columns}
+  tasks={tasks}
+  showSearchField
+  onTasksChange={setTasks}
+/>
+```
+
+Customize the placeholder via `translation`:
+
+```tsx
+<KanbanBoard
+  showSearchField
+  translation={{ searchFieldPlaceholder: "Nach Titel oder Person suchen…" }}
+  ...
+/>
+```
+
+### Option B — External search field (full control)
+
+Build your own input and pass the current value via `filterText`. The board filters but does not render any input element. Use this when you need custom placement, styling, debouncing, or when the search field is part of a larger toolbar.
 
 ```tsx
 import { useState } from 'react';
@@ -259,10 +285,12 @@ function App() {
 }
 ```
 
-**Notes:**
+**Notes (both options):**
+- Matching is case-insensitive substring on `task.title` and `task.assignee`.
 - Column counters show the filtered count (e.g., `2` instead of `5` when 2 cards match).
-- WIP-limit checks always use the **unfiltered** total — so the over-limit warning stays visible even when a filter reduces the displayed count below the limit.
-- Cards that are filtered out are excluded from the drag-and-drop sortable context. When the filter is cleared, the full list is restored.
+- WIP-limit checks always use the **unfiltered** total — the over-limit warning stays visible even when the filter reduces the visible count below the limit.
+- All callbacks (`onTasksChange`, `onTaskCreated`, `onTaskUpdated`, `onTaskDeleted`, `onTaskMoved`) always operate on the full unfiltered task list — the filter is purely visual.
+- Cards filtered out are excluded from the DnD sortable context. When the filter is cleared, the full list is restored.
 
 ---
 
@@ -326,6 +354,7 @@ The `dialogDeleteConfirm` string supports the placeholder `{title}` — it is re
 | `dialogFieldDueDate` | `"Due date"` | Label for the Due date input and chip aria-label |
 | `dialogFieldStatus` | `"Status"` | Label for the Status dropdown in Add/Edit dialog |
 | `noCardsLabel` | `"No cards"` | Placeholder shown in an empty column |
+| `searchFieldPlaceholder` | `"Search by title or assignee…"` | Placeholder for the built-in search field (`showSearchField={true}`) |
 
 ---
 

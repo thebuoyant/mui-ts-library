@@ -40,6 +40,8 @@ export type KanbanBoardTranslation = {
   dialogFieldDueDate: string;
   dialogFieldStatus: string;
   noCardsLabel: string;
+  /** Placeholder text for the built-in search field (`showSearchField={true}`). */
+  searchFieldPlaceholder: string;
 };
 
 export const DEFAULT_KANBAN_BOARD_TRANSLATION: Required<KanbanBoardTranslation> = {
@@ -56,7 +58,8 @@ export const DEFAULT_KANBAN_BOARD_TRANSLATION: Required<KanbanBoardTranslation> 
   dialogFieldAssignee:    "Assignee",
   dialogFieldDueDate:     "Due date",
   dialogFieldStatus:      "Status",
-  noCardsLabel:       "No cards",
+  noCardsLabel:           "No cards",
+  searchFieldPlaceholder: "Search by title or assignee…",
 };
 
 export type KanbanBoardProps = {
@@ -113,11 +116,22 @@ export type KanbanBoardProps = {
    */
   chipVariant?: "outlined" | "filled";
   /**
+   * When `true`, renders a built-in `size="small"` search field above the board columns.
+   * The board manages the search state internally — no extra wiring needed.
+   * Customize the placeholder via `translation.searchFieldPlaceholder`.
+   *
+   * For full control over placement, styling, or debouncing, leave this `false` (default)
+   * and pass `filterText` instead.
+   */
+  showSearchField?: boolean;
+  /**
    * Filters visible cards by title and assignee (case-insensitive substring match).
    * The consumer is responsible for rendering the search input and passing the string.
    * An empty string or `undefined` shows all cards.
    * Column counters reflect the filtered count; WIP-limit checks always use the
    * unfiltered column total so the over-limit warning is never hidden by a filter.
+   *
+   * Alternative: set `showSearchField={true}` to let the board render a built-in field.
    */
   filterText?: string;
   /** Width of the board. Default: "100%". */
