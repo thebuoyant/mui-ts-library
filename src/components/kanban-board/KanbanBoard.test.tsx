@@ -323,7 +323,7 @@ describe("KanbanBoard", () => {
   });
 
   it("does not render priority dot when task has no priority", () => {
-    const { container } = render(<KanbanBoard columns={COLUMNS} tasks={TASKS} />);
+    render(<KanbanBoard columns={COLUMNS} tasks={TASKS} />);
     // TASKS[1] (Task Beta) has no priority — no dot in its card
     const betaCard = screen.getByText("Task Beta").closest(".MuiTsKanbanBoard-card");
     expect(betaCard?.querySelector(".MuiTsKanbanBoard-cardPriorityDot")).not.toBeInTheDocument();
@@ -414,15 +414,13 @@ describe("KanbanBoard", () => {
     // TASKS has 2 todo items (Alpha + Delta) → over wipLimit of 1.
     // With filterText="alice", only Alpha is visible → counter shows "1 / 1",
     // but totalCount is still 2 so isOverLimit remains true.
-    const { container } = render(
+    render(
       <KanbanBoard columns={columns} tasks={TASKS.filter((t) => t.status !== "in-progress")} filterText="alice" />,
     );
     // The count chip in the To Do column header must carry the error color class.
     const todoCol = getColumn("To Do");
     const countChip = within(todoCol).getByLabelText(/cards.*limit/i);
     expect(countChip.className).toContain("colorError");
-    // Sanity: the chip is still in the container
-    expect(container).toContainElement(countChip);
   });
 
   // ── CSS classes ───────────────────────────────────────────────────────────────
