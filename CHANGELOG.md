@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [3.31.0] — 2026-07-18
+
 ### Added
 
 - **KanbanBoard — `showDueDateWarning` prop**: When `true` (default), cards whose `dueDate` is in the past automatically highlight: the due-date chip turns red (`color="error"`) and the card receives a subtle red background tint plus a 4 px red left-border accent. Set to `false` to opt out. Has no effect when `showDueDate` is `false` or the card has no `dueDate`. New Storybook story: "Overdue due-date warning".

@@ -11,6 +11,10 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unveröffentlicht]
 
+---
+
+## [3.31.0] — 2026-07-18
+
 ### Hinzugefügt
 
 - **KanbanBoard — `showDueDateWarning`-Prop**: Wenn `true` (Standard), werden Karten deren `dueDate` in der Vergangenheit liegt automatisch hervorgehoben: Der Fälligkeitsdatum-Chip wird rot (`color="error"`), die Karte erhält einen subtilen roten Hintergrundton und einen 4 px roten linken Rahmen. Auf `false` setzen zum Deaktivieren. Keine Wirkung wenn `showDueDate` den Wert `false` hat oder die Karte kein `dueDate` besitzt. Neue Storybook-Story: „Overdue due-date warning".
