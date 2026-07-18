@@ -31,6 +31,7 @@ export function KanbanBoard({
   onTaskUpdated,
   onTaskDeleted,
   onTaskMoved,
+  showPriority       = true,
   showAssignee       = true,
   showDueDate        = true,
   showDueDateWarning = true,
@@ -187,6 +188,7 @@ export function KanbanBoard({
               key={column.id}
               column={column}
               tasks={internalTasks.filter((t) => t.status === column.id)}
+              showPriority={showPriority}
               showAssignee={showAssignee}
               showDueDate={showDueDate}
               showDueDateWarning={showDueDateWarning}
@@ -203,6 +205,7 @@ export function KanbanBoard({
           {activeTask && (
             <KanbanBoardCard
               task={activeTask}
+              showPriority={showPriority}
               showAssignee={showAssignee}
               showDueDate={showDueDate}
               showDueDateWarning={showDueDateWarning}

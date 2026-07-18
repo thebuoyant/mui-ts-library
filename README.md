@@ -555,6 +555,27 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 ## Changelog
 
+### [Unreleased]
+
+**Added**
+- **KanbanBoard — `priority` field + `showPriority` prop**: `priority?: "low" | "medium" | "high" | "critical"` on `KanbanTask` — shown as a colored dot next to the card title. `showPriority={false}` to hide all dots. New type export: `KanbanTaskPriority`. See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.
+
+---
+
+### [3.31.0] — 2026-07-18
+
+**Added**
+- **KanbanBoard — `showDueDateWarning`**: Overdue cards (dueDate in the past) auto-highlight with a red chip, background tint, and left border. `showDueDateWarning={false}` to opt out. See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.
+- **KanbanBoard — `width` prop**: `width?: number | string` (default `"100%"`).
+
+**Fixed**
+- **KanbanBoard — column scroll**: Cards in a tall column now scroll correctly instead of being silently clipped.
+
+**Changed**
+- **KanbanBoard — card visual polish**: Explicit `1px` border, controlled box-shadow with hover lift, hidden scrollbar, `fontWeight: 700` title. See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.
+
+---
+
 ### [3.30.0] — 2026-07-17
 
 **Added**

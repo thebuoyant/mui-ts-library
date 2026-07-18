@@ -1,3 +1,5 @@
+export type KanbanTaskPriority = "low" | "medium" | "high" | "critical";
+
 export type KanbanTask = {
   id: string;
   title: string;
@@ -8,6 +10,8 @@ export type KanbanTask = {
   /** Overrides the column's default card color for this individual card. Any CSS color value. */
   color?: string;
   dueDate?: Date;
+  /** Optional priority level — shown as a colored dot next to the card title when `showPriority` is true. */
+  priority?: KanbanTaskPriority;
 };
 
 export type KanbanColumn = {
@@ -86,6 +90,11 @@ export type KanbanBoardProps = {
    * so consumers can issue a targeted API call without diffing the full list.
    */
   onTaskMoved?: (task: KanbanTask, fromColumnId: string, toColumnId: string) => void;
+  /**
+   * Show the priority dot on cards (default: true).
+   * Has no visual effect when a card has no `priority` field set.
+   */
+  showPriority?: boolean;
   /** Show the assignee label on cards (default: true). */
   showAssignee?: boolean;
   /** Show the due date on cards (default: true). */

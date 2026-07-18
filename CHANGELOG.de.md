@@ -11,6 +11,11 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unveröffentlicht]
 
+### Hinzugefügt
+
+- **KanbanBoard — `priority`-Feld auf `KanbanTask`**: `priority?: "low" | "medium" | "high" | "critical"` — wird als kleiner farbiger Punkt links neben dem Kartentitel angezeigt. Farben: low=Grün (`#4caf50`), medium=Orange (`#ff9800`), high=Rot (`#f44336`), critical=Lila (`#9c27b0`). Neuer Typ-Export: `KanbanTaskPriority`.
+- **KanbanBoard — `showPriority`-Prop**: `showPriority?: boolean` (Standard `true`) — auf `false` setzen um alle Prioritätspunkte auszublenden ohne Aufgabendaten zu verändern. Keine Wirkung auf Karten ohne `priority`-Feld. Neue Storybook-Story: „Priority indicators". Neue CSS-Klasse: `MuiTsKanbanBoard-cardPriorityDot`.
+
 ---
 
 ## [3.31.0] — 2026-07-18

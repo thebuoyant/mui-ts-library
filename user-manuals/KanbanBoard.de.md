@@ -62,6 +62,7 @@ Jede Drag-and-Drop-Aktion sowie jedes Hinzufügen, Bearbeiten und Löschen ruft 
 | `onTaskUpdated` | `(task: KanbanTask) => void` | — | Wird aufgerufen, nachdem eine vorhandene Karte über den Bearbeiten-Dialog gespeichert wurde. |
 | `onTaskDeleted` | `(taskId: string) => void` | — | Wird aufgerufen, nachdem eine Karte über die Löschbestätigung gelöscht wurde. |
 | `onTaskMoved` | `(task: KanbanTask, fromColumnId: string, toColumnId: string) => void` | — | Wird aufgerufen, wenn eine Karte per Drag & Drop in eine **andere Spalte** verschoben wird. Feuert nicht bei Neuordnung innerhalb derselben Spalte oder bei dialog-basierter Status-Änderung — dafür ist `onTaskUpdated` zuständig. |
+| `showPriority` | `boolean` | `true` | Prioritäts-Punkt auf Karten anzeigen. Keine Wirkung wenn eine Karte kein `priority`-Feld hat. |
 | `showAssignee` | `boolean` | `true` | Zuständige-Person-Chip auf Karten anzeigen. |
 | `showDueDate` | `boolean` | `true` | Fälligkeitsdatum-Chip auf Karten anzeigen. |
 | `showDueDateWarning` | `boolean` | `true` | Wenn `true`, werden Karten mit einem `dueDate` in der Vergangenheit hervorgehoben: Der Datums-Chip wird rot und die Karte erhält einen roten Hintergrundton + linken Rahmen. Mit `false` deaktivieren. Ohne Wirkung wenn `showDueDate` den Wert `false` hat. |
@@ -76,15 +77,27 @@ Jede Drag-and-Drop-Aktion sowie jedes Hinzufügen, Bearbeiten und Löschen ruft 
 
 ```ts
 type KanbanTask = {
-  id:           string;       // eindeutige ID
-  title:        string;       // Kartentitel
-  status:       string;       // muss mit einer KanbanColumn.id übereinstimmen
-  description?: string;       // optionaler Langtext (wird im Bearbeiten-Dialog angezeigt)
-  assignee?:    string;       // wird als Chip auf der Karte angezeigt
-  color?:       string;       // linke Rahmenfarbe — beliebiger CSS-Farbwert
-  dueDate?:     Date;         // wird als Chip auf der Karte angezeigt
+  id:           string;              // eindeutige ID
+  title:        string;              // Kartentitel
+  status:       string;              // muss mit einer KanbanColumn.id übereinstimmen
+  description?: string;              // optionaler Langtext (wird im Bearbeiten-Dialog angezeigt)
+  assignee?:    string;              // wird als Chip auf der Karte angezeigt
+  color?:       string;              // linke Rahmenfarbe — beliebiger CSS-Farbwert
+  dueDate?:     Date;                // wird als Chip auf der Karte angezeigt
+  priority?:    KanbanTaskPriority;  // farbiger Punkt neben dem Titel
 };
+
+type KanbanTaskPriority = "low" | "medium" | "high" | "critical";
 ```
+
+### Prioritätsfarben
+
+| Wert | Farbe | Hex |
+|---|---|---|
+| `"low"` | Grün | `#4caf50` |
+| `"medium"` | Orange | `#ff9800` |
+| `"high"` | Rot | `#f44336` |
+| `"critical"` | Lila | `#9c27b0` |
 
 ## Typ KanbanColumn
 
@@ -152,6 +165,35 @@ Wenn eigene Dialoge implementiert werden sollen, `enableBuiltinDialogs={false}` 
 | Status über Bearbeiten-Dialog geändert | ✓ | ✓ | — |
 | Neue Karte hinzugefügt | ✓ | — | — |
 | Karte gelöscht | ✓ | — | — |
+
+---
+
+## Prioritäts-Indikatoren (`showPriority`)
+
+`priority` an einem `KanbanTask` setzen, um einen kleinen farbigen Punkt links neben dem Kartentitel anzuzeigen. Der Punkt erscheint wenn `showPriority` den Wert `true` hat (Standard).
+
+```tsx
+const tasks: KanbanTask[] = [
+  { id: "1", title: "Prod-Ausfall beheben",  status: "todo", priority: "critical" },
+  { id: "2", title: "Sicherheits-Patch",     status: "todo", priority: "high" },
+  { id: "3", title: "Performance verbessern",status: "in-progress", priority: "medium" },
+  { id: "4", title: "Readme aktualisieren",  status: "todo", priority: "low" },
+  { id: "5", title: "Keine Priorität",       status: "todo" },  // kein Punkt
+];
+
+<KanbanBoard columns={columns} tasks={tasks} />
+```
+
+Mit `showPriority={false}` alle Punkte ausblenden ohne die Daten zu verändern:
+
+```tsx
+<KanbanBoard columns={columns} tasks={tasks} showPriority={false} />
+```
+
+**Hinweise:**
+- Karten ohne `priority`-Feld zeigen keinen Punkt — unabhängig von `showPriority`.
+- Der Punkt ist barrierefrei: `role="img"` und `aria-label="Priority: {level}"`.
+- Die CSS-Klasse `MuiTsKanbanBoard-cardPriorityDot` ermöglicht eigenes Styling per Plain CSS.
 
 ---
 

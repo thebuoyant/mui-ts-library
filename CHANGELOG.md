@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **KanbanBoard — `priority` field on `KanbanTask`**: `priority?: "low" | "medium" | "high" | "critical"` — shown as a small colored dot to the left of the card title. Colors: low=green (`#4caf50`), medium=orange (`#ff9800`), high=red (`#f44336`), critical=purple (`#9c27b0`). New type export: `KanbanTaskPriority`.
+- **KanbanBoard — `showPriority` prop**: `showPriority?: boolean` (default `true`) — set to `false` to hide all priority dots without modifying task data. Has no visual effect on cards with no `priority` field. New Storybook story: "Priority indicators". New CSS class: `MuiTsKanbanBoard-cardPriorityDot`.
+
 ---
 
 ## [3.31.0] — 2026-07-18

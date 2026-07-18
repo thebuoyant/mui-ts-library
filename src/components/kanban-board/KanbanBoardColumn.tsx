@@ -9,6 +9,7 @@ import { kanbanBoardClasses } from "./kanbanBoardClasses";
 type KanbanBoardColumnProps = {
   column: KanbanColumn;
   tasks: KanbanTask[];
+  showPriority: boolean;
   showAssignee: boolean;
   showDueDate: boolean;
   showDueDateWarning: boolean;
@@ -22,6 +23,7 @@ type KanbanBoardColumnProps = {
 export function KanbanBoardColumn({
   column,
   tasks,
+  showPriority,
   showAssignee,
   showDueDate,
   showDueDateWarning,
@@ -128,6 +130,7 @@ export function KanbanBoardColumn({
             <KanbanBoardCard
               key={task.id}
               task={task}
+              showPriority={showPriority}
               showAssignee={showAssignee}
               showDueDate={showDueDate}
               showDueDateWarning={showDueDateWarning}

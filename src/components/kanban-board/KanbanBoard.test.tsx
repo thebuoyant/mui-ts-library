@@ -308,6 +308,37 @@ describe("KanbanBoard", () => {
     expect(onTaskMoved).not.toHaveBeenCalled();
   });
 
+  // ── showPriority ──────────────────────────────────────────────────────────────
+
+  it("renders priority dot when task has priority and showPriority=true", () => {
+    const tasks: KanbanTask[] = [{ id: "p1", title: "Urgent", status: "todo", priority: "high" }];
+    const { container } = render(<KanbanBoard columns={COLUMNS} tasks={tasks} />);
+    expect(container.querySelector(".MuiTsKanbanBoard-cardPriorityDot")).toBeInTheDocument();
+  });
+
+  it("does not render priority dot when showPriority=false", () => {
+    const tasks: KanbanTask[] = [{ id: "p1", title: "Urgent", status: "todo", priority: "high" }];
+    const { container } = render(<KanbanBoard columns={COLUMNS} tasks={tasks} showPriority={false} />);
+    expect(container.querySelector(".MuiTsKanbanBoard-cardPriorityDot")).not.toBeInTheDocument();
+  });
+
+  it("does not render priority dot when task has no priority", () => {
+    const { container } = render(<KanbanBoard columns={COLUMNS} tasks={TASKS} />);
+    // TASKS[1] (Task Beta) has no priority — no dot in its card
+    const betaCard = screen.getByText("Task Beta").closest(".MuiTsKanbanBoard-card");
+    expect(betaCard?.querySelector(".MuiTsKanbanBoard-cardPriorityDot")).not.toBeInTheDocument();
+  });
+
+  it("renders the correct aria-label for each priority level", () => {
+    const tasks: KanbanTask[] = [
+      { id: "c", title: "Critical task", status: "todo", priority: "critical" },
+      { id: "l", title: "Low task",      status: "todo", priority: "low" },
+    ];
+    render(<KanbanBoard columns={COLUMNS} tasks={tasks} />);
+    expect(screen.getByLabelText("Priority: critical")).toBeInTheDocument();
+    expect(screen.getByLabelText("Priority: low")).toBeInTheDocument();
+  });
+
   // ── showDueDateWarning ────────────────────────────────────────────────────────
 
   const OVERDUE_TASKS: KanbanTask[] = [
