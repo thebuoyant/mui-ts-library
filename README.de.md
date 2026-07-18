@@ -555,6 +555,13 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/):
 
 ## Changelog
 
+### [Unveröffentlicht]
+
+**Geändert**
+- **KanbanBoard — Docs**: Überblick-Abschnitt und README-Beschreibung aktualisiert — Prioritäts-Punkte, Überfälligkeits-Warnung und `filterText` jetzt in der Einleitung genannt. Siehe [Vollständiger Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.de.md) für Details.
+
+---
+
 ### [3.33.0] — 2026-07-18
 
 **Hinzugefügt**

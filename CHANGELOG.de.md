@@ -11,6 +11,10 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unveröffentlicht]
 
+### Geändert
+
+- **KanbanBoard — Docs**: Überblick-Abschnitt im Benutzerhandbuch und README-Beschreibung aktualisiert — Prioritäts-Punkte, Überfälligkeits-Warnung und `filterText` werden jetzt in der Einleitung genannt (alle Features wurden in v3.31–v3.33 geliefert, fehlten aber in den Intro-Abschnitten).
+
 ---
 
 ## [3.33.0] — 2026-07-18
