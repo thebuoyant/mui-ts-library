@@ -62,6 +62,7 @@ Every drag-and-drop, Add, Edit, and Delete action calls `onTasksChange` with the
 | `onTaskUpdated` | `(task: KanbanTask) => void` | — | Called after an existing card is saved via the Edit dialog. |
 | `onTaskDeleted` | `(taskId: string) => void` | — | Called after a card is deleted via the Delete confirmation. |
 | `onTaskMoved` | `(task: KanbanTask, fromColumnId: string, toColumnId: string) => void` | — | Called when a card is moved to a **different column** via drag and drop. Not fired for in-column reordering or dialog-based status changes — use `onTaskUpdated` for those. |
+| `filterText` | `string` | `""` | Filters visible cards by title and assignee (case-insensitive substring match). The consumer renders the search input and passes the string. Column counters reflect the filtered count; WIP-limit checks always use the unfiltered total. |
 | `showPriority` | `boolean` | `true` | Show the priority dot on cards. Has no visual effect when a card has no `priority` field. |
 | `showAssignee` | `boolean` | `true` | Show the assignee chip on cards. |
 | `showDueDate` | `boolean` | `true` | Show the due-date chip on cards. |
@@ -218,6 +219,47 @@ When `showDueDateWarning` is `true` (the default), any card whose `dueDate` is b
 - Has no visual effect when `showDueDate` is `false` or a card has no `dueDate`.
 - "Overdue" means `dueDate < start of today` — cards due today are not highlighted.
 - The highlight applies to cards in any column, including "Done". If you want to suppress it for completed tasks, omit `dueDate` on done cards or set `showDueDateWarning={false}` for the whole board.
+
+---
+
+## Filtering cards (`filterText`)
+
+Pass a search string via `filterText` to narrow the visible cards. The board matches case-insensitively against `task.title` and `task.assignee`. An empty string (the default) shows all cards.
+
+The consumer is responsible for rendering the search input and managing its state:
+
+```tsx
+import { useState } from 'react';
+import { TextField } from '@mui/material';
+import { KanbanBoard } from '@thebuoyant-tsdev/mui-ts-library';
+
+function App() {
+  const [tasks, setTasks]   = useState(initialTasks);
+  const [filter, setFilter] = useState('');
+
+  return (
+    <>
+      <TextField
+        size="small"
+        placeholder="Search by title or assignee…"
+        value={filter}
+        onChange={(e) => setFilter(e.target.value)}
+      />
+      <KanbanBoard
+        columns={columns}
+        tasks={tasks}
+        filterText={filter}
+        onTasksChange={setTasks}
+      />
+    </>
+  );
+}
+```
+
+**Notes:**
+- Column counters show the filtered count (e.g., `2` instead of `5` when 2 cards match).
+- WIP-limit checks always use the **unfiltered** total — so the over-limit warning stays visible even when a filter reduces the displayed count below the limit.
+- Cards that are filtered out are excluded from the drag-and-drop sortable context. When the filter is cleared, the full list is restored.
 
 ---
 

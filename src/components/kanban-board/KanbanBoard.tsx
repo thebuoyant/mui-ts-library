@@ -36,6 +36,7 @@ export function KanbanBoard({
   showDueDate        = true,
   showDueDateWarning = true,
   chipVariant        = "outlined",
+  filterText         = "",
   width         = "100%",
   height        = "100%",
   translation,
@@ -157,6 +158,17 @@ export function KanbanBoard({
     setDialogState({ mode: "delete", task });
   }
 
+  // ── Filter ────────────────────────────────────────────────────────────────────
+
+  const needle = filterText.trim().toLowerCase();
+  function matchesFilter(task: KanbanTask) {
+    if (!needle) return true;
+    return (
+      task.title.toLowerCase().includes(needle) ||
+      (task.assignee?.toLowerCase().includes(needle) ?? false)
+    );
+  }
+
   // ── Render ────────────────────────────────────────────────────────────────────
 
   return (
@@ -183,22 +195,27 @@ export function KanbanBoard({
             alignItems: "stretch",
           }}
         >
-          {columns.map((column) => (
-            <KanbanBoardColumn
-              key={column.id}
-              column={column}
-              tasks={internalTasks.filter((t) => t.status === column.id)}
-              showPriority={showPriority}
-              showAssignee={showAssignee}
-              showDueDate={showDueDate}
-              showDueDateWarning={showDueDateWarning}
-              chipVariant={chipVariant}
-              t={t}
-              enableBuiltinDialogs={enableBuiltinDialogs}
-              onCardClick={handleCardClick}
-              onAddClick={handleAddClick}
-            />
-          ))}
+          {columns.map((column) => {
+            const allColumnTasks     = internalTasks.filter((t) => t.status === column.id);
+            const visibleColumnTasks = allColumnTasks.filter(matchesFilter);
+            return (
+              <KanbanBoardColumn
+                key={column.id}
+                column={column}
+                tasks={visibleColumnTasks}
+                totalCount={allColumnTasks.length}
+                showPriority={showPriority}
+                showAssignee={showAssignee}
+                showDueDate={showDueDate}
+                showDueDateWarning={showDueDateWarning}
+                chipVariant={chipVariant}
+                t={t}
+                enableBuiltinDialogs={enableBuiltinDialogs}
+                onCardClick={handleCardClick}
+                onAddClick={handleAddClick}
+              />
+            );
+          })}
         </Box>
 
         <DragOverlay>

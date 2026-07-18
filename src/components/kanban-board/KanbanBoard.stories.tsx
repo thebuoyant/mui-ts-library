@@ -2,7 +2,7 @@ import type { ComponentProps } from "react";
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { fn } from "storybook/test";
-import { Box, Typography } from "@mui/material";
+import { Box, TextField, Typography } from "@mui/material";
 import { KanbanBoard } from "./KanbanBoard";
 import type { KanbanColumn, KanbanTask } from "./KanbanBoard.types";
 
@@ -36,6 +36,7 @@ const meta: Meta<typeof KanbanBoard> = {
     columns:              DEFAULT_COLUMNS,
     tasks:                DEFAULT_TASKS,
     enableBuiltinDialogs: true,
+    filterText:           "",
     showPriority:         true,
     showAssignee:         true,
     showDueDate:          true,
@@ -51,25 +52,26 @@ const meta: Meta<typeof KanbanBoard> = {
     onCardClick:          fn(),
   },
   argTypes: {
+    chipVariant:          { control: "radio", options: ["outlined", "filled"] },
     enableBuiltinDialogs: { control: "boolean" },
-    showPriority:         { control: "boolean" },
+    filterText:           { control: "text" },
+    height:               { control: "number" },
     showAssignee:         { control: "boolean" },
     showDueDate:          { control: "boolean" },
     showDueDateWarning:   { control: "boolean" },
-    chipVariant:          { control: "radio", options: ["outlined", "filled"] },
+    showPriority:         { control: "boolean" },
     width:                { control: "text" },
-    height:               { control: "number" },
     // Complex objects — use dedicated stories instead.
     columns:              { control: false },
     tasks:                { control: false },
     translation:          { control: false },
     // Callbacks
-    onTasksChange:        { control: false },
+    onCardClick:          { control: false },
     onTaskCreated:        { control: false },
-    onTaskUpdated:        { control: false },
     onTaskDeleted:        { control: false },
     onTaskMoved:          { control: false },
-    onCardClick:          { control: false },
+    onTasksChange:        { control: false },
+    onTaskUpdated:        { control: false },
   },
   parameters: {
     controls: { sort: "alpha" },
@@ -197,6 +199,37 @@ export const OverdueWarning: Story = {
     // Toggle showDueDateWarning in Controls panel to compare on/off.
     showDueDateWarning: true,
   },
+};
+
+function FilterStory(args: ComponentProps<typeof KanbanBoard>) {
+  const [tasks, setTasks]         = useState<KanbanTask[]>(DEFAULT_TASKS);
+  const [filterText, setFilter]   = useState("");
+  return (
+    <Box sx={{ display: "flex", flexDirection: "column", height: "100vh", gap: 0 }}>
+      <Box sx={{ px: 2, pt: 2, pb: 1 }}>
+        <TextField
+          size="small"
+          placeholder="Search by title or assignee…"
+          value={filterText}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilter(e.target.value)}
+          sx={{ width: 280 }}
+          aria-label="Filter cards"
+        />
+      </Box>
+      <KanbanBoard
+        {...args}
+        tasks={tasks}
+        filterText={filterText}
+        height="calc(100vh - 72px)"
+        onTasksChange={(updated) => { setTasks(updated); args.onTasksChange?.(updated); }}
+      />
+    </Box>
+  );
+}
+
+export const FilterSearch: Story = {
+  name: "Filter / Suche",
+  render: (args) => <FilterStory {...args} />,
 };
 
 export const GermanLabels: Story = {

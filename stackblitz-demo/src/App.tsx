@@ -1,13 +1,14 @@
 import { useState, useMemo, useEffect } from "react";
 import {
   AppBar, Box, Card, CardContent, Chip, Container,
-  CssBaseline, Fab, IconButton, Stack, ThemeProvider,
+  CssBaseline, Fab, IconButton, InputAdornment, Stack, TextField, ThemeProvider,
   Toolbar, Tooltip, Typography, createTheme, Zoom,
 } from "@mui/material";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import SearchIcon from "@mui/icons-material/Search";
 import {
   TagSelection,
   PasswordStrengthMeter,
@@ -294,7 +295,8 @@ export default function App() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-  const [kanbanTasks, setKanbanTasks] = useState<KanbanTask[]>(INITIAL_KANBAN_TASKS);
+  const [kanbanTasks, setKanbanTasks]   = useState<KanbanTask[]>(INITIAL_KANBAN_TASKS);
+  const [kanbanFilter, setKanbanFilter] = useState("");
   const [password, setPassword] = useState("");
   const [sql, setSql]         = useState(INITIAL_SQL);
   const [json, setJson]       = useState(INITIAL_JSON);
@@ -425,11 +427,28 @@ export default function App() {
           <DemoCard
             title="KanbanBoard"
             useCase="Task & Sprint Management"
-            subtitle="Drag cards between columns, add/edit/delete via built-in dialogs. Try dragging a card or clicking '+ Add card'."
+            subtitle="Drag cards between columns, add/edit/delete via built-in dialogs. Filter by title or assignee with the search field below."
           >
+            <Box sx={{ mb: 1.5 }}>
+              <TextField
+                size="small"
+                placeholder="Filter by title or assignee…"
+                value={kanbanFilter}
+                onChange={(e) => setKanbanFilter(e.target.value)}
+                sx={{ width: 260 }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon fontSize="small" sx={{ color: "text.disabled" }} />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Box>
             <KanbanBoard
               columns={KANBAN_COLUMNS}
               tasks={kanbanTasks}
+              filterText={kanbanFilter}
               onTasksChange={setKanbanTasks}
               height={420}
             />
