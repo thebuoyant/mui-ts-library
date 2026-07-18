@@ -63,9 +63,9 @@ const KANBAN_COLUMNS: KanbanColumn[] = [
 const INITIAL_KANBAN_TASKS: KanbanTask[] = [
   { id: "k1", title: "Design component API",     status: "done",        assignee: "Alice" },
   { id: "k2", title: "Implement drag and drop",  status: "in-progress", assignee: "Bob",   dueDate: new Date(Date.now() + 3 * 86400000) },
-  { id: "k3", title: "Write unit tests",         status: "in-progress", assignee: "Alice" },
+  { id: "k3", title: "Write unit tests",         status: "in-progress", assignee: "Alice", dueDate: new Date(Date.now() - 2 * 86400000) },
   { id: "k4", title: "Add Storybook stories",    status: "review",      assignee: "Bob",   dueDate: new Date(Date.now() + 5 * 86400000) },
-  { id: "k5", title: "Write user documentation", status: "todo",        assignee: "Alice", dueDate: new Date(Date.now() + 8 * 86400000) },
+  { id: "k5", title: "Write user documentation", status: "todo",        assignee: "Alice", dueDate: new Date(Date.now() - 5 * 86400000) },
   { id: "k6", title: "Publish npm release",      status: "todo",        dueDate: new Date(Date.now() + 14 * 86400000) },
 ];
 

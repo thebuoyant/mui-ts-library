@@ -31,9 +31,11 @@ export function KanbanBoard({
   onTaskUpdated,
   onTaskDeleted,
   onTaskMoved,
-  showAssignee  = true,
-  showDueDate   = true,
-  chipVariant   = "outlined",
+  showAssignee       = true,
+  showDueDate        = true,
+  showDueDateWarning = true,
+  chipVariant        = "outlined",
+  width         = "100%",
   height        = "100%",
   translation,
 }: KanbanBoardProps) {
@@ -159,7 +161,7 @@ export function KanbanBoard({
   return (
     <Box
       className={kanbanBoardClasses.root}
-      sx={{ height, display: "flex", flexDirection: "column", overflow: "hidden" }}
+      sx={{ width, height, display: "flex", flexDirection: "column", overflow: "hidden" }}
     >
       <DndContext
         sensors={sensors}
@@ -177,7 +179,7 @@ export function KanbanBoard({
             p: 2,
             overflowX: "auto",
             overflowY: "hidden",
-            alignItems: "flex-start",
+            alignItems: "stretch",
           }}
         >
           {columns.map((column) => (
@@ -187,6 +189,7 @@ export function KanbanBoard({
               tasks={internalTasks.filter((t) => t.status === column.id)}
               showAssignee={showAssignee}
               showDueDate={showDueDate}
+              showDueDateWarning={showDueDateWarning}
               chipVariant={chipVariant}
               t={t}
               enableBuiltinDialogs={enableBuiltinDialogs}
@@ -202,6 +205,7 @@ export function KanbanBoard({
               task={activeTask}
               showAssignee={showAssignee}
               showDueDate={showDueDate}
+              showDueDateWarning={showDueDateWarning}
               chipVariant={chipVariant}
               t={t}
               onCardClick={() => {}}

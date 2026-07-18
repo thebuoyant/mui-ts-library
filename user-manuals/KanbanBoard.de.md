@@ -64,7 +64,9 @@ Jede Drag-and-Drop-Aktion sowie jedes Hinzufügen, Bearbeiten und Löschen ruft 
 | `onTaskMoved` | `(task: KanbanTask, fromColumnId: string, toColumnId: string) => void` | — | Wird aufgerufen, wenn eine Karte per Drag & Drop in eine **andere Spalte** verschoben wird. Feuert nicht bei Neuordnung innerhalb derselben Spalte oder bei dialog-basierter Status-Änderung — dafür ist `onTaskUpdated` zuständig. |
 | `showAssignee` | `boolean` | `true` | Zuständige-Person-Chip auf Karten anzeigen. |
 | `showDueDate` | `boolean` | `true` | Fälligkeitsdatum-Chip auf Karten anzeigen. |
+| `showDueDateWarning` | `boolean` | `true` | Wenn `true`, werden Karten mit einem `dueDate` in der Vergangenheit hervorgehoben: Der Datums-Chip wird rot und die Karte erhält einen roten Hintergrundton + linken Rahmen. Mit `false` deaktivieren. Ohne Wirkung wenn `showDueDate` den Wert `false` hat. |
 | `chipVariant` | `"outlined" \| "filled"` | `"outlined"` | MUI-Chip-Variante für Zuständige-Person- und Fälligkeitsdatum-Chips. `"outlined"` = dezenter Rahmen; `"filled"` = solider Hintergrund. |
+| `width` | `number \| string` | `"100%"` | Breite des Boards. Fixer Pixelwert oder beliebige CSS-Länge. |
 | `height` | `number \| string` | `"100%"` | Höhe des Boards. Fixer Pixelwert oder beliebige CSS-Länge. |
 | `translation` | `Partial<KanbanBoardTranslation>` | — | Beliebige Beschriftungen überschreiben. Nicht gesetzte Keys fallen auf englische Standardwerte zurück. |
 
@@ -150,6 +152,30 @@ Wenn eigene Dialoge implementiert werden sollen, `enableBuiltinDialogs={false}` 
 | Status über Bearbeiten-Dialog geändert | ✓ | ✓ | — |
 | Neue Karte hinzugefügt | ✓ | — | — |
 | Karte gelöscht | ✓ | — | — |
+
+---
+
+## Überfälligkeits-Warnung (`showDueDateWarning`)
+
+Wenn `showDueDateWarning` den Wert `true` hat (Standard), wird jede Karte deren `dueDate` vor dem heutigen Tag liegt automatisch hervorgehoben:
+
+- Der Fälligkeitsdatum-Chip wird rot (`color="error"` — funktioniert mit beiden Chip-Varianten `"outlined"` und `"filled"`).
+- Die Karte erhält einen subtilen roten Hintergrundton.
+- Ein 4 px roter linker Rahmen wird hinzugefügt (außer `task.color` ist gesetzt — dann hat diese Farbe Priorität).
+
+```tsx
+// Warnung deaktivieren — Datums-Chips zeigen immer die Standardfarbe
+<KanbanBoard
+  columns={columns}
+  tasks={tasks}
+  showDueDateWarning={false}
+/>
+```
+
+**Hinweise:**
+- Keine visuelle Wirkung wenn `showDueDate` den Wert `false` hat oder eine Karte kein `dueDate` besitzt.
+- „Überfällig" bedeutet `dueDate < Beginn des heutigen Tages` — Karten die heute fällig sind, werden nicht hervorgehoben.
+- Die Hervorhebung gilt für Karten in allen Spalten, auch in „Erledigt"-Spalten. Um dies für abgeschlossene Aufgaben zu unterdrücken, `dueDate` bei erledigten Karten weglassen oder `showDueDateWarning={false}` für das gesamte Board setzen.
 
 ---
 

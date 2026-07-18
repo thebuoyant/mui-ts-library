@@ -56,6 +56,23 @@ Innerhalb jeder Sektion stehen offene Items zuerst (⭐ oben), erledigte (durchg
 
 ---
 
+## KanbanBoard
+
+| Feature | Beschreibung | Aufwand | Status |
+|---|---|---|---|
+| ~~⭐ Fälligkeits-Warnung~~ | ~~Karten deren `dueDate` in der Vergangenheit liegt, erhalten automatisch einen roten Chip-Ton und optionale `sx`-Variante für den Kartenhintergrund. `showDueDateWarning?: boolean` (Default `true`). Kein neues Datenmodell — nur eine konditionale Darstellungslogik auf dem vorhandenen `dueDate`-Feld. Sehr häufiger erster Wunsch bei Kanban-Tools.~~ | Niedrig | ✅ feat/kanban-due-date-warning |
+| ⭐ Priorität auf Karten | `priority?: "low" \| "medium" \| "high" \| "critical"` auf `KanbanTask` — visuell als kleines farbiges Indikator-Feld (z.B. linker farbiger Punkt neben dem Titel). `showPriority?: boolean`-Prop. Kein neues Datenmodell, nur ein weiteres optionales Feld. | Niedrig | — |
+| ⭐ Filter / Suche | `filterText?: string` als controlled Prop filtert sichtbare Karten nach Titel und Assignee — die Spalten-Zähler passen sich an. Consumer rendert das Suchfeld selbst und übergibt den String. Standard bei jeder Board-Implementierung sobald 20+ Karten vorhanden sind. | Mittel | — |
+| ⭐ Card Template pro Spalte | `getNewTaskDefaults?: (columnId: string) => Partial<KanbanTask>` — Consumer kann vorausgefüllte Felder liefern wenn "+ Karte hinzufügen" geklickt wird (z.B. `{ priority: "high" }` für die "Critical"-Spalte). Ohne das Muster müssen Consumer den Add-Dialog abfangen und selbst befüllen. | Niedrig | — |
+| Spalten neu sortieren | Spalten per Drag & Drop neu ordnen — `onColumnsChange?: (columns: KanbanColumn[]) => void`. Baut auf @dnd-kit auf (bereits im Tree), aber Spalten-DnD + Karten-DnD brauchen separate DndContext-Ebenen. | Mittel | — |
+| Karten-Subtasks | `subtasks?: { id: string; title: string; done: boolean }[]` auf `KanbanTask` — auf der Karte als Fortschrittsbalken (`2 / 5 ✓`) dargestellt, im Edit-Dialog als Checklist. | Mittel | — |
+| Spalten-Management-UI | Spalten direkt im Board hinzufügen, umbenennen, löschen — `onColumnAdd / onColumnUpdate / onColumnDelete`-Callbacks. | Mittel | — |
+| Touch / Mobile Drag | @dnd-kit's PointerSensor sollte Touch prinzipiell unterstützen, aber der Aktivierungsabstand und das Scroll-Verhalten auf Mobilgeräten brauchen spezifisches Tuning und Testing. | Niedrig | — |
+| Swimlanes | Horizontale Gruppenzeilen innerhalb jeder Spalte (z.B. nach Assignee oder Priority) — ändert das Board-Layout fundamental. Höchster Nutzen für große Teams, höchster Aufwand. | Hoch | — |
+| ~~MVP — Drag & Drop, CRUD-Dialoge, WIP-Limits, Chips, i18n, CSS-Klassen-API, `onTaskMoved`~~ | ~~Drag & Drop (`@dnd-kit`), Add/Edit/Delete-Dialoge, WIP-Limit-Anzeige, Assignee/DueDate-Chips (`chipVariant`), Kartenfarben, vollständige i18n, CSS-Klassen-API (`kanbanBoardClasses`), `onTaskMoved`-Callback für DnD-Spalten-Wechsel, GanttChart-Adapter-Doku, 8 Stories, 28 Tests.~~ | — | ✅ v3.30.0 |
+
+---
+
 ## RichTextEditor
 
 | Feature | Beschreibung | Aufwand | Status |
