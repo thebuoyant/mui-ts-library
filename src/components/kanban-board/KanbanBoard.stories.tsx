@@ -36,6 +36,7 @@ const meta: Meta<typeof KanbanBoard> = {
     columns:              DEFAULT_COLUMNS,
     tasks:                DEFAULT_TASKS,
     enableBuiltinDialogs: true,
+    showPriority:         true,
     showAssignee:         true,
     showDueDate:          true,
     showDueDateWarning:   true,
@@ -51,6 +52,7 @@ const meta: Meta<typeof KanbanBoard> = {
   },
   argTypes: {
     enableBuiltinDialogs: { control: "boolean" },
+    showPriority:         { control: "boolean" },
     showAssignee:         { control: "boolean" },
     showDueDate:          { control: "boolean" },
     showDueDateWarning:   { control: "boolean" },
@@ -152,6 +154,27 @@ export const SingleColumn: Story = {
   args: {
     columns: [{ id: "backlog", label: "Backlog", color: "#607d8b" }],
     tasks: DEFAULT_TASKS.map((t) => ({ ...t, status: "backlog" })),
+  },
+};
+
+export const PriorityIndicators: Story = {
+  name: "Priority indicators",
+  args: {
+    columns: [
+      { id: "todo",        label: "To Do",       color: "#9e9e9e" },
+      { id: "in-progress", label: "In Progress",  color: "#2196f3" },
+      { id: "done",        label: "Done",         color: "#4caf50" },
+    ],
+    tasks: [
+      { id: "p1", title: "Critical — fix prod outage",    status: "todo",        priority: "critical", assignee: "Alice" },
+      { id: "p2", title: "High — security patch",         status: "todo",        priority: "high",     assignee: "Bob" },
+      { id: "p3", title: "Medium — improve performance",  status: "in-progress", priority: "medium",   assignee: "Alice" },
+      { id: "p4", title: "Low — update dependencies",     status: "in-progress", priority: "low" },
+      { id: "p5", title: "No priority set",               status: "todo" },
+      { id: "p6", title: "Done — was critical",           status: "done",        priority: "critical", assignee: "Bob" },
+    ],
+    // Toggle showPriority in Controls panel to compare on/off.
+    showPriority: true,
   },
 };
 

@@ -41,7 +41,9 @@ export const kanbanBoardClasses = {
   /** The assignee label on a card. */
   cardAssignee: "MuiTsKanbanBoard-cardAssignee",
   /** The due date label on a card. */
-  cardDueDate:  "MuiTsKanbanBoard-cardDueDate",
+  cardDueDate:      "MuiTsKanbanBoard-cardDueDate",
+  /** The priority indicator dot on a card. */
+  cardPriorityDot:  "MuiTsKanbanBoard-cardPriorityDot",
   /** The "+ Add card" button at the bottom of each column. */
-  addButton:    "MuiTsKanbanBoard-addButton",
+  addButton:        "MuiTsKanbanBoard-addButton",
 } as const;

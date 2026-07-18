@@ -555,6 +555,27 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/):
 
 ## Changelog
 
+### [Unveröffentlicht]
+
+**Hinzugefügt**
+- **KanbanBoard — `priority`-Feld + `showPriority`-Prop**: `priority?: "low" | "medium" | "high" | "critical"` auf `KanbanTask` — als farbiger Punkt neben dem Kartentitel. `showPriority={false}` blendet alle Punkte aus. Neuer Typ-Export: `KanbanTaskPriority`. Siehe [Vollständiger Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.de.md) für Details.
+
+---
+
+### [3.31.0] — 2026-07-18
+
+**Hinzugefügt**
+- **KanbanBoard — `showDueDateWarning`**: Überfällige Karten (dueDate in der Vergangenheit) erhalten automatisch roten Chip, Hintergrundton und linken Rahmen. `showDueDateWarning={false}` zum Deaktivieren. Siehe [Vollständiger Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.de.md) für Details.
+- **KanbanBoard — `width`-Prop**: `width?: number | string` (Standard `"100%"`).
+
+**Behoben**
+- **KanbanBoard — Spalten-Scroll**: Karten in einer hohen Spalte scrollen jetzt korrekt statt still abgeschnitten zu werden.
+
+**Geändert**
+- **KanbanBoard — Kartenoptik poliert**: Expliziter `1px`-Rahmen, kontrollierter Box-Shadow mit Hover-Lift, ausgeblendeter Scrollbalken, `fontWeight: 700`-Titel. Siehe [Vollständiger Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.de.md) für Details.
+
+---
+
 ### [3.30.0] — 2026-07-17
 
 **Hinzugefügt**

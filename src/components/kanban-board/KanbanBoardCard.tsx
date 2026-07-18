@@ -4,9 +4,16 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import PersonIcon from "@mui/icons-material/Person";
 import { Box, Card, CardActionArea, CardContent, Chip, Typography } from "@mui/material";
 import { alpha } from "@mui/material/styles";
-import type { KanbanBoardTranslation, KanbanTask } from "./KanbanBoard.types";
+import type { KanbanBoardTranslation, KanbanTask, KanbanTaskPriority } from "./KanbanBoard.types";
 import { kanbanBoardClasses } from "./kanbanBoardClasses";
 import { muiTsStateClasses } from "../../utils/muiTsClasses";
+
+const PRIORITY_COLORS: Record<KanbanTaskPriority, string> = {
+  low:      "#4caf50",
+  medium:   "#ff9800",
+  high:     "#f44336",
+  critical: "#9c27b0",
+};
 
 // Shared sx for meta chips — explicit width/height on the icon so the SVG can never
 // override the container's font-size (MuiSvgIcon-fontSizeMedium sets 1.5rem by default).
@@ -28,6 +35,7 @@ const CHIP_SX = {
 
 type KanbanBoardCardProps = {
   task: KanbanTask;
+  showPriority: boolean;
   showAssignee: boolean;
   showDueDate: boolean;
   showDueDateWarning: boolean;
@@ -40,6 +48,7 @@ type KanbanBoardCardProps = {
 
 export function KanbanBoardCard({
   task,
+  showPriority,
   showAssignee,
   showDueDate,
   showDueDateWarning,
@@ -120,13 +129,31 @@ export function KanbanBoardCard({
     >
       <CardActionArea component="div" sx={{ cursor: "inherit" }}>
         <CardContent sx={{ p: 1.5, "&:last-child": { pb: 1.5 } }}>
-          <Typography
-            className={kanbanBoardClasses.cardTitle}
-            variant="body2"
-            sx={{ mb: hasMeta ? 1 : 0, lineHeight: 1.4, fontWeight: 700, letterSpacing: "-0.01em" }}
-          >
-            {task.title}
-          </Typography>
+          <Box sx={{ display: "flex", alignItems: "flex-start", gap: 0.75, mb: hasMeta ? 1 : 0 }}>
+            {showPriority && task.priority && (
+              <Box
+                className={kanbanBoardClasses.cardPriorityDot}
+                role="img"
+                aria-label={`Priority: ${task.priority}`}
+                sx={{
+                  width: 8,
+                  height: 8,
+                  minWidth: 8,
+                  borderRadius: "50%",
+                  bgcolor: PRIORITY_COLORS[task.priority],
+                  mt: "5px",
+                  flexShrink: 0,
+                }}
+              />
+            )}
+            <Typography
+              className={kanbanBoardClasses.cardTitle}
+              variant="body2"
+              sx={{ lineHeight: 1.4, fontWeight: 700, letterSpacing: "-0.01em" }}
+            >
+              {task.title}
+            </Typography>
+          </Box>
 
           {hasMeta && (
             <Box

@@ -62,6 +62,7 @@ Every drag-and-drop, Add, Edit, and Delete action calls `onTasksChange` with the
 | `onTaskUpdated` | `(task: KanbanTask) => void` | — | Called after an existing card is saved via the Edit dialog. |
 | `onTaskDeleted` | `(taskId: string) => void` | — | Called after a card is deleted via the Delete confirmation. |
 | `onTaskMoved` | `(task: KanbanTask, fromColumnId: string, toColumnId: string) => void` | — | Called when a card is moved to a **different column** via drag and drop. Not fired for in-column reordering or dialog-based status changes — use `onTaskUpdated` for those. |
+| `showPriority` | `boolean` | `true` | Show the priority dot on cards. Has no visual effect when a card has no `priority` field. |
 | `showAssignee` | `boolean` | `true` | Show the assignee chip on cards. |
 | `showDueDate` | `boolean` | `true` | Show the due-date chip on cards. |
 | `showDueDateWarning` | `boolean` | `true` | When `true`, cards with a `dueDate` in the past are highlighted: the date chip turns red and the card gets a red background tint + left border. Set to `false` to disable. Has no effect when `showDueDate` is `false`. |
@@ -76,15 +77,27 @@ Every drag-and-drop, Add, Edit, and Delete action calls `onTasksChange` with the
 
 ```ts
 type KanbanTask = {
-  id:           string;       // unique identifier
-  title:        string;       // card title
-  status:       string;       // must match a KanbanColumn.id
-  description?: string;       // optional longer text (shown in edit dialog)
-  assignee?:    string;       // shown as a chip on the card
-  color?:       string;       // left border color — any CSS color value
-  dueDate?:     Date;         // shown as a chip on the card
+  id:           string;              // unique identifier
+  title:        string;              // card title
+  status:       string;              // must match a KanbanColumn.id
+  description?: string;              // optional longer text (shown in edit dialog)
+  assignee?:    string;              // shown as a chip on the card
+  color?:       string;              // left border color — any CSS color value
+  dueDate?:     Date;                // shown as a chip on the card
+  priority?:    KanbanTaskPriority;  // colored dot next to the title
 };
+
+type KanbanTaskPriority = "low" | "medium" | "high" | "critical";
 ```
+
+### Priority colors
+
+| Value | Color | Hex |
+|---|---|---|
+| `"low"` | Green | `#4caf50` |
+| `"medium"` | Orange | `#ff9800` |
+| `"high"` | Red | `#f44336` |
+| `"critical"` | Purple | `#9c27b0` |
 
 ## KanbanColumn type
 
@@ -152,6 +165,35 @@ When you want to implement your own dialogs, set `enableBuiltinDialogs={false}`.
 | Card status changed via Edit dialog dropdown | ✓ | ✓ | — |
 | New card added | ✓ | — | — |
 | Card deleted | ✓ | — | — |
+
+---
+
+## Priority indicators (`showPriority`)
+
+Set `priority` on any `KanbanTask` to display a small colored dot to the left of the card title. The dot is shown when `showPriority` is `true` (the default).
+
+```tsx
+const tasks: KanbanTask[] = [
+  { id: "1", title: "Fix prod outage",   status: "todo", priority: "critical" },
+  { id: "2", title: "Security patch",    status: "todo", priority: "high" },
+  { id: "3", title: "Improve perf",      status: "in-progress", priority: "medium" },
+  { id: "4", title: "Update readme",     status: "todo", priority: "low" },
+  { id: "5", title: "No priority set",   status: "todo" },  // no dot shown
+];
+
+<KanbanBoard columns={columns} tasks={tasks} />
+```
+
+Set `showPriority={false}` to hide all dots without touching your data:
+
+```tsx
+<KanbanBoard columns={columns} tasks={tasks} showPriority={false} />
+```
+
+**Notes:**
+- Cards with no `priority` field never show a dot, regardless of `showPriority`.
+- The dot is accessible: it carries `role="img"` and `aria-label="Priority: {level}"`.
+- The CSS class `MuiTsKanbanBoard-cardPriorityDot` lets you style the dot via plain CSS.
 
 ---
 
