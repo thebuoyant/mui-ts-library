@@ -1,8 +1,9 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import AddIcon from "@mui/icons-material/Add";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import PersonIcon from "@mui/icons-material/Person";
-import { Box, Card, CardActionArea, CardContent, Chip, LinearProgress, Typography } from "@mui/material";
+import { Box, Card, CardActionArea, CardContent, Chip, IconButton, LinearProgress, Tooltip, Typography } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import type { KanbanBoardTranslation, KanbanTask, KanbanTaskPriority } from "./KanbanBoard.types";
 import { kanbanBoardClasses } from "./kanbanBoardClasses";
@@ -40,6 +41,7 @@ type KanbanBoardCardProps = {
   showDueDate: boolean;
   showDueDateWarning: boolean;
   showSubtasks: boolean;
+  enableBuiltinDialogs: boolean;
   chipVariant: "outlined" | "filled";
   t: Required<KanbanBoardTranslation>;
   onCardClick: (task: KanbanTask) => void;
@@ -54,6 +56,7 @@ export function KanbanBoardCard({
   showDueDate,
   showDueDateWarning,
   showSubtasks,
+  enableBuiltinDialogs,
   chipVariant,
   t,
   onCardClick,
@@ -209,6 +212,23 @@ export function KanbanBoardCard({
               >
                 {subtaskDone} / {subtaskTotal} ✓
               </Typography>
+              {enableBuiltinDialogs && !isOverlay && (
+                <Tooltip title={t.cardSubtaskAdd} placement="top" arrow>
+                  <IconButton
+                    size="small"
+                    aria-label={t.cardSubtaskAdd}
+                    onClick={(e) => { e.stopPropagation(); onCardClick(task); }}
+                    sx={{
+                      p: 0.25,
+                      opacity: 0,
+                      transition: "opacity 0.15s",
+                      [`.${kanbanBoardClasses.card}:hover &`]: { opacity: 1 },
+                    }}
+                  >
+                    <AddIcon sx={{ fontSize: "0.85rem" }} />
+                  </IconButton>
+                </Tooltip>
+              )}
             </Box>
           )}
         </CardContent>

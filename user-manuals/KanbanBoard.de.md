@@ -254,7 +254,7 @@ const tasks: KanbanTask[] = [
 ];
 ```
 
-Die Karte zeigt einen dünnen Fortschrittsbalken gefolgt von `{erledigt} / {gesamt} ✓`. Im Bearbeiten- oder Hinzufügen-Dialog können Nutzer:
+Die Karte zeigt einen dünnen Fortschrittsbalken gefolgt von `{erledigt} / {gesamt} ✓`. Beim Hover erscheint am rechten Rand der Fortschrittszeile ein kleiner `+`-Button — ein Klick darauf öffnet direkt den Bearbeiten-Dialog (mit sichtbarer Checkliste). Im Dialog können Nutzer:
 
 - Subtasks per Checkbox **abhaken / rückgängig machen**
 - Neuen Subtask **hinzufügen** — Text eingeben und `Enter` drücken oder auf `+` klicken
@@ -406,6 +406,7 @@ Der `dialogDeleteConfirm`-String unterstützt den Platzhalter `{title}` — er w
 | `searchFieldPlaceholder` | `"Search by title or assignee…"` | Placeholder des eingebauten Suchfelds (`showSearchField={true}`) |
 | `dialogFieldSubtasks` | `"Subtasks"` | Abschnitts-Label der Subtask-Checkliste im Hinzufügen/Bearbeiten-Dialog |
 | `dialogSubtaskAdd` | `"Add subtask"` | Placeholder des „Subtask hinzufügen"-Eingabefelds im Dialog |
+| `cardSubtaskAdd` | `"Add subtask"` | Tooltip des `+`-Buttons, der beim Hover in der Fortschrittszeile der Karte erscheint |
 
 ---
 

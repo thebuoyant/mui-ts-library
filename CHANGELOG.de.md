@@ -15,7 +15,7 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 - **KanbanBoard — `subtasks` in `KanbanTask`**: Neues optionales Feld `subtasks?: KanbanSubtask[]`. Auf der Karte erscheint ein Fortschrittsbalken (`{erledigt} / {gesamt} ✓`), im Hinzufügen/Bearbeiten-Dialog eine Checkliste — Einträge lassen sich abhaken, hinzufügen (Enter oder `+`) und entfernen.
 - **KanbanBoard — `showSubtasks`-Prop**: Steuert ob Fortschrittsbalken und Checkliste angezeigt werden (Standard `true`). Auf `false` setzen um das Feature vollständig zu deaktivieren.
-- **KanbanBoard — `translation.dialogFieldSubtasks` / `translation.dialogSubtaskAdd`**: Neue Translation-Keys für das Abschnitts-Label der Checkliste und den Placeholder des „Subtask hinzufügen"-Felds.
+- **KanbanBoard — `translation.dialogFieldSubtasks` / `translation.dialogSubtaskAdd` / `translation.cardSubtaskAdd`**: Neue Translation-Keys für das Abschnitts-Label der Checkliste, den Placeholder des „Subtask hinzufügen"-Felds und den Tooltip des `+`-Hover-Buttons auf der Karte.
 - **KanbanBoard — CSS-Klassen**: `MuiTsKanbanBoard-cardSubtasks` und `MuiTsKanbanBoard-cardSubtasksBar` zur CSS-Klassen-API hinzugefügt.
 - **Typ `KanbanSubtask`**: Neuer exportierter Typ `{ id: string; title: string; done: boolean }`.
 

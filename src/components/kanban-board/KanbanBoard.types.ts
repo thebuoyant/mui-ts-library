@@ -54,6 +54,8 @@ export type KanbanBoardTranslation = {
   dialogFieldSubtasks: string;
   /** Placeholder for the "add subtask" input in the dialog. */
   dialogSubtaskAdd: string;
+  /** Tooltip for the "+" button on the card's subtask progress bar. */
+  cardSubtaskAdd: string;
 };
 
 export const DEFAULT_KANBAN_BOARD_TRANSLATION: Required<KanbanBoardTranslation> = {
@@ -74,6 +76,7 @@ export const DEFAULT_KANBAN_BOARD_TRANSLATION: Required<KanbanBoardTranslation> 
   searchFieldPlaceholder: "Search by title or assignee…",
   dialogFieldSubtasks:    "Subtasks",
   dialogSubtaskAdd:       "Add subtask",
+  cardSubtaskAdd:         "Add subtask",
 };
 
 export type KanbanBoardProps = {

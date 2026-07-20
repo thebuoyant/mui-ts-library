@@ -254,7 +254,7 @@ const tasks: KanbanTask[] = [
 ];
 ```
 
-The card shows a thin progress bar followed by `{done} / {total} ✓`. In the Edit or Add dialog users can:
+The card shows a thin progress bar followed by `{done} / {total} ✓`. A small `+` button appears on hover at the right edge of the progress row — clicking it opens the Edit dialog directly (with the subtask checklist visible). In the dialog users can:
 
 - **Check / uncheck** subtasks via the checkbox next to each item
 - **Add** a new subtask by typing in the "Add subtask" field and pressing `Enter` or clicking the `+` button
@@ -406,6 +406,7 @@ The `dialogDeleteConfirm` string supports the placeholder `{title}` — it is re
 | `searchFieldPlaceholder` | `"Search by title or assignee…"` | Placeholder for the built-in search field (`showSearchField={true}`) |
 | `dialogFieldSubtasks` | `"Subtasks"` | Section label for the subtask checklist in the Add/Edit dialog |
 | `dialogSubtaskAdd` | `"Add subtask"` | Placeholder for the "add subtask" input in the dialog |
+| `cardSubtaskAdd` | `"Add subtask"` | Tooltip for the `+` button that appears on hover in the card's subtask progress row |
 
 ---
 

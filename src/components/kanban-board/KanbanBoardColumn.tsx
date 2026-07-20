@@ -140,6 +140,7 @@ export function KanbanBoardColumn({
               showDueDate={showDueDate}
               showDueDateWarning={showDueDateWarning}
               showSubtasks={showSubtasks}
+              enableBuiltinDialogs={enableBuiltinDialogs}
               chipVariant={chipVariant}
               t={t}
               onCardClick={onCardClick}

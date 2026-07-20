@@ -259,6 +259,7 @@ export function KanbanBoard({
               showDueDate={showDueDate}
               showDueDateWarning={showDueDateWarning}
               showSubtasks={showSubtasks}
+              enableBuiltinDialogs={false}
               chipVariant={chipVariant}
               t={t}
               onCardClick={() => {}}
