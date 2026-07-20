@@ -104,7 +104,7 @@ const tasks: GanttTask[] = [
 
 ### KanbanBoard
 
-Ein Drag-and-Drop-Kanban-Board mit eingebauten Hinzufügen-/Bearbeiten-/Löschen-Dialogen, WIP-Limits und vollständiger i18n. Ideal für Task-Management-Dashboards, Sprint-Boards oder jeden Workflow, bei dem Nutzer Aufgaben zwischen Statusspalten verschieben sollen — mit Kartenfarben, Prioritäts-Punkten, Zuständige-Person-Chips, Fälligkeitsdatum-Chips mit Überfälligkeits-Warnung und `filterText`-Prop für Live-Suche.
+Ein Drag-and-Drop-Kanban-Board mit eingebauten Hinzufügen-/Bearbeiten-/Löschen-Dialogen, WIP-Limits und vollständiger i18n. Ideal für Task-Management-Dashboards, Sprint-Boards oder jeden Workflow, bei dem Nutzer Aufgaben zwischen Statusspalten verschieben sollen — mit Kartenfarben, Prioritäts-Punkten, Zuständige-Person-Chips, Fälligkeitsdatum-Chips mit Überfälligkeits-Warnung, Subtask-Checkliste mit Fortschrittsbalken und eingebautem Suchfeld (`showSearchField`) oder `filterText`-Prop für Live-Filterung.
 
 ```tsx
 import { KanbanBoard } from '@thebuoyant-tsdev/mui-ts-library';
@@ -497,7 +497,7 @@ import type {
   GanttTask, GanttTranslations, GanttTheme, GanttToolbarConfig,
 
   // KanbanBoard
-  KanbanTask, KanbanColumn, KanbanBoardProps, KanbanBoardTranslation,
+  KanbanTask, KanbanSubtask, KanbanColumn, KanbanBoardProps, KanbanBoardTranslation,
 
   // DateRangePicker
   DateRange, DateRangeEntry, DateRangeInput, DateRangePickerProps, DateRangePickerTranslation,
