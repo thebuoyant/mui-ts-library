@@ -337,6 +337,10 @@ export const GermanLabels: Story = {
       dialogFieldDueDate:     "Fälligkeitsdatum",
       dialogFieldStatus:      "Status",
       noCardsLabel:           "Keine Karten",
+      searchFieldPlaceholder: "Nach Titel oder Zuständigem suchen…",
+      dialogFieldSubtasks:    "Teilaufgaben",
+      dialogSubtaskAdd:       "Teilaufgabe hinzufügen",
+      cardSubtaskAdd:         "Teilaufgabe hinzufügen",
     },
     columns: [
       { id: "todo",        label: "Zu erledigen", color: "#9e9e9e" },
