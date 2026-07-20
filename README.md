@@ -555,7 +555,7 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 ## Changelog
 
-### [Unreleased]
+### [3.35.0] — 2026-07-20
 
 **Added**
 - **KanbanBoard — `subtasks` on `KanbanTask`**: New `subtasks?: KanbanSubtask[]` field renders a progress bar (`{done} / {total} ✓`) on the card and a checklist in the Add/Edit dialog. Control visibility with `showSubtasks` (default `true`).

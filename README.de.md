@@ -555,7 +555,7 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/):
 
 ## Changelog
 
-### [Unveröffentlicht]
+### [3.35.0] — 2026-07-20
 
 **Hinzugefügt**
 - **KanbanBoard — `subtasks` in `KanbanTask`**: Neues Feld `subtasks?: KanbanSubtask[]` — auf der Karte erscheint ein Fortschrittsbalken (`{erledigt} / {gesamt} ✓`), im Dialog eine Checkliste. Sichtbarkeit über `showSubtasks` steuerbar (Standard `true`).

@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [3.35.0] — 2026-07-20
+
 ### Added
 
 - **KanbanBoard — `subtasks` on `KanbanTask`**: New optional `subtasks?: KanbanSubtask[]` field. A progress bar (`{done} / {total} ✓`) is shown at the bottom of the card, and a checklist appears in the Add/Edit dialog — users can check/uncheck items, add new ones (Enter or `+` button), and remove them.

@@ -11,6 +11,10 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unveröffentlicht]
 
+---
+
+## [3.35.0] — 2026-07-20
+
 ### Hinzugefügt
 
 - **KanbanBoard — `subtasks` in `KanbanTask`**: Neues optionales Feld `subtasks?: KanbanSubtask[]`. Auf der Karte erscheint ein Fortschrittsbalken (`{erledigt} / {gesamt} ✓`), im Hinzufügen/Bearbeiten-Dialog eine Checkliste — Einträge lassen sich abhaken, hinzufügen (Enter oder `+`) und entfernen.
