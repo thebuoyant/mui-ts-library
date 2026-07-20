@@ -1,5 +1,11 @@
 export type KanbanTaskPriority = "low" | "medium" | "high" | "critical";
 
+export type KanbanSubtask = {
+  id: string;
+  title: string;
+  done: boolean;
+};
+
 export type KanbanTask = {
   id: string;
   title: string;
@@ -12,6 +18,8 @@ export type KanbanTask = {
   dueDate?: Date;
   /** Optional priority level — shown as a colored dot next to the card title when `showPriority` is true. */
   priority?: KanbanTaskPriority;
+  /** Optional checklist items — shown as a progress bar on the card and a checklist in the edit dialog. */
+  subtasks?: KanbanSubtask[];
 };
 
 export type KanbanColumn = {
@@ -42,6 +50,10 @@ export type KanbanBoardTranslation = {
   noCardsLabel: string;
   /** Placeholder text for the built-in search field (`showSearchField={true}`). */
   searchFieldPlaceholder: string;
+  /** Section label for the subtask checklist in the edit/add dialog. */
+  dialogFieldSubtasks: string;
+  /** Placeholder for the "add subtask" input in the dialog. */
+  dialogSubtaskAdd: string;
 };
 
 export const DEFAULT_KANBAN_BOARD_TRANSLATION: Required<KanbanBoardTranslation> = {
@@ -60,6 +72,8 @@ export const DEFAULT_KANBAN_BOARD_TRANSLATION: Required<KanbanBoardTranslation> 
   dialogFieldStatus:      "Status",
   noCardsLabel:           "No cards",
   searchFieldPlaceholder: "Search by title or assignee…",
+  dialogFieldSubtasks:    "Subtasks",
+  dialogSubtaskAdd:       "Add subtask",
 };
 
 export type KanbanBoardProps = {
@@ -115,6 +129,11 @@ export type KanbanBoardProps = {
    * `"filled"` — solid background, more prominent.
    */
   chipVariant?: "outlined" | "filled";
+  /**
+   * Show the subtask progress bar on cards and the subtask checklist in the edit/add dialog (default: true).
+   * Has no visual effect when a card has no `subtasks` field set.
+   */
+  showSubtasks?: boolean;
   /**
    * When `true`, renders a built-in `size="small"` search field above the board columns.
    * The board manages the search state internally — no extra wiring needed.

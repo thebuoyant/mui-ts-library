@@ -1,17 +1,25 @@
+import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {
+  Box,
   Button,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
+  FormControlLabel,
+  IconButton,
+  InputAdornment,
   MenuItem,
   Stack,
   TextField,
+  Typography,
 } from "@mui/material";
 import { useState } from "react";
-import type { KanbanBoardTranslation, KanbanColumn, KanbanTask } from "./KanbanBoard.types";
+import type { KanbanBoardTranslation, KanbanColumn, KanbanSubtask, KanbanTask } from "./KanbanBoard.types";
 
 export type KanbanDialogState =
   | { mode: "add"; columnId: string }
@@ -22,6 +30,7 @@ type KanbanBoardCardDialogProps = {
   state: KanbanDialogState | null;
   columns: KanbanColumn[];
   t: Required<KanbanBoardTranslation>;
+  showSubtasks: boolean;
   onSave: (task: KanbanTask) => void;
   onDelete: (taskId: string) => void;
   onClose: () => void;
@@ -29,7 +38,7 @@ type KanbanBoardCardDialogProps = {
   onRequestDelete: (task: KanbanTask) => void;
 };
 
-export function KanbanBoardCardDialog({ state, columns, t, onSave, onDelete, onClose, onRequestDelete }: KanbanBoardCardDialogProps) {
+export function KanbanBoardCardDialog({ state, columns, t, showSubtasks, onSave, onDelete, onClose, onRequestDelete }: KanbanBoardCardDialogProps) {
   const isAdd    = state?.mode === "add";
   const isEdit   = state?.mode === "edit";
   const isDelete = state?.mode === "delete";
@@ -44,6 +53,29 @@ export function KanbanBoardCardDialog({ state, columns, t, onSave, onDelete, onC
     if (isAdd  && addColumnId) return { id: "", title: "", status: addColumnId };
     return { id: "", title: "", status: columns[0]?.id ?? "" };
   });
+  const [newSubtaskTitle, setNewSubtaskTitle] = useState("");
+
+  function addSubtask() {
+    const title = newSubtaskTitle.trim();
+    if (!title) return;
+    const entry: KanbanSubtask = { id: crypto.randomUUID(), title, done: false };
+    setForm((prev) => ({ ...prev, subtasks: [...(prev.subtasks ?? []), entry] }));
+    setNewSubtaskTitle("");
+  }
+
+  function toggleSubtask(id: string) {
+    setForm((prev) => ({
+      ...prev,
+      subtasks: prev.subtasks?.map((st) => st.id === id ? { ...st, done: !st.done } : st),
+    }));
+  }
+
+  function removeSubtask(id: string) {
+    setForm((prev) => ({
+      ...prev,
+      subtasks: prev.subtasks?.filter((st) => st.id !== id),
+    }));
+  }
 
   function handleSave() {
     const title = form.title.trim();
@@ -135,6 +167,74 @@ export function KanbanBoardCardDialog({ state, columns, t, onSave, onDelete, onC
                   </MenuItem>
                 ))}
               </TextField>
+
+              {showSubtasks && (
+                <Box>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 0.5 }}>
+                    {t.dialogFieldSubtasks}
+                  </Typography>
+                  <Stack spacing={0.25}>
+                    {(form.subtasks ?? []).map((st) => (
+                      <Box key={st.id} sx={{ display: "flex", alignItems: "center" }}>
+                        <FormControlLabel
+                          sx={{ flex: 1, m: 0 }}
+                          control={
+                            <Checkbox
+                              size="small"
+                              checked={st.done}
+                              onChange={() => toggleSubtask(st.id)}
+                              sx={{ p: 0.5 }}
+                            />
+                          }
+                          label={
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                textDecoration: st.done ? "line-through" : "none",
+                                color: st.done ? "text.disabled" : "text.primary",
+                              }}
+                            >
+                              {st.title}
+                            </Typography>
+                          }
+                        />
+                        <IconButton
+                          size="small"
+                          onClick={() => removeSubtask(st.id)}
+                          aria-label={`Remove ${st.title}`}
+                        >
+                          <CloseIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+                    ))}
+                  </Stack>
+                  <TextField
+                    size="small"
+                    placeholder={t.dialogSubtaskAdd}
+                    value={newSubtaskTitle}
+                    onChange={(e) => setNewSubtaskTitle((e.target as HTMLInputElement).value)}
+                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addSubtask(); } }}
+                    fullWidth
+                    sx={{ mt: 1 }}
+                    slotProps={{
+                      input: {
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              size="small"
+                              onClick={addSubtask}
+                              disabled={!newSubtaskTitle.trim()}
+                              aria-label={t.dialogSubtaskAdd}
+                            >
+                              <AddIcon fontSize="small" />
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      },
+                    }}
+                  />
+                </Box>
+              )}
             </Stack>
           </DialogContent>
 

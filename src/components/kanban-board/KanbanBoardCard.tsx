@@ -2,7 +2,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import PersonIcon from "@mui/icons-material/Person";
-import { Box, Card, CardActionArea, CardContent, Chip, Typography } from "@mui/material";
+import { Box, Card, CardActionArea, CardContent, Chip, LinearProgress, Typography } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import type { KanbanBoardTranslation, KanbanTask, KanbanTaskPriority } from "./KanbanBoard.types";
 import { kanbanBoardClasses } from "./kanbanBoardClasses";
@@ -39,6 +39,7 @@ type KanbanBoardCardProps = {
   showAssignee: boolean;
   showDueDate: boolean;
   showDueDateWarning: boolean;
+  showSubtasks: boolean;
   chipVariant: "outlined" | "filled";
   t: Required<KanbanBoardTranslation>;
   onCardClick: (task: KanbanTask) => void;
@@ -52,6 +53,7 @@ export function KanbanBoardCard({
   showAssignee,
   showDueDate,
   showDueDateWarning,
+  showSubtasks,
   chipVariant,
   t,
   onCardClick,
@@ -71,6 +73,9 @@ export function KanbanBoardCard({
       };
 
   const hasMeta = (showAssignee && !!task.assignee) || (showDueDate && !!task.dueDate);
+  const hasSubtasks = showSubtasks && !!task.subtasks?.length;
+  const subtaskTotal = task.subtasks?.length ?? 0;
+  const subtaskDone  = task.subtasks?.filter((s) => s.done).length ?? 0;
   const dueDateStr = task.dueDate
     ? task.dueDate.toLocaleDateString(undefined, { day: "2-digit", month: "short", year: "numeric" })
     : null;
@@ -129,7 +134,7 @@ export function KanbanBoardCard({
     >
       <CardActionArea component="div" sx={{ cursor: "inherit" }}>
         <CardContent sx={{ p: 1.5, "&:last-child": { pb: 1.5 } }}>
-          <Box sx={{ display: "flex", alignItems: "flex-start", gap: 0.75, mb: hasMeta ? 1 : 0 }}>
+          <Box sx={{ display: "flex", alignItems: "flex-start", gap: 0.75, mb: hasMeta || hasSubtasks ? 1 : 0 }}>
             {showPriority && task.priority && (
               <Box
                 className={kanbanBoardClasses.cardPriorityDot}
@@ -183,6 +188,27 @@ export function KanbanBoardCard({
                   sx={CHIP_SX}
                 />
               )}
+            </Box>
+          )}
+
+          {hasSubtasks && (
+            <Box
+              className={kanbanBoardClasses.cardSubtasks}
+              sx={{ display: "flex", alignItems: "center", gap: 1, mt: hasMeta ? 0.75 : 0 }}
+            >
+              <LinearProgress
+                className={kanbanBoardClasses.cardSubtasksBar}
+                variant="determinate"
+                value={(subtaskDone / subtaskTotal) * 100}
+                sx={{ flex: 1, height: 4, borderRadius: 2 }}
+                aria-label={`${subtaskDone} of ${subtaskTotal} subtasks done`}
+              />
+              <Typography
+                variant="caption"
+                sx={{ whiteSpace: "nowrap", color: "text.secondary", fontSize: "0.65rem", lineHeight: 1 }}
+              >
+                {subtaskDone} / {subtaskTotal} ✓
+              </Typography>
             </Box>
           )}
         </CardContent>

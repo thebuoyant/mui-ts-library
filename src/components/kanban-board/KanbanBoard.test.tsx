@@ -467,4 +467,105 @@ describe("KanbanBoard", () => {
     const cards = container.querySelectorAll(".MuiTsKanbanBoard-card");
     expect(cards.length).toBe(TASKS.length);
   });
+
+  // ── Subtasks ──────────────────────────────────────────────────────────────────
+
+  it("renders subtask progress bar when task has subtasks", () => {
+    const tasks: KanbanTask[] = [
+      {
+        id: "1", title: "Task with subtasks", status: "todo",
+        subtasks: [
+          { id: "s1", title: "Sub A", done: true },
+          { id: "s2", title: "Sub B", done: false },
+          { id: "s3", title: "Sub C", done: false },
+        ],
+      },
+    ];
+    const { container } = render(<KanbanBoard columns={COLUMNS} tasks={tasks} />);
+    expect(screen.getByText("1 / 3 ✓")).toBeInTheDocument();
+    expect(container.querySelector(".MuiTsKanbanBoard-cardSubtasks")).toBeInTheDocument();
+  });
+
+  it("does not render subtasks bar when task has no subtasks", () => {
+    const { container } = render(<KanbanBoard columns={COLUMNS} tasks={TASKS} />);
+    expect(container.querySelector(".MuiTsKanbanBoard-cardSubtasks")).not.toBeInTheDocument();
+  });
+
+  it("hides subtasks bar when showSubtasks={false}", () => {
+    const tasks: KanbanTask[] = [
+      {
+        id: "1", title: "Task with subtasks", status: "todo",
+        subtasks: [{ id: "s1", title: "Sub A", done: true }],
+      },
+    ];
+    const { container } = render(<KanbanBoard columns={COLUMNS} tasks={tasks} showSubtasks={false} />);
+    expect(container.querySelector(".MuiTsKanbanBoard-cardSubtasks")).not.toBeInTheDocument();
+  });
+
+  it("shows subtask checklist when edit dialog opens", () => {
+    const tasks: KanbanTask[] = [
+      {
+        id: "1", title: "My Task", status: "todo",
+        subtasks: [
+          { id: "s1", title: "Sub A", done: false },
+          { id: "s2", title: "Sub B", done: true },
+        ],
+      },
+    ];
+    render(<KanbanBoard columns={COLUMNS} tasks={tasks} />);
+    fireEvent.click(screen.getByText("My Task"));
+    expect(screen.getByText("Subtasks")).toBeInTheDocument();
+    expect(screen.getByText("Sub A")).toBeInTheDocument();
+    expect(screen.getByText("Sub B")).toBeInTheDocument();
+  });
+
+  it("can add a subtask via the edit dialog", () => {
+    const tasks: KanbanTask[] = [{ id: "1", title: "My Task", status: "todo" }];
+    const onTasksChange = vi.fn();
+    render(<KanbanBoard columns={COLUMNS} tasks={tasks} onTasksChange={onTasksChange} />);
+    fireEvent.click(screen.getByText("My Task"));
+    const input = screen.getByPlaceholderText("Add subtask");
+    fireEvent.change(input, { target: { value: "New Sub" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(screen.getByText("New Sub")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Save"));
+    expect(onTasksChange).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({
+          subtasks: expect.arrayContaining([
+            expect.objectContaining({ title: "New Sub", done: false }),
+          ]),
+        }),
+      ]),
+    );
+  });
+
+  it("can toggle a subtask done in the dialog", () => {
+    const tasks: KanbanTask[] = [
+      {
+        id: "1", title: "My Task", status: "todo",
+        subtasks: [{ id: "s1", title: "Sub A", done: false }],
+      },
+    ];
+    render(<KanbanBoard columns={COLUMNS} tasks={tasks} />);
+    fireEvent.click(screen.getByText("My Task"));
+    const checkbox = screen.getByRole("checkbox", { name: "Sub A" });
+    expect(checkbox).not.toBeChecked();
+    fireEvent.click(checkbox);
+    expect(checkbox).toBeChecked();
+  });
+
+  it("can remove a subtask in the dialog", () => {
+    const tasks: KanbanTask[] = [
+      {
+        id: "1", title: "My Task", status: "todo",
+        subtasks: [{ id: "s1", title: "Sub A", done: false }],
+      },
+    ];
+    render(<KanbanBoard columns={COLUMNS} tasks={tasks} />);
+    fireEvent.click(screen.getByText("My Task"));
+    expect(screen.getByText("Sub A")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Remove Sub A" }));
+    expect(screen.queryByText("Sub A")).not.toBeInTheDocument();
+  });
 });

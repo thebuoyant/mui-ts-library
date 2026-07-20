@@ -555,6 +555,15 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/):
 
 ## Changelog
 
+### [Unveröffentlicht]
+
+**Hinzugefügt**
+- **KanbanBoard — `subtasks` in `KanbanTask`**: Neues Feld `subtasks?: KanbanSubtask[]` — auf der Karte erscheint ein Fortschrittsbalken (`{erledigt} / {gesamt} ✓`), im Dialog eine Checkliste. Sichtbarkeit über `showSubtasks` steuerbar (Standard `true`).
+- **KanbanBoard — Typ `KanbanSubtask`**: Neuer exportierter Typ `{ id: string; title: string; done: boolean }`.
+- **KanbanBoard — CSS-Klassen**: `MuiTsKanbanBoard-cardSubtasks` und `MuiTsKanbanBoard-cardSubtasksBar`. Siehe [Vollständiger Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.de.md) für Details.
+
+---
+
 ### [3.34.0] — 2026-07-18
 
 **Hinzugefügt**

@@ -30,6 +30,7 @@ import type {
   GanttTask,
   KanbanColumn,
   KanbanTask,
+  KanbanSubtask,
   SunburstChartData,
   ChordChartData,
   RadialTreeChartData,
@@ -61,9 +62,33 @@ const KANBAN_COLUMNS: KanbanColumn[] = [
 ];
 
 const INITIAL_KANBAN_TASKS: KanbanTask[] = [
-  { id: "k1", title: "Design component API",     status: "done",        assignee: "Alice",                                                                        priority: "low"      },
-  { id: "k2", title: "Implement drag and drop",  status: "in-progress", assignee: "Bob",   dueDate: new Date(Date.now() + 3 * 86400000),                          priority: "medium"   },
-  { id: "k3", title: "Write unit tests",         status: "in-progress", assignee: "Alice", dueDate: new Date(Date.now() - 2 * 86400000) /* overdue */,            priority: "high"     },
+  {
+    id: "k1", title: "Design component API", status: "done", assignee: "Alice", priority: "low",
+    subtasks: [
+      { id: "k1s1", title: "Define TypeScript types", done: true },
+      { id: "k1s2", title: "Document all props",      done: true },
+      { id: "k1s3", title: "Review with team",        done: true },
+    ] satisfies KanbanSubtask[],
+  },
+  {
+    id: "k2", title: "Implement drag and drop", status: "in-progress", assignee: "Bob",
+    dueDate: new Date(Date.now() + 3 * 86400000), priority: "medium",
+    subtasks: [
+      { id: "k2s1", title: "Core DnD logic",     done: true  },
+      { id: "k2s2", title: "Column drop zones",  done: true  },
+      { id: "k2s3", title: "In-column sorting",  done: false },
+      { id: "k2s4", title: "Keyboard support",   done: false },
+    ] satisfies KanbanSubtask[],
+  },
+  {
+    id: "k3", title: "Write unit tests", status: "in-progress", assignee: "Alice",
+    dueDate: new Date(Date.now() - 2 * 86400000) /* overdue */, priority: "high",
+    subtasks: [
+      { id: "k3s1", title: "Rendering tests",  done: true  },
+      { id: "k3s2", title: "CRUD tests",       done: false },
+      { id: "k3s3", title: "Filter tests",     done: false },
+    ] satisfies KanbanSubtask[],
+  },
   { id: "k4", title: "Add Storybook stories",    status: "review",      assignee: "Bob",   dueDate: new Date(Date.now() + 5 * 86400000)                                                },
   { id: "k5", title: "Write user documentation", status: "todo",        assignee: "Alice", dueDate: new Date(Date.now() - 5 * 86400000) /* overdue */,            priority: "critical" },
   { id: "k6", title: "Publish npm release",      status: "todo",                           dueDate: new Date(Date.now() + 14 * 86400000)                                               },
@@ -425,7 +450,7 @@ export default function App() {
           <DemoCard
             title="KanbanBoard"
             useCase="Task & Sprint Management"
-            subtitle="Drag cards between columns, add/edit/delete via built-in dialogs. Use the built-in search field to filter by title or assignee."
+            subtitle="Drag cards between columns, add/edit/delete via built-in dialogs. Cards support subtasks with a progress bar. Use the built-in search field to filter by title or assignee."
           >
             <KanbanBoard
               columns={KANBAN_COLUMNS}

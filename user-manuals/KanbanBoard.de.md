@@ -14,6 +14,7 @@
 - **Karten** zeigen den Aufgabentitel und optionale Meta-Chips (Zuständige Person, Fälligkeitsdatum). Pro Karte kann ein farbiger linker Rahmen gesetzt werden.
 - **Prioritäts-Punkte**: `priority` an einer Aufgabe setzen — ein farbiger Punkt erscheint neben dem Titel (`"low"` → grün, `"medium"` → orange, `"high"` → rot, `"critical"` → lila).
 - **Überfälligkeits-Warnung**: Karten mit einem `dueDate` in der Vergangenheit erhalten automatisch einen roten Chip, Hintergrundton und linken Rahmen — steuerbar über `showDueDateWarning`.
+- **Subtasks**: Ein `subtasks`-Array an einer Aufgabe setzen — auf der Karte erscheint ein Fortschrittsbalken (`2 / 5 ✓`), im Bearbeiten/Hinzufügen-Dialog eine Checkliste.
 - **Filter / Suche**: `showSearchField={true}` für ein eingebautes Suchfeld, oder `filterText` übergeben für eigenes Suchfeld (eigene Platzierung, Debouncing, etc.).
 - **Drag & Drop** (via `@dnd-kit`): Karte greifen und in eine beliebige Spalte ziehen. Neuordnung innerhalb einer Spalte wird ebenfalls unterstützt.
 - **Eingebaute Dialoge**: Klick auf eine Karte öffnet den Bearbeiten-Dialog; Klick auf „+ Karte hinzufügen" in einer Spalte öffnet den Hinzufügen-Dialog. Ein Lösch-Bestätigungsdialog ist über den Bearbeiten-Dialog erreichbar.
@@ -71,6 +72,7 @@ Jede Drag-and-Drop-Aktion sowie jedes Hinzufügen, Bearbeiten und Löschen ruft 
 | `showAssignee` | `boolean` | `true` | Zuständige-Person-Chip auf Karten anzeigen. |
 | `showDueDate` | `boolean` | `true` | Fälligkeitsdatum-Chip auf Karten anzeigen. |
 | `showDueDateWarning` | `boolean` | `true` | Wenn `true`, werden Karten mit einem `dueDate` in der Vergangenheit hervorgehoben: Der Datums-Chip wird rot und die Karte erhält einen roten Hintergrundton + linken Rahmen. Mit `false` deaktivieren. Ohne Wirkung wenn `showDueDate` den Wert `false` hat. |
+| `showSubtasks` | `boolean` | `true` | Fortschrittsbalken auf Karten und Checkliste im Hinzufügen/Bearbeiten-Dialog anzeigen. Keine Wirkung wenn eine Karte kein `subtasks`-Feld hat. |
 | `chipVariant` | `"outlined" \| "filled"` | `"outlined"` | MUI-Chip-Variante für Zuständige-Person- und Fälligkeitsdatum-Chips. `"outlined"` = dezenter Rahmen; `"filled"` = solider Hintergrund. |
 | `width` | `number \| string` | `"100%"` | Breite des Boards. Fixer Pixelwert oder beliebige CSS-Länge. |
 | `height` | `number \| string` | `"100%"` | Höhe des Boards. Fixer Pixelwert oder beliebige CSS-Länge. |
@@ -90,9 +92,16 @@ type KanbanTask = {
   color?:       string;              // linke Rahmenfarbe — beliebiger CSS-Farbwert
   dueDate?:     Date;                // wird als Chip auf der Karte angezeigt
   priority?:    KanbanTaskPriority;  // farbiger Punkt neben dem Titel
+  subtasks?:    KanbanSubtask[];     // Checkliste — Fortschrittsbalken auf der Karte
 };
 
 type KanbanTaskPriority = "low" | "medium" | "high" | "critical";
+
+type KanbanSubtask = {
+  id:    string;   // eindeutige ID
+  title: string;   // Text des Eintrags
+  done:  boolean;  // Erledigungszustand
+};
 ```
 
 ### Prioritätsfarben
@@ -226,6 +235,46 @@ Wenn `showDueDateWarning` den Wert `true` hat (Standard), wird jede Karte deren 
 
 ---
 
+## Subtasks (`subtasks`)
+
+Ein `subtasks`-Array an einer `KanbanTask` setzen, um auf der Karte einen Fortschrittsbalken und im Bearbeiten/Hinzufügen-Dialog eine Checkliste zu erhalten.
+
+```tsx
+const tasks: KanbanTask[] = [
+  {
+    id: "1",
+    title: "Feature implementieren",
+    status: "in-progress",
+    subtasks: [
+      { id: "s1", title: "Typen schreiben",  done: true  },
+      { id: "s2", title: "Tests schreiben",  done: false },
+      { id: "s3", title: "Doku aktualisieren", done: false },
+    ],
+  },
+];
+```
+
+Die Karte zeigt einen dünnen Fortschrittsbalken gefolgt von `{erledigt} / {gesamt} ✓`. Im Bearbeiten- oder Hinzufügen-Dialog können Nutzer:
+
+- Subtasks per Checkbox **abhaken / rückgängig machen**
+- Neuen Subtask **hinzufügen** — Text eingeben und `Enter` drücken oder auf `+` klicken
+- Subtask mit `×` **entfernen**
+
+Alle Änderungen werden beim Klick auf **Speichern** übernommen — das aktualisierte `subtasks`-Array ist in der Aufgabe enthalten, die von `onTasksChange` / `onTaskUpdated` / `onTaskCreated` zurückgegeben wird.
+
+Feature für das gesamte Board deaktivieren (versteckt den Balken auf Karten und die Checkliste in Dialogen):
+
+```tsx
+<KanbanBoard columns={columns} tasks={tasks} showSubtasks={false} />
+```
+
+**Hinweise:**
+
+- Karten ohne `subtasks`-Feld (oder mit leerem Array) zeigen niemals den Fortschrittsbalken, unabhängig von `showSubtasks`.
+- Die `id` jedes Subtasks muss innerhalb der Aufgabe eindeutig sein. Bei programmatischer Erstellung empfiehlt sich `crypto.randomUUID()`.
+
+---
+
 ## Karten filtern (`showSearchField` / `filterText`)
 
 Es gibt zwei Wege zum Filtern — je nach Anwendungsfall:
@@ -355,6 +404,8 @@ Der `dialogDeleteConfirm`-String unterstützt den Platzhalter `{title}` — er w
 | `dialogFieldStatus` | `"Status"` | Beschriftung des Status-Dropdowns im Hinzufügen-/Bearbeiten-Dialog |
 | `noCardsLabel` | `"No cards"` | Platzhaltertext in leeren Spalten |
 | `searchFieldPlaceholder` | `"Search by title or assignee…"` | Placeholder des eingebauten Suchfelds (`showSearchField={true}`) |
+| `dialogFieldSubtasks` | `"Subtasks"` | Abschnitts-Label der Subtask-Checkliste im Hinzufügen/Bearbeiten-Dialog |
+| `dialogSubtaskAdd` | `"Add subtask"` | Placeholder des „Subtask hinzufügen"-Eingabefelds im Dialog |
 
 ---
 
@@ -374,9 +425,14 @@ import { kanbanBoardClasses } from "mui-ts-library";
 // kanbanBoardClasses.card         → "MuiTsKanbanBoard-card"
 // kanbanBoardClasses.cardTitle    → "MuiTsKanbanBoard-cardTitle"
 // kanbanBoardClasses.cardMeta     → "MuiTsKanbanBoard-cardMeta"
-// kanbanBoardClasses.cardAssignee → "MuiTsKanbanBoard-cardAssignee"
-// kanbanBoardClasses.cardDueDate  → "MuiTsKanbanBoard-cardDueDate"
-// kanbanBoardClasses.addButton    → "MuiTsKanbanBoard-addButton"
+// kanbanBoardClasses.cardAssignee     → "MuiTsKanbanBoard-cardAssignee"
+// kanbanBoardClasses.cardDueDate      → "MuiTsKanbanBoard-cardDueDate"
+// kanbanBoardClasses.cardPriorityDot  → "MuiTsKanbanBoard-cardPriorityDot"
+// kanbanBoardClasses.cardSubtasks     → "MuiTsKanbanBoard-cardSubtasks"
+// kanbanBoardClasses.cardSubtasksBar  → "MuiTsKanbanBoard-cardSubtasksBar"
+// kanbanBoardClasses.addButton        → "MuiTsKanbanBoard-addButton"
+// kanbanBoardClasses.searchFieldWrapper → "MuiTsKanbanBoard-searchFieldWrapper"
+// kanbanBoardClasses.searchField        → "MuiTsKanbanBoard-searchField"
 ```
 
 ### Beispiel: individuelle Kartenstile
@@ -545,6 +601,7 @@ import {
   kanbanBoardClasses,
   // Typen
   type KanbanTask,
+  type KanbanSubtask,
   type KanbanColumn,
   type KanbanBoardProps,
   type KanbanBoardTranslation,
