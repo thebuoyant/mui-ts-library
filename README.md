@@ -104,7 +104,7 @@ const tasks: GanttTask[] = [
 
 ### KanbanBoard
 
-A drag-and-drop Kanban board with built-in Add / Edit / Delete dialogs, WIP limits, and full i18n. Use it for task management dashboards, sprint boards, or any workflow where users move work items between status columns — with card colors, priority dots, assignee chips, due-date chips with overdue highlighting, and a `filterText` prop for live card search.
+A drag-and-drop Kanban board with built-in Add / Edit / Delete dialogs, WIP limits, and full i18n. Use it for task management dashboards, sprint boards, or any workflow where users move work items between status columns — with card colors, priority dots, assignee chips, due-date chips with overdue highlighting, a subtask checklist with progress bar, and a built-in search field (`showSearchField`) or controlled `filterText` prop for live card filtering.
 
 ```tsx
 import { KanbanBoard } from '@thebuoyant-tsdev/mui-ts-library';
@@ -497,7 +497,7 @@ import type {
   GanttTask, GanttTranslations, GanttTheme, GanttToolbarConfig,
 
   // KanbanBoard
-  KanbanTask, KanbanColumn, KanbanBoardProps, KanbanBoardTranslation,
+  KanbanTask, KanbanSubtask, KanbanColumn, KanbanBoardProps, KanbanBoardTranslation,
 
   // DateRangePicker
   DateRange, DateRangeEntry, DateRangeInput, DateRangePickerProps, DateRangePickerTranslation,
@@ -554,6 +554,16 @@ This project follows [Semantic Versioning](https://semver.org/):
 ---
 
 ## Changelog
+
+### [Unreleased]
+
+**Added**
+- **KanbanBoard — `subtasks` on `KanbanTask`**: New `subtasks?: KanbanSubtask[]` field renders a progress bar (`{done} / {total} ✓`) on the card and a checklist in the Add/Edit dialog. Control visibility with `showSubtasks` (default `true`).
+- **KanbanBoard — `KanbanSubtask` type**: New exported type `{ id: string; title: string; done: boolean }`.
+- **KanbanBoard — subtask `+` button**: A small `+` button with tooltip appears on hover in the card's subtask progress row, opening the Edit dialog directly.
+- **KanbanBoard — CSS classes**: `MuiTsKanbanBoard-cardSubtasks` and `MuiTsKanbanBoard-cardSubtasksBar`. See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.
+
+---
 
 ### [3.34.0] — 2026-07-18
 

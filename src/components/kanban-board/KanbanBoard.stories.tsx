@@ -44,6 +44,7 @@ const meta: Meta<typeof KanbanBoard> = {
     showAssignee:         true,
     showDueDate:          true,
     showDueDateWarning:   true,
+    showSubtasks:         true,
     chipVariant:          "outlined",
     width:                "100%",
     height:               500,
@@ -64,6 +65,7 @@ const meta: Meta<typeof KanbanBoard> = {
     showDueDate:          { control: "boolean" },
     showDueDateWarning:   { control: "boolean" },
     showPriority:         { control: "boolean" },
+    showSubtasks:         { control: "boolean" },
     width:                { control: "text" },
     // Complex objects — use dedicated stories instead.
     columns:              { control: false },
@@ -205,6 +207,71 @@ export const OverdueWarning: Story = {
   },
 };
 
+const SUBTASK_TASKS: KanbanTask[] = [
+  {
+    id: "s1", title: "Set up project", status: "done", assignee: "Alice",
+    subtasks: [
+      { id: "sub1", title: "Create repo",          done: true },
+      { id: "sub2", title: "Install dependencies", done: true },
+      { id: "sub3", title: "Configure CI",         done: true },
+    ],
+  },
+  {
+    id: "s2", title: "Design component API", status: "in-progress", assignee: "Bob",
+    subtasks: [
+      { id: "sub4", title: "Define TypeScript types", done: true  },
+      { id: "sub5", title: "Write unit tests",        done: false },
+      { id: "sub6", title: "Document all props",      done: false },
+    ],
+  },
+  {
+    id: "s3", title: "Implement drag and drop", status: "in-progress",
+    subtasks: [
+      { id: "sub7", title: "Core DnD logic",  done: true  },
+      { id: "sub8", title: "UI interactions", done: false },
+    ],
+  },
+  {
+    id: "s4", title: "Write documentation", status: "todo", assignee: "Alice",
+    subtasks: [
+      { id: "sub9",  title: "User manual",       done: false },
+      { id: "sub10", title: "Storybook stories", done: false },
+      { id: "sub11", title: "README",            done: false },
+      { id: "sub12", title: "Changelog",         done: false },
+    ],
+  },
+  {
+    id: "s5", title: "Publish npm release", status: "todo",
+    subtasks: [
+      { id: "sub13", title: "Version bump",    done: false },
+      { id: "sub14", title: "Tag git release", done: false },
+    ],
+  },
+  {
+    id: "s6", title: "Regular card — no subtasks", status: "review", assignee: "Bob",
+  },
+];
+
+function WithSubtasksStory(args: ComponentProps<typeof KanbanBoard>) {
+  const [tasks, setTasks] = useState<KanbanTask[]>(SUBTASK_TASKS);
+  return (
+    <KanbanBoard
+      {...args}
+      tasks={tasks}
+      onTasksChange={(updated) => { setTasks(updated); args.onTasksChange?.(updated); }}
+      onTaskCreated={(task) => args.onTaskCreated?.(task)}
+      onTaskUpdated={(task) => args.onTaskUpdated?.(task)}
+      onTaskDeleted={(id) => args.onTaskDeleted?.(id)}
+      onTaskMoved={(task, from, to) => args.onTaskMoved?.(task, from, to)}
+    />
+  );
+}
+
+export const WithSubtasks: Story = {
+  name: "Subtasks — progress bar on cards (live)",
+  render: (args) => <WithSubtasksStory {...args} />,
+};
+
 export const FilterSearch: Story = {
   name: "Filter / Suche — built-in field (showSearchField)",
   args: {
@@ -270,6 +337,10 @@ export const GermanLabels: Story = {
       dialogFieldDueDate:     "Fälligkeitsdatum",
       dialogFieldStatus:      "Status",
       noCardsLabel:           "Keine Karten",
+      searchFieldPlaceholder: "Nach Titel oder Zuständigem suchen…",
+      dialogFieldSubtasks:    "Teilaufgaben",
+      dialogSubtaskAdd:       "Teilaufgabe hinzufügen",
+      cardSubtaskAdd:         "Teilaufgabe hinzufügen",
     },
     columns: [
       { id: "todo",        label: "Zu erledigen", color: "#9e9e9e" },

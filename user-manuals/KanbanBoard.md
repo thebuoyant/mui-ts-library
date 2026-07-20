@@ -14,6 +14,7 @@ The `KanbanBoard` renders a horizontal row of columns, each containing a list of
 - **Cards** show the task title and optional meta chips (assignee, due date). A colored left border can be added per card.
 - **Priority dots**: set `priority` on any task to show a small colored dot next to its title (`"low"` → green, `"medium"` → orange, `"high"` → red, `"critical"` → purple).
 - **Overdue warning**: cards whose `dueDate` is in the past automatically receive a red chip, background tint, and left border — toggle with `showDueDateWarning`.
+- **Subtasks**: add a `subtasks` array to any task to show a progress bar (`2 / 5 ✓`) at the bottom of the card and a checklist in the Edit/Add dialog.
 - **Filter / search**: set `showSearchField={true}` for a built-in search bar, or pass `filterText` to supply the string yourself (custom placement, debouncing, etc.).
 - **Drag and drop** (powered by `@dnd-kit`): grab a card and drop it into any column. In-column reordering is also supported.
 - **Built-in dialogs**: click a card to open the Edit dialog; click "+ Add card" in a column to open the Add dialog. A Delete confirmation is reachable from the Edit dialog.
@@ -71,6 +72,7 @@ Every drag-and-drop, Add, Edit, and Delete action calls `onTasksChange` with the
 | `showAssignee` | `boolean` | `true` | Show the assignee chip on cards. |
 | `showDueDate` | `boolean` | `true` | Show the due-date chip on cards. |
 | `showDueDateWarning` | `boolean` | `true` | When `true`, cards with a `dueDate` in the past are highlighted: the date chip turns red and the card gets a red background tint + left border. Set to `false` to disable. Has no effect when `showDueDate` is `false`. |
+| `showSubtasks` | `boolean` | `true` | Show the subtask progress bar on cards and the subtask checklist in the Add/Edit dialog. Has no visual effect when a card has no `subtasks` array. |
 | `chipVariant` | `"outlined" \| "filled"` | `"outlined"` | MUI Chip variant for the assignee and due-date chips. `"outlined"` = subtle border; `"filled"` = solid background. |
 | `width` | `number \| string` | `"100%"` | Width of the board. Use a fixed pixel value or any CSS length. |
 | `height` | `number \| string` | `"100%"` | Height of the board. Use a fixed pixel value or any CSS length. |
@@ -90,9 +92,16 @@ type KanbanTask = {
   color?:       string;              // left border color — any CSS color value
   dueDate?:     Date;                // shown as a chip on the card
   priority?:    KanbanTaskPriority;  // colored dot next to the title
+  subtasks?:    KanbanSubtask[];     // checklist items — progress bar shown on card
 };
 
 type KanbanTaskPriority = "low" | "medium" | "high" | "critical";
+
+type KanbanSubtask = {
+  id:    string;   // unique identifier
+  title: string;   // text of the checklist item
+  done:  boolean;  // checked state
+};
 ```
 
 ### Priority colors
@@ -226,6 +235,46 @@ When `showDueDateWarning` is `true` (the default), any card whose `dueDate` is b
 
 ---
 
+## Subtasks (`subtasks`)
+
+Add a `subtasks` array to any `KanbanTask` to get a progress bar at the bottom of the card and a checklist in the Edit/Add dialog.
+
+```tsx
+const tasks: KanbanTask[] = [
+  {
+    id: "1",
+    title: "Implement feature",
+    status: "in-progress",
+    subtasks: [
+      { id: "s1", title: "Write types",  done: true  },
+      { id: "s2", title: "Write tests",  done: false },
+      { id: "s3", title: "Update docs",  done: false },
+    ],
+  },
+];
+```
+
+The card shows a thin progress bar followed by `{done} / {total} ✓`. A small `+` button appears on hover at the right edge of the progress row — clicking it opens the Edit dialog directly (with the subtask checklist visible). In the dialog users can:
+
+- **Check / uncheck** subtasks via the checkbox next to each item
+- **Add** a new subtask by typing in the "Add subtask" field and pressing `Enter` or clicking the `+` button
+- **Remove** a subtask with the `×` button
+
+All changes are saved when the user clicks **Save** — the updated `subtasks` array is included in the task returned by `onTasksChange` / `onTaskUpdated` / `onTaskCreated`.
+
+To disable the feature entirely (hides the bar on cards and removes the checklist from dialogs):
+
+```tsx
+<KanbanBoard columns={columns} tasks={tasks} showSubtasks={false} />
+```
+
+**Notes**
+
+- Cards with no `subtasks` field (or an empty array) never show the progress bar, regardless of `showSubtasks`.
+- The `id` of each subtask must be unique within the task. Use `crypto.randomUUID()` when creating subtasks programmatically.
+
+---
+
 ## Filtering cards (`showSearchField` / `filterText`)
 
 There are two ways to filter cards — pick the one that fits your use case:
@@ -355,6 +404,9 @@ The `dialogDeleteConfirm` string supports the placeholder `{title}` — it is re
 | `dialogFieldStatus` | `"Status"` | Label for the Status dropdown in Add/Edit dialog |
 | `noCardsLabel` | `"No cards"` | Placeholder shown in an empty column |
 | `searchFieldPlaceholder` | `"Search by title or assignee…"` | Placeholder for the built-in search field (`showSearchField={true}`) |
+| `dialogFieldSubtasks` | `"Subtasks"` | Section label for the subtask checklist in the Add/Edit dialog |
+| `dialogSubtaskAdd` | `"Add subtask"` | Placeholder for the "add subtask" input in the dialog |
+| `cardSubtaskAdd` | `"Add subtask"` | Tooltip for the `+` button that appears on hover in the card's subtask progress row |
 
 ---
 
@@ -374,9 +426,14 @@ import { kanbanBoardClasses } from "mui-ts-library";
 // kanbanBoardClasses.card         → "MuiTsKanbanBoard-card"
 // kanbanBoardClasses.cardTitle    → "MuiTsKanbanBoard-cardTitle"
 // kanbanBoardClasses.cardMeta     → "MuiTsKanbanBoard-cardMeta"
-// kanbanBoardClasses.cardAssignee → "MuiTsKanbanBoard-cardAssignee"
-// kanbanBoardClasses.cardDueDate  → "MuiTsKanbanBoard-cardDueDate"
-// kanbanBoardClasses.addButton    → "MuiTsKanbanBoard-addButton"
+// kanbanBoardClasses.cardAssignee     → "MuiTsKanbanBoard-cardAssignee"
+// kanbanBoardClasses.cardDueDate      → "MuiTsKanbanBoard-cardDueDate"
+// kanbanBoardClasses.cardPriorityDot  → "MuiTsKanbanBoard-cardPriorityDot"
+// kanbanBoardClasses.cardSubtasks     → "MuiTsKanbanBoard-cardSubtasks"
+// kanbanBoardClasses.cardSubtasksBar  → "MuiTsKanbanBoard-cardSubtasksBar"
+// kanbanBoardClasses.addButton        → "MuiTsKanbanBoard-addButton"
+// kanbanBoardClasses.searchFieldWrapper → "MuiTsKanbanBoard-searchFieldWrapper"
+// kanbanBoardClasses.searchField        → "MuiTsKanbanBoard-searchField"
 ```
 
 ### Example: custom card style
@@ -545,6 +602,7 @@ import {
   kanbanBoardClasses,
   // Types
   type KanbanTask,
+  type KanbanSubtask,
   type KanbanColumn,
   type KanbanBoardProps,
   type KanbanBoardTranslation,

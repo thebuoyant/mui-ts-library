@@ -36,6 +36,7 @@ export function KanbanBoard({
   showAssignee       = true,
   showDueDate        = true,
   showDueDateWarning = true,
+  showSubtasks       = true,
   chipVariant        = "outlined",
   showSearchField    = false,
   filterText         = "",
@@ -238,6 +239,7 @@ export function KanbanBoard({
                 showAssignee={showAssignee}
                 showDueDate={showDueDate}
                 showDueDateWarning={showDueDateWarning}
+                showSubtasks={showSubtasks}
                 chipVariant={chipVariant}
                 t={t}
                 enableBuiltinDialogs={enableBuiltinDialogs}
@@ -256,6 +258,8 @@ export function KanbanBoard({
               showAssignee={showAssignee}
               showDueDate={showDueDate}
               showDueDateWarning={showDueDateWarning}
+              showSubtasks={showSubtasks}
+              enableBuiltinDialogs={false}
               chipVariant={chipVariant}
               t={t}
               onCardClick={() => {}}
@@ -275,6 +279,7 @@ export function KanbanBoard({
           state={dialogState}
           columns={columns}
           t={t}
+          showSubtasks={showSubtasks}
           onSave={handleDialogSave}
           onDelete={handleDialogDelete}
           onRequestDelete={handleRequestDelete}

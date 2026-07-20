@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **KanbanBoard — `subtasks` on `KanbanTask`**: New optional `subtasks?: KanbanSubtask[]` field. A progress bar (`{done} / {total} ✓`) is shown at the bottom of the card, and a checklist appears in the Add/Edit dialog — users can check/uncheck items, add new ones (Enter or `+` button), and remove them.
+- **KanbanBoard — `showSubtasks` prop**: Controls whether the progress bar and checklist are shown (default `true`). Set to `false` to fully disable the subtask feature.
+- **KanbanBoard — `translation.dialogFieldSubtasks` / `translation.dialogSubtaskAdd` / `translation.cardSubtaskAdd`**: New translation keys for the subtask checklist section label, the "Add subtask" input placeholder, and the tooltip on the card's `+` hover button.
+- **KanbanBoard — CSS classes**: `MuiTsKanbanBoard-cardSubtasks` and `MuiTsKanbanBoard-cardSubtasksBar` added to the CSS classes API.
+- **`KanbanSubtask` type**: New exported type `{ id: string; title: string; done: boolean }`.
+
 ---
 
 ## [3.34.0] — 2026-07-18

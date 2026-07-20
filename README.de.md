@@ -104,7 +104,7 @@ const tasks: GanttTask[] = [
 
 ### KanbanBoard
 
-Ein Drag-and-Drop-Kanban-Board mit eingebauten Hinzufügen-/Bearbeiten-/Löschen-Dialogen, WIP-Limits und vollständiger i18n. Ideal für Task-Management-Dashboards, Sprint-Boards oder jeden Workflow, bei dem Nutzer Aufgaben zwischen Statusspalten verschieben sollen — mit Kartenfarben, Prioritäts-Punkten, Zuständige-Person-Chips, Fälligkeitsdatum-Chips mit Überfälligkeits-Warnung und `filterText`-Prop für Live-Suche.
+Ein Drag-and-Drop-Kanban-Board mit eingebauten Hinzufügen-/Bearbeiten-/Löschen-Dialogen, WIP-Limits und vollständiger i18n. Ideal für Task-Management-Dashboards, Sprint-Boards oder jeden Workflow, bei dem Nutzer Aufgaben zwischen Statusspalten verschieben sollen — mit Kartenfarben, Prioritäts-Punkten, Zuständige-Person-Chips, Fälligkeitsdatum-Chips mit Überfälligkeits-Warnung, Subtask-Checkliste mit Fortschrittsbalken und eingebautem Suchfeld (`showSearchField`) oder `filterText`-Prop für Live-Filterung.
 
 ```tsx
 import { KanbanBoard } from '@thebuoyant-tsdev/mui-ts-library';
@@ -497,7 +497,7 @@ import type {
   GanttTask, GanttTranslations, GanttTheme, GanttToolbarConfig,
 
   // KanbanBoard
-  KanbanTask, KanbanColumn, KanbanBoardProps, KanbanBoardTranslation,
+  KanbanTask, KanbanSubtask, KanbanColumn, KanbanBoardProps, KanbanBoardTranslation,
 
   // DateRangePicker
   DateRange, DateRangeEntry, DateRangeInput, DateRangePickerProps, DateRangePickerTranslation,
@@ -554,6 +554,16 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/):
 ---
 
 ## Changelog
+
+### [Unveröffentlicht]
+
+**Hinzugefügt**
+- **KanbanBoard — `subtasks` in `KanbanTask`**: Neues Feld `subtasks?: KanbanSubtask[]` — auf der Karte erscheint ein Fortschrittsbalken (`{erledigt} / {gesamt} ✓`), im Dialog eine Checkliste. Sichtbarkeit über `showSubtasks` steuerbar (Standard `true`).
+- **KanbanBoard — Typ `KanbanSubtask`**: Neuer exportierter Typ `{ id: string; title: string; done: boolean }`.
+- **KanbanBoard — `+`-Button in Subtask-Zeile**: Beim Hover erscheint ein kleiner `+`-Button mit Tooltip in der Fortschrittszeile der Karte, der den Bearbeiten-Dialog direkt öffnet.
+- **KanbanBoard — CSS-Klassen**: `MuiTsKanbanBoard-cardSubtasks` und `MuiTsKanbanBoard-cardSubtasksBar`. Siehe [Vollständiger Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.de.md) für Details.
+
+---
 
 ### [3.34.0] — 2026-07-18
 

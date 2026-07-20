@@ -50,4 +50,8 @@ export const kanbanBoardClasses = {
   searchFieldWrapper:   "MuiTsKanbanBoard-searchFieldWrapper",
   /** The built-in search TextField (`showSearchField={true}`). */
   searchField:          "MuiTsKanbanBoard-searchField",
+  /** The subtask progress row at the bottom of a card (bar + "N / M ✓" label). */
+  cardSubtasks:         "MuiTsKanbanBoard-cardSubtasks",
+  /** The LinearProgress bar inside the subtask row. */
+  cardSubtasksBar:      "MuiTsKanbanBoard-cardSubtasksBar",
 } as const;
