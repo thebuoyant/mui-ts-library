@@ -11,14 +11,17 @@ import {
   type DragStartEvent,
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import AddIcon from "@mui/icons-material/Add";
 import SearchIcon from "@mui/icons-material/Search";
-import { Box, InputAdornment, TextField } from "@mui/material";
+import { Box, Button, InputAdornment, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
-import type { KanbanTask } from "./KanbanBoard.types";
+import type { KanbanColumn, KanbanTask } from "./KanbanBoard.types";
 import { DEFAULT_KANBAN_BOARD_TRANSLATION, type KanbanBoardProps } from "./KanbanBoard.types";
 import { KanbanBoardCard } from "./KanbanBoardCard";
 import type { KanbanDialogState } from "./KanbanBoardCardDialog";
 import { KanbanBoardCardDialog } from "./KanbanBoardCardDialog";
+import type { KanbanColumnDialogState } from "./KanbanBoardColumnDialog";
+import { KanbanBoardColumnDialog } from "./KanbanBoardColumnDialog";
 import { KanbanBoardColumn } from "./KanbanBoardColumn";
 import { kanbanBoardClasses } from "./kanbanBoardClasses";
 
@@ -27,11 +30,16 @@ export function KanbanBoard({
   columns,
   onTasksChange,
   onCardClick,
-  enableBuiltinDialogs = true,
+  enableBuiltinDialogs    = true,
+  enableColumnManagement  = false,
   onTaskCreated,
   onTaskUpdated,
   onTaskDeleted,
   onTaskMoved,
+  onColumnsChange,
+  onColumnAdd,
+  onColumnUpdate,
+  onColumnDelete,
   showPriority       = true,
   showAssignee       = true,
   showDueDate        = true,
@@ -50,9 +58,14 @@ export function KanbanBoard({
   const [internalTasks, setInternalTasks] = useState<KanbanTask[]>(tasks);
   useEffect(() => { setInternalTasks(tasks); }, [tasks]);
 
-  const [activeTask, setActiveTask]       = useState<KanbanTask | null>(null);
-  const [dialogState, setDialogState]     = useState<KanbanDialogState | null>(null);
-  const [internalFilter, setInternalFilter] = useState("");
+  // Internal column list — managed for add / rename / delete operations.
+  const [internalColumns, setInternalColumns] = useState<KanbanColumn[]>(columns);
+  useEffect(() => { setInternalColumns(columns); }, [columns]);
+
+  const [activeTask, setActiveTask]             = useState<KanbanTask | null>(null);
+  const [dialogState, setDialogState]           = useState<KanbanDialogState | null>(null);
+  const [columnDialogState, setColumnDialogState] = useState<KanbanColumnDialogState | null>(null);
+  const [internalFilter, setInternalFilter]     = useState("");
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -174,6 +187,44 @@ export function KanbanBoard({
     );
   }
 
+  // ── Column management ─────────────────────────────────────────────────────────
+
+  function handleColumnAdd(column: KanbanColumn) {
+    const updated = [...internalColumns, column];
+    setInternalColumns(updated);
+    onColumnAdd?.(column);
+    onColumnsChange?.(updated);
+    setColumnDialogState(null);
+  }
+
+  function handleColumnRename(columnId: string, newLabel: string) {
+    const updated = internalColumns.map((c) =>
+      c.id === columnId ? { ...c, label: newLabel } : c,
+    );
+    setInternalColumns(updated);
+    const changed = updated.find((c) => c.id === columnId);
+    if (changed) onColumnUpdate?.(changed);
+    onColumnsChange?.(updated);
+  }
+
+  function handleColumnDeleteRequest(columnId: string) {
+    const column = internalColumns.find((c) => c.id === columnId);
+    if (!column) return;
+    const cardCount = internalTasks.filter((t) => t.status === columnId).length;
+    setColumnDialogState({ mode: "delete", column, cardCount });
+  }
+
+  function handleColumnDelete(columnId: string) {
+    const updatedColumns = internalColumns.filter((c) => c.id !== columnId);
+    const updatedTasks   = internalTasks.filter((t) => t.status !== columnId);
+    setInternalColumns(updatedColumns);
+    setInternalTasks(updatedTasks);
+    onColumnDelete?.(columnId);
+    onColumnsChange?.(updatedColumns);
+    onTasksChange?.(updatedTasks);
+    setColumnDialogState(null);
+  }
+
   // ── Render ────────────────────────────────────────────────────────────────────
 
   return (
@@ -226,7 +277,7 @@ export function KanbanBoard({
             alignItems: "stretch",
           }}
         >
-          {columns.map((column) => {
+          {internalColumns.map((column) => {
             const allColumnTasks     = internalTasks.filter((t) => t.status === column.id);
             const visibleColumnTasks = allColumnTasks.filter(matchesFilter);
             return (
@@ -243,11 +294,38 @@ export function KanbanBoard({
                 chipVariant={chipVariant}
                 t={t}
                 enableBuiltinDialogs={enableBuiltinDialogs}
+                enableColumnManagement={enableColumnManagement && enableBuiltinDialogs}
                 onCardClick={handleCardClick}
                 onAddClick={handleAddClick}
+                onColumnRename={handleColumnRename}
+                onColumnDeleteRequest={handleColumnDeleteRequest}
               />
             );
           })}
+          {enableColumnManagement && enableBuiltinDialogs && (
+            <Box sx={{ display: "flex", alignItems: "flex-start", pt: 0.5 }}>
+              <Button
+                className={kanbanBoardClasses.columnAddButton}
+                startIcon={<AddIcon />}
+                size="small"
+                onClick={() => setColumnDialogState({ mode: "add" })}
+                sx={{
+                  minWidth: 140,
+                  whiteSpace: "nowrap",
+                  color: "text.secondary",
+                  border: "1px dashed",
+                  borderColor: "divider",
+                  borderRadius: 2,
+                  py: 1,
+                  px: 2,
+                  fontWeight: 600,
+                  "&:hover": { bgcolor: "action.hover", borderColor: "text.secondary" },
+                }}
+              >
+                {t.columnAddLabel}
+              </Button>
+            </Box>
+          )}
         </Box>
 
         <DragOverlay>
@@ -277,13 +355,23 @@ export function KanbanBoard({
               : "closed"
           }
           state={dialogState}
-          columns={columns}
+          columns={internalColumns}
           t={t}
           showSubtasks={showSubtasks}
           onSave={handleDialogSave}
           onDelete={handleDialogDelete}
           onRequestDelete={handleRequestDelete}
           onClose={() => setDialogState(null)}
+        />
+      )}
+
+      {enableColumnManagement && enableBuiltinDialogs && (
+        <KanbanBoardColumnDialog
+          state={columnDialogState}
+          t={t}
+          onAdd={handleColumnAdd}
+          onDelete={handleColumnDelete}
+          onClose={() => setColumnDialogState(null)}
         />
       )}
     </Box>
