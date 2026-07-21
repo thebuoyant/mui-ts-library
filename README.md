@@ -555,7 +555,7 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 ## Changelog
 
-### [Unreleased]
+### [3.36.0] — 2026-07-21
 
 **Added**
 - **KanbanBoard — column management UI (`enableColumnManagement`)**: New opt-in prop (default `false`). When enabled, column headers show inline Rename / Delete icon buttons on hover and an "Add column" button appears at the right end of the board. Rename is inline in the header; delete shows a confirmation dialog with card-count warning. Deleting a column also removes all its cards. New callbacks: `onColumnsChange`, `onColumnAdd`, `onColumnUpdate`, `onColumnDelete`. Six new translation keys (`columnAddLabel`, `columnAddPlaceholder`, `columnDeleteConfirm`, `columnDeleteCardsWarning`, `columnRenameTooltip`, `columnDeleteTooltip`). Two new CSS classes: `MuiTsKanbanBoard-columnActions`, `MuiTsKanbanBoard-columnAddButton`. See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.

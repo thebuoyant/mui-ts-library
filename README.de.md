@@ -555,7 +555,7 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/):
 
 ## Changelog
 
-### [Unveröffentlicht]
+### [3.36.0] — 2026-07-21
 
 **Hinzugefügt**
 - **KanbanBoard — Spalten-Management-UI (`enableColumnManagement`)**: Neues Opt-in-Prop (Standard `false`). Wenn aktiviert, erhalten Spalten-Header bei Hover Umbenennen-/Löschen-Icon-Buttons und am rechten Board-Ende erscheint ein „Spalte hinzufügen"-Button. Umbenennen erfolgt inline; Löschen zeigt einen Bestätigungsdialog mit Karten-Anzahl-Warnung. Löschen einer Spalte entfernt auch alle ihre Karten. Neue Callbacks: `onColumnsChange`, `onColumnAdd`, `onColumnUpdate`, `onColumnDelete`. Sechs neue Translation-Keys, zwei neue CSS-Klassen. Siehe [Vollständiger Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.de.md) für Details.
