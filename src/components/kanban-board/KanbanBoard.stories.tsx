@@ -362,6 +362,7 @@ export const FilterSearchExternal: Story = {
 export const GermanLabels: Story = {
   name: "German labels",
   args: {
+    enableColumnManagement: true,
     translation: {
       addCardLabel:           "Karte hinzufügen",
       dialogAddTitle:         "Karte hinzufügen",
@@ -392,7 +393,7 @@ export const GermanLabels: Story = {
       { id: "todo",        label: "Zu erledigen", color: "#9e9e9e" },
       { id: "in-progress", label: "In Arbeit",    color: "#2196f3" },
       { id: "review",      label: "In Prüfung",   color: "#ff9800" },
-      { id: "done",        label: "Erledigt",      color: "#4caf50" },
+      { id: "done",        label: "Erledigt",     color: "#4caf50" },
     ],
   },
 };
