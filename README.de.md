@@ -104,7 +104,7 @@ const tasks: GanttTask[] = [
 
 ### KanbanBoard
 
-Ein Drag-and-Drop-Kanban-Board mit eingebauten Hinzufügen-/Bearbeiten-/Löschen-Dialogen, WIP-Limits und vollständiger i18n. Ideal für Task-Management-Dashboards, Sprint-Boards oder jeden Workflow, bei dem Nutzer Aufgaben zwischen Statusspalten verschieben sollen — mit Kartenfarben, Prioritäts-Punkten, Zuständige-Person-Chips, Fälligkeitsdatum-Chips mit Überfälligkeits-Warnung, Subtask-Checkliste mit Fortschrittsbalken und eingebautem Suchfeld (`showSearchField`) oder `filterText`-Prop für Live-Filterung.
+Ein Drag-and-Drop-Kanban-Board mit eingebauten Hinzufügen-/Bearbeiten-/Löschen-Dialogen, WIP-Limits und vollständiger i18n. Ideal für Task-Management-Dashboards, Sprint-Boards oder jeden Workflow, bei dem Nutzer Aufgaben zwischen Statusspalten verschieben sollen — mit Kartenfarben, Prioritäts-Punkten, Zuständige-Person-Chips, Fälligkeitsdatum-Chips mit Überfälligkeits-Warnung, Subtask-Checkliste mit Fortschrittsbalken, eingebautem Suchfeld (`showSearchField`) oder `filterText`-Prop für Live-Filterung, und optionalem Spalten-Management (`enableColumnManagement`) zum Hinzufügen, Umbenennen und Löschen von Spalten direkt im Board.
 
 ```tsx
 import { KanbanBoard } from '@thebuoyant-tsdev/mui-ts-library';
@@ -554,6 +554,13 @@ Dieses Projekt folgt [Semantic Versioning](https://semver.org/):
 ---
 
 ## Changelog
+
+### [Unveröffentlicht]
+
+**Hinzugefügt**
+- **KanbanBoard — Spalten-Management-UI (`enableColumnManagement`)**: Neues Opt-in-Prop (Standard `false`). Wenn aktiviert, erhalten Spalten-Header bei Hover Umbenennen-/Löschen-Icon-Buttons und am rechten Board-Ende erscheint ein „Spalte hinzufügen"-Button. Umbenennen erfolgt inline; Löschen zeigt einen Bestätigungsdialog mit Karten-Anzahl-Warnung. Löschen einer Spalte entfernt auch alle ihre Karten. Neue Callbacks: `onColumnsChange`, `onColumnAdd`, `onColumnUpdate`, `onColumnDelete`. Sechs neue Translation-Keys, zwei neue CSS-Klassen. Siehe [Vollständiger Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.de.md) für Details.
+
+---
 
 ### [3.35.0] — 2026-07-20
 

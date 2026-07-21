@@ -568,4 +568,113 @@ describe("KanbanBoard", () => {
     fireEvent.click(screen.getByRole("button", { name: "Remove Sub A" }));
     expect(screen.queryByText("Sub A")).not.toBeInTheDocument();
   });
+
+  // ── Column management ─────────────────────────────────────────────────────────
+
+  it("shows no column management controls by default", () => {
+    render(<KanbanBoard columns={COLUMNS} tasks={TASKS} />);
+    expect(screen.queryByRole("button", { name: /rename/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /delete column/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /add column/i })).not.toBeInTheDocument();
+  });
+
+  it("shows Add column button when enableColumnManagement=true", () => {
+    render(<KanbanBoard columns={COLUMNS} tasks={TASKS} enableColumnManagement />);
+    expect(screen.getByRole("button", { name: /add column/i })).toBeInTheDocument();
+  });
+
+  it("opens Add column dialog and adds a column", () => {
+    const onColumnAdd    = vi.fn();
+    const onColumnsChange = vi.fn();
+    render(
+      <KanbanBoard
+        columns={COLUMNS}
+        tasks={TASKS}
+        enableColumnManagement
+        onColumnAdd={onColumnAdd}
+        onColumnsChange={onColumnsChange}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: /add column/i }));
+    const input = screen.getByPlaceholderText("Column name");
+    fireEvent.change(input, { target: { value: "Backlog" } });
+    fireEvent.click(screen.getByRole("button", { name: /save/i }));
+    expect(screen.getByText("Backlog", { selector: ".MuiTsKanbanBoard-columnTitle" })).toBeInTheDocument();
+    expect(onColumnAdd).toHaveBeenCalledWith(expect.objectContaining({ label: "Backlog" }));
+    expect(onColumnsChange).toHaveBeenCalled();
+  });
+
+  it("can add a column via Enter key in the dialog", () => {
+    render(<KanbanBoard columns={COLUMNS} tasks={TASKS} enableColumnManagement />);
+    fireEvent.click(screen.getByRole("button", { name: /add column/i }));
+    const input = screen.getByPlaceholderText("Column name");
+    fireEvent.change(input, { target: { value: "Archive" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(screen.getByText("Archive", { selector: ".MuiTsKanbanBoard-columnTitle" })).toBeInTheDocument();
+  });
+
+  it("renames a column inline on Enter", () => {
+    const onColumnUpdate = vi.fn();
+    render(
+      <KanbanBoard
+        columns={COLUMNS}
+        tasks={TASKS}
+        enableColumnManagement
+        onColumnUpdate={onColumnUpdate}
+      />,
+    );
+    // Click the first column's rename button ("To Do")
+    fireEvent.click(screen.getAllByRole("button", { name: /rename/i, hidden: true })[0]);
+    const input = screen.getByRole("textbox", { name: /rename/i });
+    fireEvent.change(input, { target: { value: "Doing" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(screen.getByText("Doing", { selector: ".MuiTsKanbanBoard-columnTitle" })).toBeInTheDocument();
+    expect(onColumnUpdate).toHaveBeenCalledWith(expect.objectContaining({ label: "Doing" }));
+  });
+
+  it("deletes a column (no cards) after confirmation", () => {
+    const onColumnDelete = vi.fn();
+    render(
+      <KanbanBoard
+        columns={COLUMNS}
+        tasks={[]}
+        enableColumnManagement
+        onColumnDelete={onColumnDelete}
+      />,
+    );
+    fireEvent.click(screen.getAllByRole("button", { name: /delete column/i, hidden: true })[0]);
+    fireEvent.click(screen.getByRole("button", { name: /^delete$/i }));
+    expect(screen.queryByText("To Do", { selector: ".MuiTsKanbanBoard-columnTitle" })).not.toBeInTheDocument();
+    expect(onColumnDelete).toHaveBeenCalledWith("todo");
+  });
+
+  it("shows card-count warning when deleting a column with cards", () => {
+    render(
+      <KanbanBoard columns={COLUMNS} tasks={TASKS} enableColumnManagement />,
+    );
+    // "To Do" has 2 tasks (Task Alpha + Task Delta)
+    fireEvent.click(screen.getAllByRole("button", { name: /delete column/i, hidden: true })[0]);
+    expect(screen.getByText(/2 card\(s\) in this column will also be deleted/i)).toBeInTheDocument();
+  });
+
+  it("also removes cards when a column is deleted", () => {
+    const onTasksChange = vi.fn();
+    render(
+      <KanbanBoard
+        columns={COLUMNS}
+        tasks={TASKS}
+        enableColumnManagement
+        onTasksChange={onTasksChange}
+      />,
+    );
+    // Delete "To Do" which has Task Alpha + Task Delta
+    fireEvent.click(screen.getAllByRole("button", { name: /delete column/i, hidden: true })[0]);
+    fireEvent.click(screen.getByRole("button", { name: /^delete$/i }));
+    expect(screen.queryByText("Task Alpha")).not.toBeInTheDocument();
+    expect(screen.queryByText("Task Delta")).not.toBeInTheDocument();
+    // onTasksChange should have been called with the remaining tasks
+    expect(onTasksChange).toHaveBeenCalledWith(
+      expect.not.arrayContaining([expect.objectContaining({ status: "todo" })]),
+    );
+  });
 });

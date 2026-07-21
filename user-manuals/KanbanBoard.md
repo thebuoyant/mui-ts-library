@@ -16,6 +16,7 @@ The `KanbanBoard` renders a horizontal row of columns, each containing a list of
 - **Overdue warning**: cards whose `dueDate` is in the past automatically receive a red chip, background tint, and left border — toggle with `showDueDateWarning`.
 - **Subtasks**: add a `subtasks` array to any task to show a progress bar (`2 / 5 ✓`) at the bottom of the card and a checklist in the Edit/Add dialog.
 - **Filter / search**: set `showSearchField={true}` for a built-in search bar, or pass `filterText` to supply the string yourself (custom placement, debouncing, etc.).
+- **Column management**: set `enableColumnManagement={true}` to allow users to add, rename, and delete columns directly in the board — no external dialog required.
 - **Drag and drop** (powered by `@dnd-kit`): grab a card and drop it into any column. In-column reordering is also supported.
 - **Built-in dialogs**: click a card to open the Edit dialog; click "+ Add card" in a column to open the Add dialog. A Delete confirmation is reachable from the Edit dialog.
 - **WIP limits**: set `wipLimit` on a column — the count chip turns red when the limit is exceeded.
@@ -66,6 +67,11 @@ Every drag-and-drop, Add, Edit, and Delete action calls `onTasksChange` with the
 | `onTaskUpdated` | `(task: KanbanTask) => void` | — | Called after an existing card is saved via the Edit dialog. |
 | `onTaskDeleted` | `(taskId: string) => void` | — | Called after a card is deleted via the Delete confirmation. |
 | `onTaskMoved` | `(task: KanbanTask, fromColumnId: string, toColumnId: string) => void` | — | Called when a card is moved to a **different column** via drag and drop. Not fired for in-column reordering or dialog-based status changes — use `onTaskUpdated` for those. |
+| `enableColumnManagement` | `boolean` | `false` | When `true`, shows inline Rename / Delete icon buttons on column headers on hover and an "Add column" button at the end of the board. Requires `enableBuiltinDialogs` to be `true`. |
+| `onColumnsChange` | `(columns: KanbanColumn[]) => void` | — | Called after every column add, rename, or delete with the full updated column list. |
+| `onColumnAdd` | `(column: KanbanColumn) => void` | — | Called after a new column is added via the built-in UI. |
+| `onColumnUpdate` | `(column: KanbanColumn) => void` | — | Called after a column label is changed via inline rename. |
+| `onColumnDelete` | `(columnId: string) => void` | — | Called after a column (and all its cards) is deleted. |
 | `showSearchField` | `boolean` | `false` | Renders a built-in `size="small"` search field above the board. The board manages the search state internally — no extra wiring needed. Customize the placeholder via `translation.searchFieldPlaceholder`. |
 | `filterText` | `string` | `""` | Filters visible cards by title and assignee (case-insensitive substring match). The consumer renders and manages the search input. Takes priority over the built-in field when both are used. Column counters reflect the filtered count; WIP-limit checks always use the unfiltered total. |
 | `showPriority` | `boolean` | `true` | Show the priority dot on cards. Has no visual effect when a card has no `priority` field. |
@@ -275,6 +281,59 @@ To disable the feature entirely (hides the bar on cards and removes the checklis
 
 ---
 
+## Column management (`enableColumnManagement`)
+
+Set `enableColumnManagement={true}` to let users add, rename, and delete columns directly in the board. The controls are only active when `enableBuiltinDialogs` is also `true`.
+
+```tsx
+const [columns, setColumns] = useState<KanbanColumn[]>([
+  { id: "todo",        label: "To Do",       color: "#9e9e9e" },
+  { id: "in-progress", label: "In Progress", color: "#2196f3" },
+  { id: "done",        label: "Done",        color: "#4caf50" },
+]);
+const [tasks, setTasks] = useState<KanbanTask[]>(initialTasks);
+
+<KanbanBoard
+  columns={columns}
+  tasks={tasks}
+  enableColumnManagement
+  onColumnsChange={setColumns}
+  onTasksChange={setTasks}
+  onColumnAdd={(col) => api.post("/columns", col)}
+  onColumnUpdate={(col) => api.patch(`/columns/${col.id}`, col)}
+  onColumnDelete={(id) => api.delete(`/columns/${id}`)}
+/>
+```
+
+### What the UI provides
+
+| Interaction | How it works |
+|---|---|
+| **Rename** | Hover over a column header → click the ✏️ icon → the title becomes an inline `TextField`. Press `Enter` or click away to save; press `Escape` to cancel. |
+| **Delete** | Hover over a column header → click the 🗑️ icon → a confirmation dialog appears. If the column contains cards, a warning lists how many will also be deleted. |
+| **Add** | An "Add column" button appears at the right end of the columns row. Click it → enter a name → press `Enter` or **Save**. The column id is auto-generated. |
+
+### Deleting a column removes its cards
+
+Deleting a column permanently removes all tasks with `status === columnId`. Both `onColumnDelete` and `onTasksChange` fire — wire both to keep your state consistent:
+
+```tsx
+<KanbanBoard
+  ...
+  enableColumnManagement
+  onColumnDelete={(id) => api.deleteColumnAndTasks(id)}
+  onTasksChange={setTasks}   // fires with remaining tasks after deletion
+  onColumnsChange={setColumns}
+/>
+```
+
+**Notes:**
+- `enableColumnManagement` defaults to `false` — existing boards are unaffected.
+- The `id` of a new column is generated with `crypto.randomUUID()`. You can rename it later; all task `status` values that reference the id stay valid.
+- Column color cannot be set from the built-in UI — provide a `color` in `onColumnsChange` after the fact, or pre-seed columns with colors programmatically.
+
+---
+
 ## Filtering cards (`showSearchField` / `filterText`)
 
 There are two ways to filter cards — pick the one that fits your use case:
@@ -407,6 +466,12 @@ The `dialogDeleteConfirm` string supports the placeholder `{title}` — it is re
 | `dialogFieldSubtasks` | `"Subtasks"` | Section label for the subtask checklist in the Add/Edit dialog |
 | `dialogSubtaskAdd` | `"Add subtask"` | Placeholder for the "add subtask" input in the dialog |
 | `cardSubtaskAdd` | `"Add subtask"` | Tooltip for the `+` button that appears on hover in the card's subtask progress row |
+| `columnAddLabel` | `"Add column"` | Label on the "Add column" ghost button (`enableColumnManagement`) |
+| `columnAddPlaceholder` | `"Column name"` | Placeholder inside the Add column dialog text field |
+| `columnDeleteConfirm` | `'Delete column "{label}"?'` | Confirmation dialog title — `{label}` is replaced with the column name |
+| `columnDeleteCardsWarning` | `'{count} card(s) in this column will also be deleted.'` | Warning line shown when the column has cards — `{count}` is replaced with the count |
+| `columnRenameTooltip` | `"Rename"` | Tooltip on the ✏️ rename icon in the column header |
+| `columnDeleteTooltip` | `"Delete column"` | Tooltip on the 🗑️ delete icon in the column header |
 
 ---
 
@@ -434,6 +499,8 @@ import { kanbanBoardClasses } from "mui-ts-library";
 // kanbanBoardClasses.addButton        → "MuiTsKanbanBoard-addButton"
 // kanbanBoardClasses.searchFieldWrapper → "MuiTsKanbanBoard-searchFieldWrapper"
 // kanbanBoardClasses.searchField        → "MuiTsKanbanBoard-searchField"
+// kanbanBoardClasses.columnActions      → "MuiTsKanbanBoard-columnActions"
+// kanbanBoardClasses.columnAddButton    → "MuiTsKanbanBoard-columnAddButton"
 ```
 
 ### Example: custom card style

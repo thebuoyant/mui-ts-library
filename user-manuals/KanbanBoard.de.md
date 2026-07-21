@@ -16,6 +16,7 @@
 - **Überfälligkeits-Warnung**: Karten mit einem `dueDate` in der Vergangenheit erhalten automatisch einen roten Chip, Hintergrundton und linken Rahmen — steuerbar über `showDueDateWarning`.
 - **Subtasks**: Ein `subtasks`-Array an einer Aufgabe setzen — auf der Karte erscheint ein Fortschrittsbalken (`2 / 5 ✓`), im Bearbeiten/Hinzufügen-Dialog eine Checkliste.
 - **Filter / Suche**: `showSearchField={true}` für ein eingebautes Suchfeld, oder `filterText` übergeben für eigenes Suchfeld (eigene Platzierung, Debouncing, etc.).
+- **Spalten-Management**: `enableColumnManagement={true}` setzen, um Nutzern das direkte Hinzufügen, Umbenennen und Löschen von Spalten im Board zu ermöglichen — kein externer Dialog nötig.
 - **Drag & Drop** (via `@dnd-kit`): Karte greifen und in eine beliebige Spalte ziehen. Neuordnung innerhalb einer Spalte wird ebenfalls unterstützt.
 - **Eingebaute Dialoge**: Klick auf eine Karte öffnet den Bearbeiten-Dialog; Klick auf „+ Karte hinzufügen" in einer Spalte öffnet den Hinzufügen-Dialog. Ein Lösch-Bestätigungsdialog ist über den Bearbeiten-Dialog erreichbar.
 - **WIP-Limits**: `wipLimit` an einer Spalte setzen — der Anzahl-Chip wird rot, wenn das Limit überschritten wird.
@@ -66,6 +67,11 @@ Jede Drag-and-Drop-Aktion sowie jedes Hinzufügen, Bearbeiten und Löschen ruft 
 | `onTaskUpdated` | `(task: KanbanTask) => void` | — | Wird aufgerufen, nachdem eine vorhandene Karte über den Bearbeiten-Dialog gespeichert wurde. |
 | `onTaskDeleted` | `(taskId: string) => void` | — | Wird aufgerufen, nachdem eine Karte über die Löschbestätigung gelöscht wurde. |
 | `onTaskMoved` | `(task: KanbanTask, fromColumnId: string, toColumnId: string) => void` | — | Wird aufgerufen, wenn eine Karte per Drag & Drop in eine **andere Spalte** verschoben wird. Feuert nicht bei Neuordnung innerhalb derselben Spalte oder bei dialog-basierter Status-Änderung — dafür ist `onTaskUpdated` zuständig. |
+| `enableColumnManagement` | `boolean` | `false` | Wenn `true`, werden Umbenennen-/Löschen-Icon-Buttons bei Hover im Spalten-Header angezeigt sowie ein „Spalte hinzufügen"-Button am Ende des Boards. Erfordert `enableBuiltinDialogs={true}`. |
+| `onColumnsChange` | `(columns: KanbanColumn[]) => void` | — | Wird nach jedem Spalten-Add, -Rename oder -Delete mit der vollständigen aktualisierten Spalten-Liste aufgerufen. |
+| `onColumnAdd` | `(column: KanbanColumn) => void` | — | Wird aufgerufen, nachdem eine neue Spalte über das eingebaute UI hinzugefügt wurde. |
+| `onColumnUpdate` | `(column: KanbanColumn) => void` | — | Wird aufgerufen, nachdem ein Spalten-Label über Inline-Rename geändert wurde. |
+| `onColumnDelete` | `(columnId: string) => void` | — | Wird aufgerufen, nachdem eine Spalte (und alle ihre Karten) gelöscht wurde. |
 | `showSearchField` | `boolean` | `false` | Rendert ein eingebautes `size="small"`-Suchfeld über dem Board. Das Board verwaltet den Suchzustand intern — kein zusätzliches Wiring nötig. Placeholder via `translation.searchFieldPlaceholder` anpassbar. |
 | `filterText` | `string` | `""` | Filtert sichtbare Karten nach Titel und Zuständiger Person (Groß-/Kleinschreibung egal, Substring-Suche). Der Consumer rendert und verwaltet das Suchfeld selbst. Hat Vorrang vor dem eingebauten Feld wenn beide genutzt werden. Spalten-Counter zeigen die gefilterte Anzahl; WIP-Limit-Prüfungen nutzen immer die ungefilterte Gesamtanzahl. |
 | `showPriority` | `boolean` | `true` | Prioritäts-Punkt auf Karten anzeigen. Keine Wirkung wenn eine Karte kein `priority`-Feld hat. |
@@ -275,6 +281,59 @@ Feature für das gesamte Board deaktivieren (versteckt den Balken auf Karten und
 
 ---
 
+## Spalten-Management (`enableColumnManagement`)
+
+`enableColumnManagement={true}` setzen, um Nutzern das direkte Hinzufügen, Umbenennen und Löschen von Spalten zu ermöglichen. Die Steuerelemente sind nur aktiv, wenn auch `enableBuiltinDialogs={true}` gesetzt ist.
+
+```tsx
+const [columns, setColumns] = useState<KanbanColumn[]>([
+  { id: "todo",        label: "Zu erledigen", color: "#9e9e9e" },
+  { id: "in-progress", label: "In Arbeit",    color: "#2196f3" },
+  { id: "done",        label: "Erledigt",     color: "#4caf50" },
+]);
+const [tasks, setTasks] = useState<KanbanTask[]>(initialTasks);
+
+<KanbanBoard
+  columns={columns}
+  tasks={tasks}
+  enableColumnManagement
+  onColumnsChange={setColumns}
+  onTasksChange={setTasks}
+  onColumnAdd={(col) => api.post("/columns", col)}
+  onColumnUpdate={(col) => api.patch(`/columns/${col.id}`, col)}
+  onColumnDelete={(id) => api.delete(`/columns/${id}`)}
+/>
+```
+
+### Was das UI bietet
+
+| Interaktion | Funktionsweise |
+|---|---|
+| **Umbenennen** | Hover über den Spalten-Header → ✏️-Icon klicken → Titel wird zu einem Inline-`TextField`. `Enter` oder Klick außerhalb speichert; `Escape` bricht ab. |
+| **Löschen** | Hover über den Spalten-Header → 🗑️-Icon klicken → Bestätigungsdialog erscheint. Enthält die Spalte Karten, wird die Anzahl als Warnung angezeigt. |
+| **Hinzufügen** | Am rechten Ende der Spalten-Reihe erscheint ein „Spalte hinzufügen"-Button. Klick → Namen eingeben → `Enter` oder **Speichern**. Die Spalten-ID wird automatisch generiert. |
+
+### Löschen einer Spalte entfernt auch deren Karten
+
+Beim Löschen einer Spalte werden alle Aufgaben mit `status === columnId` dauerhaft entfernt. Beide Callbacks `onColumnDelete` und `onTasksChange` feuern — beide verdrahten um den State konsistent zu halten:
+
+```tsx
+<KanbanBoard
+  ...
+  enableColumnManagement
+  onColumnDelete={(id) => api.deleteColumnAndTasks(id)}
+  onTasksChange={setTasks}
+  onColumnsChange={setColumns}
+/>
+```
+
+**Hinweise:**
+- `enableColumnManagement` ist standardmäßig `false` — bestehende Boards sind nicht betroffen.
+- Die `id` einer neuen Spalte wird per `crypto.randomUUID()` generiert.
+- Spaltenfarben können nicht über das eingebaute UI gesetzt werden — nach dem Erstellen programmatisch via `onColumnsChange` setzen.
+
+---
+
 ## Karten filtern (`showSearchField` / `filterText`)
 
 Es gibt zwei Wege zum Filtern — je nach Anwendungsfall:
@@ -407,6 +466,12 @@ Der `dialogDeleteConfirm`-String unterstützt den Platzhalter `{title}` — er w
 | `dialogFieldSubtasks` | `"Subtasks"` | Abschnitts-Label der Subtask-Checkliste im Hinzufügen/Bearbeiten-Dialog |
 | `dialogSubtaskAdd` | `"Add subtask"` | Placeholder des „Subtask hinzufügen"-Eingabefelds im Dialog |
 | `cardSubtaskAdd` | `"Add subtask"` | Tooltip des `+`-Buttons, der beim Hover in der Fortschrittszeile der Karte erscheint |
+| `columnAddLabel` | `"Add column"` | Beschriftung des „Spalte hinzufügen"-Buttons (`enableColumnManagement`) |
+| `columnAddPlaceholder` | `"Column name"` | Placeholder im Spalte-hinzufügen-Dialog |
+| `columnDeleteConfirm` | `'Delete column "{label}"?'` | Titel des Bestätigungsdialogs — `{label}` wird durch den Spaltennamen ersetzt |
+| `columnDeleteCardsWarning` | `'{count} card(s) in this column will also be deleted.'` | Warnzeile wenn die Spalte Karten enthält — `{count}` wird durch die Anzahl ersetzt |
+| `columnRenameTooltip` | `"Rename"` | Tooltip des ✏️-Umbenennen-Icons im Spalten-Header |
+| `columnDeleteTooltip` | `"Delete column"` | Tooltip des 🗑️-Löschen-Icons im Spalten-Header |
 
 ---
 
@@ -434,6 +499,8 @@ import { kanbanBoardClasses } from "mui-ts-library";
 // kanbanBoardClasses.addButton        → "MuiTsKanbanBoard-addButton"
 // kanbanBoardClasses.searchFieldWrapper → "MuiTsKanbanBoard-searchFieldWrapper"
 // kanbanBoardClasses.searchField        → "MuiTsKanbanBoard-searchField"
+// kanbanBoardClasses.columnActions      → "MuiTsKanbanBoard-columnActions"
+// kanbanBoardClasses.columnAddButton    → "MuiTsKanbanBoard-columnAddButton"
 ```
 
 ### Beispiel: individuelle Kartenstile

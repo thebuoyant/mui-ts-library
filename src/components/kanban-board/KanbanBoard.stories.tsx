@@ -54,19 +54,25 @@ const meta: Meta<typeof KanbanBoard> = {
     onTaskDeleted:        fn(),
     onTaskMoved:          fn(),
     onCardClick:          fn(),
+    enableColumnManagement: false,
+    onColumnsChange:      fn(),
+    onColumnAdd:          fn(),
+    onColumnUpdate:       fn(),
+    onColumnDelete:       fn(),
   },
   argTypes: {
-    chipVariant:          { control: "radio", options: ["outlined", "filled"] },
-    enableBuiltinDialogs: { control: "boolean" },
-    filterText:           { control: "text" },
-    showSearchField:      { control: "boolean" },
-    height:               { control: "number" },
-    showAssignee:         { control: "boolean" },
-    showDueDate:          { control: "boolean" },
-    showDueDateWarning:   { control: "boolean" },
-    showPriority:         { control: "boolean" },
-    showSubtasks:         { control: "boolean" },
-    width:                { control: "text" },
+    chipVariant:            { control: "radio", options: ["outlined", "filled"] },
+    enableBuiltinDialogs:   { control: "boolean" },
+    enableColumnManagement: { control: "boolean" },
+    filterText:             { control: "text" },
+    showSearchField:        { control: "boolean" },
+    height:                 { control: "number" },
+    showAssignee:           { control: "boolean" },
+    showDueDate:            { control: "boolean" },
+    showDueDateWarning:     { control: "boolean" },
+    showPriority:           { control: "boolean" },
+    showSubtasks:           { control: "boolean" },
+    width:                  { control: "text" },
     // Complex objects — use dedicated stories instead.
     columns:              { control: false },
     tasks:                { control: false },
@@ -78,6 +84,10 @@ const meta: Meta<typeof KanbanBoard> = {
     onTaskMoved:          { control: false },
     onTasksChange:        { control: false },
     onTaskUpdated:        { control: false },
+    onColumnsChange:      { control: false },
+    onColumnAdd:          { control: false },
+    onColumnUpdate:       { control: false },
+    onColumnDelete:       { control: false },
   },
   parameters: {
     controls: { sort: "alpha" },
@@ -272,6 +282,36 @@ export const WithSubtasks: Story = {
   render: (args) => <WithSubtasksStory {...args} />,
 };
 
+function ColumnManagementStory(args: ComponentProps<typeof KanbanBoard>) {
+  const [columns, setColumns] = useState(DEFAULT_COLUMNS);
+  const [tasks, setTasks]     = useState<KanbanTask[]>(DEFAULT_TASKS);
+  return (
+    <KanbanBoard
+      {...args}
+      columns={columns}
+      tasks={tasks}
+      onColumnsChange={(updated) => { setColumns(updated); args.onColumnsChange?.(updated); }}
+      onColumnAdd={(col) => args.onColumnAdd?.(col)}
+      onColumnUpdate={(col) => args.onColumnUpdate?.(col)}
+      onColumnDelete={(id) => args.onColumnDelete?.(id)}
+      onTasksChange={(updated) => { setTasks(updated); args.onTasksChange?.(updated); }}
+      onTaskCreated={(task) => args.onTaskCreated?.(task)}
+      onTaskUpdated={(task) => args.onTaskUpdated?.(task)}
+      onTaskDeleted={(id) => args.onTaskDeleted?.(id)}
+      onTaskMoved={(task, from, to) => args.onTaskMoved?.(task, from, to)}
+    />
+  );
+}
+
+export const ColumnManagement: Story = {
+  name: "Column management — add / rename / delete (live)",
+  render: (args) => <ColumnManagementStory {...args} />,
+  args: {
+    enableColumnManagement: true,
+    height: 560,
+  },
+};
+
 export const FilterSearch: Story = {
   name: "Filter / Suche — built-in field (showSearchField)",
   args: {
@@ -322,6 +362,7 @@ export const FilterSearchExternal: Story = {
 export const GermanLabels: Story = {
   name: "German labels",
   args: {
+    enableColumnManagement: true,
     translation: {
       addCardLabel:           "Karte hinzufügen",
       dialogAddTitle:         "Karte hinzufügen",
@@ -341,12 +382,18 @@ export const GermanLabels: Story = {
       dialogFieldSubtasks:    "Teilaufgaben",
       dialogSubtaskAdd:       "Teilaufgabe hinzufügen",
       cardSubtaskAdd:         "Teilaufgabe hinzufügen",
+      columnAddLabel:           "Spalte hinzufügen",
+      columnAddPlaceholder:     "Spaltenname",
+      columnDeleteConfirm:      'Spalte "{label}" löschen?',
+      columnDeleteCardsWarning: '{count} Karte(n) in dieser Spalte werden ebenfalls gelöscht.',
+      columnRenameTooltip:      "Umbenennen",
+      columnDeleteTooltip:      "Spalte löschen",
     },
     columns: [
       { id: "todo",        label: "Zu erledigen", color: "#9e9e9e" },
       { id: "in-progress", label: "In Arbeit",    color: "#2196f3" },
       { id: "review",      label: "In Prüfung",   color: "#ff9800" },
-      { id: "done",        label: "Erledigt",      color: "#4caf50" },
+      { id: "done",        label: "Erledigt",     color: "#4caf50" },
     ],
   },
 };

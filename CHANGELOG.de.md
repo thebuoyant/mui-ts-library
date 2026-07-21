@@ -11,6 +11,10 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unveröffentlicht]
 
+### Hinzugefügt
+
+- **KanbanBoard — Spalten-Management-UI (`enableColumnManagement`)**: Neues Opt-in-Prop (Standard `false`). Wenn aktiviert, erhalten Spalten-Header bei Hover Umbenennen-✏️- und Löschen-🗑️-Icon-Buttons; am rechten Ende des Boards erscheint ein „Spalte hinzufügen"-Ghost-Button. Das Umbenennen erfolgt inline im Header (Enter/Blur zum Speichern, Escape zum Abbrechen). Beim Löschen erscheint ein Bestätigungsdialog mit Karten-Anzahl-Warnung. Löschen einer Spalte entfernt auch alle ihre Karten und feuert `onTasksChange`. Neue Callbacks: `onColumnsChange`, `onColumnAdd`, `onColumnUpdate`, `onColumnDelete`. Sechs neue Translation-Keys: `columnAddLabel`, `columnAddPlaceholder`, `columnDeleteConfirm`, `columnDeleteCardsWarning`, `columnRenameTooltip`, `columnDeleteTooltip`. Zwei neue CSS-Klassen: `MuiTsKanbanBoard-columnActions`, `MuiTsKanbanBoard-columnAddButton`.
+
 ---
 
 ## [3.35.0] — 2026-07-20

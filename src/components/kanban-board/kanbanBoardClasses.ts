@@ -54,4 +54,8 @@ export const kanbanBoardClasses = {
   cardSubtasks:         "MuiTsKanbanBoard-cardSubtasks",
   /** The LinearProgress bar inside the subtask row. */
   cardSubtasksBar:      "MuiTsKanbanBoard-cardSubtasksBar",
+  /** The edit / delete icon row that appears on column header hover (`enableColumnManagement`). */
+  columnActions:        "MuiTsKanbanBoard-columnActions",
+  /** The "Add column" ghost button at the end of the columns row (`enableColumnManagement`). */
+  columnAddButton:      "MuiTsKanbanBoard-columnAddButton",
 } as const;

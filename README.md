@@ -104,7 +104,7 @@ const tasks: GanttTask[] = [
 
 ### KanbanBoard
 
-A drag-and-drop Kanban board with built-in Add / Edit / Delete dialogs, WIP limits, and full i18n. Use it for task management dashboards, sprint boards, or any workflow where users move work items between status columns — with card colors, priority dots, assignee chips, due-date chips with overdue highlighting, a subtask checklist with progress bar, and a built-in search field (`showSearchField`) or controlled `filterText` prop for live card filtering.
+A drag-and-drop Kanban board with built-in Add / Edit / Delete dialogs, WIP limits, and full i18n. Use it for task management dashboards, sprint boards, or any workflow where users move work items between status columns — with card colors, priority dots, assignee chips, due-date chips with overdue highlighting, a subtask checklist with progress bar, a built-in search field (`showSearchField`) or controlled `filterText` prop for live card filtering, and optional column management (`enableColumnManagement`) for adding, renaming, and deleting columns directly in the board.
 
 ```tsx
 import { KanbanBoard } from '@thebuoyant-tsdev/mui-ts-library';
@@ -554,6 +554,13 @@ This project follows [Semantic Versioning](https://semver.org/):
 ---
 
 ## Changelog
+
+### [Unreleased]
+
+**Added**
+- **KanbanBoard — column management UI (`enableColumnManagement`)**: New opt-in prop (default `false`). When enabled, column headers show inline Rename / Delete icon buttons on hover and an "Add column" button appears at the right end of the board. Rename is inline in the header; delete shows a confirmation dialog with card-count warning. Deleting a column also removes all its cards. New callbacks: `onColumnsChange`, `onColumnAdd`, `onColumnUpdate`, `onColumnDelete`. Six new translation keys (`columnAddLabel`, `columnAddPlaceholder`, `columnDeleteConfirm`, `columnDeleteCardsWarning`, `columnRenameTooltip`, `columnDeleteTooltip`). Two new CSS classes: `MuiTsKanbanBoard-columnActions`, `MuiTsKanbanBoard-columnAddButton`. See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.
+
+---
 
 ### [3.35.0] — 2026-07-20
 

@@ -1,7 +1,10 @@
+import { useState } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import AddIcon from "@mui/icons-material/Add";
-import { Box, Button, Chip, Typography } from "@mui/material";
+import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import { Box, Button, Chip, IconButton, TextField, Tooltip, Typography } from "@mui/material";
 import type { KanbanBoardTranslation, KanbanColumn, KanbanTask } from "./KanbanBoard.types";
 import { KanbanBoardCard } from "./KanbanBoardCard";
 import { kanbanBoardClasses } from "./kanbanBoardClasses";
@@ -19,8 +22,11 @@ type KanbanBoardColumnProps = {
   chipVariant: "outlined" | "filled";
   t: Required<KanbanBoardTranslation>;
   enableBuiltinDialogs: boolean;
+  enableColumnManagement: boolean;
   onCardClick: (task: KanbanTask) => void;
   onAddClick: (columnId: string) => void;
+  onColumnRename: (columnId: string, newLabel: string) => void;
+  onColumnDeleteRequest: (columnId: string) => void;
 };
 
 export function KanbanBoardColumn({
@@ -35,10 +41,31 @@ export function KanbanBoardColumn({
   chipVariant,
   t,
   enableBuiltinDialogs,
+  enableColumnManagement,
   onCardClick,
   onAddClick,
+  onColumnRename,
+  onColumnDeleteRequest,
 }: KanbanBoardColumnProps) {
   const { setNodeRef, isOver } = useDroppable({ id: column.id });
+
+  const [isRenaming, setIsRenaming]   = useState(false);
+  const [renameValue, setRenameValue] = useState(column.label);
+
+  function commitRename() {
+    const trimmed = renameValue.trim();
+    if (trimmed && trimmed !== column.label) {
+      onColumnRename(column.id, trimmed);
+    } else {
+      setRenameValue(column.label);
+    }
+    setIsRenaming(false);
+  }
+
+  function startRename() {
+    setRenameValue(column.label);
+    setIsRenaming(true);
+  }
 
   const isOverLimit = column.wipLimit !== undefined && totalCount > column.wipLimit;
   const countLabel = column.wipLimit !== undefined
@@ -79,13 +106,29 @@ export function KanbanBoardColumn({
           bgcolor: (theme) => theme.palette.mode === "dark" ? "grey.800" : "grey.300",
         }}
       >
-        <Typography
-          className={kanbanBoardClasses.columnTitle}
-          variant="subtitle2"
-          sx={{ flex: 1, fontWeight: 700 }}
-        >
-          {column.label}
-        </Typography>
+        {isRenaming ? (
+          <TextField
+            autoFocus
+            size="small"
+            value={renameValue}
+            onChange={(e) => setRenameValue((e.target as HTMLInputElement).value)}
+            onBlur={commitRename}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") { e.preventDefault(); commitRename(); }
+              if (e.key === "Escape") { setRenameValue(column.label); setIsRenaming(false); }
+            }}
+            sx={{ flex: 1, "& .MuiInputBase-input": { fontWeight: 700, fontSize: "0.875rem", py: 0.5 } }}
+            slotProps={{ htmlInput: { "aria-label": t.columnRenameTooltip } }}
+          />
+        ) : (
+          <Typography
+            className={kanbanBoardClasses.columnTitle}
+            variant="subtitle2"
+            sx={{ flex: 1, fontWeight: 700 }}
+          >
+            {column.label}
+          </Typography>
+        )}
         <Chip
           className={kanbanBoardClasses.columnCount}
           label={countLabel}
@@ -101,6 +144,27 @@ export function KanbanBoardColumn({
           }}
           aria-label={`${tasks.length} cards${column.wipLimit ? ` of ${column.wipLimit} limit` : ""}${tasks.length !== totalCount ? ` (${totalCount} total)` : ""}`}
         />
+        {enableColumnManagement && !isRenaming && (
+          <Box
+            className={kanbanBoardClasses.columnActions}
+            sx={{ display: "flex", gap: 0.25 }}
+          >
+            <Tooltip title={t.columnRenameTooltip}>
+              <IconButton size="small" onClick={startRename} sx={{ p: 0.25 }}>
+                <EditOutlinedIcon sx={{ fontSize: 18 }} />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t.columnDeleteTooltip}>
+              <IconButton
+                size="small"
+                onClick={() => onColumnDeleteRequest(column.id)}
+                sx={{ p: 0.25, color: "error.main" }}
+              >
+                <DeleteOutlinedIcon sx={{ fontSize: 18 }} />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        )}
       </Box>
 
       {/* Card list — background slightly lighter than cards to create contrast */}

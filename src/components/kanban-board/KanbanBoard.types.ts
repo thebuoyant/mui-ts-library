@@ -56,6 +56,18 @@ export type KanbanBoardTranslation = {
   dialogSubtaskAdd: string;
   /** Tooltip for the "+" button on the card's subtask progress bar. */
   cardSubtaskAdd: string;
+  /** Button label for the "Add column" ghost button (`enableColumnManagement`). */
+  columnAddLabel: string;
+  /** Placeholder inside the add-column dialog text field. */
+  columnAddPlaceholder: string;
+  /** Confirmation dialog title when deleting a column. "{label}" → column name. */
+  columnDeleteConfirm: string;
+  /** Warning line shown when the column being deleted still has cards. "{count}" → number of cards. */
+  columnDeleteCardsWarning: string;
+  /** Tooltip on the rename icon in the column header. */
+  columnRenameTooltip: string;
+  /** Tooltip on the delete icon in the column header. */
+  columnDeleteTooltip: string;
 };
 
 export const DEFAULT_KANBAN_BOARD_TRANSLATION: Required<KanbanBoardTranslation> = {
@@ -77,6 +89,12 @@ export const DEFAULT_KANBAN_BOARD_TRANSLATION: Required<KanbanBoardTranslation> 
   dialogFieldSubtasks:    "Subtasks",
   dialogSubtaskAdd:       "Add subtask",
   cardSubtaskAdd:         "Add subtask",
+  columnAddLabel:           "Add column",
+  columnAddPlaceholder:     "Column name",
+  columnDeleteConfirm:      'Delete column "{label}"?',
+  columnDeleteCardsWarning: '{count} card(s) in this column will also be deleted.',
+  columnRenameTooltip:      "Rename",
+  columnDeleteTooltip:      "Delete column",
 };
 
 export type KanbanBoardProps = {
@@ -156,6 +174,25 @@ export type KanbanBoardProps = {
    * Alternative: set `showSearchField={true}` to let the board render a built-in field.
    */
   filterText?: string;
+  /**
+   * When `true`, shows inline rename / delete controls on column headers and an
+   * "Add column" button at the end of the board. Default: `false`.
+   *
+   * Requires `enableBuiltinDialogs` to be `true` (the controls are suppressed
+   * when built-in dialogs are disabled).
+   */
+  enableColumnManagement?: boolean;
+  /**
+   * Called after every column add, rename, or delete with the full updated column list.
+   * Mirror of `onTasksChange` for columns.
+   */
+  onColumnsChange?: (columns: KanbanColumn[]) => void;
+  /** Called after a new column is added via the built-in UI. */
+  onColumnAdd?: (column: KanbanColumn) => void;
+  /** Called after a column label is changed via the inline rename. */
+  onColumnUpdate?: (column: KanbanColumn) => void;
+  /** Called after a column (and all its cards) is deleted via the built-in UI. */
+  onColumnDelete?: (columnId: string) => void;
   /** Width of the board. Default: "100%". */
   width?: number | string;
   /** Height of the board. Default: "100%". */
