@@ -104,9 +104,6 @@ export function KanbanBoardColumn({
           borderColor: "divider",
           borderTop: `3px solid ${column.color ?? "transparent"}`,
           bgcolor: (theme) => theme.palette.mode === "dark" ? "grey.800" : "grey.300",
-          "&:hover .MuiTsKanbanBoard-columnActions": {
-            opacity: 1,
-          },
         }}
       >
         {isRenaming ? (
@@ -150,11 +147,11 @@ export function KanbanBoardColumn({
         {enableColumnManagement && !isRenaming && (
           <Box
             className={kanbanBoardClasses.columnActions}
-            sx={{ display: "flex", gap: 0.25, opacity: 0, transition: "opacity 0.15s" }}
+            sx={{ display: "flex", gap: 0.25 }}
           >
             <Tooltip title={t.columnRenameTooltip}>
               <IconButton size="small" onClick={startRename} sx={{ p: 0.25 }}>
-                <EditOutlinedIcon sx={{ fontSize: 15 }} />
+                <EditOutlinedIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </Tooltip>
             <Tooltip title={t.columnDeleteTooltip}>
@@ -163,7 +160,7 @@ export function KanbanBoardColumn({
                 onClick={() => onColumnDeleteRequest(column.id)}
                 sx={{ p: 0.25, color: "error.main" }}
               >
-                <DeleteOutlinedIcon sx={{ fontSize: 15 }} />
+                <DeleteOutlinedIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </Tooltip>
           </Box>
