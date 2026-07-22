@@ -19,9 +19,9 @@
  */
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { useGanttChartStore, useRawGanttChartStore, useGanttTranslations } from "../GanttChart";
+import { useGanttChartStore, useRawGanttChartStore, useGanttTranslations, useGanttWorkingDays } from "../GanttChart";
 import type { GanttTask, GanttTaskNode } from "../GanttChart.types";
-import { addDays } from "../util/gantt-chart.util";
+import { addDays, snapToNextWorkingDay, snapToPrevWorkingDay } from "../util/gantt-chart.util";
 import type { TimelineRange } from "../util/gantt-chart.util";
 
 const MS_PER_DAY = 86_400_000;
@@ -82,9 +82,10 @@ export function useGanttDrag({
   onTaskResized,
   onTasksChange,
 }: UseGanttDragOptions): UseGanttDragReturn {
-  const updateTask = useGanttChartStore((s) => s.updateTask);
-  const rawStore   = useRawGanttChartStore();
-  const t          = useGanttTranslations();
+  const updateTask     = useGanttChartStore((s) => s.updateTask);
+  const rawStore       = useRawGanttChartStore();
+  const t              = useGanttTranslations();
+  const workingDays    = useGanttWorkingDays();
 
   // Pixel pro Tag — als Ref damit mousemove-Closures immer den aktuellen Wert lesen.
   const dayWidthPxRef = useRef(1);
@@ -94,6 +95,7 @@ export function useGanttDrag({
   const onTaskMovedRef   = useRef(onTaskMoved);
   const onTaskResizedRef = useRef(onTaskResized);
   const onTasksChangeRef = useRef(onTasksChange);
+  const workingDaysRef   = useRef(workingDays);
 
   useLayoutEffect(() => {
     dayWidthPxRef.current =
@@ -104,6 +106,7 @@ export function useGanttDrag({
     onTaskMovedRef.current   = onTaskMoved;
     onTaskResizedRef.current = onTaskResized;
     onTasksChangeRef.current = onTasksChange;
+    workingDaysRef.current   = workingDays;
   });
 
   // Zwei-Ebenen State (Muster 2)
@@ -167,16 +170,30 @@ export function useGanttDrag({
       if (init && drag && suppressClickRef.current && drag.deltaDays !== 0) {
         const currentTask = rawStore.getState().tasks.find((t) => t.id === init.taskId);
         if (currentTask) {
+          const { workdays: wd, normalizedHolidays: nh } = workingDaysRef.current;
+          const snapEnabled = wd.length > 0;
+
           if (drag.type === "move") {
-            const newStart = addDays(init.originalStart, drag.deltaDays);
-            const newEnd   = addDays(init.originalEnd,   drag.deltaDays);
+            let newStart = addDays(init.originalStart, drag.deltaDays);
+            let newEnd   = addDays(init.originalEnd,   drag.deltaDays);
+            if (snapEnabled) {
+              const snapped = snapToNextWorkingDay(newStart, wd, nh);
+              const offset  = snapped.getTime() - newStart.getTime();
+              newStart = snapped;
+              newEnd   = new Date(newEnd.getTime() + offset);
+            }
             updateTask({ ...currentTask, startDate: newStart, endDate: newEnd });
             onTaskMovedRef.current?.(currentTask, newStart, newEnd);
           } else {
+            // resize — endDate anpassen, auf letzten Arbeitstag rückwärts snappen
             const rawNewEnd = addDays(init.originalEnd, drag.deltaDays);
-            const newEnd    = rawNewEnd > init.originalStart
-              ? rawNewEnd
-              : addDays(init.originalStart, 1);
+            let newEnd = rawNewEnd > init.originalStart ? rawNewEnd : addDays(init.originalStart, 1);
+            if (snapEnabled) {
+              const snapped = snapToPrevWorkingDay(newEnd, wd, nh);
+              newEnd = snapped > init.originalStart
+                ? snapped
+                : snapToNextWorkingDay(addDays(init.originalStart, 1), wd, nh);
+            }
             updateTask({ ...currentTask, endDate: newEnd });
             onTaskResizedRef.current?.(currentTask, newEnd);
           }

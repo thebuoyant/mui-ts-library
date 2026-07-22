@@ -228,6 +228,18 @@ export type GanttChartProps = {
   virtualizeRows?: boolean;
   /** Show the Assignee column in the task panel (default: false) */
   showAssigneeColumn?: boolean;
+  /**
+   * Arbeitstag-Wochentag-Indices (0=So, 1=Mo … 6=Sa). Default: [1,2,3,4,5] (Mo–Fr).
+   * Steuert welche Tage als Arbeitstage gelten — beeinflusst Wochenend-Highlights,
+   * Drag-Snap (Start/End landen immer auf einem Arbeitstag) und Cascade-Advance.
+   */
+  workdays?: number[];
+  /**
+   * Konkrete Feiertage (z. B. gesetzliche Feiertage, Betriebsferien) die als
+   * Nicht-Arbeitstage gelten, unabhängig davon welcher Wochentag sie sind.
+   * Werden in der Tages-Skala grau hinterlegt und mit einem Punkt markiert.
+   */
+  holidays?: Date[];
   /** Breite des Charts. "auto" = 100 % des Eltern-Containers. Standard: "100%". */
   width?: number | string;
   // Wenn true, ändert Strg+Mausrad die Zeitskala (days ↔ weeks ↔ months ↔ quarters).

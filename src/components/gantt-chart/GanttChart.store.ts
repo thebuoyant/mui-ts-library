@@ -66,6 +66,8 @@ export function createGanttChartStore(
   initialExpandAll = false,
   initialRange?: TimelineRange,
   cascadeDependencies = false,
+  workdays: number[] = [],
+  normalizedHolidays: Set<string> = new Set(),
 ) {
   const autoRange = getTimelineRange(initialTasks);
 
@@ -115,7 +117,11 @@ export function createGanttChartStore(
 
         if (state.cascadeDependencies && original) {
           const deltaMs = task.endDate.getTime() - original.endDate.getTime();
-          tasks = cascadeDateUpdate(tasks, task.id, deltaMs);
+          tasks = cascadeDateUpdate(
+            tasks, task.id, deltaMs,
+            workdays.length > 0 ? workdays : undefined,
+            workdays.length > 0 ? normalizedHolidays : undefined,
+          );
         }
 
         let timelineRange = expandRangeForTask(state.timelineRange, task);

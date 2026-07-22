@@ -6,6 +6,8 @@ export type HeaderColumn = {
   label: string;
   width: number;
   isWeekend?: boolean;
+  /** Markiert einen gesetzlichen Feiertag — erhält denselben Grau-Hintergrund wie Wochenenden. */
+  isHoliday?: boolean;
 };
 
 // Obere Gruppenzeile für den Zwei-Ebenen-Header (z. B. Monate über Tages-Spalten).
@@ -26,32 +28,51 @@ type GanttTimelineHeaderProps = {
   todayColor?:   string;
 };
 
-function HeaderRow({ items }: { items: Array<{ key: string; label: string; width: number; isWeekend?: boolean }> }) {
+function HeaderRow({ items }: { items: Array<{ key: string; label: string; width: number; isWeekend?: boolean; isHoliday?: boolean }> }) {
   return (
     <Box sx={{ display: "flex" }}>
-      {items.map((item) => (
-        <Box
-          key={item.key}
-          sx={{
-            width: item.width,
-            flexShrink: 0,
-            height: HEADER_HEIGHT,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRight: "1px solid",
-            borderColor: "divider",
-            bgcolor: item.isWeekend ? "action.hover" : "transparent",
-          }}
-        >
-          <Typography
-            variant="caption"
-            color={item.isWeekend ? "text.disabled" : "text.secondary"}
+      {items.map((item) => {
+        const nonWorking = item.isWeekend || item.isHoliday;
+        return (
+          <Box
+            key={item.key}
+            sx={{
+              width: item.width,
+              flexShrink: 0,
+              height: HEADER_HEIGHT,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRight: "1px solid",
+              borderColor: "divider",
+              bgcolor: nonWorking ? "action.hover" : "transparent",
+              position: "relative",
+            }}
           >
-            {item.label}
-          </Typography>
-        </Box>
-      ))}
+            <Typography
+              variant="caption"
+              color={nonWorking ? "text.disabled" : "text.secondary"}
+            >
+              {item.label}
+            </Typography>
+            {item.isHoliday && !item.isWeekend && (
+              <Box
+                sx={{
+                  position: "absolute",
+                  bottom: 3,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  width: 4,
+                  height: 4,
+                  borderRadius: "50%",
+                  bgcolor: "warning.main",
+                  opacity: 0.8,
+                }}
+              />
+            )}
+          </Box>
+        );
+      })}
     </Box>
   );
 }

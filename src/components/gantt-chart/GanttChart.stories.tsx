@@ -232,6 +232,7 @@ const meta: Meta<typeof GanttChart> = {
     draggable:            { control: "boolean" },
     enableBuiltinDialogs: { control: "boolean" },
     ganttTheme:           { control: false },
+    holidays:             { control: false },
     height:               { control: "text" },
     initialExpandAll:     { control: "boolean" },
     inlineEdit:           { control: "boolean" },
@@ -249,6 +250,7 @@ const meta: Meta<typeof GanttChart> = {
     translations:         { control: false },
     virtualizeRows:       { control: "boolean" },
     width:                { control: "text" },
+    workdays:             { control: false },
     zoomable:             { control: "boolean" },
     // Callbacks A–Z
     onAddTask:            { control: false },
@@ -1072,6 +1074,87 @@ export const MarketingCampaignLaunch: Story = {
     timeScale: "weeks",
     initialExpandAll: true,
     height: 480,
+  },
+  render: (args) => (
+    <Box sx={{ width: "100%" }}>
+      <GanttChart {...args} />
+    </Box>
+  ),
+};
+
+// ---------------------------------------------------------------------------
+// WorkingDays — Arbeitstage & Feiertage
+// ---------------------------------------------------------------------------
+
+const DE_HOLIDAYS_2025 = [
+  new Date("2025-12-24"), // Heiligabend (kein gesetzlicher Feiertag, aber häufig frei)
+  new Date("2025-12-25"), // 1. Weihnachtstag
+  new Date("2025-12-26"), // 2. Weihnachtstag
+  new Date("2026-01-01"), // Neujahr
+  new Date("2026-01-06"), // Heilige Drei Könige (BY, BW, ST)
+];
+
+const workdaysTasks: GanttTask[] = [
+  {
+    id: "sprint-a",
+    name: "Sprint A — Feature Development",
+    status: "in-progress",
+    startDate: new Date("2025-12-08"),
+    endDate: new Date("2025-12-19"),
+    progress: 60,
+  },
+  {
+    id: "sprint-b",
+    name: "Sprint B — Integration & Tests",
+    status: "planned",
+    startDate: new Date("2025-12-22"),
+    endDate: new Date("2026-01-09"),
+    dependencies: ["sprint-a"],
+  },
+  {
+    id: "sprint-c",
+    name: "Sprint C — Hardening",
+    status: "planned",
+    startDate: new Date("2026-01-12"),
+    endDate: new Date("2026-01-23"),
+    dependencies: ["sprint-b"],
+  },
+  {
+    id: "release",
+    name: "Release 1.0",
+    status: "planned",
+    isMilestone: true,
+    startDate: new Date("2026-01-26"),
+    endDate: new Date("2026-01-26"),
+    dependencies: ["sprint-c"],
+  },
+];
+
+export const WorkingDays: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '**Arbeitstage & Feiertage** — `workdays={[1,2,3,4,5]}` (Mo–Fr) + `holidays` für die ' +
+          'deutschen Weihnachtsfeiertage und Neujahr 2025/26. In der Tages-Skala werden Feiertage ' +
+          'grau hinterlegt und mit einem orangen Punkt markiert. Drag & Drop und Resize snappen ' +
+          'automatisch auf den nächsten/letzten Arbeitstag.',
+      },
+    },
+  },
+  args: {
+    tasks:              workdaysTasks,
+    workdays:           [1, 2, 3, 4, 5],
+    holidays:           DE_HOLIDAYS_2025,
+    timeScale:          "days",
+    draggable:          true,
+    resizable:          true,
+    cascadeDependencies: true,
+    initialExpandAll:   true,
+    height:             320,
+    defaultRangeStart:  new Date("2025-12-01"),
+    defaultRangeEnd:    new Date("2026-02-28"),
+    translations:       EN_TRANSLATIONS,
   },
   render: (args) => (
     <Box sx={{ width: "100%" }}>

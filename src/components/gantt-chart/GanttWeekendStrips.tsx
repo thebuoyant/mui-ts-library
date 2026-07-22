@@ -6,10 +6,15 @@ import { COLUMN_WIDTH_DAY } from "./GanttChart.constants";
 // Props
 // ---------------------------------------------------------------------------
 
-type WeekendStrip = { key: string; left: number };
+export type NonWorkingStrip = {
+  key:       string;
+  left:      number;
+  /** true = Feiertag (erhält zusätzlichen Punkt-Marker), false/undefined = Wochenende */
+  isHoliday?: boolean;
+};
 
 type GanttWeekendStripsProps = {
-  strips:     WeekendStrip[];
+  strips:     NonWorkingStrip[];
   totalWidth: number;
   height:     number;
   top:        number;
@@ -20,9 +25,10 @@ type GanttWeekendStripsProps = {
 // ---------------------------------------------------------------------------
 
 /**
- * Zeichnet halbtransparente Hintergrundstreifen für Wochenend-Spalten
- * in der Tages-Skala. Eigener Layer (pointerEvents: none) damit Klicks
- * auf Balken und Zeilen durchgehen.
+ * Zeichnet halbtransparente Hintergrundstreifen für nicht-arbeitende Tage
+ * (Wochenenden + Feiertage) in der Tages-Skala.
+ * Feiertage erhalten zusätzlich einen kleinen orangen Punkt oben im Streifen.
+ * Eigener Layer (pointerEvents: none) damit Klicks auf Balken und Zeilen durchgehen.
  */
 export function GanttWeekendStrips({ strips, totalWidth, height, top }: GanttWeekendStripsProps) {
   const { weekendColor } = useGanttTheme();
@@ -52,7 +58,23 @@ export function GanttWeekendStrips({ strips, totalWidth, height, top }: GanttWee
             height:   "100%",
             bgcolor:  weekendColor || "action.hover",
           }}
-        />
+        >
+          {strip.isHoliday && (
+            <Box
+              sx={{
+                position:        "absolute",
+                top:             6,
+                left:            "50%",
+                transform:       "translateX(-50%)",
+                width:           5,
+                height:          5,
+                borderRadius:    "50%",
+                bgcolor:         "warning.main",
+                opacity:         0.75,
+              }}
+            />
+          )}
+        </Box>
       ))}
     </Box>
   );

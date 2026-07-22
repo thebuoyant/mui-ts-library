@@ -192,14 +192,20 @@ function buildSuccessorMap(tasks: GanttTask[]): Map<string, string[]> {
  * Verschiebt alle Finish-to-Start-Nachfolger des geänderten Tasks um dasselbe Zeit-Delta.
  * Läuft via BFS durch den Abhängigkeitsgraphen — zyklische Abhängigkeiten werden durch
  * das `visited`-Set abgefangen.
+ *
+ * Wenn workdays + normalizedHolidays übergeben werden, wird der neue startDate jedes
+ * Nachfolgers auf den nächsten Arbeitstag geforwarded (bei gleicher Kalenderdauer).
  */
 export function cascadeDateUpdate(
   tasks: GanttTask[],
   changedTaskId: string,
   deltaMs: number,
+  workdays?: number[],
+  normalizedHolidays?: Set<string>,
 ): GanttTask[] {
   if (deltaMs === 0) return tasks;
 
+  const useWorkingDays = (workdays?.length ?? 0) > 0 && normalizedHolidays !== undefined;
   const successorMap = buildSuccessorMap(tasks);
   const updatedMap = new Map<string, GanttTask>(tasks.map((t) => [t.id, t]));
   const queue = [...(successorMap.get(changedTaskId) ?? [])];
@@ -211,12 +217,18 @@ export function cascadeDateUpdate(
     visited.add(succId);
 
     const succ = updatedMap.get(succId)!;
-    updatedMap.set(succId, {
-      ...succ,
-      startDate: new Date(succ.startDate.getTime() + deltaMs),
-      endDate: new Date(succ.endDate.getTime() + deltaMs),
-    });
+    const rawStart = new Date(succ.startDate.getTime() + deltaMs);
+    const rawEnd   = new Date(succ.endDate.getTime()   + deltaMs);
 
+    let newStart = rawStart;
+    let newEnd   = rawEnd;
+    if (useWorkingDays) {
+      const duration = succ.endDate.getTime() - succ.startDate.getTime();
+      newStart = snapToNextWorkingDay(rawStart, workdays!, normalizedHolidays!);
+      newEnd   = new Date(newStart.getTime() + duration);
+    }
+
+    updatedMap.set(succId, { ...succ, startDate: newStart, endDate: newEnd });
     queue.push(...(successorMap.get(succId) ?? []));
   }
 
@@ -300,6 +312,56 @@ export function getWeeksInRange(range: TimelineRange): Date[] {
   }
 
   return weeks;
+}
+
+// ---------------------------------------------------------------------------
+// Arbeitstag-Hilfsfunktionen
+// ---------------------------------------------------------------------------
+
+function toDateKey(d: Date): string {
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+}
+
+/** Konvertiert ein Date[]-Holiday-Array in ein O(1)-Lookup-Set. */
+export function normalizeHolidays(holidays: Date[]): Set<string> {
+  return new Set(holidays.map(toDateKey));
+}
+
+/**
+ * Gibt true zurück wenn das Datum ein Arbeitstag ist (Wochentag in `workdays` UND kein Feiertag).
+ * workdays: JS-Wochentag-Indices (0=So, 1=Mo … 6=Sa). Standard: [1,2,3,4,5].
+ * normalizedHolidays: Ergebnis von normalizeHolidays().
+ */
+export function isWorkingDay(date: Date, workdays: number[], normalizedHolidays: Set<string>): boolean {
+  if (!workdays.includes(date.getDay())) return false;
+  return !normalizedHolidays.has(toDateKey(date));
+}
+
+/**
+ * Gibt das nächste Datum (ab `date` vorwärts) zurück, das ein Arbeitstag ist.
+ * Wird für Start-Datum-Snap verwendet (frühester möglicher Arbeitstag).
+ * Guard (max. 14 Iterationen) verhindert Endlosschleifen bei leeren workdays.
+ */
+export function snapToNextWorkingDay(date: Date, workdays: number[], normalizedHolidays: Set<string>): Date {
+  let d = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
+  let guard = 0;
+  while (!isWorkingDay(d, workdays, normalizedHolidays) && guard++ < 14) {
+    d = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1, 0, 0, 0, 0);
+  }
+  return d;
+}
+
+/**
+ * Gibt das nächste Datum (ab `date` rückwärts) zurück, das ein Arbeitstag ist.
+ * Wird für End-Datum-Snap verwendet (letzter möglicher Arbeitstag).
+ */
+export function snapToPrevWorkingDay(date: Date, workdays: number[], normalizedHolidays: Set<string>): Date {
+  let d = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
+  let guard = 0;
+  while (!isWorkingDay(d, workdays, normalizedHolidays) && guard++ < 14) {
+    d = new Date(d.getFullYear(), d.getMonth(), d.getDate() - 1, 0, 0, 0, 0);
+  }
+  return d;
 }
 
 // ---------------------------------------------------------------------------
