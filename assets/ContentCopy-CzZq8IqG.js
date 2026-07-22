@@ -1,0 +1,1 @@
+import{i as e}from"./preload-helper-Cs4UwXAW.js";import{Z as t,q as n}from"./iframe-Bb8mcAY9.js";import{t as r}from"./createSvgIcon-CmGEPqU-.js";var i,a,o=e((()=>{r(),i=t(),a=n((0,i.jsx)(`path`,{d:`M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2m0 16H8V7h11z`}),`ContentCopy`)}));export{o as n,a as t};

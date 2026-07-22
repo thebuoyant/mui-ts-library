@@ -1,0 +1,1 @@
+import{i as e}from"./preload-helper-Cs4UwXAW.js";import{Z as t,q as n}from"./iframe-Bb8mcAY9.js";import{t as r}from"./createSvgIcon-CmGEPqU-.js";var i,a,o=e((()=>{r(),i=t(),a=n((0,i.jsx)(`path`,{d:`M5 20h14v-2H5zM19 9h-4V3H9v6H5l7 7z`}),`Download`)}));export{o as n,a as t};
