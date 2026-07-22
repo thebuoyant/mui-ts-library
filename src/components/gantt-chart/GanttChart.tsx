@@ -72,7 +72,7 @@ export type GanttWorkingDaysConfig = {
 };
 
 const DEFAULT_WORKING_DAYS_CONFIG: GanttWorkingDaysConfig = {
-  workdays: [1, 2, 3, 4, 5],
+  workdays: [],
   normalizedHolidays: new Set(),
 };
 
@@ -366,7 +366,7 @@ export function GanttChart({
   virtualizeRows = false,
   showAssigneeColumn = false,
   cascadeDependencies = false,
-  workdays = [1, 2, 3, 4, 5],
+  workdays = [],
   holidays = [],
   statusColors,
   ganttTheme,

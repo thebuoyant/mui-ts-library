@@ -48,6 +48,12 @@ Right-clicking a task bar opens a **context menu** to change its status without 
 
 ---
 
+> ### New (upcoming release)
+>
+> | Feature | Description | Jump to |
+> |---|---|---|
+> | **Working days & public holidays** | `workdays` (default Mon–Fri) and `holidays` (Date[]) make drag snap, cascade advance, and day-scale visuals working-day-aware. Holidays render amber; weekends remain grey. | [→ Working days & public holidays](#working-days--public-holidays) |
+
 > ### New in v3.25.0
 >
 > | Feature | Description | Jump to |
@@ -229,6 +235,8 @@ type GanttTask = {
 | `translations` | `Partial<GanttTranslations>` | DE/EN mix | Override any UI text. See [Translations](#translations). |
 | `virtualizeRows` | `boolean` | `false` | Virtual list — recommended for 200+ tasks. |
 | `width` | `number \| string` | `"100%"` | Total chart width. |
+| `workdays` | `number[]` | `[]` | Working day indices (0 = Sun, 1 = Mon … 6 = Sat). When set, enables drag snap (start/end always land on a working day), cascade advance, and distinct day-scale column colors. Typical value: `[1,2,3,4,5]` for Mon–Fri. |
+| `holidays` | `Date[]` | `[]` | Specific dates treated as non-working days (public holidays, company closures), regardless of weekday. Shown amber in the day scale (distinct from grey weekends). |
 | `zoomable` | `boolean` | `false` | `Ctrl / Cmd ⌘+Scroll` cycles through time scales. |
 
 > **Note on `defaultRangeStart`/`defaultRangeEnd`:** When not set, the chart calculates the range automatically from the earliest and latest task dates and adds a 1-month buffer at both ends.
@@ -297,6 +305,7 @@ All fields are optional. Unset keys use the MUI palette defaults.
 | `milestoneColor` | `string` | `warning.main` | Color of the milestone diamond. |
 | `todayLineColor` | `string` | `primary.main` | Color of the vertical "today" line in the timeline. |
 | `weekendColor` | `string` | `action.hover` | Background color of weekend columns (only visible on the days scale). |
+| `holidayColor` | `string` | `rgba(255,152,0,0.18)` | Background color of holiday columns (only visible on the days scale). Defaults to a warm amber so holidays are immediately distinguishable from grey weekends. Only has an effect when `holidays` is set. |
 | `barBorderRadius` | `number` | `4` | Corner radius of task bars in pixels. `0` = square bars. |
 
 **TypeScript types:**
@@ -310,6 +319,7 @@ type GanttTheme = {
   milestoneColor?:    string;
   todayLineColor?:    string;
   weekendColor?:      string;
+  holidayColor?:      string;
   barBorderRadius?:   number;
 };
 ```
@@ -776,6 +786,72 @@ The task panel supports full keyboard navigation without any configuration:
 - **Auto-scrolls**: the panel scrolls automatically to keep the selected row in view.
 - **Input guard**: keys typed inside an inline-edit field (`inlineEdit` mode) are not intercepted — the panel only handles keys when it has direct focus.
 - **`aria-selected`** is set on each row so assistive technologies can announce the current selection.
+
+---
+
+## Working Days & Public Holidays
+
+By default the chart treats every calendar day equally. Set `workdays` and `holidays` to make the chart working-day-aware.
+
+### Visual representation (day scale only)
+
+| Day type | Header + strip color |
+|---|---|
+| Normal working day | transparent |
+| Weekend / non-working weekday | grey (`weekendColor`, default `action.hover`) |
+| Public holiday | amber (`holidayColor`, default `rgba(255,152,0,0.18)`) + orange underline in header |
+
+Holidays on a weekend are rendered as weekends (already non-working — the amber would be redundant).
+
+### Drag & drop snap
+
+When `draggable` or `resizable` is enabled, dropped positions automatically snap:
+- **Move**: the new `startDate` snaps **forward** to the next working day; `endDate` moves by the same offset to keep the duration.
+- **Resize**: the new `endDate` snaps **backward** to the previous working day.
+
+### Cascade advance
+
+When `cascadeDependencies={true}`, successor tasks that would land on a non-working day have their `startDate` snapped **forward** to the next working day (calendar duration is preserved).
+
+### Example — German Christmas holidays
+
+```tsx
+const holidays = [
+  new Date('2025-12-24'), // Christmas Eve
+  new Date('2025-12-25'), // Christmas Day
+  new Date('2025-12-26'), // Boxing Day
+  new Date('2026-01-01'), // New Year
+];
+
+<GanttChart
+  tasks={tasks}
+  workdays={[1, 2, 3, 4, 5]}   // Mon–Fri (default, can be omitted)
+  holidays={holidays}
+  timeScale="days"
+  draggable
+  resizable
+  cascadeDependencies
+/>
+```
+
+### Custom holiday color
+
+```tsx
+<GanttChart
+  tasks={tasks}
+  holidays={holidays}
+  ganttTheme={{ holidayColor: 'rgba(251, 113, 133, 0.2)' }}  // pink tint
+/>
+```
+
+### Four-day work week
+
+```tsx
+<GanttChart
+  tasks={tasks}
+  workdays={[1, 2, 3, 4]}   // Mon–Thu; Fridays treated like weekends
+/>
+```
 
 ---
 

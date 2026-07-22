@@ -52,7 +52,7 @@ export default defineConfig({
     css: true,
     coverage: {
       provider: "v8",
-      reporter: ["text", "html"],
+      reporter: ["text", "html", "lcov"],
       reportsDirectory: "./coverage",
       include: ["src/components/**/*.{ts,tsx}"],
       exclude: [

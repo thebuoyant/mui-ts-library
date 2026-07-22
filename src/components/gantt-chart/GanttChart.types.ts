@@ -232,9 +232,10 @@ export type GanttChartProps = {
   /** Show the Assignee column in the task panel (default: false) */
   showAssigneeColumn?: boolean;
   /**
-   * Arbeitstag-Wochentag-Indices (0=So, 1=Mo … 6=Sa). Default: [1,2,3,4,5] (Mo–Fr).
-   * Steuert welche Tage als Arbeitstage gelten — beeinflusst Wochenend-Highlights,
-   * Drag-Snap (Start/End landen immer auf einem Arbeitstag) und Cascade-Advance.
+   * Arbeitstag-Wochentag-Indices (0=So, 1=Mo … 6=Sa). Default: [] (kein Snap).
+   * Wenn gesetzt, aktiviert Drag-Snap (Start/End landen auf einem Arbeitstag),
+   * Cascade-Advance und farblich unterschiedliche Nicht-Arbeitstags-Spalten in der Tages-Skala.
+   * Typischer Wert: [1,2,3,4,5] für Mo–Fr.
    */
   workdays?: number[];
   /**

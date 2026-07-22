@@ -41,7 +41,7 @@ Innerhalb jeder Sektion stehen offene Items zuerst (⭐ oben), erledigte (durchg
 | Feature | Beschreibung | Aufwand | Status |
 |---|---|---|---|
 | ⭐ Multi-select Tasks | `showCheckboxColumn?: boolean` — Checkbox-Spalte zum Markieren mehrerer Tasks. `selectedTaskIds?: string[]` + `onSelectionChange` für controlled use. Schaltet erst Bulk-Aktionen frei, die bisher sinnlos wären: Status mehrerer Tasks gleichzeitig ändern, mehrere Tasks auf einmal löschen. Ohne Mehrfachauswahl ist Bulk ein Anti-Pattern. | Mittel | — |
-| ⭐ Arbeitstage & Feiertage | `workdays?: number[]` (Default `[1,2,3,4,5]` = Mo–Fr) + `holidays?: Date[]` — Wochenenden werden in der Timeline bereits grau hinterlegt, aber Dauerberechnungen, Auto-Advance und Clamp-Logik ignorieren bisher Nicht-Arbeitstage. Standard in jedem professionellen Gantt-Tool. Ein "5-Tage-Task" soll 5 Arbeitstage dauern, nicht 5 Kalendertage. | Mittel | — |
+| ~~⭐ Arbeitstage & Feiertage~~ | ~~`workdays?: number[]` (Default `[1,2,3,4,5]` = Mo–Fr) + `holidays?: Date[]` — Drag-Snap (vorwärts/rückwärts), Cascade-Advance und Tages-Skala-Highlights sind arbeitstag-bewusst. Feiertage erscheinen amber (`holidayColor`), Wochenenden grau. Vollständig rückwärtskompatibel.~~ | ~~Mittel~~ | ⚡ feat/gantt-workdays |
 | Touch / Mobile Drag | Drag & Drop für Task-Balken auf Touch-Geräten über die Pointer Events API — aktuell nur Maus. | Hoch | — |
 | Baseline-Vergleich | Ursprungsplanung als zweiter, schmalerer Balken hinter dem Ist-Balken — Standardmuster aus MS Project / Jira-Gantt-Plugins, kein Custom-Konzept. | Hoch | — |
 | ~~⭐ Keyboard Navigation~~ | ~~Tab fokussiert das Panel, ↑/↓ bewegen die Auswahl, Enter öffnet den Edit-Dialog, Escape hebt die Auswahl auf.~~ | ~~Mittel~~ | ✅ v3.25.0 |

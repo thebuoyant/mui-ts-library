@@ -25,8 +25,15 @@ jobs:
       - name: Lint
         run: npx eslint .
 
-      - name: Test (719 unit tests)
-        run: npm test -- --run
+      - name: Test & Coverage
+        run: npm run test:coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false
 
       - name: Build
         run: npm run build

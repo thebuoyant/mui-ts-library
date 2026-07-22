@@ -180,10 +180,13 @@ export function GanttTimeline({
   const columns = useMemo((): HeaderColumn[] => {
     if (timeScale === "days") {
       return getDaysInRange(displayRange).map((d) => {
-        // isWeekend: Wochentag ist nicht in workdays (Sa/So by default, bei 4-Tage-Woche auch Fr)
-        const isWeekend = !wd.includes(d.getDay());
+        // isWeekend: ohne workdays-Prop → klassische Sa/So-Erkennung (Abwärtskompatibilität);
+        // mit workdays → jeder Wochentag der nicht im Array steht gilt als Wochenende.
+        const isWeekend = wd.length > 0
+          ? !wd.includes(d.getDay())
+          : d.getDay() === 0 || d.getDay() === 6;
         // isHoliday: Wochentag wäre Arbeitstag, ist aber als Feiertag ausgeschlossen
-        const isHoliday = !isWeekend && !isWorkingDay(d, wd, nh);
+        const isHoliday = !isWeekend && wd.length > 0 && !isWorkingDay(d, wd, nh);
         return {
           key: d.toISOString(),
           label: String(d.getDate()),
@@ -212,7 +215,7 @@ export function GanttTimeline({
       label: m.toLocaleString(t.dateLocale, { month: "short", year: "2-digit" }),
       width: COLUMN_WIDTH_MONTH,
     }));
-  }, [timeScale, displayRange, t.weekColumnPrefix, t.dateLocale]);
+  }, [timeScale, displayRange, t.weekColumnPrefix, t.dateLocale, wd, nh]);
 
   const totalWidth = useMemo(
     () => columns.reduce((sum, col) => sum + col.width, 0),
