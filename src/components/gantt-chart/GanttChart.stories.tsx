@@ -1087,7 +1087,7 @@ export const MarketingCampaignLaunch: Story = {
 // ---------------------------------------------------------------------------
 
 const DE_HOLIDAYS_2025 = [
-  new Date("2025-12-24"), // Heiligabend (kein gesetzlicher Feiertag, aber häufig frei)
+  new Date("2025-12-24"), // Heiligabend
   new Date("2025-12-25"), // 1. Weihnachtstag
   new Date("2025-12-26"), // 2. Weihnachtstag
   new Date("2026-01-01"), // Neujahr
@@ -1135,26 +1135,30 @@ export const WorkingDays: Story = {
     docs: {
       description: {
         story:
-          '**Arbeitstage & Feiertage** — `workdays={[1,2,3,4,5]}` (Mo–Fr) + `holidays` für die ' +
-          'deutschen Weihnachtsfeiertage und Neujahr 2025/26. In der Tages-Skala werden Feiertage ' +
-          'grau hinterlegt und mit einem orangen Punkt markiert. Drag & Drop und Resize snappen ' +
-          'automatisch auf den nächsten/letzten Arbeitstag.',
+          '**Working days & public holidays** — `workdays={[1,2,3,4,5]}` (Mon–Fri) + `holidays` for ' +
+          'German Christmas holidays and New Year 2025/26. In the day scale, **weekends appear grey** ' +
+          'and **public holidays appear amber** with an orange underline in the header. ' +
+          'Drag & drop and resize automatically snap to the nearest working day; with ' +
+          '`cascadeDependencies` enabled, successor tasks also advance to the next working day.',
       },
     },
   },
   args: {
-    tasks:              workdaysTasks,
-    workdays:           [1, 2, 3, 4, 5],
-    holidays:           DE_HOLIDAYS_2025,
-    timeScale:          "days",
-    draggable:          true,
-    resizable:          true,
+    tasks:               workdaysTasks,
+    workdays:            [1, 2, 3, 4, 5],
+    holidays:            DE_HOLIDAYS_2025,
+    timeScale:           "days",
+    draggable:           true,
+    resizable:           true,
     cascadeDependencies: true,
-    initialExpandAll:   true,
-    height:             320,
-    defaultRangeStart:  new Date("2025-12-01"),
-    defaultRangeEnd:    new Date("2026-02-28"),
-    translations:       EN_TRANSLATIONS,
+    initialExpandAll:    true,
+    height:              320,
+    defaultRangeStart:   new Date("2025-12-01"),
+    defaultRangeEnd:     new Date("2026-02-28"),
+    translations:        EN_TRANSLATIONS,
+    // holidayColor wird über ganttTheme etwas kräftiger gesetzt damit der
+    // visuelle Unterschied zu Wochenenden (grau) auf Anhieb erkennbar ist.
+    ganttTheme:          { holidayColor: "rgba(255, 152, 0, 0.22)" },
   },
   render: (args) => (
     <Box sx={{ width: "100%" }}>

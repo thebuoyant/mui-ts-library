@@ -9,7 +9,7 @@ import { COLUMN_WIDTH_DAY } from "./GanttChart.constants";
 export type NonWorkingStrip = {
   key:       string;
   left:      number;
-  /** true = Feiertag (erhält zusätzlichen Punkt-Marker), false/undefined = Wochenende */
+  /** true = Feiertag (eigene Farbe), false/undefined = Wochenende */
   isHoliday?: boolean;
 };
 
@@ -21,18 +21,28 @@ type GanttWeekendStripsProps = {
 };
 
 // ---------------------------------------------------------------------------
+// Defaults
+// ---------------------------------------------------------------------------
+
+/** Warmes Amber bei ~18 % Deckkraft — sichtbar anders als das neutrale Grau der Wochenenden. */
+const DEFAULT_HOLIDAY_COLOR = "rgba(255, 152, 0, 0.18)";
+
+// ---------------------------------------------------------------------------
 // Komponente
 // ---------------------------------------------------------------------------
 
 /**
  * Zeichnet halbtransparente Hintergrundstreifen für nicht-arbeitende Tage
  * (Wochenenden + Feiertage) in der Tages-Skala.
- * Feiertage erhalten zusätzlich einen kleinen orangen Punkt oben im Streifen.
+ * Wochenenden = `weekendColor` (grau), Feiertage = `holidayColor` (amber).
  * Eigener Layer (pointerEvents: none) damit Klicks auf Balken und Zeilen durchgehen.
  */
 export function GanttWeekendStrips({ strips, totalWidth, height, top }: GanttWeekendStripsProps) {
-  const { weekendColor } = useGanttTheme();
+  const { weekendColor, holidayColor } = useGanttTheme();
   if (strips.length === 0) return null;
+
+  const resolvedHolidayColor = holidayColor || DEFAULT_HOLIDAY_COLOR;
+  const resolvedWeekendColor = weekendColor || "action.hover";
 
   return (
     <Box
@@ -56,25 +66,9 @@ export function GanttWeekendStrips({ strips, totalWidth, height, top }: GanttWee
             width:    COLUMN_WIDTH_DAY,
             top:      0,
             height:   "100%",
-            bgcolor:  weekendColor || "action.hover",
+            bgcolor:  strip.isHoliday ? resolvedHolidayColor : resolvedWeekendColor,
           }}
-        >
-          {strip.isHoliday && (
-            <Box
-              sx={{
-                position:        "absolute",
-                top:             6,
-                left:            "50%",
-                transform:       "translateX(-50%)",
-                width:           5,
-                height:          5,
-                borderRadius:    "50%",
-                bgcolor:         "warning.main",
-                opacity:         0.75,
-              }}
-            />
-          )}
-        </Box>
+        />
       ))}
     </Box>
   );

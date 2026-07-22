@@ -164,6 +164,9 @@ export type GanttTheme = {
   todayLineColor?: string;
   // Hintergrundfarbe der Wochenend-Spalten (Default: action.hover).
   weekendColor?: string;
+  // Hintergrundfarbe der Feiertags-Spalten (Default: warmes Amber, ~18 % Opacity).
+  // Feiertage werden immer anders gefärbt als Wochenenden damit man sie auf einen Blick unterscheiden kann.
+  holidayColor?: string;
   // Eckenradius der Aufgaben-Balken in Pixeln (Default: 4).
   barBorderRadius?: number;
 };
