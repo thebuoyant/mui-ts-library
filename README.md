@@ -556,6 +556,14 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 ## Changelog
 
+### [Unreleased]
+
+**Added**
+- **GanttChart — working days & public holidays (`workdays`, `holidays`)**: New props `workdays?: number[]` and `holidays?: Date[]` make drag snap, cascade advance, and day-scale visuals working-day-aware. Omitting both props keeps all existing behavior unchanged. When set: drag-move snaps `startDate` to the next working day; drag-resize snaps `endDate` to the previous working day; cascade advance (`cascadeDependencies`) snaps successor dates forward. Holiday columns render amber (`holidayColor` in `GanttTheme`); weekend columns remain grey. Fully backwards-compatible. See [Full Changelog](https://github.com/thebuoyant/mui-ts-library/blob/main/CHANGELOG.md) for details.
+- **CI — Codecov coverage reporting**: Coverage is now measured on every CI run and published to [Codecov](https://codecov.io/gh/thebuoyant/mui-ts-library). Coverage badge added to README.
+
+---
+
 ### [3.36.0] — 2026-07-21
 
 **Added**
