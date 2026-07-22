@@ -1,11 +1,14 @@
 import { Box, Chip, Tooltip, Typography, useTheme } from "@mui/material";
 import { HEADER_HEIGHT } from "./GanttChart.constants";
+import { useGanttTheme } from "./GanttChart";
 
 export type HeaderColumn = {
   key: string;
   label: string;
   width: number;
   isWeekend?: boolean;
+  /** Markiert einen gesetzlichen Feiertag — erhält denselben Grau-Hintergrund wie Wochenenden. */
+  isHoliday?: boolean;
 };
 
 // Obere Gruppenzeile für den Zwei-Ebenen-Header (z. B. Monate über Tages-Spalten).
@@ -26,32 +29,60 @@ type GanttTimelineHeaderProps = {
   todayColor?:   string;
 };
 
-function HeaderRow({ items }: { items: Array<{ key: string; label: string; width: number; isWeekend?: boolean }> }) {
+const DEFAULT_HOLIDAY_COLOR = "rgba(255, 152, 0, 0.18)";
+
+function HeaderRow({ items }: { items: Array<{ key: string; label: string; width: number; isWeekend?: boolean; isHoliday?: boolean }> }) {
+  const { weekendColor, holidayColor } = useGanttTheme();
+  const resolvedHolidayColor = holidayColor || DEFAULT_HOLIDAY_COLOR;
+  const resolvedWeekendColor = weekendColor || "action.hover";
+
   return (
     <Box sx={{ display: "flex" }}>
-      {items.map((item) => (
-        <Box
-          key={item.key}
-          sx={{
-            width: item.width,
-            flexShrink: 0,
-            height: HEADER_HEIGHT,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRight: "1px solid",
-            borderColor: "divider",
-            bgcolor: item.isWeekend ? "action.hover" : "transparent",
-          }}
-        >
-          <Typography
-            variant="caption"
-            color={item.isWeekend ? "text.disabled" : "text.secondary"}
+      {items.map((item) => {
+        const bg = item.isHoliday
+          ? resolvedHolidayColor
+          : item.isWeekend
+            ? resolvedWeekendColor
+            : "transparent";
+        const textColor = (item.isWeekend || item.isHoliday) ? "text.disabled" : "text.secondary";
+
+        return (
+          <Box
+            key={item.key}
+            sx={{
+              width:       item.width,
+              flexShrink:  0,
+              height:      HEADER_HEIGHT,
+              display:     "flex",
+              alignItems:  "center",
+              justifyContent: "center",
+              borderRight: "1px solid",
+              borderColor: "divider",
+              bgcolor:     bg,
+              position:    "relative",
+            }}
           >
-            {item.label}
-          </Typography>
-        </Box>
-      ))}
+            <Typography variant="caption" color={textColor}>
+              {item.label}
+            </Typography>
+            {item.isHoliday && (
+              <Box
+                sx={{
+                  position:  "absolute",
+                  bottom:    2,
+                  left:      "50%",
+                  transform: "translateX(-50%)",
+                  width:     16,
+                  height:    2,
+                  borderRadius: 1,
+                  bgcolor:   "warning.main",
+                  opacity:   0.75,
+                }}
+              />
+            )}
+          </Box>
+        );
+      })}
     </Box>
   );
 }

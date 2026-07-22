@@ -48,6 +48,12 @@ Rechtsklick auf einen Balken öffnet ein **Kontextmenü** zum direkten Ändern d
 
 ---
 
+> ### Neu (kommende Version)
+>
+> | Feature | Beschreibung | Springe zu |
+> |---|---|---|
+> | **Arbeitstage & Feiertage** | `workdays` (Standard Mo–Fr) und `holidays` (`Date[]`) machen Drag-Snap, Cascade-Advance und die Tages-Skala arbeitstag-bewusst. Feiertage erscheinen in Amber; Wochenenden bleiben grau. | [→ Arbeitstage & Feiertage](#arbeitstage--feiertage) |
+
 > ### Neu in v3.25.0
 >
 > | Feature | Beschreibung | Springe zu |
@@ -229,6 +235,8 @@ type GanttTask = {
 | `translations` | `Partial<GanttTranslations>` | Deutsch/Englisch | Texte für alle UI-Elemente. Nur abweichende Keys angeben. Siehe [Texte & Übersetzungen](#texte--übersetzungen). |
 | `virtualizeRows` | `boolean` | `false` | Wenn `true`, werden nur die aktuell sichtbaren Zeilen gerendert (virtuelle Liste). Empfohlen ab ca. 200 Tasks, da es die DOM-Größe drastisch reduziert. |
 | `width` | `number \| string` | `"100%"` | Breite des Gesamtcharts. Standard füllt den verfügbaren Platz. |
+| `workdays` | `number[]` | `[]` | Wochentag-Indices der Arbeitstage (0 = So, 1 = Mo … 6 = Sa). Wenn gesetzt, aktiviert Drag-Snap (Start/End landen auf einem Arbeitstag), Cascade-Advance und farblich unterschiedliche Nicht-Arbeitstags-Spalten in der Tages-Skala. Typischer Wert: `[1,2,3,4,5]` für Mo–Fr. |
+| `holidays` | `Date[]` | `[]` | Konkrete Feiertage (z. B. gesetzliche Feiertage, Betriebsferien), die als Nicht-Arbeitstage gelten — unabhängig vom Wochentag. In der Tages-Skala amber hinterlegt (deutlich anders als die grauen Wochenenden). |
 | `zoomable` | `boolean` | `false` | Ermöglicht Zoom per `Strg + Mausrad`. Ändert die Zeitskala zyklisch (Tage ↔ Wochen ↔ Monate ↔ Quartale). |
 
 > **Hinweis zu `defaultRangeStart`/`defaultRangeEnd`:** Werden diese nicht gesetzt, berechnet der Chart den Bereich automatisch aus den frühesten und spätesten Task-Daten und fügt einen 1-Monat-Puffer an beiden Enden hinzu.
@@ -297,6 +305,7 @@ Alle Felder sind optional. Nicht gesetzte Keys verwenden die MUI-Palette-Default
 | `milestoneColor` | `string` | `warning.main` | Farbe der Meilenstein-Raute. |
 | `todayLineColor` | `string` | `primary.main` | Farbe der vertikalen „Heute"-Linie in der Zeitleiste. |
 | `weekendColor` | `string` | `action.hover` | Hintergrundfarbe der Wochenend-Spalten (nur sichtbar in der Tages-Skala). |
+| `holidayColor` | `string` | `rgba(255,152,0,0.18)` | Hintergrundfarbe der Feiertags-Spalten (nur sichtbar in der Tages-Skala). Standardmäßig warmes Amber, damit Feiertage auf den ersten Blick von den grauen Wochenenden unterscheidbar sind. Nur wirksam wenn `holidays` gesetzt ist. |
 | `barBorderRadius` | `number` | `4` | Eckenradius der Task-Balken in Pixeln. `0` = eckige Balken. |
 
 **TypeScript-Typen:**
@@ -310,6 +319,7 @@ type GanttTheme = {
   milestoneColor?:    string;
   todayLineColor?:    string;
   weekendColor?:      string;
+  holidayColor?:      string;
   barBorderRadius?:   number;
 };
 ```
@@ -776,6 +786,72 @@ Das Task-Panel unterstützt vollständige Tastaturnavigation ohne jegliche Konfi
 - **Auto-Scroll**: Das Panel scrollt automatisch, damit die ausgewählte Zeile immer sichtbar bleibt.
 - **Input-Guard**: Im Inline-Edit-Modus (`inlineEdit`) werden Tasten innerhalb eines Eingabefelds nicht abgefangen — das Panel reagiert nur, wenn es direkt fokussiert ist.
 - **`aria-selected`** ist auf jeder Zeile gesetzt, damit Screenreader die aktuelle Auswahl ansagen können.
+
+---
+
+## Arbeitstage & Feiertage
+
+Standardmäßig behandelt der Chart jeden Kalendertag gleich. Mit `workdays` und `holidays` wird der Chart arbeitstag-bewusst.
+
+### Visuelle Darstellung (nur Tages-Skala)
+
+| Tagestyp | Header + Streifen-Farbe |
+|---|---|
+| Normaler Arbeitstag | transparent |
+| Wochenende / Nicht-Arbeitstag | grau (`weekendColor`, Standard `action.hover`) |
+| Feiertag | amber (`holidayColor`, Standard `rgba(255,152,0,0.18)`) + oranger Unterstrich im Header |
+
+Feiertage die auf ein Wochenende fallen werden als Wochenende dargestellt — sie sind bereits kein Arbeitstag, der Amber-Effekt wäre redundant.
+
+### Drag & Drop Snap
+
+Wenn `draggable` oder `resizable` aktiv ist, snappen abgelegte Positionen automatisch:
+- **Verschieben:** Das neue `startDate` snappt **vorwärts** auf den nächsten Arbeitstag; `endDate` verschiebt sich um denselben Offset, damit die Dauer erhalten bleibt.
+- **Resize:** Das neue `endDate` snappt **rückwärts** auf den letzten Arbeitstag vor dem Nicht-Arbeitstag.
+
+### Cascade-Advance
+
+Bei `cascadeDependencies={true}` werden Nachfolger-Tasks, die auf einen Nicht-Arbeitstag fallen würden, mit ihrem `startDate` **vorwärts** auf den nächsten Arbeitstag verschoben (Kalenderdauer bleibt erhalten).
+
+### Beispiel — Deutsche Weihnachtsfeiertage
+
+```tsx
+const holidays = [
+  new Date('2025-12-24'), // Heiligabend
+  new Date('2025-12-25'), // 1. Weihnachtstag
+  new Date('2025-12-26'), // 2. Weihnachtstag
+  new Date('2026-01-01'), // Neujahr
+];
+
+<GanttChart
+  tasks={tasks}
+  workdays={[1, 2, 3, 4, 5]}   // Mo–Fr (Standard, kann weggelassen werden)
+  holidays={holidays}
+  timeScale="days"
+  draggable
+  resizable
+  cascadeDependencies
+/>
+```
+
+### Benutzerdefinierte Feiertagsfarbe
+
+```tsx
+<GanttChart
+  tasks={tasks}
+  holidays={holidays}
+  ganttTheme={{ holidayColor: 'rgba(251, 113, 133, 0.2)' }}  // Rosa-Tönung
+/>
+```
+
+### 4-Tage-Woche
+
+```tsx
+<GanttChart
+  tasks={tasks}
+  workdays={[1, 2, 3, 4]}   // Mo–Do; Freitage werden wie Wochenenden behandelt
+/>
+```
 
 ---
 

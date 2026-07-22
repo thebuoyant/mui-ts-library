@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **GanttChart — working days & public holidays (`workdays`, `holidays`)**: New props `workdays?: number[]` (default `[1,2,3,4,5]` = Mon–Fri) and `holidays?: Date[]` (default `[]`) make the chart working-day-aware. When set: drag-move snaps `startDate` forward to the next working day (preserving duration); drag-resize snaps `endDate` backward to the previous working day; cascade advance (`cascadeDependencies`) snaps successor `startDate` values forward. In the day scale, weekend columns remain grey (`weekendColor`) while holiday columns render in a distinct warm amber (`holidayColor`, default `rgba(255,152,0,0.18)`) with an orange underline bar in the header. New `GanttTheme` field `holidayColor?: string` to customize the holiday strip color. Fully backwards-compatible — omitting both props keeps existing behavior unchanged.
+
 ---
 
 ## [3.36.0] — 2026-07-21

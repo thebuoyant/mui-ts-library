@@ -164,6 +164,9 @@ export type GanttTheme = {
   todayLineColor?: string;
   // Hintergrundfarbe der Wochenend-Spalten (Default: action.hover).
   weekendColor?: string;
+  // Hintergrundfarbe der Feiertags-Spalten (Default: warmes Amber, ~18 % Opacity).
+  // Feiertage werden immer anders gefärbt als Wochenenden damit man sie auf einen Blick unterscheiden kann.
+  holidayColor?: string;
   // Eckenradius der Aufgaben-Balken in Pixeln (Default: 4).
   barBorderRadius?: number;
 };
@@ -228,6 +231,19 @@ export type GanttChartProps = {
   virtualizeRows?: boolean;
   /** Show the Assignee column in the task panel (default: false) */
   showAssigneeColumn?: boolean;
+  /**
+   * Arbeitstag-Wochentag-Indices (0=So, 1=Mo … 6=Sa). Default: [] (kein Snap).
+   * Wenn gesetzt, aktiviert Drag-Snap (Start/End landen auf einem Arbeitstag),
+   * Cascade-Advance und farblich unterschiedliche Nicht-Arbeitstags-Spalten in der Tages-Skala.
+   * Typischer Wert: [1,2,3,4,5] für Mo–Fr.
+   */
+  workdays?: number[];
+  /**
+   * Konkrete Feiertage (z. B. gesetzliche Feiertage, Betriebsferien) die als
+   * Nicht-Arbeitstage gelten, unabhängig davon welcher Wochentag sie sind.
+   * Werden in der Tages-Skala grau hinterlegt und mit einem Punkt markiert.
+   */
+  holidays?: Date[];
   /** Breite des Charts. "auto" = 100 % des Eltern-Containers. Standard: "100%". */
   width?: number | string;
   // Wenn true, ändert Strg+Mausrad die Zeitskala (days ↔ weeks ↔ months ↔ quarters).

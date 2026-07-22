@@ -6,27 +6,43 @@ import { COLUMN_WIDTH_DAY } from "./GanttChart.constants";
 // Props
 // ---------------------------------------------------------------------------
 
-type WeekendStrip = { key: string; left: number };
+export type NonWorkingStrip = {
+  key:       string;
+  left:      number;
+  /** true = Feiertag (eigene Farbe), false/undefined = Wochenende */
+  isHoliday?: boolean;
+};
 
 type GanttWeekendStripsProps = {
-  strips:     WeekendStrip[];
+  strips:     NonWorkingStrip[];
   totalWidth: number;
   height:     number;
   top:        number;
 };
 
 // ---------------------------------------------------------------------------
+// Defaults
+// ---------------------------------------------------------------------------
+
+/** Warmes Amber bei ~18 % Deckkraft — sichtbar anders als das neutrale Grau der Wochenenden. */
+const DEFAULT_HOLIDAY_COLOR = "rgba(255, 152, 0, 0.18)";
+
+// ---------------------------------------------------------------------------
 // Komponente
 // ---------------------------------------------------------------------------
 
 /**
- * Zeichnet halbtransparente Hintergrundstreifen für Wochenend-Spalten
- * in der Tages-Skala. Eigener Layer (pointerEvents: none) damit Klicks
- * auf Balken und Zeilen durchgehen.
+ * Zeichnet halbtransparente Hintergrundstreifen für nicht-arbeitende Tage
+ * (Wochenenden + Feiertage) in der Tages-Skala.
+ * Wochenenden = `weekendColor` (grau), Feiertage = `holidayColor` (amber).
+ * Eigener Layer (pointerEvents: none) damit Klicks auf Balken und Zeilen durchgehen.
  */
 export function GanttWeekendStrips({ strips, totalWidth, height, top }: GanttWeekendStripsProps) {
-  const { weekendColor } = useGanttTheme();
+  const { weekendColor, holidayColor } = useGanttTheme();
   if (strips.length === 0) return null;
+
+  const resolvedHolidayColor = holidayColor || DEFAULT_HOLIDAY_COLOR;
+  const resolvedWeekendColor = weekendColor || "action.hover";
 
   return (
     <Box
@@ -50,7 +66,7 @@ export function GanttWeekendStrips({ strips, totalWidth, height, top }: GanttWee
             width:    COLUMN_WIDTH_DAY,
             top:      0,
             height:   "100%",
-            bgcolor:  weekendColor || "action.hover",
+            bgcolor:  strip.isHoliday ? resolvedHolidayColor : resolvedWeekendColor,
           }}
         />
       ))}

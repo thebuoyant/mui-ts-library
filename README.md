@@ -3,6 +3,7 @@
 > [Deutsche Version →](README.de.md)
 
 [![CI](https://github.com/thebuoyant/mui-ts-library/actions/workflows/ci.yml/badge.svg)](https://github.com/thebuoyant/mui-ts-library/actions/workflows/ci.yml)
+[![Coverage](https://codecov.io/gh/thebuoyant/mui-ts-library/branch/main/graph/badge.svg)](https://codecov.io/gh/thebuoyant/mui-ts-library)
 [![npm](https://img.shields.io/npm/v/@thebuoyant-tsdev/mui-ts-library)](https://www.npmjs.com/package/@thebuoyant-tsdev/mui-ts-library)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 

@@ -7,7 +7,7 @@ import {
 } from "./GanttChart.store";
 import type { GanttChartProps, GanttTheme, GanttToolbarConfig, GanttTranslations } from "./GanttChart.types";
 import { DEFAULT_GANTT_TRANSLATIONS } from "./GanttChart.types";
-import { getDisplayRange, getTimelineRange } from "./util/gantt-chart.util";
+import { getDisplayRange, getTimelineRange, normalizeHolidays } from "./util/gantt-chart.util";
 import type { GanttTimeScale } from "./GanttChart.types";
 import { GanttTaskPanel } from "./GanttTaskPanel";
 import { GanttTimeline } from "./GanttTimeline";
@@ -60,6 +60,27 @@ const GanttThemeContext = createContext<GanttTheme>({});
 // eslint-disable-next-line react-refresh/only-export-components
 export function useGanttTheme(): GanttTheme {
   return useContext(GanttThemeContext);
+}
+
+// ---------------------------------------------------------------------------
+// Working-Days-Kontext — workdays + normalisierte Feiertage für Drag-Snap und Visuals.
+// ---------------------------------------------------------------------------
+
+export type GanttWorkingDaysConfig = {
+  workdays: number[];
+  normalizedHolidays: Set<string>;
+};
+
+const DEFAULT_WORKING_DAYS_CONFIG: GanttWorkingDaysConfig = {
+  workdays: [],
+  normalizedHolidays: new Set(),
+};
+
+const GanttWorkingDaysContext = createContext<GanttWorkingDaysConfig>(DEFAULT_WORKING_DAYS_CONFIG);
+
+// eslint-disable-next-line react-refresh/only-export-components
+export function useGanttWorkingDays(): GanttWorkingDaysConfig {
+  return useContext(GanttWorkingDaysContext);
 }
 
 // ---------------------------------------------------------------------------
@@ -345,6 +366,8 @@ export function GanttChart({
   virtualizeRows = false,
   showAssigneeColumn = false,
   cascadeDependencies = false,
+  workdays = [],
+  holidays = [],
   statusColors,
   ganttTheme,
   onExportCSV,
@@ -371,16 +394,25 @@ export function GanttChart({
     [translations],
   );
 
+  // normalizeHolidays in useMemo damit das Set stabil bleibt (kein Re-render bei gleichen Feiertagen).
+  const normalizedHolidays = useMemo(() => normalizeHolidays(holidays), [holidays]);
+
+  const workingDaysConfig = useMemo<GanttWorkingDaysConfig>(
+    () => ({ workdays, normalizedHolidays }),
+    [workdays, normalizedHolidays],
+  );
+
   const [store] = useState(() => {
+    const nh = normalizeHolidays(holidays);
     const hasCustomRange = defaultRangeStart !== undefined || defaultRangeEnd !== undefined;
     if (!hasCustomRange) {
-      return createGanttChartStore(tasks, timeScale, initialExpandAll, undefined, cascadeDependencies);
+      return createGanttChartStore(tasks, timeScale, initialExpandAll, undefined, cascadeDependencies, workdays, nh);
     }
     const autoRange = getTimelineRange(tasks);
     return createGanttChartStore(tasks, timeScale, initialExpandAll, {
       start: defaultRangeStart ?? autoRange.start,
       end: defaultRangeEnd ?? autoRange.end,
-    }, cascadeDependencies);
+    }, cascadeDependencies, workdays, nh);
   });
 
   // statusColors (Phase 17, backwards compat) wird von ganttTheme.statusColors überschrieben.
@@ -392,6 +424,7 @@ export function GanttChart({
   return (
     <GanttTranslationsContext.Provider value={mergedTranslations}>
       <GanttThemeContext.Provider value={resolvedTheme}>
+      <GanttWorkingDaysContext.Provider value={workingDaysConfig}>
       <GanttChartStoreContext.Provider value={store}>
         <GanttChartInner
           tasks={tasks}
@@ -427,6 +460,7 @@ export function GanttChart({
           maxPanelWidth={maxPanelWidth}
         />
       </GanttChartStoreContext.Provider>
+      </GanttWorkingDaysContext.Provider>
       </GanttThemeContext.Provider>
     </GanttTranslationsContext.Provider>
   );

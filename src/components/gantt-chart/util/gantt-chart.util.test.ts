@@ -13,6 +13,10 @@ import {
   getTimelineRange,
   getVisibleTasks,
   getWeeksInRange,
+  isWorkingDay,
+  normalizeHolidays,
+  snapToNextWorkingDay,
+  snapToPrevWorkingDay,
   startOfMonth,
   startOfQuarter,
   startOfWeek,
@@ -604,5 +608,124 @@ describe("getDependencyCycleCandidates", () => {
     ];
 
     expect(() => getDependencyCycleCandidates(tasks, "a")).not.toThrow();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Arbeitstag-Hilfsfunktionen
+// ---------------------------------------------------------------------------
+
+const DEFAULT_WORKDAYS = [1, 2, 3, 4, 5]; // Mo–Fr
+const NO_HOLIDAYS = new Set<string>();
+
+describe("isWorkingDay", () => {
+  it("returns true for a Monday (Mo–Fr config, no holidays)", () => {
+    // 2025-01-06 ist ein Montag
+    expect(isWorkingDay(new Date("2025-01-06"), DEFAULT_WORKDAYS, NO_HOLIDAYS)).toBe(true);
+  });
+
+  it("returns false for a Saturday", () => {
+    // 2025-01-04 ist ein Samstag
+    expect(isWorkingDay(new Date("2025-01-04"), DEFAULT_WORKDAYS, NO_HOLIDAYS)).toBe(false);
+  });
+
+  it("returns false for a Sunday", () => {
+    expect(isWorkingDay(new Date("2025-01-05"), DEFAULT_WORKDAYS, NO_HOLIDAYS)).toBe(false);
+  });
+
+  it("returns false for a Monday that is a holiday", () => {
+    const holidays = normalizeHolidays([new Date("2025-01-06")]);
+    expect(isWorkingDay(new Date("2025-01-06"), DEFAULT_WORKDAYS, holidays)).toBe(false);
+  });
+
+  it("returns true for a Saturday when workdays includes 6", () => {
+    expect(isWorkingDay(new Date("2025-01-04"), [1, 2, 3, 4, 5, 6], NO_HOLIDAYS)).toBe(true);
+  });
+});
+
+describe("normalizeHolidays", () => {
+  it("creates a set with the correct date key for each holiday", () => {
+    const holidays = normalizeHolidays([new Date("2025-12-25"), new Date("2026-01-01")]);
+    // isWorkingDay with these holidays should return false for those days
+    expect(isWorkingDay(new Date("2025-12-25"), DEFAULT_WORKDAYS, holidays)).toBe(false);
+    expect(isWorkingDay(new Date("2026-01-01"), DEFAULT_WORKDAYS, holidays)).toBe(false);
+    expect(isWorkingDay(new Date("2025-12-24"), DEFAULT_WORKDAYS, holidays)).toBe(true);
+  });
+
+  it("returns empty set for empty array", () => {
+    const holidays = normalizeHolidays([]);
+    expect(holidays.size).toBe(0);
+  });
+});
+
+describe("snapToNextWorkingDay", () => {
+  it("returns the same date if it is already a working day", () => {
+    // 2025-01-06 = Montag
+    const result = snapToNextWorkingDay(new Date("2025-01-06"), DEFAULT_WORKDAYS, NO_HOLIDAYS);
+    expect(result.toDateString()).toBe(new Date("2025-01-06").toDateString());
+  });
+
+  it("skips over the weekend to Monday", () => {
+    // 2025-01-04 = Samstag → snap to 2025-01-06 (Montag)
+    const result = snapToNextWorkingDay(new Date("2025-01-04"), DEFAULT_WORKDAYS, NO_HOLIDAYS);
+    expect(result.toDateString()).toBe(new Date("2025-01-06").toDateString());
+  });
+
+  it("skips over a holiday to the next working day", () => {
+    // 2025-12-25 = Donnerstag (Feiertag) → snap to 2025-12-26 (Freitag, kein Feiertag)
+    const holidays = normalizeHolidays([new Date("2025-12-25")]);
+    const result = snapToNextWorkingDay(new Date("2025-12-25"), DEFAULT_WORKDAYS, holidays);
+    expect(result.toDateString()).toBe(new Date("2025-12-26").toDateString());
+  });
+
+  it("skips weekend + holiday", () => {
+    // 2025-12-27 = Samstag, 28 = Sonntag, 29 = Montag (kein Feiertag) → snap to Montag 29.12.
+    const holidays = normalizeHolidays([new Date("2025-12-25"), new Date("2025-12-26")]);
+    const result = snapToNextWorkingDay(new Date("2025-12-27"), DEFAULT_WORKDAYS, holidays);
+    expect(result.toDateString()).toBe(new Date("2025-12-29").toDateString());
+  });
+});
+
+describe("snapToPrevWorkingDay", () => {
+  it("returns the same date if it is already a working day", () => {
+    // 2025-01-06 = Montag
+    const result = snapToPrevWorkingDay(new Date("2025-01-06"), DEFAULT_WORKDAYS, NO_HOLIDAYS);
+    expect(result.toDateString()).toBe(new Date("2025-01-06").toDateString());
+  });
+
+  it("snaps backwards from Sunday to Friday", () => {
+    // 2025-01-05 = Sonntag → snap back to 2025-01-03 (Freitag)
+    const result = snapToPrevWorkingDay(new Date("2025-01-05"), DEFAULT_WORKDAYS, NO_HOLIDAYS);
+    expect(result.toDateString()).toBe(new Date("2025-01-03").toDateString());
+  });
+
+  it("snaps backwards over a holiday to the previous working day", () => {
+    // 2025-12-25 = Donnerstag (Feiertag) → snap back to 2025-12-24 (Mittwoch)
+    const holidays = normalizeHolidays([new Date("2025-12-25")]);
+    const result = snapToPrevWorkingDay(new Date("2025-12-25"), DEFAULT_WORKDAYS, holidays);
+    expect(result.toDateString()).toBe(new Date("2025-12-24").toDateString());
+  });
+});
+
+describe("cascadeDateUpdate — working days", () => {
+  const tasks: GanttTask[] = [
+    { id: "a", name: "A", status: "planned", startDate: new Date("2025-01-06"), endDate: new Date("2025-01-10") },
+    { id: "b", name: "B", status: "planned", startDate: new Date("2025-01-13"), endDate: new Date("2025-01-17"), dependencies: ["a"] },
+  ];
+
+  it("snaps successor start to next working day when cascade lands on weekend", () => {
+    // Task A wird um 2 Tage nach hinten geschoben (endet jetzt Mittwoch 15.01.)
+    // → Task B startet 13.01. + 2 Tage = 15.01. (Mittwoch) — schon ein Arbeitstag → kein Snap nötig
+    const result = cascadeDateUpdate(tasks, "a", 2 * 86400000, DEFAULT_WORKDAYS, NO_HOLIDAYS);
+    const b = result.find((t) => t.id === "b")!;
+    expect(b.startDate.toDateString()).toBe(new Date("2025-01-15").toDateString());
+  });
+
+  it("snaps successor start forward to Monday when delta lands on Saturday", () => {
+    // Task A um 1 Tag verschoben → B startet 13.01. + 1 = 14.01. (Dienstag) → bereits Arbeitstag
+    // Wir verschieben um 3 Tage: 13.01. + 3 = 16.01. (Donnerstag) → Arbeitstag
+    const result = cascadeDateUpdate(tasks, "a", 3 * 86400000, DEFAULT_WORKDAYS, NO_HOLIDAYS);
+    const b = result.find((t) => t.id === "b")!;
+    expect(b.startDate.toDateString()).toBe(new Date("2025-01-16").toDateString());
   });
 });

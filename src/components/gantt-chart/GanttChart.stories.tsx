@@ -232,6 +232,7 @@ const meta: Meta<typeof GanttChart> = {
     draggable:            { control: "boolean" },
     enableBuiltinDialogs: { control: "boolean" },
     ganttTheme:           { control: false },
+    holidays:             { control: false },
     height:               { control: "text" },
     initialExpandAll:     { control: "boolean" },
     inlineEdit:           { control: "boolean" },
@@ -249,6 +250,7 @@ const meta: Meta<typeof GanttChart> = {
     translations:         { control: false },
     virtualizeRows:       { control: "boolean" },
     width:                { control: "text" },
+    workdays:             { control: false },
     zoomable:             { control: "boolean" },
     // Callbacks A–Z
     onAddTask:            { control: false },
@@ -1072,6 +1074,91 @@ export const MarketingCampaignLaunch: Story = {
     timeScale: "weeks",
     initialExpandAll: true,
     height: 480,
+  },
+  render: (args) => (
+    <Box sx={{ width: "100%" }}>
+      <GanttChart {...args} />
+    </Box>
+  ),
+};
+
+// ---------------------------------------------------------------------------
+// WorkingDays — Arbeitstage & Feiertage
+// ---------------------------------------------------------------------------
+
+const DE_HOLIDAYS_2025 = [
+  new Date("2025-12-24"), // Heiligabend
+  new Date("2025-12-25"), // 1. Weihnachtstag
+  new Date("2025-12-26"), // 2. Weihnachtstag
+  new Date("2026-01-01"), // Neujahr
+  new Date("2026-01-06"), // Heilige Drei Könige (BY, BW, ST)
+];
+
+const workdaysTasks: GanttTask[] = [
+  {
+    id: "sprint-a",
+    name: "Sprint A — Feature Development",
+    status: "in-progress",
+    startDate: new Date("2025-12-08"),
+    endDate: new Date("2025-12-19"),
+    progress: 60,
+  },
+  {
+    id: "sprint-b",
+    name: "Sprint B — Integration & Tests",
+    status: "planned",
+    startDate: new Date("2025-12-22"),
+    endDate: new Date("2026-01-09"),
+    dependencies: ["sprint-a"],
+  },
+  {
+    id: "sprint-c",
+    name: "Sprint C — Hardening",
+    status: "planned",
+    startDate: new Date("2026-01-12"),
+    endDate: new Date("2026-01-23"),
+    dependencies: ["sprint-b"],
+  },
+  {
+    id: "release",
+    name: "Release 1.0",
+    status: "planned",
+    isMilestone: true,
+    startDate: new Date("2026-01-26"),
+    endDate: new Date("2026-01-26"),
+    dependencies: ["sprint-c"],
+  },
+];
+
+export const WorkingDays: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '**Working days & public holidays** — `workdays={[1,2,3,4,5]}` (Mon–Fri) + `holidays` for ' +
+          'German Christmas holidays and New Year 2025/26. In the day scale, **weekends appear grey** ' +
+          'and **public holidays appear amber** with an orange underline in the header. ' +
+          'Drag & drop and resize automatically snap to the nearest working day; with ' +
+          '`cascadeDependencies` enabled, successor tasks also advance to the next working day.',
+      },
+    },
+  },
+  args: {
+    tasks:               workdaysTasks,
+    workdays:            [1, 2, 3, 4, 5],
+    holidays:            DE_HOLIDAYS_2025,
+    timeScale:           "days",
+    draggable:           true,
+    resizable:           true,
+    cascadeDependencies: true,
+    initialExpandAll:    true,
+    height:              320,
+    defaultRangeStart:   new Date("2025-12-01"),
+    defaultRangeEnd:     new Date("2026-02-28"),
+    translations:        EN_TRANSLATIONS,
+    // holidayColor wird über ganttTheme etwas kräftiger gesetzt damit der
+    // visuelle Unterschied zu Wochenenden (grau) auf Anhieb erkennbar ist.
+    ganttTheme:          { holidayColor: "rgba(255, 152, 0, 0.22)" },
   },
   render: (args) => (
     <Box sx={{ width: "100%" }}>

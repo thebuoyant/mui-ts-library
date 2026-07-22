@@ -3,7 +3,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { type RefObject, type UIEventHandler } from "react";
 import { Box, useTheme } from "@mui/material";
-import { useGanttChartStore, useGanttTheme, useGanttTranslations, useRawGanttChartStore } from "./GanttChart";
+import { useGanttChartStore, useGanttTheme, useGanttTranslations, useGanttWorkingDays, useRawGanttChartStore } from "./GanttChart";
 import type { GanttTask, GanttTaskStatus } from "./GanttChart.types";
 import type { GanttTaskNode } from "./GanttChart.types";
 import { useGanttDrag } from "./hooks/useGanttDrag";
@@ -18,6 +18,7 @@ import {
   getQuartersInRange,
   getVisibleTasks,
   getWeeksInRange,
+  isWorkingDay,
 } from "./util/gantt-chart.util";
 import type { TimelineRange } from "./util/gantt-chart.util";
 import { GanttTimelineHeader } from "./GanttTimelineHeader";
@@ -153,6 +154,7 @@ export function GanttTimeline({
   const t           = useGanttTranslations();
   const muiTheme    = useTheme();
   const { todayLineColor } = useGanttTheme();
+  const { workdays: wd, normalizedHolidays: nh } = useGanttWorkingDays();
   // Jede Instanz braucht eine eigene Marker-ID damit mehrere GanttCharts auf einer Seite
   // nicht dieselbe SVG-defs-Referenz teilen.
   const instanceId = useId().replace(/:/g, "");
@@ -177,12 +179,22 @@ export function GanttTimeline({
 
   const columns = useMemo((): HeaderColumn[] => {
     if (timeScale === "days") {
-      return getDaysInRange(displayRange).map((d) => ({
-        key: d.toISOString(),
-        label: String(d.getDate()),
-        width: COLUMN_WIDTH_DAY,
-        isWeekend: d.getDay() === 0 || d.getDay() === 6,
-      }));
+      return getDaysInRange(displayRange).map((d) => {
+        // isWeekend: ohne workdays-Prop → klassische Sa/So-Erkennung (Abwärtskompatibilität);
+        // mit workdays → jeder Wochentag der nicht im Array steht gilt als Wochenende.
+        const isWeekend = wd.length > 0
+          ? !wd.includes(d.getDay())
+          : d.getDay() === 0 || d.getDay() === 6;
+        // isHoliday: Wochentag wäre Arbeitstag, ist aber als Feiertag ausgeschlossen
+        const isHoliday = !isWeekend && wd.length > 0 && !isWorkingDay(d, wd, nh);
+        return {
+          key: d.toISOString(),
+          label: String(d.getDate()),
+          width: COLUMN_WIDTH_DAY,
+          isWeekend,
+          isHoliday,
+        };
+      });
     }
     if (timeScale === "weeks") {
       return getWeeksInRange(displayRange).map((w) => ({
@@ -203,7 +215,7 @@ export function GanttTimeline({
       label: m.toLocaleString(t.dateLocale, { month: "short", year: "2-digit" }),
       width: COLUMN_WIDTH_MONTH,
     }));
-  }, [timeScale, displayRange, t.weekColumnPrefix, t.dateLocale]);
+  }, [timeScale, displayRange, t.weekColumnPrefix, t.dateLocale, wd, nh]);
 
   const totalWidth = useMemo(
     () => columns.reduce((sum, col) => sum + col.width, 0),
@@ -246,12 +258,13 @@ export function GanttTimeline({
     overscan: 5,
   });
 
-  // Positionen der Wochenend-Spalten für das Hintergrund-Highlight (nur Tages-Skala).
+  // Positionen nicht-arbeitender Tage (Wochenenden + Feiertage) für das Hintergrund-Highlight (nur Tages-Skala).
   const weekendStrips = useMemo(() => {
     if (timeScale !== "days") return [];
     let x = 0;
     return columns.flatMap((col) => {
-      const strip = col.isWeekend ? [{ key: col.key, left: x }] : [];
+      const nonWorking = col.isWeekend || col.isHoliday;
+      const strip = nonWorking ? [{ key: col.key, left: x, isHoliday: col.isHoliday }] : [];
       x += col.width;
       return strip;
     });

@@ -11,6 +11,10 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unveröffentlicht]
 
+### Hinzugefügt
+
+- **GanttChart — Arbeitstage & Feiertage (`workdays`, `holidays`)**: Neue Props `workdays?: number[]` (Standard `[1,2,3,4,5]` = Mo–Fr) und `holidays?: Date[]` (Standard `[]`) machen den Chart arbeitstag-bewusst. Wenn gesetzt: Drag-Verschieben snappt `startDate` vorwärts auf den nächsten Arbeitstag (Dauer bleibt erhalten); Drag-Resize snappt `endDate` rückwärts auf den letzten Arbeitstag; Cascade-Advance (`cascadeDependencies`) snappt Nachfolger-`startDate`-Werte ebenfalls vorwärts. In der Tages-Skala bleiben Wochenend-Spalten grau (`weekendColor`), während Feiertags-Spalten in einem warmen Amber erscheinen (`holidayColor`, Standard `rgba(255,152,0,0.18)`) — mit orangem Unterstrich-Balken im Header. Neues `GanttTheme`-Feld `holidayColor?: string` zum Anpassen der Feiertagsfarbe. Vollständig rückwärtskompatibel — ohne beide Props bleibt das bisherige Verhalten unverändert.
+
 ---
 
 ## [3.36.0] — 2026-07-21
